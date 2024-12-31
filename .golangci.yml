@@ -1,0 +1,18 @@
+# https://golangci-lint.run/usage/configuration/
+
+linters:
+  # TODO: add more linters
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+
+linters-settings:
+  # TODO
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0

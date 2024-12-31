@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package example.v1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/mattdowdell/sandbox/pkg/example/v1;examplev1";
+
+// ...
+message Resource {
+  // ...
+  string id = 1 [(buf.validate.field).string.uuid = true];
+}
+
+// ...
+message ResourceCreate {}
+
+// ...
+message ResourceUpdate {}

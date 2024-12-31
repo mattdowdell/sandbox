@@ -1,0 +1,97 @@
+syntax = "proto3";
+
+package example.v1;
+
+import "buf/validate/validate.proto";
+import "example/v1/models.proto";
+
+option go_package = "github.com/mattdowdell/sandbox/pkg/example/v1;examplev1";
+
+// ...
+message CreateResourceRequest {
+  ResourceCreate resource = 1 [(buf.validate.field).required = true];
+}
+
+// ...
+message CreateResourceResponse {
+  Resource resource = 1 [(buf.validate.field).required = true];
+}
+
+// ...
+message GetResourceRequest {
+  string id = 1 [(buf.validate.field).string.uuid = true]; // TODO: check if empty is rejected
+}
+
+// ...
+message GetResourceResponse {
+  Resource resource = 1 [(buf.validate.field).required = true];
+}
+
+// ...
+enum Direction {
+  // ...
+  DIRECTION_UNSPECIFIED = 0;
+
+  // ...
+  DIRECTION_ASC = 1;
+
+  // ...
+  DIRECTION_DESC = 2;
+}
+
+// ...
+message Sort {
+  // ...
+  string field = 1; // TODO: make required
+
+  // ...
+  Direction direction = 2 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+}
+
+// ...
+message ListResourcesFilter {} // TODO: add max lengths to fields
+
+// ...
+message ListResourcesRequest {
+  // ...
+  string next = 1;
+
+  // ...
+  int32 limit = 2; // TODO: add min/max (and default?)
+
+  // ...
+  repeated Sort sort = 3; // TODO: add max length
+
+  // ...
+  ListResourcesFilter filter = 4;
+}
+
+// ...
+message ListResourcesResponse {
+  // ...
+  string next = 1;
+
+  // ...
+  repeated Resource items = 2;
+}
+
+// ...
+message UpdateResourceRequest {
+  ResourceUpdate resource = 1 [(buf.validate.field).required = true];
+}
+
+// ...
+message UpdateResourceResponse {
+  Resource resource = 1 [(buf.validate.field).required = true];
+}
+
+// ...
+message DeleteResourceRequest {
+  string id = 1 [(buf.validate.field).string.uuid = true]; // TODO: check if empty is rejected
+}
+
+// ...
+message DeleteResourceResponse {}

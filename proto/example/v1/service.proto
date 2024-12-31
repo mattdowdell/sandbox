@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package example.v1;
+
+import "example/v1/messages.proto";
+
+option go_package = "github.com/mattdowdell/sandbox/pkg/example/v1;examplev1";
+
+// ...
+service ExampleService {
+  // ...
+  rpc CreateResource(CreateResourceRequest) returns (CreateResourceResponse) {}
+
+  // ...
+  rpc GetResource(GetResourceRequest) returns (GetResourceResponse) {}
+
+  // ...
+  rpc ListResources(ListResourcesRequest) returns (ListResourcesResponse) {}
+
+  // ...
+  rpc UpdateResource(UpdateResourceRequest) returns (UpdateResourceResponse) {}
+
+  // ...
+  rpc DeleteResource(DeleteResourceRequest) returns (DeleteResourceResponse) {}
+}
