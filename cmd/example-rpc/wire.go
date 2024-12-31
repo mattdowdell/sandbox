@@ -4,9 +4,9 @@
 package main
 
 import (
+	"context"
+
 	"connectrpc.com/connect"
-	"connectrpc.com/otelconnect"
-	"connectrpc.com/validate"
 	"github.com/google/wire"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
@@ -18,20 +18,22 @@ import (
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/otelconnectx"
+	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/validatex"
 )
 
-func ProvideApp() (*App, error) {
+func ProvideApp(ctx context.Context) (*App, error) {
 	wire.Build(
 		// config
 		flagoptions.New,
 		config.New,
 		LoadConfig,
-		wire.FieldsOf(new(Config), "App", "Logging", "OtelConnect", "RPCServer"),
+		wire.FieldsOf(new(Config), "App", "Logging", "Meter", "OtelConnect", "RPCServer", "Tracer"),
 		// observability
 		logging.NewAsDefaultFromConfig,
 		otelx.NewTracerProvider,
+		otelx.NewMeterProvider,
 		// middleware
-		validateInterceptor,
+		validatex.New,
 		otelconnectx.NewFromConfig,
 		collectInterceptors,
 		collectHandlerOptions,
@@ -39,8 +41,8 @@ func ProvideApp() (*App, error) {
 		examplerpc.New,
 		reflectrpc.New,
 		healthrpc.New,
-		// servers
 		collectHandlers,
+		// server
 		rpcserver.NewFromConfig,
 		// app
 		NewApp,
@@ -66,18 +68,15 @@ func collectHandlers(
 }
 
 // ...
-func validateInterceptor() (*validate.Interceptor, error) {
-	return validate.NewInterceptor()
-}
-
-// ...
+//
+// TODO: document that the ordering here is important
 func collectInterceptors(
-	validat *validate.Interceptor,
-	otelconnec *otelconnect.Interceptor,
+	validate *validatex.Interceptor,
+	otelconnect *otelconnectx.Interceptor,
 ) []connect.Interceptor {
 	return []connect.Interceptor{
-		validat,
-		otelconnec,
+		otelconnect,
+		validate,
 	}
 }
 

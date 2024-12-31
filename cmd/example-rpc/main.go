@@ -15,7 +15,7 @@ func main() {
 }
 
 func run(ctx context.Context) int {
-	app, err := ProvideApp()
+	app, err := ProvideApp(ctx)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to build app", logging.Error(err))
 		return exit.Failure

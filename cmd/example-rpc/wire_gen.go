@@ -8,8 +8,7 @@ package main
 
 import (
 	"connectrpc.com/connect"
-	"connectrpc.com/otelconnect"
-	"connectrpc.com/validate"
+	"context"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/healthrpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/reflectrpc"
@@ -19,11 +18,12 @@ import (
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/otelconnectx"
+	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/validatex"
 )
 
 // Injectors from wire.go:
 
-func ProvideApp() (*App, error) {
+func ProvideApp(ctx context.Context) (*App, error) {
 	options := flagoptions.New()
 	configConfig := config.New(options)
 	mainConfig, err := LoadConfig(configConfig)
@@ -38,7 +38,7 @@ func ProvideApp() (*App, error) {
 	reflectrpcHandler := reflectrpc.New()
 	healthrpcHandler := healthrpc.New()
 	v := collectHandlers(handler, reflectrpcHandler, healthrpcHandler)
-	interceptor, err := validateInterceptor()
+	interceptor, err := validatex.New()
 	if err != nil {
 		return nil, err
 	}
@@ -50,8 +50,17 @@ func ProvideApp() (*App, error) {
 	v2 := collectInterceptors(interceptor, otelconnectInterceptor)
 	v3 := collectHandlerOptions(v2)
 	server := rpcserver.NewFromConfig(rpcserverConfig, v, v3)
-	tracerProviderShutdown := otelx.NewTracerProvider()
-	app := NewApp(appConfig, logger, server, tracerProviderShutdown)
+	tracerProviderConfig := mainConfig.Tracer
+	tracerProviderShutdown, err := otelx.NewTracerProvider(ctx, tracerProviderConfig)
+	if err != nil {
+		return nil, err
+	}
+	meterProviderConfig := mainConfig.Meter
+	meterProviderShutdown, err := otelx.NewMeterProvider(ctx, meterProviderConfig)
+	if err != nil {
+		return nil, err
+	}
+	app := NewApp(appConfig, logger, server, tracerProviderShutdown, meterProviderShutdown)
 	return app, nil
 }
 
@@ -74,18 +83,15 @@ func collectHandlers(
 }
 
 // ...
-func validateInterceptor() (*validate.Interceptor, error) {
-	return validate.NewInterceptor()
-}
-
-// ...
+//
+// TODO: document that the ordering here is important
 func collectInterceptors(
-	validat *validate.Interceptor,
-	otelconnec *otelconnect.Interceptor,
+	validate *validatex.Interceptor,
+	otelconnect *otelconnectx.Interceptor,
 ) []connect.Interceptor {
 	return []connect.Interceptor{
-		validat,
-		otelconnec,
+		otelconnect,
+		validate,
 	}
 }
 

@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/mattdowdell/sandbox/internal/drivers/config"
 	"github.com/mattdowdell/sandbox/internal/drivers/logging"
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/otelconnectx"
 )
@@ -11,8 +12,10 @@ import (
 type Config struct {
 	App         AppConfig
 	Logging     logging.Config
-	RPCServer   rpcserver.Config
+	Meter       otelx.MeterProviderConfig
+	Tracer      otelx.TracerProviderConfig
 	OtelConnect otelconnectx.Config
+	RPCServer   rpcserver.Config
 }
 
 // LoadConfig loads the service configuration.

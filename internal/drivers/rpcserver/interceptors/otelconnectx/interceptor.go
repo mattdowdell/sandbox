@@ -5,6 +5,9 @@ import (
 )
 
 // ...
+type Interceptor = otelconnect.Interceptor
+
+// ...
 type Config struct {
 	// ...
 	TrustRemote bool `koanf:"otelconnect.trustremote"`
@@ -22,6 +25,6 @@ func (c *Config) toOptions() []otelconnect.Option {
 }
 
 // ...
-func NewFromConfig(conf Config) (*otelconnect.Interceptor, error) {
+func NewFromConfig(conf Config) (*Interceptor, error) {
 	return otelconnect.NewInterceptor(conf.toOptions()...)
 }

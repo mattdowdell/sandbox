@@ -18,6 +18,7 @@ type App struct {
 	logger          *slog.Logger
 	server          *rpcserver.Server
 	tpShutdown      otelx.TracerProviderShutdown
+	mtShutdown      otelx.MeterProviderShutdown
 }
 
 // ...
@@ -26,11 +27,13 @@ func NewApp(
 	logger *slog.Logger,
 	server *rpcserver.Server,
 	tpShutdown otelx.TracerProviderShutdown,
+	mtShutdown otelx.MeterProviderShutdown,
 ) *App {
 	return &App{
 		shutdownTimeout: config.ShutdownTimeout,
 		logger:          logger,
 		server:          server,
 		tpShutdown:      tpShutdown,
+		mtShutdown:      mtShutdown,
 	}
 }

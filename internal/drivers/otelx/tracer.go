@@ -4,18 +4,31 @@ import (
 	"context"
 
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/sdk/trace"
 )
+
+// ...
+type TracerProviderConfig struct {
+	// ...
+	Endpoint string `koanf:"tracerprovider.endpoint"`
+}
 
 // ...
 type TracerProviderShutdown func(context.Context) error
 
 // ...
-//
-// TODO: look at options
-func NewTracerProvider() TracerProviderShutdown {
-	provider := trace.NewTracerProvider()
+func NewTracerProvider(
+	ctx context.Context,
+	conf TracerProviderConfig,
+) (TracerProviderShutdown, error) {
+	exporter, err := otlptracehttp.New(ctx, otlptracehttp.WithEndpoint(conf.Endpoint))
+	if err != nil {
+		return nil, err
+	}
+
+	provider := trace.NewTracerProvider(trace.WithBatcher(exporter))
 	otel.SetTracerProvider(provider)
 
-	return provider.Shutdown
+	return provider.Shutdown, nil
 }
