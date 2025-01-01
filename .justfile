@@ -1,4 +1,4 @@
-# TODO: link to docs
+# https://just.systems/man/en/
 
 [private]
 default:
@@ -29,7 +29,13 @@ fmt-buf:
 # Run the Go formatter.
 fmt-go:
 	gofumpt -l -w .
-	gci write --skip-vendor --skip-generated -s standard -s default -s localmodule .
+	gci write \
+		--skip-vendor \
+		--skip-generated \
+		-s standard \
+		-s default \
+		-s localmodule \
+		.
 
 # Run all formatter checks.
 fmt-check: fmt-check-buf fmt-check-go
@@ -38,9 +44,9 @@ fmt-check: fmt-check-buf fmt-check-go
 fmt-check-buf:
 	buf format --config buf.yaml --diff --exit-code
 
-# Run the Go formatter check.
+# Run the Go formatter check (unimplemented).
 fmt-check-go:
-	@echo "TODO"
+	@echo '{{ style("error") }}unimplemented{{ NORMAL }}' && exit 1
 
 # Run all linters.
 lint: lint-buf lint-go
@@ -81,3 +87,17 @@ gen-go-mockery:
 # Run the Go unit tests.
 unit:
 	go test -count=1 -cover ./...
+
+# Build all containers.
+container-build: container-build-rpc
+
+# Build the example-rpc container.
+container-build-rpc: (_container-build "example-rpc")
+
+[private]
+_container-build service:
+	podman build \
+		--target runtime \
+		--build-arg SERVICE={{ service }} \
+		--tag {{ service }}:local \
+		.

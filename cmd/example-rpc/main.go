@@ -24,30 +24,14 @@ func run(ctx context.Context) int {
 	ctx, stop := signal.NotifyContext(ctx, os.Interrupt, os.Kill)
 	defer stop()
 
-	app.logger.InfoContext(ctx, "starting")
-
-	go func() {
-		if err := app.server.Start(); err != nil {
-			slog.ErrorContext(ctx, "failed to start server", logging.Error(err))
-		}
-
-		stop()
-	}()
+	app.Start(ctx, stop)
 
 	<-ctx.Done()
-
-	app.logger.InfoContext(ctx, "stopping")
 
 	ctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), app.shutdownTimeout)
 	defer cancel()
 
-	if err := app.server.Shutdown(ctx); err != nil {
-		app.logger.WarnContext(ctx, "failed to shutdown server", logging.Error(err))
-	}
-
-	if err := app.tpShutdown(ctx); err != nil {
-		app.logger.WarnContext(ctx, "failed to shutdown tracer provider", logging.Error(err))
-	}
+	app.Shutdown(ctx)
 
 	return exit.Success
 }
