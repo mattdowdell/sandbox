@@ -25,6 +25,6 @@ func (*Handler) Register(mux *http.ServeMux, opts []connect.HandlerOption) {
 		grpchealth.HealthV1ServiceName,
 	)
 
-	mux.Handle(grpcreflect.NewHandlerV1(reflector))
-	mux.Handle(grpcreflect.NewHandlerV1Alpha(reflector))
+	mux.Handle(grpcreflect.NewHandlerV1(reflector, opts...))
+	mux.Handle(grpcreflect.NewHandlerV1Alpha(reflector, opts...))
 }

@@ -10,8 +10,8 @@ import (
 
 // ...
 func (h *Handler) DeleteResource(
-	ctx context.Context,
-	req *connect.Request[examplev1.DeleteResourceRequest],
+	_ context.Context,
+	_ *connect.Request[examplev1.DeleteResourceRequest],
 ) (*connect.Response[examplev1.DeleteResourceResponse], error) {
 	return nil, ErrUnimplemented
 }

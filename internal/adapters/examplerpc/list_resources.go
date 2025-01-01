@@ -10,8 +10,8 @@ import (
 
 // ...
 func (h *Handler) ListResources(
-	ctx context.Context,
-	req *connect.Request[examplev1.ListResourcesRequest],
+	_ context.Context,
+	_ *connect.Request[examplev1.ListResourcesRequest],
 ) (*connect.Response[examplev1.ListResourcesResponse], error) {
 	return nil, ErrUnimplemented
 }

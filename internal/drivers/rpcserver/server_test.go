@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func Test_New(t *testing.T) {
+func Test_New(_ *testing.T) {
 	// arrange
 
 	// act
@@ -12,7 +12,7 @@ func Test_New(t *testing.T) {
 	// assert
 }
 
-func Test_Server_Start(t *testing.T) {
+func Test_Server_Start(_ *testing.T) {
 	// arrange
 
 	// act

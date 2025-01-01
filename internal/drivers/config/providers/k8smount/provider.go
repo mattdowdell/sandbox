@@ -25,7 +25,7 @@ type K8SMount struct {
 // a Kubernetes pod.
 //
 // The given path should be the mount point of the configmap or secret. The delimiter is used to
-// create a heirarchy of keys based on the mounted filename. For example, a configmap mounted at
+// create a hierarchy of keys based on the mounted filename. For example, a configmap mounted at
 // "/my/config/" with a key of "log.level" set to "INFO" would result in {"log":{"level":"INFO"}}
 // being read as configuration.
 func Provider(mount, delim string) *K8SMount {

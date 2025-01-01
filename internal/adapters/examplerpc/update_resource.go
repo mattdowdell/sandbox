@@ -10,8 +10,8 @@ import (
 
 // ...
 func (h *Handler) UpdateResource(
-	ctx context.Context,
-	req *connect.Request[examplev1.UpdateResourceRequest],
+	_ context.Context,
+	_ *connect.Request[examplev1.UpdateResourceRequest],
 ) (*connect.Response[examplev1.UpdateResourceResponse], error) {
 	return nil, ErrUnimplemented
 }

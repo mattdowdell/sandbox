@@ -1,17 +1,104 @@
 # https://golangci-lint.run/usage/configuration/
 
 linters:
-  # TODO: add more linters
   enable:
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - canonicalheader
+    - containedctx
+    - contextcheck
+    - copyloopvar
+    - dogsled
+    - dupl
+    - durationcheck
     - errcheck
+    - exhaustive
+    - fatcontext
+    - forcetypeassert
+    - gci
+    - gocheckcompilerdirectives
+    - gochecknoinits
+    - gochecksumtype
+    - gocognit
+    - goconst
+    - gocritic
+    - godot
+    - gofumpt
+    - gomoddirectives
+    - goprintffuncname
+    - gosec
     - gosimple
     - govet
+    - grouper
+    - iface
     - ineffassign
+    - importas
+    - intrange
+    - makezero
+    - mirror
+    - misspell
+    - mnd
+    - nakedret
+    - nestif
+    - nilerr
+    - noctx
+    - nolintlint
+    - nosprintfhostport
+    - perfsprint
+    - predeclared
+    - protogetter
+    - reassign
+    - recvcheck
+    - revive
+    - rowserrcheck
+    - sloglint
+    - spancheck
+    - sqlclosecheck
     - staticcheck
+    - stylecheck
+    - tagliatelle
+    - tenv
+    - testifylint
+    - testpackage
+    - thelper
+    - unconvert
+    - unparam
     - unused
+    - usestdlibvars
+    - wastedassign
+    - whitespace
 
 linters-settings:
-  # TODO
+  gci:
+    sections:
+      - standard
+      - default
+      - localmodule
+    skip-generated: true
+
+  gocognit:
+    min-complexity: 15
+
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - style
+      - performance
+      - experimental
+      - opinionated
+
+  sloglint:
+    attr-only: true
+    context: "all"
+    static-msg: true
+    no-raw-keys: true
+    key-naming-case: snake
+    forbidden-keys:
+      - time
+      - level
+      - msg
+      - source
 
 issues:
   max-issues-per-linter: 0

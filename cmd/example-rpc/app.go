@@ -5,8 +5,8 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
 	"github.com/mattdowdell/sandbox/internal/drivers/logging"
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver"
 )
 

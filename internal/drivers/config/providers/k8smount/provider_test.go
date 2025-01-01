@@ -6,16 +6,23 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/mattdowdell/sandbox/internal/drivers/config/providers/k8smount"
 )
 
 func createFile(t *testing.T, root, path, content string) {
-	absPath := filepath.Join(root, path)
+	t.Helper()
 
-	require.NoError(t, os.MkdirAll(filepath.Dir(absPath), 0o755), "failed to create directory")
-	require.NoError(t, os.WriteFile(absPath, []byte(content), 0o644), "failed to create file")
+	absPath := filepath.Join(root, path)
+	absDirPath := filepath.Dir(absPath)
+
+	if err := os.MkdirAll(absDirPath, 0o755); err != nil {
+		t.Fatalf("failed to create directory: %s", err)
+	}
+
+	if err := os.WriteFile(absPath, []byte(content), 0o600); err != nil {
+		t.Fatalf("failed to create file: %s", err)
+	}
 }
 
 func Test_New(t *testing.T) {

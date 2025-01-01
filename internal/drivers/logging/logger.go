@@ -37,21 +37,22 @@ func New(level slog.Level) *slog.Logger {
 	handler := slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
 		AddSource: true,
 		Level:     level,
-		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+		ReplaceAttr: func(groups []string, attr slog.Attr) slog.Attr {
 			if len(groups) > 0 {
-				return a
+				return attr
 			}
 
-			switch a.Key {
+			switch attr.Key {
 			case slog.SourceKey:
-				source := a.Value.Any().(*slog.Source)
-				a.Value = slog.StringValue(fmt.Sprintf("%s:%d", source.File, source.Line))
+				if source, ok := attr.Value.Any().(*slog.Source); ok {
+					attr.Value = slog.StringValue(fmt.Sprintf("%s:%d", source.File, source.Line))
+				}
 
 			case slog.LevelKey:
-				a.Value = slog.StringValue(strings.ToLower(a.Value.String()))
+				attr.Value = slog.StringValue(strings.ToLower(attr.Value.String()))
 			}
 
-			return a
+			return attr
 		},
 	})
 
