@@ -5,6 +5,8 @@ import (
 	"log/slog"
 	"time"
 
+	"go.opentelemetry.io/contrib/instrumentation/runtime"
+
 	"github.com/mattdowdell/sandbox/internal/drivers/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver"
@@ -43,6 +45,13 @@ func NewApp(
 // ...
 func (a *App) Start(ctx context.Context, stop context.CancelFunc) {
 	a.logger.InfoContext(ctx, "starting")
+
+	if err := runtime.Start(); err != nil {
+		a.logger.ErrorContext(ctx, "failed to start runtime metrics", logging.Error(err))
+		stop()
+
+		return
+	}
 
 	go func() {
 		if err := a.server.Start(); err != nil {
