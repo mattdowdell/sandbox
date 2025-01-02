@@ -12,6 +12,7 @@ tidy: tidy-buf tidy-go
 
 # Tidy Protobuf dependencies.
 tidy-buf:
+	buf dep prune
 	buf dep update
 
 # Tidy Go dependencies

@@ -21,8 +21,8 @@ runs:
       id: cache
       with:
         path: ~/go/bin/${{ inputs.name }}
-        key: ${{ runner.os }}-go-install-${{ inputs.name }}-${{ hashFiles('~/go/bin/${{ inputs.name }}') }}
-        restore-keys: ${{ runner.os }}-go-install-${{ inputs.name }}-
+        key: ${{ runner.os }}-go-install-${{ inputs.name }}-${{ inputs.version }}-${{ hashFiles('~/go/bin/${{ inputs.name }}') }}
+        restore-keys: ${{ runner.os }}-go-install-${{ inputs.name }}-${{ inputs.version }}-
 
     - name: Install
       if: steps.cache.outputs.cache-hit != 'true'
