@@ -1,0 +1,29 @@
+package main
+
+import (
+	"context"
+	"log/slog"
+	"os"
+
+	"github.com/charmbracelet/bubbletea"
+
+	"github.com/mattdowdell/sandbox/internal/drivers/exit"
+	"github.com/mattdowdell/sandbox/internal/drivers/logging"
+)
+
+func main() {
+	os.Exit(run(context.Background()))
+}
+
+func run(ctx context.Context) int {
+	logger := logging.NewAsDefault(slog.LevelInfo)
+
+	program := tea.NewProgram(New())
+
+	if _, err := program.Run(); err != nil {
+		logger.ErrorContext(ctx, "failed to strat program", logging.Error(err))
+		return exit.Failure
+	}
+
+	return exit.Success
+}
