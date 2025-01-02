@@ -4,11 +4,14 @@ name: 'Go Install'
 description: 'Installs and caches Go binaries using "go install".'
 
 inputs:
-  package:
-    description: 'The Go package to install'
-    required: true
+  module:
+    description: 'The Go module. Only required when version is "latest" and "main.go" is not in the root of the module.'
+    required: false
   name:
     description: 'The name of the installed Go binary.'
+    required: true
+  package:
+    description: 'The Go package to install'
     required: true
   version:
     description: 'The Go package version to install.'
@@ -30,7 +33,11 @@ runs:
       id: version
       run: |
         if [ "${{ inputs.version }}" = "latest" ]; then
-          version=$(go list -m -versions -mod=readonly -json ${{ inputs.package }} | jq -r '.Versions[-1]')
+          if [ -n "${{ inputs.module }}" ]
+            version=$(go list -m -versions -mod=readonly -json ${{ inputs.module }} | jq -r '.Versions[-1]')
+          else
+            version=$(go list -m -versions -mod=readonly -json ${{ inputs.package }} | jq -r '.Versions[-1]')
+          fi
         else
           version=${{ inputs.version }}
         fi
