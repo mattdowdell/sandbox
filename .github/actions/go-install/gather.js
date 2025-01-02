@@ -39,7 +39,9 @@ module.exports = async ({core, exec}) => {
 
 		if (code == 0) {
 			const data = JSON.parse(output);
+			// google.golang.org returns success when not in the module root
 			if (!data.hasOwnProperty('Versions')) {
+				mod = mod.split('/').slice(0, -1).join('/');
 				continue;
 			}
 
