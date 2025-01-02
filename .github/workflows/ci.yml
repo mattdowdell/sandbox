@@ -36,6 +36,30 @@ jobs:
       - name: Install Just
         uses: extractions/setup-just@v2
 
+      - name: Install gci
+        uses: ./.github/actions/go-install
+        with:
+          package: github.com/daixiang0/gci
+          name: gci
+
+      - name: Install gofumpt
+        uses: ./.github/actions/go-install
+        with:
+          package: mvdan.cc/gofumpt
+          name: gofumpt
+
+      # - name: Install mockery
+      #   uses: ./.github/actions/go-install
+      #   with:
+      #     package: github.com/vektra/mockery/v2
+      #     name: mockery
+
+      - name: Install wire
+        uses: ./.github/actions/go-install
+        with:
+          package: github.com/google/wire/cmd/wire
+          name: wire
+
       - name: Checks
         run: just checks
 
@@ -60,7 +84,7 @@ jobs:
         uses: bufbuild/buf-action@v1
         with:
           pr_comment: false
-          input:
+          # input:
           format: false
           breaking: false
 
