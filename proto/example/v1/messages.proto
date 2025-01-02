@@ -52,7 +52,18 @@ message Sort {
 }
 
 // ...
-message ListResourcesFilter {} // TODO: add max lengths to fields
+//
+// TODO: add max lengths to fields
+message ListResourcesFilter {
+  // ...
+  repeated string id = 1 [(buf.validate.field).repeated = {
+    max_items: 10
+    unique: true
+    items: {
+      string: {uuid: true}
+    }
+  }];
+}
 
 // ...
 message ListResourcesRequest {
@@ -60,10 +71,13 @@ message ListResourcesRequest {
   string next = 1;
 
   // ...
-  int32 limit = 2; // TODO: add min/max (and default?)
+  int32 limit = 2 [(buf.validate.field).int32 = {
+    gte: 0
+    lte: 100
+  }];
 
   // ...
-  repeated Sort sort = 3; // TODO: add max length
+  repeated Sort sort = 3 [(buf.validate.field).repeated.max_items = 5];
 
   // ...
   ListResourcesFilter filter = 4;
@@ -95,3 +109,43 @@ message DeleteResourceRequest {
 
 // ...
 message DeleteResourceResponse {}
+
+// ...
+//
+// TODO: add max lengths to fields
+message ListAuditEventsFilter {}
+
+// ...
+message ListAuditEventsRequest {
+  // ...
+  string next = 1;
+
+  // ...
+  int32 limit = 2 [(buf.validate.field).int32 = {
+    gt: 0
+    lte: 100
+  }];
+
+  // ...
+  repeated Sort sort = 3 [(buf.validate.field).repeated.max_items = 5];
+
+  // ...
+  ListAuditEventsFilter filter = 4;
+}
+
+// ...
+message ListAuditEventsResponse {
+  // ...
+  string next = 1;
+
+  // ...
+  repeated AuditEvent items = 2;
+}
+
+// ...
+message WatchAuditEventsRequest {}
+
+// ...
+message WatchAuditEventsResponse {
+  AuditEvent audit_event = 1;
+}

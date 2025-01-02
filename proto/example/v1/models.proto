@@ -17,3 +17,9 @@ message ResourceCreate {}
 
 // ...
 message ResourceUpdate {}
+
+// ...
+message AuditEvent {
+  // ...
+  string id = 1 [(buf.validate.field).string.uuid = true];
+}

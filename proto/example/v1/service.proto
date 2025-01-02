@@ -22,4 +22,10 @@ service ExampleService {
 
   // ...
   rpc DeleteResource(DeleteResourceRequest) returns (DeleteResourceResponse) {}
+
+  // ...
+  rpc ListAuditEvents(ListAuditEventsRequest) returns (ListAuditEventsResponse) {}
+
+  // ...
+  rpc WatchAuditEvents(WatchAuditEventsRequest) returns (stream WatchAuditEventsResponse) {}
 }

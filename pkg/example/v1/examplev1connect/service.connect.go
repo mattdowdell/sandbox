@@ -48,16 +48,24 @@ const (
 	// ExampleServiceDeleteResourceProcedure is the fully-qualified name of the ExampleService's
 	// DeleteResource RPC.
 	ExampleServiceDeleteResourceProcedure = "/example.v1.ExampleService/DeleteResource"
+	// ExampleServiceListAuditEventsProcedure is the fully-qualified name of the ExampleService's
+	// ListAuditEvents RPC.
+	ExampleServiceListAuditEventsProcedure = "/example.v1.ExampleService/ListAuditEvents"
+	// ExampleServiceWatchAuditEventsProcedure is the fully-qualified name of the ExampleService's
+	// WatchAuditEvents RPC.
+	ExampleServiceWatchAuditEventsProcedure = "/example.v1.ExampleService/WatchAuditEvents"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	exampleServiceServiceDescriptor              = v1.File_example_v1_service_proto.Services().ByName("ExampleService")
-	exampleServiceCreateResourceMethodDescriptor = exampleServiceServiceDescriptor.Methods().ByName("CreateResource")
-	exampleServiceGetResourceMethodDescriptor    = exampleServiceServiceDescriptor.Methods().ByName("GetResource")
-	exampleServiceListResourcesMethodDescriptor  = exampleServiceServiceDescriptor.Methods().ByName("ListResources")
-	exampleServiceUpdateResourceMethodDescriptor = exampleServiceServiceDescriptor.Methods().ByName("UpdateResource")
-	exampleServiceDeleteResourceMethodDescriptor = exampleServiceServiceDescriptor.Methods().ByName("DeleteResource")
+	exampleServiceServiceDescriptor                = v1.File_example_v1_service_proto.Services().ByName("ExampleService")
+	exampleServiceCreateResourceMethodDescriptor   = exampleServiceServiceDescriptor.Methods().ByName("CreateResource")
+	exampleServiceGetResourceMethodDescriptor      = exampleServiceServiceDescriptor.Methods().ByName("GetResource")
+	exampleServiceListResourcesMethodDescriptor    = exampleServiceServiceDescriptor.Methods().ByName("ListResources")
+	exampleServiceUpdateResourceMethodDescriptor   = exampleServiceServiceDescriptor.Methods().ByName("UpdateResource")
+	exampleServiceDeleteResourceMethodDescriptor   = exampleServiceServiceDescriptor.Methods().ByName("DeleteResource")
+	exampleServiceListAuditEventsMethodDescriptor  = exampleServiceServiceDescriptor.Methods().ByName("ListAuditEvents")
+	exampleServiceWatchAuditEventsMethodDescriptor = exampleServiceServiceDescriptor.Methods().ByName("WatchAuditEvents")
 )
 
 // ExampleServiceClient is a client for the example.v1.ExampleService service.
@@ -72,6 +80,10 @@ type ExampleServiceClient interface {
 	UpdateResource(context.Context, *connect.Request[v1.UpdateResourceRequest]) (*connect.Response[v1.UpdateResourceResponse], error)
 	// ...
 	DeleteResource(context.Context, *connect.Request[v1.DeleteResourceRequest]) (*connect.Response[v1.DeleteResourceResponse], error)
+	// ...
+	ListAuditEvents(context.Context, *connect.Request[v1.ListAuditEventsRequest]) (*connect.Response[v1.ListAuditEventsResponse], error)
+	// ...
+	WatchAuditEvents(context.Context, *connect.Request[v1.WatchAuditEventsRequest]) (*connect.ServerStreamForClient[v1.WatchAuditEventsResponse], error)
 }
 
 // NewExampleServiceClient constructs a client for the example.v1.ExampleService service. By
@@ -114,16 +126,30 @@ func NewExampleServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			connect.WithSchema(exampleServiceDeleteResourceMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		listAuditEvents: connect.NewClient[v1.ListAuditEventsRequest, v1.ListAuditEventsResponse](
+			httpClient,
+			baseURL+ExampleServiceListAuditEventsProcedure,
+			connect.WithSchema(exampleServiceListAuditEventsMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		watchAuditEvents: connect.NewClient[v1.WatchAuditEventsRequest, v1.WatchAuditEventsResponse](
+			httpClient,
+			baseURL+ExampleServiceWatchAuditEventsProcedure,
+			connect.WithSchema(exampleServiceWatchAuditEventsMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // exampleServiceClient implements ExampleServiceClient.
 type exampleServiceClient struct {
-	createResource *connect.Client[v1.CreateResourceRequest, v1.CreateResourceResponse]
-	getResource    *connect.Client[v1.GetResourceRequest, v1.GetResourceResponse]
-	listResources  *connect.Client[v1.ListResourcesRequest, v1.ListResourcesResponse]
-	updateResource *connect.Client[v1.UpdateResourceRequest, v1.UpdateResourceResponse]
-	deleteResource *connect.Client[v1.DeleteResourceRequest, v1.DeleteResourceResponse]
+	createResource   *connect.Client[v1.CreateResourceRequest, v1.CreateResourceResponse]
+	getResource      *connect.Client[v1.GetResourceRequest, v1.GetResourceResponse]
+	listResources    *connect.Client[v1.ListResourcesRequest, v1.ListResourcesResponse]
+	updateResource   *connect.Client[v1.UpdateResourceRequest, v1.UpdateResourceResponse]
+	deleteResource   *connect.Client[v1.DeleteResourceRequest, v1.DeleteResourceResponse]
+	listAuditEvents  *connect.Client[v1.ListAuditEventsRequest, v1.ListAuditEventsResponse]
+	watchAuditEvents *connect.Client[v1.WatchAuditEventsRequest, v1.WatchAuditEventsResponse]
 }
 
 // CreateResource calls example.v1.ExampleService.CreateResource.
@@ -151,6 +177,16 @@ func (c *exampleServiceClient) DeleteResource(ctx context.Context, req *connect.
 	return c.deleteResource.CallUnary(ctx, req)
 }
 
+// ListAuditEvents calls example.v1.ExampleService.ListAuditEvents.
+func (c *exampleServiceClient) ListAuditEvents(ctx context.Context, req *connect.Request[v1.ListAuditEventsRequest]) (*connect.Response[v1.ListAuditEventsResponse], error) {
+	return c.listAuditEvents.CallUnary(ctx, req)
+}
+
+// WatchAuditEvents calls example.v1.ExampleService.WatchAuditEvents.
+func (c *exampleServiceClient) WatchAuditEvents(ctx context.Context, req *connect.Request[v1.WatchAuditEventsRequest]) (*connect.ServerStreamForClient[v1.WatchAuditEventsResponse], error) {
+	return c.watchAuditEvents.CallServerStream(ctx, req)
+}
+
 // ExampleServiceHandler is an implementation of the example.v1.ExampleService service.
 type ExampleServiceHandler interface {
 	// ...
@@ -163,6 +199,10 @@ type ExampleServiceHandler interface {
 	UpdateResource(context.Context, *connect.Request[v1.UpdateResourceRequest]) (*connect.Response[v1.UpdateResourceResponse], error)
 	// ...
 	DeleteResource(context.Context, *connect.Request[v1.DeleteResourceRequest]) (*connect.Response[v1.DeleteResourceResponse], error)
+	// ...
+	ListAuditEvents(context.Context, *connect.Request[v1.ListAuditEventsRequest]) (*connect.Response[v1.ListAuditEventsResponse], error)
+	// ...
+	WatchAuditEvents(context.Context, *connect.Request[v1.WatchAuditEventsRequest], *connect.ServerStream[v1.WatchAuditEventsResponse]) error
 }
 
 // NewExampleServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -201,6 +241,18 @@ func NewExampleServiceHandler(svc ExampleServiceHandler, opts ...connect.Handler
 		connect.WithSchema(exampleServiceDeleteResourceMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	exampleServiceListAuditEventsHandler := connect.NewUnaryHandler(
+		ExampleServiceListAuditEventsProcedure,
+		svc.ListAuditEvents,
+		connect.WithSchema(exampleServiceListAuditEventsMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	exampleServiceWatchAuditEventsHandler := connect.NewServerStreamHandler(
+		ExampleServiceWatchAuditEventsProcedure,
+		svc.WatchAuditEvents,
+		connect.WithSchema(exampleServiceWatchAuditEventsMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/example.v1.ExampleService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case ExampleServiceCreateResourceProcedure:
@@ -213,6 +265,10 @@ func NewExampleServiceHandler(svc ExampleServiceHandler, opts ...connect.Handler
 			exampleServiceUpdateResourceHandler.ServeHTTP(w, r)
 		case ExampleServiceDeleteResourceProcedure:
 			exampleServiceDeleteResourceHandler.ServeHTTP(w, r)
+		case ExampleServiceListAuditEventsProcedure:
+			exampleServiceListAuditEventsHandler.ServeHTTP(w, r)
+		case ExampleServiceWatchAuditEventsProcedure:
+			exampleServiceWatchAuditEventsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -240,4 +296,12 @@ func (UnimplementedExampleServiceHandler) UpdateResource(context.Context, *conne
 
 func (UnimplementedExampleServiceHandler) DeleteResource(context.Context, *connect.Request[v1.DeleteResourceRequest]) (*connect.Response[v1.DeleteResourceResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("example.v1.ExampleService.DeleteResource is not implemented"))
+}
+
+func (UnimplementedExampleServiceHandler) ListAuditEvents(context.Context, *connect.Request[v1.ListAuditEventsRequest]) (*connect.Response[v1.ListAuditEventsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("example.v1.ExampleService.ListAuditEvents is not implemented"))
+}
+
+func (UnimplementedExampleServiceHandler) WatchAuditEvents(context.Context, *connect.Request[v1.WatchAuditEventsRequest], *connect.ServerStream[v1.WatchAuditEventsResponse]) error {
+	return connect.NewError(connect.CodeUnimplemented, errors.New("example.v1.ExampleService.WatchAuditEvents is not implemented"))
 }
