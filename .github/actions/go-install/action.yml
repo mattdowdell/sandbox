@@ -53,4 +53,4 @@ runs:
           await script({exec}))
       env:
         package: ${{ inputs.package }}
-        version: {{ steps.version.outputs.version }}
+        version: ${{ steps.version.outputs.version }}
