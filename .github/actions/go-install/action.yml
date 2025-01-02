@@ -4,6 +4,9 @@ name: 'Go Install'
 description: 'Installs and caches Go binaries using "go install".'
 
 inputs:
+  name:
+    description: 'The name of the Go binary to install.'
+    required: true
   package:
     description: 'The Go package to install'
     required: true
@@ -68,7 +71,7 @@ runs:
               return;
             }
 
-            module = module.split('/')[0:-1];
+            module = module.split('/').slice(0, -1).join('/');
           }
 
     - name: Cache

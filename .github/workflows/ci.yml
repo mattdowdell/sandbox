@@ -65,20 +65,17 @@ jobs:
         uses: ./.github/actions/go-install
         with:
           name: protoc-gen-connect-go
-          # module: connectrpc.com/connect
           package: connectrpc.com/connect/cmd/protoc-gen-connect-go
 
       - name: Install protoc-gen-go
         uses: ./.github/actions/go-install
         with:
           name: protoc-gen-go
-          # module: google.golang.org/protobuf
           package: google.golang.org/protobuf/cmd/protoc-gen-go
 
       - name: Install wire
         uses: ./.github/actions/go-install
         with:
-          # module: github.com/google/wire
           name: wire
           package: github.com/google/wire/cmd/wire
 
