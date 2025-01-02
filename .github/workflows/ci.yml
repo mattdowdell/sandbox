@@ -61,12 +61,17 @@ jobs:
       #     package: github.com/vektra/mockery/v2
       #     name: mockery
 
+      - name: Install protoc-gen-connect-go
+        uses: ./.github/actions/go-install
+        with:
+          package: connectrpc.com/connect/cmd/protoc-gen-connect-go
+          name: protoc-gen-connect-go
+
       - name: Install protoc-gen-go
         uses: ./.github/actions/go-install
         with:
           package: google.golang.org/protobuf/cmd/protoc-gen-go
           name: protoc-gen-go
-
 
       - name: Install wire
         uses: ./.github/actions/go-install
