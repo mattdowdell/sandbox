@@ -80,7 +80,7 @@ jobs:
           name: wire
 
       - name: Checks
-        run: just checks
+        run: just checks dirty
 
   lint:
     name: Lint

@@ -1,5 +1,5 @@
 name: 'Go Install'
-description: 'Installs Go binaries using "go install".'
+description: 'Installs and caches Go binaries using "go install".'
 
 inputs:
   package:
@@ -13,20 +13,40 @@ inputs:
     required: false
     default: 'latest'
 
+outputs:
+  version:
+    description: 'The installed version.'
+    value: ${{ steps.version.outputs.version }}
+  cached:
+    description: 'Whether the binary was cached.'
+    value: ${{ steps.cache.outputs.cache-hit }}
+
 runs:
   using: "composite"
   steps:
+    - name: Version
+      id: version
+      run: |
+        if [ "${{ inputs.version }}" = "latest" ]; then
+          version=$(go list -m -versions -json ${{ inputs.package }} | jq -r '.Versions[-1]')
+        else
+          version=${{ inputs.version }}
+        end
+
+        echo "version=$version" >> $GITHUB_OUTPUT
+      shell: bash
+
     - name: Cache
       uses: actions/cache@v4
       id: cache
       with:
         path: ~/go/bin/${{ inputs.name }}
-        key: ${{ runner.os }}-go-install-${{ inputs.name }}-${{ inputs.version }}-${{ hashFiles('~/go/bin/${{ inputs.name }}') }}
-        restore-keys: ${{ runner.os }}-go-install-${{ inputs.name }}-${{ inputs.version }}-
+        key: go-install-${{ runner.os }}-${{ runner.arch }}-${{ inputs.name }}-${{ steps.version.outputs.version }}-${{ hashFiles('~/go/bin/${{ inputs.name }}') }}
+        restore-keys: go-install-${{ runner.os }}-${{ runner.arch }}-${{ inputs.name }}-${{ steps.version.outputs.version }}-
 
     - name: Install
       if: steps.cache.outputs.cache-hit != 'true'
-      run: go install ${{ inputs.package }}@${{ inputs.version }}
+      run: go install ${{ inputs.package }}@${{ steps.version.outputs.version }}
       shell: bash
 
 
