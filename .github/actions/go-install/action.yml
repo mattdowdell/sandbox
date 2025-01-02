@@ -25,7 +25,7 @@ runs:
           ${{ runner.os }}-go-install-${{ inputs.name }}-
 
     - name: Install
-      if steps.cache.outputs.cache-hit != 'true'
+      if: steps.cache.outputs.cache-hit != 'true'
       run: go install ${{ inputs.package }}@${{ inputs.version }}
       shell: bash
 
