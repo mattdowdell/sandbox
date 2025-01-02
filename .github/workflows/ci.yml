@@ -4,6 +4,18 @@ on:
   pull_request:
 
 jobs:
+  size:
+    name: Size
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Size
+        uses: mattdowdell/pr-size@main
+
   checks:
     name: Checks
     runs-on: ubuntu-latest
