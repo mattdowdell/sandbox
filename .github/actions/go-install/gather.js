@@ -17,8 +17,6 @@ module.exports = async ({core, exec}) => {
 		core.setOutput('version', version);
 	}
 
-	const pkg = process.env.package;
-
 	let mod = pkg;
 
 	while (true) {
