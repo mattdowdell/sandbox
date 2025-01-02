@@ -1,16 +1,15 @@
 /**
  *
  */
-module.exports = async ({core, exec}) {
+module.exports = async ({core, exec}) => {
 	const version = process.env.version;
 	if (version != 'latest') {
 		core.setOutput('version', version);
 	}
 
-	const package = process.env.package;
+	const pkg = process.env.package;
 
-	let mod = package;
-	let versions = [];
+	let mod = pkg;
 
 	while (true) {
 		let output = '';
@@ -25,13 +24,13 @@ module.exports = async ({core, exec}) {
 		};
 
 		const code = await exec.exec(
-			'go'
+			'go',
 			['list', '-m', '-versions', '-mod=readonly', '-json',  mod],
 			options
 		);
 
 		if (code == 0) {
-			const data = JSON.parse(json);
+			const data = JSON.parse(output);
 			console.debug(data);
 			core.setOutput('version', data.Versions[-1]);
 			return;

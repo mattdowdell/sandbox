@@ -46,6 +46,11 @@ runs:
         restore-keys: go-install-${{ runner.os }}-${{ runner.arch }}-${{ inputs.name }}-${{ steps.version.outputs.version }}-
 
     - name: Install
-      if: steps.cache.outputs.cache-hit != 'true'
-      run: go install ${{ inputs.package }}@${{ steps.version.outputs.version }}
-      shell: bash
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const script = require('./install.js')
+          await script({exec}))
+      env:
+        package: ${{ inputs.package }}
+        version: {{ steps.version.outputs.version }}
