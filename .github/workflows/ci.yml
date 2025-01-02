@@ -5,7 +5,7 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true # TODO: limit to pull requests
+  cancel-in-progress: true # TODO: limit to pull requests, don't kill branch builds
 
 jobs:
   size:
@@ -104,7 +104,6 @@ jobs:
         uses: bufbuild/buf-action@v1
         with:
           pr_comment: false
-          # input:
           format: false
           breaking: false
 
