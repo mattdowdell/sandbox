@@ -16,12 +16,15 @@ inputs:
     default: 'latest'
 
 outputs:
-  version:
-    description: 'The installed version.'
-    value: ${{ steps.version.outputs.version }}
   cached:
     description: 'Whether the binary was cached.'
     value: ${{ steps.cache.outputs.cache-hit }}
+  name:
+    description: 'The name of the installed binary.'
+    value: ${{ steps.gather.outputs.name }}
+  version:
+    description: 'The installed version.'
+    value: ${{ steps.gather.outputs.version }}
 
 runs:
   using: "composite"

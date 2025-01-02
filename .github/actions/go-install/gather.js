@@ -39,6 +39,10 @@ module.exports = async ({core, exec}) => {
 
 		if (code == 0) {
 			const data = JSON.parse(output);
+			if (!data.hasOwnProperty('Versions')) {
+				continue;
+			}
+
 			core.setOutput('version', data.Versions[data.Versions.length - 1]);
 			return;
 		}
