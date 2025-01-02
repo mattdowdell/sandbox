@@ -3,6 +3,10 @@ name: CI
 on:
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true # TODO: limit to pull requests
+
 jobs:
   size:
     name: Size
@@ -17,7 +21,7 @@ jobs:
           fetch-depth: 0
 
       - name: Size
-        uses: mattdowdell/pr-size@main
+        uses: mattdowdell/pr-size@main # TODO: use tag
 
   checks:
     name: Checks
@@ -82,6 +86,7 @@ jobs:
         uses: golangci/golangci-lint-action@v6
         with:
           version: 'latest'
+          args: --timeout=10m
 
       - name: Lint Protobuf
         uses: bufbuild/buf-action@v1
@@ -108,3 +113,6 @@ jobs:
 
       - name: Unit test
         run: just unit
+
+      # TODO: report coverage to PR
+      # maybe gwatts/go-coverage-action?
