@@ -16,13 +16,13 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/cache@v4
+    - name: Cache
+      uses: actions/cache@v4
       id: cache
       with:
         path: ~/go/bin/${{ inputs.name }}
         key: ${{ runner.os }}-go-install-${{ inputs.name }}-${{ hashFiles('~/go/bin/${{ inputs.name }}') }}
-        restore-keys: |
-          ${{ runner.os }}-go-install-${{ inputs.name }}-
+        restore-keys: ${{ runner.os }}-go-install-${{ inputs.name }}-
 
     - name: Install
       if: steps.cache.outputs.cache-hit != 'true'
