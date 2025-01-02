@@ -1,0 +1,56 @@
+# TODO: move to separate repository
+
+name: 'Go Install'
+description: 'Installs and caches Go binaries using "go install".'
+
+inputs:
+  package:
+    description: 'The Go package to install'
+    required: true
+  version:
+    description: 'The Go package version to install.'
+    required: false
+    default: 'latest'
+
+outputs:
+  cached:
+    description: 'Whether the binary was cached.'
+    value: ${{ steps.cache.outputs.cache-hit }}
+  name:
+    description: 'The name of the installed binary.'
+    value: ${{ steps.gather.outputs.name }}
+  version:
+    description: 'The installed version.'
+    value: ${{ steps.gather.outputs.version }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Gather
+      id: gather
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const script = require('${{ github.action_path }}/gather.js')
+          await script({core, exec})
+      env:
+        package: ${{ inputs.package }}
+        version: ${{ inputs.version }}
+
+    - name: Cache
+      uses: actions/cache@v4
+      id: cache
+      with:
+        path: ~/go/bin/${{ inputs.name }}
+        key: go-install-${{ runner.os }}-${{ runner.arch }}-${{ steps.gather.outputs.name }}-${{ steps.gather.outputs.version }}
+
+    - name: Install
+      uses: actions/github-script@v7
+      if: steps.cache.outputs.cache-hit != 'true'
+      with:
+        script: |
+          const script = require('${{ github.action_path }}/install.js')
+          await script({exec})
+      env:
+        package: ${{ inputs.package }}
+        version: ${{ steps.gather.outputs.version }}

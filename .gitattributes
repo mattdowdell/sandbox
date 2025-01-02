@@ -1,0 +1,10 @@
+# https://github.com/github-linguist/linguist/blob/main/docs/overrides.md
+
+# generated files
+go.sum         linguist-generated
+buf.lock       linguist-generated
+wire_gen.go    linguist-generated
+pkg/example/** linguist-generated
+
+# vendored files
+vendor/** linguist-vendored

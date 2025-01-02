@@ -1,0 +1,124 @@
+name: CI
+
+on:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true # TODO: limit to pull requests, don't kill branch builds
+
+jobs:
+  size:
+    name: Size
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Size
+        uses: mattdowdell/pr-size@main # TODO: use tag
+
+  checks:
+    name: Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Go
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Install Buf
+        uses: bufbuild/buf-action@v1
+        with:
+          setup_only: true
+
+      - name: Install Just
+        uses: extractions/setup-just@v2
+
+      - name: Install gci
+        uses: ./.github/actions/go-install
+        with:
+          package: github.com/daixiang0/gci
+
+      - name: Install gofumpt
+        uses: ./.github/actions/go-install
+        with:
+          package: mvdan.cc/gofumpt
+
+      # - name: Install mockery
+      #   uses: ./.github/actions/go-install
+      #   with:
+      #     name: mockery
+      #     package: github.com/vektra/mockery/v2
+
+      - name: Install protoc-gen-connect-go
+        uses: ./.github/actions/go-install
+        with:
+          package: connectrpc.com/connect/cmd/protoc-gen-connect-go
+
+      - name: Install protoc-gen-go
+        uses: ./.github/actions/go-install
+        with:
+          package: google.golang.org/protobuf/cmd/protoc-gen-go
+
+      - name: Install wire
+        uses: ./.github/actions/go-install
+        with:
+          package: github.com/google/wire/cmd/wire
+
+      - name: Checks
+        run: just checks dirty
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Go
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Lint Go
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: 'latest'
+          args: --timeout=10m
+
+      - name: Lint Protobuf
+        uses: bufbuild/buf-action@v1
+        with:
+          pr_comment: false
+          format: false
+          breaking: false
+
+  unit:
+    name: Unit test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Go
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Install Just
+        uses: extractions/setup-just@v2
+
+      - name: Unit test
+        run: just unit
+
+      # TODO: report coverage to PR
+      # maybe gwatts/go-coverage-action?
