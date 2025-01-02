@@ -46,38 +46,41 @@ jobs:
       - name: Install gci
         uses: ./.github/actions/go-install
         with:
-          package: github.com/daixiang0/gci
           name: gci
+          package: github.com/daixiang0/gci
 
       - name: Install gofumpt
         uses: ./.github/actions/go-install
         with:
-          package: mvdan.cc/gofumpt
           name: gofumpt
+          package: mvdan.cc/gofumpt
 
       # - name: Install mockery
       #   uses: ./.github/actions/go-install
       #   with:
-      #     package: github.com/vektra/mockery/v2
       #     name: mockery
+      #     package: github.com/vektra/mockery/v2
 
       - name: Install protoc-gen-connect-go
         uses: ./.github/actions/go-install
         with:
-          package: connectrpc.com/connect/cmd/protoc-gen-connect-go
           name: protoc-gen-connect-go
+          # module: connectrpc.com/connect
+          package: connectrpc.com/connect/cmd/protoc-gen-connect-go
 
       - name: Install protoc-gen-go
         uses: ./.github/actions/go-install
         with:
-          package: google.golang.org/protobuf/cmd/protoc-gen-go
           name: protoc-gen-go
+          # module: google.golang.org/protobuf
+          package: google.golang.org/protobuf/cmd/protoc-gen-go
 
       - name: Install wire
         uses: ./.github/actions/go-install
         with:
-          package: github.com/google/wire/cmd/wire
+          # module: github.com/google/wire
           name: wire
+          package: github.com/google/wire/cmd/wire
 
       - name: Checks
         run: just checks dirty

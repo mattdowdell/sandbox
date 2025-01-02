@@ -4,12 +4,6 @@ name: 'Go Install'
 description: 'Installs and caches Go binaries using "go install".'
 
 inputs:
-  module:
-    description: 'The Go module. Only required when version is "latest" and "main.go" is not in the root of the module.'
-    required: false
-  name:
-    description: 'The name of the installed Go binary.'
-    required: true
   package:
     description: 'The Go package to install'
     required: true
@@ -31,19 +25,51 @@ runs:
   steps:
     - name: Version
       id: version
-      run: |
-        if [ "${{ inputs.version }}" = "latest" ]; then
-          if [ -n "${{ inputs.module }}" ]
-            version=$(go list -m -versions -mod=readonly -json ${{ inputs.module }} | jq -r '.Versions[-1]')
-          else
-            version=$(go list -m -versions -mod=readonly -json ${{ inputs.package }} | jq -r '.Versions[-1]')
-          fi
-        else
-          version=${{ inputs.version }}
-        fi
+      uses: actions/github-script@v7
+      with:
+        result-encoding: string
+        script: |
+          const version = core.getInput('version');
+          if (version != 'latest') {
+            core.setOutput('version', version);
+          }
 
-        echo "version=$version" >> $GITHUB_OUTPUT
-      shell: bash
+          const package = core.getInput('package');
+
+          let module = package;
+          let versions = [];
+
+          while {
+            let output = '';
+
+            const options = {
+              ignoreReturnCode: true,
+              listeners: {
+                stdout: (data) => {
+                  output += data.toString();
+                },
+              },
+            };
+
+            const code = await exec.exec(
+              'go'
+              ['list', '-m', '-versions', '-mod=readonly', '-json',  module],
+              options
+            );
+
+            if (code == 0) {
+              const data = JSON.parse(json);
+              core.setOutput('version', data.Versions[-1]);
+              return;
+            }
+
+            if (module.lastIndexOf('/') == -1) {
+              core.setFailed('failed to identify go module');
+              return;
+            }
+
+            module = module.split('/')[0:-1];
+          }
 
     - name: Cache
       uses: actions/cache@v4
