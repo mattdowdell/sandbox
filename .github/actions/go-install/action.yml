@@ -43,7 +43,7 @@ runs:
       with:
         path: ~/go/bin/${{ inputs.name }}
         key: go-install-${{ runner.os }}-${{ runner.arch }}-${{ steps.gather.outputs.name }}-${{ steps.gather.outputs.version }}
-        restore-keys: go-install-${{ runner.os }}-${{ runner.arch }}-${{ steps.gather.outputs.name }}-${{ steps.gather.outputs.version }}
+        # restore-keys: go-install-${{ runner.os }}-${{ runner.arch }}-${{ steps.gather.outputs.name }}-${{ steps.gather.outputs.version }}
 
     - name: Install
       uses: actions/github-script@v7
