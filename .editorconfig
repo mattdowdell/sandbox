@@ -17,7 +17,7 @@ charset = utf-8
 indent_style = space
 indent_size = 4
 
-[*.go]
+[*.{go,js}]
 indent_style = tab
 
 [*.{yml,yaml}]
