@@ -32,18 +32,21 @@ runs:
       with:
         result-encoding: string
         script: |
+          console.debug('1');
           const version = core.getInput('version');
           if (version != 'latest') {
             core.setOutput('version', version);
           }
 
+          console.debug('2');
           const package = core.getInput('package');
 
-          let module = package;
+          let mod = package;
           let versions = [];
 
+          console.debug('3');
           while (true) {
-            console.debug(module);
+            console.debug(mod);
             let output = '';
 
             const options = {
@@ -57,7 +60,7 @@ runs:
 
             const code = await exec.exec(
               'go'
-              ['list', '-m', '-versions', '-mod=readonly', '-json',  module],
+              ['list', '-m', '-versions', '-mod=readonly', '-json',  mod],
               options
             );
 
@@ -68,12 +71,12 @@ runs:
               return;
             }
 
-            if (module.lastIndexOf('/') == -1) {
+            if (mod.lastIndexOf('/') == -1) {
               core.setFailed('failed to identify go module');
               return;
             }
 
-            module = module.split('/').slice(0, -1).join('/');
+            mod = mod.split('/').slice(0, -1).join('/');
           }
 
     - name: Cache
