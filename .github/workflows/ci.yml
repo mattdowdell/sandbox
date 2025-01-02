@@ -46,13 +46,11 @@ jobs:
       - name: Install gci
         uses: ./.github/actions/go-install
         with:
-          name: gci
           package: github.com/daixiang0/gci
 
       - name: Install gofumpt
         uses: ./.github/actions/go-install
         with:
-          name: gofumpt
           package: mvdan.cc/gofumpt
 
       # - name: Install mockery
@@ -64,19 +62,16 @@ jobs:
       - name: Install protoc-gen-connect-go
         uses: ./.github/actions/go-install
         with:
-          name: protoc-gen-connect-go
           package: connectrpc.com/connect/cmd/protoc-gen-connect-go
 
       - name: Install protoc-gen-go
         uses: ./.github/actions/go-install
         with:
-          name: protoc-gen-go
           package: google.golang.org/protobuf/cmd/protoc-gen-go
 
       - name: Install wire
         uses: ./.github/actions/go-install
         with:
-          name: wire
           package: github.com/google/wire/cmd/wire
 
       - name: Checks

@@ -4,9 +4,6 @@ name: 'Go Install'
 description: 'Installs and caches Go binaries using "go install".'
 
 inputs:
-  name:
-    description: 'The name of the Go binary to install.'
-    required: true
   package:
     description: 'The Go package to install'
     required: true
@@ -40,19 +37,13 @@ runs:
         package: ${{ inputs.package }}
         version: ${{ inputs.version }}
 
-    - name: Debug
-      run: |
-        echo version=${{ steps.gather.outputs.version }}
-        echo name=${{ steps.gather.outputs.name }}
-      shell: bash
-
     - name: Cache
       uses: actions/cache@v4
       id: cache
       with:
         path: ~/go/bin/${{ inputs.name }}
-        key: go-install-${{ runner.os }}-${{ runner.arch }}-${{ inputs.name }}-${{ steps.gather.outputs.version }}-${{ hashFiles('~/go/bin/${{ inputs.name }}') }}
-        restore-keys: go-install-${{ runner.os }}-${{ runner.arch }}-${{ inputs.name }}-${{ steps.gather.outputs.version }}-
+        key: go-install-${{ runner.os }}-${{ runner.arch }}-${{ steps.gather.outputs.name }}-${{ steps.gather.outputs.version }}
+        restore-keys: go-install-${{ runner.os }}-${{ runner.arch }}-${{ steps.gather.outputs.name }}-${{ steps.gather.outputs.version }}
 
     - name: Install
       uses: actions/github-script@v7
