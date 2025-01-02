@@ -31,8 +31,8 @@ module.exports = async ({core, exec}) => {
 
 		if (code == 0) {
 			const data = JSON.parse(output);
-			console.debug(data);
 			core.setOutput('version', data.Versions[-1]);
+			console.debug(data.Versions[-1]);
 			return;
 		}
 
