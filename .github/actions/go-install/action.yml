@@ -32,7 +32,7 @@ runs:
       with:
         script: |
           const script = require('./version.js')
-          await script({core, exec}))
+          await script({core, exec})
       env:
         package: ${{ inputs.package }}
         version: ${{ inputs.version }}
@@ -50,7 +50,7 @@ runs:
       with:
         script: |
           const script = require('./install.js')
-          await script({exec}))
+          await script({exec})
       env:
         package: ${{ inputs.package }}
         version: ${{ steps.version.outputs.version }}
