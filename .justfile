@@ -4,6 +4,9 @@
 default:
 	@just --list
 
+# Check if all automated code modifications are up to date.
+checks: tidy vendor fmt gen dirty
+
 # Tidy all dependencies.
 tidy: tidy-buf tidy-go
 
@@ -15,8 +18,11 @@ tidy-buf:
 tidy-go:
 	go mod tidy
 
+# Vendor all dependencies.
+vendor: vendor-go
+
 # Vendor Go dependencies.
-vendor:
+vendor-go:
 	go mod vendor
 
 # Run all formatters.
@@ -37,16 +43,27 @@ fmt-go:
 		-s localmodule \
 		.
 
-# Run all formatter checks.
-fmt-check: fmt-check-buf fmt-check-go
+# Run all code generators.
+gen: gen-buf gen-go
 
-# Run the Protobuf formatter check.
-fmt-check-buf:
-	buf format --config buf.yaml --diff --exit-code
+# Run the Protobuf generator.
+gen-buf:
+	buf generate --clean --config buf.yaml
 
-# Run the Go formatter check (unimplemented).
-fmt-check-go:
-	@echo '{{ style("error") }}unimplemented{{ NORMAL }}' && exit 1
+# Run the Go generators.
+gen-go: gen-go-wire
+
+# Run the Go wire generator.
+gen-go-wire:
+	wire gen ./cmd/...
+
+# Run the Go mockery generator.
+gen-go-mockery:
+	mockery
+
+# Check for uncommitted changes.
+dirty:
+	git diff --exit-code
 
 # Run all linters.
 lint: lint-buf lint-go
@@ -65,24 +82,6 @@ lint-fix:
 # Run the Go linter fixer.
 lint-fix-go:
 	golangci-lint run --fix
-
-# Run all code generators.
-gen: gen-buf gen-go
-
-# Run the Protobuf generator.
-gen-buf:
-	buf generate --clean --config buf.yaml
-
-# Run the Go generators.
-gen-go: gen-go-wire
-
-# Run the Go wire generator.
-gen-go-wire:
-	wire gen ./cmd/...
-
-# Run the Go mockery generator.
-gen-go-mockery:
-	mockery
 
 # Run the Go unit tests.
 unit:
