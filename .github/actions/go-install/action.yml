@@ -1,0 +1,33 @@
+name: 'Go Install'
+description: 'Installs Go binaries using "go install".'
+
+inputs:
+  package:
+    description: 'The Go package to install'
+    required: true
+  name:
+    description: 'The name of the installed Go binary.'
+    required: true
+  version:
+    description: 'The Go package version to install.'
+    required: false
+    default: 'latest'
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/cache@v4
+      id: cache
+      with:
+        path: ~/go/bin/${{ inputs.name }}
+        key: ${{ runner.os }}-go-install-${{ inputs.name }}-${{ hashFiles('~/go/bin/${{ inputs.name }}') }}
+        restore-keys: |
+          ${{ runner.os }}-go-install-${{ inputs.name }}-
+
+    - name: Install
+      if steps.cache.outputs.cache-hit != 'true'
+      run: go install ${{ inputs.package }}@${{ inputs.version }}
+      shell: bash
+
+
+
