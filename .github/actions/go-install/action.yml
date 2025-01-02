@@ -39,7 +39,7 @@ runs:
           let module = package;
           let versions = [];
 
-          while {
+          while (true) {
             let output = '';
 
             const options = {
