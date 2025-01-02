@@ -30,7 +30,7 @@ runs:
       id: version
       run: |
         if [ "${{ inputs.version }}" = "latest" ]; then
-          version=$(go list -m -versions -mod-readonly -json ${{ inputs.package }} | jq -r '.Versions[-1]')
+          version=$(go list -m -versions -mod=readonly -json ${{ inputs.package }} | jq -r '.Versions[-1]')
         else
           version=${{ inputs.version }}
         fi
