@@ -2,6 +2,16 @@
  *
  */
 module.exports = async ({core, exec}) => {
+	const pkg = process.env.package;
+	const parts = pkg.split('/');
+
+	let name = parts[parts.length - 1];
+	if (/v\d+/.test(name)) {
+		name = parts[parts.length - 1];
+	}
+
+	core.setOutput('name', name);
+
 	const version = process.env.version;
 	if (version != 'latest') {
 		core.setOutput('version', version);
@@ -31,10 +41,7 @@ module.exports = async ({core, exec}) => {
 
 		if (code == 0) {
 			const data = JSON.parse(output);
-			console.debug(data);
-			console.debug(data.Versions);
-			console.debug(data.Versions[data.Versions.length-1]);
-			core.setOutput('version', data.Versions[data.Versions.length-1]);
+			core.setOutput('version', data.Versions[data.Versions.length - 1]);
 			return;
 		}
 
