@@ -31,7 +31,7 @@ runs:
       uses: actions/github-script@v7
       with:
         script: |
-          const script = require('./version.js')
+          const script = require('${{ github.action_path }}/version.js')
           await script({core, exec})
       env:
         package: ${{ inputs.package }}
@@ -49,7 +49,7 @@ runs:
       uses: actions/github-script@v7
       with:
         script: |
-          const script = require('./install.js')
+          const script = require('${{ github.action_path }}/install.js')
           await script({exec})
       env:
         package: ${{ inputs.package }}
