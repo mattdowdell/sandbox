@@ -37,7 +37,7 @@ module.exports = async ({core, exec}) {
 			return;
 		}
 
-		if (module.lastIndexOf('/') == -1) {
+		if (mod.lastIndexOf('/') == -1) {
 			core.setFailed('failed to identify go module');
 			return;
 		}
