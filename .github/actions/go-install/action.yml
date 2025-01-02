@@ -43,6 +43,7 @@ runs:
           let versions = [];
 
           while (true) {
+            console.debug(module);
             let output = '';
 
             const options = {
