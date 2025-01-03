@@ -18,10 +18,10 @@ func main() {
 func run(ctx context.Context) int {
 	logger := logging.NewAsDefault(slog.LevelInfo)
 
-	program := tea.NewProgram(New())
+	program := tea.NewProgram(New(), tea.WithAltScreen())
 
 	if _, err := program.Run(); err != nil {
-		logger.ErrorContext(ctx, "failed to strat program", logging.Error(err))
+		logger.ErrorContext(ctx, "failed to start program", logging.Error(err))
 		return exit.Failure
 	}
 

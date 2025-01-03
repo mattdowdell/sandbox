@@ -10,6 +10,7 @@ require (
 	connectrpc.com/otelconnect v0.7.1
 	connectrpc.com/validate v0.1.0
 	github.com/charmbracelet/bubbletea v1.2.4
+	github.com/charmbracelet/lipgloss v1.0.0
 	github.com/creasty/defaults v1.8.0
 	github.com/google/wire v0.6.0
 	github.com/knadh/koanf/maps v0.1.1
@@ -36,7 +37,6 @@ require (
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/bufbuild/protovalidate-go v0.3.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
-	github.com/charmbracelet/lipgloss v1.0.0 // indirect
 	github.com/charmbracelet/x/ansi v0.4.5 // indirect
 	github.com/charmbracelet/x/term v0.2.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
