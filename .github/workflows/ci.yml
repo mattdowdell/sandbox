@@ -26,9 +26,9 @@ jobs:
 
       - name: Debug
         run: |
-          echo size=${{ step.size.ouputs.size }}
-          echo includes=${{ step.size.ouputs.includes }}
-          echo excludes=${{ step.size.ouputs.excludes }}
+          echo size=${{ steps.size.ouputs.size }}
+          echo includes=${{ steps.size.ouputs.includes }}
+          echo excludes=${{ steps.size.ouputs.excludes }}
 
   checks:
     name: Checks
