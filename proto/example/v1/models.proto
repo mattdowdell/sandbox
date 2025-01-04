@@ -3,23 +3,86 @@ syntax = "proto3";
 package example.v1;
 
 import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/mattdowdell/sandbox/pkg/example/v1;examplev1";
+option go_package = "github.com/mattdowdell/sandbox/gen/example/v1;examplev1";
 
 // ...
 message Resource {
   // ...
   string id = 1 [(buf.validate.field).string.uuid = true];
+
+  // ...
+  string name = 2 [(buf.validate.field).string = {
+    min_len: 3
+    max_len: 100
+    pattern: "^[ -~]+$" // printable ascii
+  }];
+
+  // ...
+  google.protobuf.Timestamp created_at = 3; // not empty
+
+  // ...
+  google.protobuf.Timestamp updated_at = 4; // not empty
 }
 
 // ...
-message ResourceCreate {}
+message ResourceCreate {
+  //
+  string name = 1 [(buf.validate.field).string = {
+    min_len: 3
+    max_len: 100
+    pattern: "^[ -~]+$" // printable ascii
+  }];
+}
 
 // ...
-message ResourceUpdate {}
+message ResourceUpdate {
+  // ...
+  string id = 1 [(buf.validate.field).string.uuid = true];
+
+  //
+  string name = 2 [(buf.validate.field).string = {
+    min_len: 3
+    max_len: 100
+    pattern: "^[ -~]+$" // printable ascii
+  }];
+}
+
+enum Operation {
+  // ...
+  OPERATION_UNSPECIFIED = 0;
+
+  // ...
+  OPERATION_CREATED = 1;
+
+  // ...
+  OPERATION_MODIFIED = 2;
+
+  // ...
+  OPERATION_DELETED = 3;
+}
 
 // ...
 message AuditEvent {
   // ...
   string id = 1 [(buf.validate.field).string.uuid = true];
+
+  // ...
+  Operation operation = 2 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+
+  // ...
+  google.protobuf.Timestamp created_at = 3; // not empty
+
+  // ...
+  string summary = 4; // min/max length
+
+  // ...
+  string resource_id = 5 [(buf.validate.field).string.uuid = true];
+
+  // ...
+  string resource_type = 6; // min/max length
 }

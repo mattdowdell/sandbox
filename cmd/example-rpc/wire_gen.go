@@ -9,9 +9,11 @@ package main
 import (
 	"connectrpc.com/connect"
 	"context"
+	"github.com/mattdowdell/sandbox/internal/adapters/datastore"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/healthrpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/reflectrpc"
+	"github.com/mattdowdell/sandbox/internal/drivers/clock"
 	"github.com/mattdowdell/sandbox/internal/drivers/config"
 	"github.com/mattdowdell/sandbox/internal/drivers/config/flagoptions"
 	"github.com/mattdowdell/sandbox/internal/drivers/logging"
@@ -19,6 +21,8 @@ import (
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/otelconnectx"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/validatex"
+	"github.com/mattdowdell/sandbox/internal/drivers/uuidgen"
+	"github.com/mattdowdell/sandbox/internal/usecases"
 )
 
 // Injectors from wire.go:
@@ -34,7 +38,17 @@ func ProvideApp(ctx context.Context) (*App, error) {
 	loggingConfig := mainConfig.Logging
 	logger := logging.NewAsDefaultFromConfig(loggingConfig)
 	rpcserverConfig := mainConfig.RPCServer
-	handler := examplerpc.New()
+	clockClock := clock.New()
+	generator := uuidgen.New()
+	stub := datastore.NewStub()
+	createResource := usecases.NewCreateResource(clockClock, generator, stub)
+	getResource := usecases.NewGetResource(stub)
+	listResources := usecases.NewListResources(stub)
+	updateResource := usecases.NewUpdateResource(clockClock, stub)
+	deleteResource := usecases.NewDeleteResource(stub)
+	listAuditEvents := usecases.NewListAuditEvents(stub)
+	watchAuditEvents := usecases.NewWatchAuditEvents(stub)
+	handler := examplerpc.New(createResource, getResource, listResources, updateResource, deleteResource, listAuditEvents, watchAuditEvents)
 	reflectrpcHandler := reflectrpc.New()
 	healthrpcHandler := healthrpc.New()
 	v := collectHandlers(handler, reflectrpcHandler, healthrpcHandler)

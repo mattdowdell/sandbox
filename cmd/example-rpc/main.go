@@ -7,7 +7,7 @@ import (
 	"os/signal"
 
 	"github.com/mattdowdell/sandbox/internal/drivers/exit"
-	"github.com/mattdowdell/sandbox/internal/drivers/logging"
+	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
 func main() {
@@ -17,7 +17,7 @@ func main() {
 func run(ctx context.Context) int {
 	app, err := ProvideApp(ctx)
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to build app", logging.Error(err))
+		slog.ErrorContext(ctx, "failed to build app", slogx.Err(err))
 		return exit.Failure
 	}
 
