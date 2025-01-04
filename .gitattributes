@@ -4,7 +4,7 @@
 go.sum         linguist-generated
 buf.lock       linguist-generated
 wire_gen.go    linguist-generated
-pkg/example/** linguist-generated
+gen/example/** linguist-generated
 
 # vendored files
 vendor/** linguist-vendored
