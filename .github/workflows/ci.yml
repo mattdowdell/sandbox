@@ -24,6 +24,7 @@ jobs:
         id: size
         uses: mattdowdell/pr-size@main # TODO: use tag
 
+      # todo: not working
       - name: Debug
         run: |
           echo size=${{ steps.size.ouputs.size }}

@@ -59,7 +59,7 @@ func (s *Stub) WatchAuditEvents(ctx context.Context, ch chan<- *entities.AuditEv
 				ID:           uuid.Must(uuid.NewV7()),
 				Operation:    entities.OperationCreated,
 				CreatedAt:    t,
-				Summary:      fmt.Sprintf("summary %s", t.Format(time.RFC1123)),
+				Summary:      "summary",
 				ResourceID:   uuid.Must(uuid.NewV7()),
 				ResourceType: entities.ResourceTypeResource,
 			}
