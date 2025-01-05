@@ -22,14 +22,17 @@ jobs:
 
       - name: Size
         id: size
-        uses: mattdowdell/pr-sizer@main # TODO: use tag
+        uses: mattdowdell/pr-sizer@45266d54471a64e7698eac319d2ee8b6cb13cc3d # v0.1.0
 
-      # todo: not working
-      - name: Debug
+      - name: Outputs
         run: |
-          echo size=${{ steps.size.outputs.size }}
-          echo includes=${{ steps.size.outputs.includes }}
-          echo excludes=${{ steps.size.outputs.excludes }}
+          echo size=${SIZE}
+          echo includes=${INCLUDES}
+          echo excludes=${EXCLUDES}
+        env:
+          SIZE: ${{ steps.size.outputs.size }}
+          INCLUDES: ${{ steps.size.outputs.includes }}
+          EXCLUDES: ${{ steps.size.outputs.excludes }}
 
   checks:
     name: Checks
