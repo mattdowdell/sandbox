@@ -22,7 +22,7 @@ jobs:
 
       - name: Size
         id: size
-        uses: mattdowdell/pr-size@main # TODO: use tag
+        uses: mattdowdell/pr-sizer@main # TODO: use tag
 
       # todo: not working
       - name: Debug
