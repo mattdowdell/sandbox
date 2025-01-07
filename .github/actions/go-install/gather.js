@@ -15,6 +15,7 @@ module.exports = async ({core, exec}) => {
 	const version = process.env.version;
 	if (version != 'latest') {
 		core.setOutput('version', version);
+		return
 	}
 
 	let mod = pkg;
