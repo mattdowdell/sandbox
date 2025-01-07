@@ -79,6 +79,7 @@ jobs:
         uses: ./.github/actions/go-install
         with:
           package: google.golang.org/protobuf/cmd/protoc-gen-go
+          version: v1.36.1
 
       - name: Install wire
         uses: ./.github/actions/go-install
