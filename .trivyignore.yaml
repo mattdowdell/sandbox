@@ -1,0 +1,27 @@
+---
+# TODO: document ignore expectations
+# https://trivy.dev/latest/docs/configuration/filtering/#trivyignoreyaml
+
+licenses:
+  - id: Apache-2.0
+    statement: Permissive license.
+
+  - id: BSD-3-Clause
+    statement: Permissive license.
+
+  - id: ISC
+    statement: Permissive license.
+
+  - id: MIT
+    statement: Permissive license.
+
+misconfigurations:
+  # https://avd.aquasec.com/misconfig/dockerfile/general/avd-ds-0002/
+  - id: AVD-DS-0002
+    paths:
+      - Containerfile
+    statement: User defined in distroless base image.
+
+  # https://avd.aquasec.com/misconfig/dockerfile/general/avd-ds-0026/
+  - id: AVD-DS-0026
+    statement: Healthchecks defined outside Dockerfiles.
