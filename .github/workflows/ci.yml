@@ -147,3 +147,6 @@ jobs:
         with:
           scan-type: fs
           trivy-config: trivy.yaml
+
+      # TODO: publish to github for default branch builds
+      # https://github.com/actions/starter-workflows/blob/main/code-scanning/trivy.yml
