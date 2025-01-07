@@ -9,6 +9,7 @@ import (
 
 	"github.com/mattdowdell/sandbox/internal/drivers/exit"
 	"github.com/mattdowdell/sandbox/internal/drivers/logging"
+	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
 func main() {
@@ -21,7 +22,7 @@ func run(ctx context.Context) int {
 	program := tea.NewProgram(New(), tea.WithAltScreen())
 
 	if _, err := program.Run(); err != nil {
-		logger.ErrorContext(ctx, "failed to start program", logging.Error(err))
+		logger.ErrorContext(ctx, "failed to start program", slogx.Err(err))
 		return exit.Failure
 	}
 

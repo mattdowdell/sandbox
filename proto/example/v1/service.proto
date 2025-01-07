@@ -4,7 +4,7 @@ package example.v1;
 
 import "example/v1/messages.proto";
 
-option go_package = "github.com/mattdowdell/sandbox/pkg/example/v1;examplev1";
+option go_package = "github.com/mattdowdell/sandbox/gen/example/v1;examplev1";
 
 // ...
 service ExampleService {

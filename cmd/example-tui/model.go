@@ -14,7 +14,7 @@ import (
 var (
 	docStyle       = lipgloss.NewStyle().Padding(1, 2)
 	highlightColor = lipgloss.AdaptiveColor{Light: "#874BFD", Dark: "#7D56F4"}
-	windowStyle    = lipgloss.NewStyle().
+	bodyStyle      = lipgloss.NewStyle().
 			BorderForeground(highlightColor).
 			Padding(2, 0).
 			Align(lipgloss.Center).
@@ -89,16 +89,16 @@ func (m *Model) View() string {
 	}
 
 	row := lipgloss.JoinHorizontal(lipgloss.Top, rendered...)
-	gapLen := m.width - lipgloss.Width(row) - windowStyle.GetHorizontalFrameSize() - docStyle.GetHorizontalFrameSize() - 1
+	gapLen := m.width - lipgloss.Width(row) - bodyStyle.GetHorizontalFrameSize() - docStyle.GetHorizontalFrameSize() - 1
 	gap := tab.GapStyle(highlightColor).Render(strings.Repeat(" ", max(0, gapLen)))
 	row = lipgloss.JoinHorizontal(lipgloss.Bottom, row, gap)
 
 	doc.WriteString(row)
 	doc.WriteString("\n")
 	doc.WriteString(
-		windowStyle.
-			Width(m.width - windowStyle.GetHorizontalFrameSize() - docStyle.GetHorizontalFrameSize()).
-			Height(m.height - windowStyle.GetVerticalFrameSize() - docStyle.GetVerticalFrameSize() + 1).
+		bodyStyle.
+			Width(m.width - bodyStyle.GetHorizontalFrameSize() - docStyle.GetHorizontalFrameSize()).
+			Height(m.height - bodyStyle.GetVerticalFrameSize() - docStyle.GetVerticalFrameSize() + 1).
 			Render("content"),
 	)
 

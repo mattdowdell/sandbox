@@ -1,4 +1,4 @@
-package logging
+package slogx
 
 import (
 	"log/slog"
@@ -7,9 +7,7 @@ import (
 )
 
 // ...
-//
-// TODO: move this to a more clean arch friendly package, maybe under internal/domain/?
-func Error(err error) slog.Attr {
+func Err(err error) slog.Attr {
 	return slog.String("error", err.Error())
 }
 

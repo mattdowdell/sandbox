@@ -5,18 +5,42 @@ import (
 
 	"connectrpc.com/connect"
 
-	"github.com/mattdowdell/sandbox/pkg/example/v1/examplev1connect"
+	"github.com/mattdowdell/sandbox/gen/example/v1/examplev1connect"
 )
 
 // Non-allocating compile-time check for interface implementation.
 var _ examplev1connect.ExampleServiceHandler = (*Handler)(nil)
 
 // Handler implements the ExampleService RPC.
-type Handler struct{}
+type Handler struct {
+	resourceCreator   ResourceCreator
+	resourceGetter    ResourceGetter
+	resourceLister    ResourceLister
+	resourceUpdater   ResourceUpdater
+	resourceDeleter   ResourceDeleter
+	auditEventLister  AuditEventLister
+	auditEventWatcher AuditEventWatcher
+}
 
 // New creates a new Handler.
-func New() *Handler {
-	return &Handler{}
+func New(
+	resourceCreator ResourceCreator,
+	resourceGetter ResourceGetter,
+	resourceLister ResourceLister,
+	resourceUpdater ResourceUpdater,
+	resourceDeleter ResourceDeleter,
+	auditEventLister AuditEventLister,
+	auditEventWatcher AuditEventWatcher,
+) *Handler {
+	return &Handler{
+		resourceCreator:   resourceCreator,
+		resourceGetter:    resourceGetter,
+		resourceLister:    resourceLister,
+		resourceUpdater:   resourceUpdater,
+		resourceDeleter:   resourceDeleter,
+		auditEventLister:  auditEventLister,
+		auditEventWatcher: auditEventWatcher,
+	}
 }
 
 // Register adds the handler to the given multiplexer.

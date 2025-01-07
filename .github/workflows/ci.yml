@@ -21,7 +21,18 @@ jobs:
           fetch-depth: 0
 
       - name: Size
-        uses: mattdowdell/pr-size@main # TODO: use tag
+        id: size
+        uses: mattdowdell/pr-sizer@45266d54471a64e7698eac319d2ee8b6cb13cc3d # v0.1.0
+
+      - name: Outputs
+        run: |
+          echo size=${SIZE}
+          echo includes=${INCLUDES}
+          echo excludes=${EXCLUDES}
+        env:
+          SIZE: ${{ steps.size.outputs.size }}
+          INCLUDES: ${{ steps.size.outputs.includes }}
+          EXCLUDES: ${{ steps.size.outputs.excludes }}
 
   checks:
     name: Checks

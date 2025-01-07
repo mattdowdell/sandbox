@@ -5,19 +5,26 @@ import (
 	"log/slog"
 
 	"connectrpc.com/connect"
-	"go.opentelemetry.io/otel/trace"
 
-	"github.com/mattdowdell/sandbox/internal/drivers/logging"
-	"github.com/mattdowdell/sandbox/pkg/example/v1"
+	"github.com/mattdowdell/sandbox/gen/example/v1"
+	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc/models"
+	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
 // ...
 func (h *Handler) CreateResource(
 	ctx context.Context,
-	_ *connect.Request[examplev1.CreateResourceRequest],
+	req *connect.Request[examplev1.CreateResourceRequest],
 ) (*connect.Response[examplev1.CreateResourceResponse], error) {
-	span := trace.SpanFromContext(ctx)
-	slog.InfoContext(ctx, "create resource called", logging.TraceID(span))
+	input := models.ResourceCreateToDomain(req.Msg.GetResource())
 
-	return nil, ErrUnimplemented
+	output, err := h.resourceCreator.Execute(ctx, input)
+	if err != nil {
+		slog.DebugContext(ctx, "usecase error", slogx.Err(err))
+		return nil, ErrInternal
+	}
+
+	return connect.NewResponse(&examplev1.CreateResourceResponse{
+		Resource: models.ResourceFromDomain(output),
+	}), nil
 }

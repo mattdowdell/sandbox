@@ -43,7 +43,6 @@ linters:
     - nestif
     - nilerr
     - noctx
-    - nolintlint
     - nosprintfhostport
     - perfsprint
     - predeclared

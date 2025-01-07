@@ -7,7 +7,7 @@ import (
 	"connectrpc.com/grpchealth"
 	"connectrpc.com/grpcreflect"
 
-	"github.com/mattdowdell/sandbox/pkg/example/v1/examplev1connect"
+	"github.com/mattdowdell/sandbox/gen/example/v1/examplev1connect"
 )
 
 // ...

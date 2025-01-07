@@ -46,7 +46,8 @@ func New(port uint16, handlers []Handler, opts []connect.HandlerOption) *Server 
 
 	return &Server{
 		server: &http.Server{
-			Addr:              fmt.Sprintf(":%d", port),
+			// TODO: remove localhost once running in a container
+			Addr:              fmt.Sprintf("localhost:%d", port),
 			Handler:           h2c.NewHandler(mux, &http2.Server{}),
 			ReadHeaderTimeout: readHeaderTimeout,
 		},
