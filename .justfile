@@ -93,6 +93,13 @@ lint-fix-go:
 unit:
     go test -count=1 -cover ./...
 
+# Scan the repository for issues.
+scan: scan-trivy
+
+# Scan the repository for issues using Trivy.
+scan-trivy:
+    trivy fs --config trivy.yaml .
+
 # Build all containers.
 container-build: container-build-rpc
 
