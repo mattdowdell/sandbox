@@ -1,0 +1,26 @@
+---
+# TODO: document ignore expectations
+# https://trivy.dev/latest/docs/configuration/filtering/#trivyignoreyaml
+
+# Licenses that are always safe to use.
+licenses:
+  - id: Apache-2.0
+  - id: BSD-3-Clause
+  - id: ISC
+  - id: MIT
+
+misconfigurations:
+  # https://avd.aquasec.com/misconfig/dockerfile/general/avd-ds-0002/
+  - id: AVD-DS-0002
+    paths:
+      - Containerfile
+    statement: User defined in distroless base image.
+
+  - id: AVD-DS-0002
+    paths:
+      - vendor/github.com/pelletier/go-toml/Dockerfile
+    statement: Ignore file from vendored dependencies.
+
+  # https://avd.aquasec.com/misconfig/dockerfile/general/avd-ds-0026/
+  - id: AVD-DS-0026
+    statement: Healthchecks defined outside Dockerfiles.

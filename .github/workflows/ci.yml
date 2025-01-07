@@ -133,3 +133,15 @@ jobs:
 
       # TODO: report coverage to PR
       # maybe gwatts/go-coverage-action?
+
+  scan:
+    name: Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run scanner
+        uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 # 0.29.0
+        with:
+          trivy-config: trivy.yaml
