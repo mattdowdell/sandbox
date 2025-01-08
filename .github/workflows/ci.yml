@@ -55,33 +55,33 @@ jobs:
         uses: extractions/setup-just@v2
 
       - name: Install gci
-        uses: ./.github/actions/go-install
+        uses: mattdowdell/go-install@main
         with:
           package: github.com/daixiang0/gci
 
       - name: Install gofumpt
-        uses: ./.github/actions/go-install
+        uses: mattdowdell/go-install@main
         with:
           package: mvdan.cc/gofumpt
 
       # - name: Install mockery
-      #   uses: ./.github/actions/go-install
+      #   uses: mattdowdell/go-install@main
       #   with:
       #     name: mockery
       #     package: github.com/vektra/mockery/v2
 
       - name: Install protoc-gen-connect-go
-        uses: ./.github/actions/go-install
+        uses: mattdowdell/go-install@main
         with:
           package: connectrpc.com/connect/cmd/protoc-gen-connect-go
 
       - name: Install protoc-gen-go
-        uses: ./.github/actions/go-install
+        uses: mattdowdell/go-install@main
         with:
           package: google.golang.org/protobuf/cmd/protoc-gen-go
 
       - name: Install wire
-        uses: ./.github/actions/go-install
+        uses: mattdowdell/go-install@main
         with:
           package: github.com/google/wire/cmd/wire
 
