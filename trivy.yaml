@@ -1,0 +1,24 @@
+
+
+# https://github.com/aquasecurity/trivy/discussions/7538
+db:
+  repository: public.ecr.aws/aquasecurity/trivy-db:2
+
+exit-code: 1
+ignorefile: .trivyignore.yaml
+
+scan:
+  scanners:
+    - vuln
+    - secret
+    - license
+    - misconfig
+  skip-dirs:
+    - vendor
+
+severity:
+  - UNKNOWN
+  - LOW
+  - MEDIUM
+  - HIGH
+  - CRITICAL
