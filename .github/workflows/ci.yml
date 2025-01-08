@@ -74,6 +74,7 @@ jobs:
         uses: mattdowdell/go-install@main
         with:
           package: connectrpc.com/connect/cmd/protoc-gen-connect-go
+          version: v1.18.0
 
       - name: Install protoc-gen-go
         uses: mattdowdell/go-install@main

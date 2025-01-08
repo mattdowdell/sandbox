@@ -56,18 +56,6 @@ const (
 	ExampleServiceWatchAuditEventsProcedure = "/example.v1.ExampleService/WatchAuditEvents"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
-var (
-	exampleServiceServiceDescriptor                = v1.File_example_v1_service_proto.Services().ByName("ExampleService")
-	exampleServiceCreateResourceMethodDescriptor   = exampleServiceServiceDescriptor.Methods().ByName("CreateResource")
-	exampleServiceGetResourceMethodDescriptor      = exampleServiceServiceDescriptor.Methods().ByName("GetResource")
-	exampleServiceListResourcesMethodDescriptor    = exampleServiceServiceDescriptor.Methods().ByName("ListResources")
-	exampleServiceUpdateResourceMethodDescriptor   = exampleServiceServiceDescriptor.Methods().ByName("UpdateResource")
-	exampleServiceDeleteResourceMethodDescriptor   = exampleServiceServiceDescriptor.Methods().ByName("DeleteResource")
-	exampleServiceListAuditEventsMethodDescriptor  = exampleServiceServiceDescriptor.Methods().ByName("ListAuditEvents")
-	exampleServiceWatchAuditEventsMethodDescriptor = exampleServiceServiceDescriptor.Methods().ByName("WatchAuditEvents")
-)
-
 // ExampleServiceClient is a client for the example.v1.ExampleService service.
 type ExampleServiceClient interface {
 	// ...
@@ -95,47 +83,48 @@ type ExampleServiceClient interface {
 // http://api.acme.com or https://acme.com/grpc).
 func NewExampleServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ExampleServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
+	exampleServiceMethods := v1.File_example_v1_service_proto.Services().ByName("ExampleService").Methods()
 	return &exampleServiceClient{
 		createResource: connect.NewClient[v1.CreateResourceRequest, v1.CreateResourceResponse](
 			httpClient,
 			baseURL+ExampleServiceCreateResourceProcedure,
-			connect.WithSchema(exampleServiceCreateResourceMethodDescriptor),
+			connect.WithSchema(exampleServiceMethods.ByName("CreateResource")),
 			connect.WithClientOptions(opts...),
 		),
 		getResource: connect.NewClient[v1.GetResourceRequest, v1.GetResourceResponse](
 			httpClient,
 			baseURL+ExampleServiceGetResourceProcedure,
-			connect.WithSchema(exampleServiceGetResourceMethodDescriptor),
+			connect.WithSchema(exampleServiceMethods.ByName("GetResource")),
 			connect.WithClientOptions(opts...),
 		),
 		listResources: connect.NewClient[v1.ListResourcesRequest, v1.ListResourcesResponse](
 			httpClient,
 			baseURL+ExampleServiceListResourcesProcedure,
-			connect.WithSchema(exampleServiceListResourcesMethodDescriptor),
+			connect.WithSchema(exampleServiceMethods.ByName("ListResources")),
 			connect.WithClientOptions(opts...),
 		),
 		updateResource: connect.NewClient[v1.UpdateResourceRequest, v1.UpdateResourceResponse](
 			httpClient,
 			baseURL+ExampleServiceUpdateResourceProcedure,
-			connect.WithSchema(exampleServiceUpdateResourceMethodDescriptor),
+			connect.WithSchema(exampleServiceMethods.ByName("UpdateResource")),
 			connect.WithClientOptions(opts...),
 		),
 		deleteResource: connect.NewClient[v1.DeleteResourceRequest, v1.DeleteResourceResponse](
 			httpClient,
 			baseURL+ExampleServiceDeleteResourceProcedure,
-			connect.WithSchema(exampleServiceDeleteResourceMethodDescriptor),
+			connect.WithSchema(exampleServiceMethods.ByName("DeleteResource")),
 			connect.WithClientOptions(opts...),
 		),
 		listAuditEvents: connect.NewClient[v1.ListAuditEventsRequest, v1.ListAuditEventsResponse](
 			httpClient,
 			baseURL+ExampleServiceListAuditEventsProcedure,
-			connect.WithSchema(exampleServiceListAuditEventsMethodDescriptor),
+			connect.WithSchema(exampleServiceMethods.ByName("ListAuditEvents")),
 			connect.WithClientOptions(opts...),
 		),
 		watchAuditEvents: connect.NewClient[v1.WatchAuditEventsRequest, v1.WatchAuditEventsResponse](
 			httpClient,
 			baseURL+ExampleServiceWatchAuditEventsProcedure,
-			connect.WithSchema(exampleServiceWatchAuditEventsMethodDescriptor),
+			connect.WithSchema(exampleServiceMethods.ByName("WatchAuditEvents")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -211,46 +200,47 @@ type ExampleServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewExampleServiceHandler(svc ExampleServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	exampleServiceMethods := v1.File_example_v1_service_proto.Services().ByName("ExampleService").Methods()
 	exampleServiceCreateResourceHandler := connect.NewUnaryHandler(
 		ExampleServiceCreateResourceProcedure,
 		svc.CreateResource,
-		connect.WithSchema(exampleServiceCreateResourceMethodDescriptor),
+		connect.WithSchema(exampleServiceMethods.ByName("CreateResource")),
 		connect.WithHandlerOptions(opts...),
 	)
 	exampleServiceGetResourceHandler := connect.NewUnaryHandler(
 		ExampleServiceGetResourceProcedure,
 		svc.GetResource,
-		connect.WithSchema(exampleServiceGetResourceMethodDescriptor),
+		connect.WithSchema(exampleServiceMethods.ByName("GetResource")),
 		connect.WithHandlerOptions(opts...),
 	)
 	exampleServiceListResourcesHandler := connect.NewUnaryHandler(
 		ExampleServiceListResourcesProcedure,
 		svc.ListResources,
-		connect.WithSchema(exampleServiceListResourcesMethodDescriptor),
+		connect.WithSchema(exampleServiceMethods.ByName("ListResources")),
 		connect.WithHandlerOptions(opts...),
 	)
 	exampleServiceUpdateResourceHandler := connect.NewUnaryHandler(
 		ExampleServiceUpdateResourceProcedure,
 		svc.UpdateResource,
-		connect.WithSchema(exampleServiceUpdateResourceMethodDescriptor),
+		connect.WithSchema(exampleServiceMethods.ByName("UpdateResource")),
 		connect.WithHandlerOptions(opts...),
 	)
 	exampleServiceDeleteResourceHandler := connect.NewUnaryHandler(
 		ExampleServiceDeleteResourceProcedure,
 		svc.DeleteResource,
-		connect.WithSchema(exampleServiceDeleteResourceMethodDescriptor),
+		connect.WithSchema(exampleServiceMethods.ByName("DeleteResource")),
 		connect.WithHandlerOptions(opts...),
 	)
 	exampleServiceListAuditEventsHandler := connect.NewUnaryHandler(
 		ExampleServiceListAuditEventsProcedure,
 		svc.ListAuditEvents,
-		connect.WithSchema(exampleServiceListAuditEventsMethodDescriptor),
+		connect.WithSchema(exampleServiceMethods.ByName("ListAuditEvents")),
 		connect.WithHandlerOptions(opts...),
 	)
 	exampleServiceWatchAuditEventsHandler := connect.NewServerStreamHandler(
 		ExampleServiceWatchAuditEventsProcedure,
 		svc.WatchAuditEvents,
-		connect.WithSchema(exampleServiceWatchAuditEventsMethodDescriptor),
+		connect.WithSchema(exampleServiceMethods.ByName("WatchAuditEvents")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/example.v1.ExampleService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
