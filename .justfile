@@ -56,7 +56,7 @@ gen-buf:
     buf generate --clean --config buf.yaml
 
 # Run the Go generators.
-gen-go: gen-go-wire
+gen-go: gen-go-wire gen-go-mockery
 
 # Run the Go wire generator.
 gen-go-wire:
@@ -64,6 +64,7 @@ gen-go-wire:
 
 # Run the Go mockery generator.
 gen-go-mockery:
+    rm -rf mocks/
     mockery
 
 # Check for uncommitted changes.

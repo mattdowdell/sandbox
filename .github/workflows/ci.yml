@@ -64,11 +64,11 @@ jobs:
         with:
           package: mvdan.cc/gofumpt
 
-      # - name: Install mockery
-      #   uses: mattdowdell/go-installer@v0.1.0
-      #   with:
-      #     name: mockery
-      #     package: github.com/vektra/mockery/v2
+      - name: Install mockery
+        uses: mattdowdell/go-installer@v0.1.0
+        with:
+          package: github.com/vektra/mockery/v2
+          version: v2.50.4
 
       - name: Install protoc-gen-connect-go
         uses: mattdowdell/go-installer@v0.1.0
