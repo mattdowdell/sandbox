@@ -13,7 +13,7 @@ dev-down:
     podman compose down -v
 
 # Run all automated code modifications.
-checks: tidy vendor fmt gen
+checks: tidy vendor gen fmt
 
 # Tidy all dependencies.
 tidy: tidy-buf tidy-go
