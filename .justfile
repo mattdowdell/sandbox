@@ -4,6 +4,14 @@
 default:
     @just --list
 
+# Start the development environment.
+dev-up:
+    podman compose --podman-run-args='--replace' up -d --build
+
+# Stop the development environment.
+dev-down:
+    podman compose down -v
+
 # Run all automated code modifications.
 checks: tidy vendor fmt gen
 

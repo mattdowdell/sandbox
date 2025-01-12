@@ -13,7 +13,7 @@ import (
 )
 
 type AppConfig struct {
-	ShutdownTimeout time.Duration `koanf:"app.shutdowntimeout" default:"30s"`
+	ShutdownTimeout time.Duration `koanf:"shutdowntimeout" default:"30s"`
 }
 
 // ...

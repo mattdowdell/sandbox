@@ -1,0 +1,40 @@
+# https://github.com/compose-spec/compose-spec/blob/main/spec.md
+
+services:
+  rpc:
+    image: "example-rpc:local"
+    build:
+      context: .
+      target: runtime
+      dockerfile: Containerfile
+      args:
+        SERVICE: example-rpc
+    environment:
+      APP_RPCSERVER_HOST: "0.0.0.0"
+      APP_METERPROVIDER_ENDPOINT: "http://victoria-metrics:8428/opentelemetry/v1/metrics"
+      APP_TRACERPROVIDER_ENDPOINT: "http://jaeger:4318"
+    ports:
+      - "127.0.0.1:5000:5000"
+
+  jaeger:
+    image: "mirror.gcr.io/jaegertracing/jaeger:2.2.0"
+    ports:
+      - "127.0.0.1:16686:16686"
+
+  victoria-metrics:
+    image: "mirror.gcr.io/victoriametrics/victoria-metrics:latest" # TODO: pick tag
+    ports:
+      - "127.0.0.1:8428:8428"
+
+  grafana:
+    image: "mirror.gcr.io/grafana/grafana:latest"
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
+      GF_AUTH_BASIC_ENABLED: "false"
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+    - "./config/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro"
+
+
