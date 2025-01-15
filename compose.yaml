@@ -13,6 +13,7 @@ services:
       APP_RPCSERVER_HOST: "0.0.0.0"
       APP_METERPROVIDER_ENDPOINT: "http://victoria-metrics:8428/opentelemetry/v1/metrics"
       APP_TRACERPROVIDER_ENDPOINT: "http://jaeger:4318"
+      OTEL_GO_X_DEPRECATED_RUNTIME_METRICS: "false"
     ports:
       - "127.0.0.1:5000:5000"
 
@@ -21,6 +22,8 @@ services:
     ports:
       - "127.0.0.1:16686:16686"
 
+  # TODO: use plain prometheus?
+  #       avoids need for grafana plugin, but modifies meter provider to enable scraping
   victoria-metrics:
     image: "mirror.gcr.io/victoriametrics/victoria-metrics:latest" # TODO: pick tag
     ports:
@@ -32,9 +35,15 @@ services:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
       GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
       GF_AUTH_BASIC_ENABLED: "false"
+      # while victoria-metrics is somewhat compatible with prometheus, it differs just enough that
+      # some parts are broken, see https://github.com/grafana/grafana/issues/42615
+      GF_INSTALL_PLUGINS: "https://github.com/VictoriaMetrics/victoriametrics-datasource/releases/download/v0.10.3/victoriametrics-datasource-v0.10.3.zip;victoriametrics-datasource"
+      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: "victoriametrics-datasource"
     ports:
       - "127.0.0.1:3000:3000"
     volumes:
-    - "./config/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro"
+      - "./config/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro"
+      - "./config/dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml:ro"
+      - "./config/dashboards:/etc/dashboards:rw"
 
 

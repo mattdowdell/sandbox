@@ -3,6 +3,7 @@ package datastore
 import (
 	"context"
 	"errors"
+	"math/rand/v2"
 	"time"
 
 	"github.com/google/uuid"
@@ -17,6 +18,10 @@ func NewStub() *Stub {
 }
 
 func (s *Stub) CreateResource(context.Context, *entities.Resource) error {
+	// temporarily introduce a small sleep to generate more interesting metrics for duration
+	i := rand.IntN(1000)
+	time.Sleep(time.Millisecond * time.Duration(i))
+
 	return nil
 }
 

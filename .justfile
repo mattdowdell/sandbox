@@ -12,6 +12,9 @@ dev-up:
 dev-down:
     podman compose down -v
 
+# Restart the development environment.
+dev-restart: dev-down dev-up
+
 # Run all automated code modifications.
 checks: tidy vendor gen fmt
 
