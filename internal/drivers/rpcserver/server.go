@@ -3,8 +3,9 @@ package rpcserver
 import (
 	"context"
 	"errors"
-	"fmt"
+	"net"
 	"net/http"
+	"strconv"
 	"time"
 
 	"connectrpc.com/connect"
@@ -18,7 +19,8 @@ const (
 
 // Config contains the configuration for creating a Server instance.
 type Config struct {
-	Port uint16 `koanf:"rpcserver.port" default:"5000"`
+	Host string `koanf:"host" default:"localhost"`
+	Port uint16 `koanf:"port" default:"5000"`
 }
 
 // Handler implementations can register themselves to be hosted by the server.
@@ -33,11 +35,11 @@ type Server struct {
 
 // New creates a new Server instance from the given configuration.
 func NewFromConfig(config Config, handlers []Handler, opts []connect.HandlerOption) *Server {
-	return New(config.Port, handlers, opts)
+	return New(config.Host, config.Port, handlers, opts)
 }
 
 // New creates a new Server instance.
-func New(port uint16, handlers []Handler, opts []connect.HandlerOption) *Server {
+func New(host string, port uint16, handlers []Handler, opts []connect.HandlerOption) *Server {
 	mux := http.NewServeMux()
 
 	for _, h := range handlers {
@@ -46,8 +48,7 @@ func New(port uint16, handlers []Handler, opts []connect.HandlerOption) *Server 
 
 	return &Server{
 		server: &http.Server{
-			// TODO: remove localhost once running in a container
-			Addr:              fmt.Sprintf("localhost:%d", port),
+			Addr:              net.JoinHostPort(host, strconv.FormatUint(uint64(port), 10 /*base*/)),
 			Handler:           h2c.NewHandler(mux, &http2.Server{}),
 			ReadHeaderTimeout: readHeaderTimeout,
 		},

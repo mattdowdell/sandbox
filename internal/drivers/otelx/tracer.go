@@ -11,7 +11,7 @@ import (
 // ...
 type TracerProviderConfig struct {
 	// ...
-	Endpoint string `koanf:"tracerprovider.endpoint"`
+	Endpoint string `koanf:"endpoint"`
 }
 
 // ...
@@ -22,7 +22,7 @@ func NewTracerProvider(
 	ctx context.Context,
 	conf TracerProviderConfig,
 ) (TracerProviderShutdown, error) {
-	exporter, err := otlptracehttp.New(ctx, otlptracehttp.WithEndpoint(conf.Endpoint))
+	exporter, err := otlptracehttp.New(ctx, otlptracehttp.WithEndpointURL(conf.Endpoint))
 	if err != nil {
 		return nil, err
 	}

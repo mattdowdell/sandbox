@@ -10,12 +10,12 @@ import (
 
 // Config contains the service configuration.
 type Config struct {
-	App         AppConfig
-	Logging     logging.Config
-	Meter       otelx.MeterProviderConfig
-	Tracer      otelx.TracerProviderConfig
-	OtelConnect otelconnectx.Config
-	RPCServer   rpcserver.Config
+	App         AppConfig                  `koanf:",squash"`
+	Logging     logging.Config             `koanf:"logging"`
+	Meter       otelx.MeterProviderConfig  `koanf:"meterprovider"`
+	Tracer      otelx.TracerProviderConfig `koanf:"tracerprovider"`
+	OtelConnect otelconnectx.Config        `koanf:"otelconnect"`
+	RPCServer   rpcserver.Config           `koanf:"rpcserver"`
 }
 
 // LoadConfig loads the service configuration.

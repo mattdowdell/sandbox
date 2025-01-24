@@ -1,0 +1,2027 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 1,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 21,
+      "panels": [],
+      "title": "Description",
+      "type": "row"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      },
+      "id": 20,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "This dashboard provides visualisations for 3 of the 4 golden signals: Errors,\nLatency and Traffic.\n\nIt aims to track compliance with the following [SLOs][1]:\n\n* 99% of requests must be served within 100ms.\n* 99% of requests must result in a success response.\n\nThe following [status codes][2] are considered to be error responses.\n\n| Status Code      | ID |\n| ---------------- | -- |\n| Unknown          | 2  |\n| DeadlineExceeded | 4  |\n| Internal         | 13 |\n| Unavailable      | 14 |\n\n[1]: https://sre.google/sre-book/service-level-objectives/\n[2]: https://grpc.io/docs/guides/status-codes/",
+        "mode": "markdown"
+      },
+      "pluginVersion": "11.4.0",
+      "title": "",
+      "type": "text"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 11
+      },
+      "id": 13,
+      "panels": [],
+      "title": "Errors",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-datasource",
+        "uid": "victoriametrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "noValue": "N/A",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0.01
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 0,
+        "y": 12
+      },
+      "id": 18,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-datasource",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "(sum(increase(rpc.server.duration_bucket{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",le=\"250\"}[$__rate_interval])) - sum(increase(rpc.server.duration_bucket{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",le=\"100\"}[$__rate_interval]))) / sum(increase(rpc.server.duration_count{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\"}[$__rate_interval]))",
+          "hide": false,
+          "legendFormat": "Requests",
+          "range": true,
+          "refId": "C"
+        }
+      ],
+      "title": "Above Latency Threshold",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-datasource",
+        "uid": "victoriametrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "noValue": "N/A",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0.1
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 4,
+        "y": 12
+      },
+      "id": 19,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(increase(rpc.server.duration_count{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.grpc.status_code=~\"2|4|13|14\"}[$__rate_interval])) / sum(increase(rpc.server.duration_count{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\"}[$__rate_interval]))",
+          "legendFormat": "Requests",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Error Responses",
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "0",
+            "renamePattern": "OK"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "1",
+            "renamePattern": "Cancelled"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "2",
+            "renamePattern": "Unknown"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "3",
+            "renamePattern": "InvalidArgument"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "4",
+            "renamePattern": "DeadlineExceeded"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "5",
+            "renamePattern": "NotFound"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "6",
+            "renamePattern": "AlreadyExists"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "7",
+            "renamePattern": "PermissionDenied"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "8",
+            "renamePattern": "ResourceExhausted"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "9",
+            "renamePattern": "FailedPrecondition"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "10",
+            "renamePattern": "Aborted"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "11",
+            "renamePattern": "OutOfRange"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "12",
+            "renamePattern": "Unimplemented"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "13",
+            "renamePattern": "Internal"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "14",
+            "renamePattern": "Unavailable"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "15",
+            "renamePattern": "DataLosss"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "16",
+            "renamePattern": "Unauthenticated"
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-datasource",
+        "uid": "victoriametrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMax": 0.1,
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "max": 7,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 12
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-datasource",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "(sum by(service.name,rpc.service,rpc.method) (increase(rpc.server.duration_bucket{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",le=\"250\"}[$__rate_interval])) - sum by(service.name,rpc.service,rpc.method) (increase(rpc.server.duration_bucket{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",le=\"100\"}[$__rate_interval]))) / sum by(service.name,rpc.service,rpc.method) (increase(rpc.server.duration_count{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\"}[$__rate_interval]))",
+          "hide": false,
+          "legendFormat": "{{service.name}} {{rpc.service}}/{{rpc.method}}",
+          "range": true,
+          "refId": "C"
+        }
+      ],
+      "title": "Above Latency Threshold",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-datasource",
+        "uid": "victoriametrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMax": 0.1,
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 12
+      },
+      "id": 17,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum by(service.name,rpc.service,rpc.method) (increase(rpc.server.duration_count{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.grpc.status_code=~\"2|4|13|14\"}[$__rate_interval])) / sum by(service.name,rpc.service,rpc.method) (increase(rpc.server.duration_count{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\"}[$__rate_interval]))",
+          "legendFormat": "{{service.name}} {{rpc.service}}/{{rpc.method}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Error Responses",
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "0",
+            "renamePattern": "OK"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "1",
+            "renamePattern": "Cancelled"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "2",
+            "renamePattern": "Unknown"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "3",
+            "renamePattern": "InvalidArgument"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "4",
+            "renamePattern": "DeadlineExceeded"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "5",
+            "renamePattern": "NotFound"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "6",
+            "renamePattern": "AlreadyExists"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "7",
+            "renamePattern": "PermissionDenied"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "8",
+            "renamePattern": "ResourceExhausted"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "9",
+            "renamePattern": "FailedPrecondition"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "10",
+            "renamePattern": "Aborted"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "11",
+            "renamePattern": "OutOfRange"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "12",
+            "renamePattern": "Unimplemented"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "13",
+            "renamePattern": "Internal"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "14",
+            "renamePattern": "Unavailable"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "15",
+            "renamePattern": "DataLosss"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "16",
+            "renamePattern": "Unauthenticated"
+          }
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 20
+      },
+      "id": 12,
+      "panels": [],
+      "title": "Latency",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-datasource",
+        "uid": "victoriametrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "noValue": "N/A",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 100
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 0,
+        "y": 21
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "histogram_quantile(0.5, sum(increase(rpc.server.duration_bucket{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.grpc.status_code!~\"2|4|13|14\"}[$__rate_interval])) by (le))",
+          "format": "time_series",
+          "instant": false,
+          "legendFormat": "p50",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "P50 Average (Success)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-datasource",
+        "uid": "victoriametrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "min": 0,
+          "noValue": "N/A",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 100
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 4,
+        "y": 21
+      },
+      "id": 6,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "histogram_quantile(0.5, sum(increase(rpc.server.duration_bucket{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.grpc.status_code=~\"2|4|13|14\"}[$__rate_interval])) by (le))",
+          "format": "time_series",
+          "instant": false,
+          "legendFormat": "p50",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "P50 Average (Error)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-datasource",
+        "uid": "victoriametrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "min": 0,
+          "noValue": "N/A",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 100
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 8,
+        "y": 21
+      },
+      "id": 7,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "histogram_quantile(0.9, sum(increase(rpc.server.duration_bucket{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.grpc.status_code!~\"2|4|13|14\"}[$__rate_interval])) by (le))",
+          "format": "time_series",
+          "instant": false,
+          "legendFormat": "p50",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "P90 Average (Success)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-datasource",
+        "uid": "victoriametrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "min": 0,
+          "noValue": "N/A",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 100
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 12,
+        "y": 21
+      },
+      "id": 8,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "histogram_quantile(0.9, sum(increase(rpc.server.duration_bucket{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.grpc.status_code=~\"2|4|13|14\"}[$__rate_interval])) by (le))",
+          "format": "time_series",
+          "instant": false,
+          "legendFormat": "p50",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "P90 Average (Error)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-datasource",
+        "uid": "victoriametrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "min": 0,
+          "noValue": "N/A",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 100
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 16,
+        "y": 21
+      },
+      "id": 10,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "histogram_quantile(0.99, sum(increase(rpc.server.duration_bucket{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.grpc.status_code!~\"2|4|13|14\"}[$__rate_interval])) by (le))",
+          "format": "time_series",
+          "instant": false,
+          "legendFormat": "p50",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "P99 Average (Success)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-datasource",
+        "uid": "victoriametrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "min": 0,
+          "noValue": "N/A",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 100
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 20,
+        "y": 21
+      },
+      "id": 9,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "histogram_quantile(0.99, sum(increase(rpc.server.duration_bucket{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.grpc.status_code=~\"2|4|13|14\"}[$__rate_interval])) by (le))",
+          "format": "time_series",
+          "instant": false,
+          "legendFormat": "p50",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "P99 Average (Error)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-datasource",
+        "uid": "victoriametrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 24
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-datasource",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.5, sum(increase(rpc.server.duration_bucket{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\"}[$__rate_interval])) by (le))",
+          "legendFormat": "p50",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-datasource",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.9, sum(increase(rpc.server.duration_bucket{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\"}[$__rate_interval])) by (le))",
+          "hide": false,
+          "legendFormat": "p90",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-datasource",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.99, sum(increase(rpc.server.duration_bucket{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\"}[$__rate_interval])) by (le))",
+          "hide": false,
+          "legendFormat": "p99",
+          "range": true,
+          "refId": "C"
+        }
+      ],
+      "title": "Overall",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-datasource",
+        "uid": "victoriametrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 24
+      },
+      "id": 11,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-datasource",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.5, sum(increase(rpc.server.duration_bucket{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.grpc.status_code!~\"2|4|13|14\"}[$__rate_interval])) by (le))",
+          "legendFormat": "p50",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-datasource",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.9, sum(increase(rpc.server.duration_bucket{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.grpc.status_code!~\"2|4|13|14\"}[$__rate_interval])) by (le))",
+          "hide": false,
+          "legendFormat": "p90",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-datasource",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.99, sum(increase(rpc.server.duration_bucket{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.grpc.status_code!~\"2|4|13|14\"}[$__rate_interval])) by (le))",
+          "hide": false,
+          "legendFormat": "p99",
+          "range": true,
+          "refId": "C"
+        }
+      ],
+      "title": "Success Responses",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-datasource",
+        "uid": "victoriametrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 24
+      },
+      "id": 15,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-datasource",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.5, sum(increase(rpc.server.duration_bucket{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.grpc.status_code=~\"2|4|13|14\"}[$__rate_interval])) by (le))",
+          "legendFormat": "p50",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-datasource",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.9, sum(increase(rpc.server.duration_bucket{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.grpc.status_code=~\"2|4|13|14\"}[$__rate_interval])) by (le))",
+          "hide": false,
+          "legendFormat": "p90",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-datasource",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.99, sum(increase(rpc.server.duration_bucket{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.grpc.status_code=~\"2|4|13|14\"}[$__rate_interval])) by (le))",
+          "hide": false,
+          "legendFormat": "p99",
+          "range": true,
+          "refId": "C"
+        }
+      ],
+      "title": "Error Responses",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 32
+      },
+      "id": 14,
+      "panels": [],
+      "title": "Traffic",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-datasource",
+        "uid": "victoriametrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": [],
+          "noValue": "N/A"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 0,
+        "y": 33
+      },
+      "id": 16,
+      "options": {
+        "displayLabels": [],
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum by(rpc.grpc.status_code) (increase(rpc.server.duration_count{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\"}[$__rate_interval]))",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Status Codes",
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "0",
+            "renamePattern": "OK"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "1",
+            "renamePattern": "Cancelled"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "2",
+            "renamePattern": "Unknown"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "3",
+            "renamePattern": "InvalidArgument"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "4",
+            "renamePattern": "DeadlineExceeded"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "5",
+            "renamePattern": "NotFound"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "6",
+            "renamePattern": "AlreadyExists"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "7",
+            "renamePattern": "PermissionDenied"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "8",
+            "renamePattern": "ResourceExhausted"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "9",
+            "renamePattern": "FailedPrecondition"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "10",
+            "renamePattern": "Aborted"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "11",
+            "renamePattern": "OutOfRange"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "12",
+            "renamePattern": "Unimplemented"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "13",
+            "renamePattern": "Internal"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "14",
+            "renamePattern": "Unavailable"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "15",
+            "renamePattern": "DataLosss"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "16",
+            "renamePattern": "Unauthenticated"
+          }
+        }
+      ],
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-datasource",
+        "uid": "victoriametrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Requests",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 10,
+        "x": 4,
+        "y": 33
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(increase(rpc.server.duration_count{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\"}[$__rate_interval])) default 0",
+          "legendFormat": "Requests",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Overall",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-datasource",
+        "uid": "victoriametrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Requests",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 10,
+        "x": 14,
+        "y": 33
+      },
+      "id": 3,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum by(rpc.grpc.status_code) (increase(rpc.server.duration_count{service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\"}[$__rate_interval]))",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "By Status Code",
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "0",
+            "renamePattern": "OK"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "1",
+            "renamePattern": "Cancelled"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "2",
+            "renamePattern": "Unknown"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "3",
+            "renamePattern": "InvalidArgument"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "4",
+            "renamePattern": "DeadlineExceeded"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "5",
+            "renamePattern": "NotFound"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "6",
+            "renamePattern": "AlreadyExists"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "7",
+            "renamePattern": "PermissionDenied"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "8",
+            "renamePattern": "ResourceExhausted"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "9",
+            "renamePattern": "FailedPrecondition"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "10",
+            "renamePattern": "Aborted"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "11",
+            "renamePattern": "OutOfRange"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "12",
+            "renamePattern": "Unimplemented"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "13",
+            "renamePattern": "Internal"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "14",
+            "renamePattern": "Unavailable"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "15",
+            "renamePattern": "DataLosss"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "16",
+            "renamePattern": "Unauthenticated"
+          }
+        }
+      ],
+      "type": "timeseries"
+    }
+  ],
+  "preload": false,
+  "refresh": "1m",
+  "schemaVersion": 40,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "definition": "label_values(rpc.server.duration_bucket,service.name)",
+        "includeAll": true,
+        "label": "Service Name",
+        "name": "service_name",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(rpc.server.duration_bucket,service.name)",
+          "refId": "VariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "definition": "label_values(rpc.server.duration_bucket{service.name=~\"$service_name\"},rpc.service)",
+        "includeAll": true,
+        "label": "RPC Service",
+        "name": "rpc_service",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(rpc.server.duration_bucket{service.name=~\"$service_name\"},rpc.service)",
+          "refId": "VariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "definition": "label_values(rpc.server.duration_bucket{service.name=~\"$service_name\", rpc.service=~\"$rpc_service\"},rpc.method)",
+        "includeAll": true,
+        "label": "RPC Method",
+        "name": "rpc_method",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(rpc.server.duration_bucket{service.name=~\"$service_name\", rpc.service=~\"$rpc_service\"},rpc.method)",
+          "refId": "VariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "RPC",
+  "uid": "aeaqszf1dscn4b",
+  "version": 2,
+  "weekStart": ""
+}

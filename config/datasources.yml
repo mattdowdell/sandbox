@@ -1,0 +1,21 @@
+# TODO: link to docs
+
+apiVersion: 1
+datasources:
+  - name: "VictoriaMetrics"
+    type: "victoriametrics-datasource"
+    uid: "victoriametrics"
+    url: "http://victoria-metrics:8428/"
+    access: "proxy"
+    basicAuth: false
+    isDefault: true
+    editable: false
+
+  - name: "Jaeger"
+    type: "jaeger"
+    uid: "jaeger"
+    url: "http://jaeger:16686"
+    access: "proxy"
+    basicAuth: false
+    isDefault: false
+    editable: false

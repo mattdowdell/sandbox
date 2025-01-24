@@ -153,8 +153,8 @@ func (x *Resource) GetUpdatedAt() *timestamppb.Timestamp {
 
 // ...
 type ResourceCreate struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -200,7 +200,7 @@ func (x *ResourceCreate) GetName() string {
 type ResourceUpdate struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// ...
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name          string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

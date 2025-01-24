@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"syscall"
 
 	"github.com/mattdowdell/sandbox/internal/drivers/exit"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
@@ -21,7 +22,7 @@ func run(ctx context.Context) int {
 		return exit.Failure
 	}
 
-	ctx, stop := signal.NotifyContext(ctx, os.Interrupt, os.Kill)
+	ctx, stop := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
 	app.Start(ctx, stop)

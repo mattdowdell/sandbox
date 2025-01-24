@@ -11,7 +11,7 @@ import (
 // ...
 type MeterProviderConfig struct {
 	// ...
-	Endpoint string `koanf:"meterprovider.endpoint"`
+	Endpoint string `koanf:"endpoint"`
 }
 
 // ...
@@ -22,7 +22,7 @@ func NewMeterProvider(
 	ctx context.Context,
 	conf MeterProviderConfig,
 ) (MeterProviderShutdown, error) {
-	exporter, err := otlpmetrichttp.New(ctx, otlpmetrichttp.WithEndpoint(conf.Endpoint))
+	exporter, err := otlpmetrichttp.New(ctx, otlpmetrichttp.WithEndpointURL(conf.Endpoint))
 	if err != nil {
 		return nil, err
 	}
