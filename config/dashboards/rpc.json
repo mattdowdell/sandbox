@@ -52,7 +52,7 @@
           "showLineNumbers": false,
           "showMiniMap": false
         },
-        "content": "This dashboard provides visualisations for 3 of the 4 golden signals: Errors,\nLatency and Traffic.\n\nIt aims to track compliance with the following [SLOs][1]:\n\n* 99% of requests must be served within 100ms.\n* 99% of requests must result in a success response.\n\nThe following [status codes][2] are considered as error responses.\n\n| Status Code      | ID |\n| ---------------- | -- |\n| Unknown          | 2  |\n| DeadlineExceeded | 4  |\n| Internal         | 13 |\n| Unavailable      | 14 |\n\n[1]: https://sre.google/sre-book/service-level-objectives/\n[2]: https://grpc.io/docs/guides/status-codes/",
+        "content": "This dashboard provides visualisations for 3 of the 4 golden signals: Errors,\nLatency and Traffic.\n\nIt aims to track compliance with the following [SLOs][1]:\n\n* 99% of requests must be served within 100ms.\n* 99% of requests must result in a success response.\n\nThe following [status codes][2] are considered to be error responses.\n\n| Status Code      | ID |\n| ---------------- | -- |\n| Unknown          | 2  |\n| DeadlineExceeded | 4  |\n| Internal         | 13 |\n| Unavailable      | 14 |\n\n[1]: https://sre.google/sre-book/service-level-objectives/\n[2]: https://grpc.io/docs/guides/status-codes/",
         "mode": "markdown"
       },
       "pluginVersion": "11.4.0",
