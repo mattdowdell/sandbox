@@ -27,7 +27,15 @@ func NewTracerProvider(
 		return nil, err
 	}
 
-	provider := trace.NewTracerProvider(trace.WithBatcher(exporter))
+	res, err := newResource()
+	if err != nil {
+		return nil, err
+	}
+
+	provider := trace.NewTracerProvider(
+		trace.WithBatcher(exporter),
+		trace.WithResource(res),
+	)
 	otel.SetTracerProvider(provider)
 
 	return provider.Shutdown, nil
