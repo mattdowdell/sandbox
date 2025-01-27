@@ -11,7 +11,7 @@ server reflection enabled, ad-hoc debugging tools can call your gRPC-compatible
 handlers and print the responses *without* a copy of the schema.
 
 The exposed reflection API is wire compatible with Google's gRPC
-implementations, so it works with [grpcurl], [grpcui], [BloomRPC], and many
+implementations, so it works with [grpcurl], [grpcui], and many
 other tools.
 
 For more on Connect, see the [announcement blog post][blog], the documentation
@@ -57,7 +57,8 @@ func main() {
 
 This module is stable. It supports:
 
-* The [two most recent major releases][go-support-policy] of Go.
+* The three most recent major releases of Go. Keep in mind that [only the last
+  two releases receive security patches][go-support-policy].
 * [APIv2] of Protocol Buffers in Go (`google.golang.org/protobuf`).
 
 Within those parameters, `grpcreflect` follows semantic versioning.
@@ -68,7 +69,6 @@ We will _not_ make breaking changes in the 1.x series of releases.
 Offered under the [Apache 2 license][license].
 
 [APIv2]: https://blog.golang.org/protobuf-apiv2
-[BloomRPC]: https://github.com/bloomrpc/bloomrpc
 [Getting Started]: https://connectrpc.com/go/getting-started
 [blog]: https://buf.build/blog/connect-a-better-grpc
 [connect]: https://github.com/connectrpc/connect-go
