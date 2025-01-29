@@ -27,7 +27,15 @@ func NewMeterProvider(
 		return nil, err
 	}
 
-	provider := metric.NewMeterProvider(metric.WithReader(metric.NewPeriodicReader(exporter)))
+	res, err := newResource()
+	if err != nil {
+		return nil, err
+	}
+
+	provider := metric.NewMeterProvider(
+		metric.WithReader(metric.NewPeriodicReader(exporter)),
+		metric.WithResource(res),
+	)
 	otel.SetMeterProvider(provider)
 
 	return provider.Shutdown, nil

@@ -1,0 +1,59 @@
+# TODO: link docs
+#
+# TODO: document use of mirror.gcr.io
+# https://cloud.google.com/artifact-registry/docs/pull-cached-dockerhub-images
+
+FROM mirror.gcr.io/golang:1.23-bookworm
+
+RUN set -eux; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends tini; \
+	rm -rf /var/lib/apt/lists/*;
+
+RUN set -eux; \
+	curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | \
+	bash -s -- --to /usr/local/bin;
+
+ARG TRIVY_VERSION=v0.18.3
+RUN set -eux; \
+	curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | \
+	sh -s -- -b /usr/local/bin ${TRIVY_VERSION};
+
+ARG USER_NAME=dev
+ARG USER_COMMENT=Dev
+ARG USER_UID=1000
+ARG USER_GID=1000
+RUN set -eux; \
+	groupadd --gid ${USER_GID} ${USER_NAME}; \
+	useradd --comment ${USER_COMMENT} --create-home --gid ${USER_GID} --uid ${USER_UID} ${USER_NAME}
+
+ENV GOPATH=''
+USER ${USER_NAME}
+RUN set -eux; \
+	echo "export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin" >> /home/dev/.bashrc
+
+ARG BUF_VERSION=v1.50.0
+ARG CONNECTRPC_VERSION=v1.18.1
+ARG GCI_VERSION=v0.13.5
+ARG GOFUMPT_VERSION=v0.7.0
+ARG MOCKERY_VERSION=v2.50.4
+ARG PROTOBUF_VERSION=v1.36.1
+ARG WIRE_VERSION=v0.6.0
+RUN set -eux; \
+	go install github.com/bufbuild/buf/cmd/buf@${BUF_VERSION}; \
+	go install connectrpc.com/connect/cmd/protoc-gen-connect-go@${CONNECTRPC_VERSION}; \
+	go install github.com/daixiang0/gci@${GCI_VERSION}; \
+	go install mvdan.cc/gofumpt@${GOFUMPT_VERSION}; \
+	go install github.com/vektra/mockery/v2@${MOCKERY_VERSION}; \
+	go install google.golang.org/protobuf/cmd/protoc-gen-go@${PROTOBUF_VERSION}; \
+	go install github.com/google/wire/cmd/wire@${WIRE_VERSION};
+
+ARG GOLANGCI_LINT_VERSION=v1.63.4
+RUN set -eux; \
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | \
+	sh -s -- -b $(go env GOPATH)/bin ${GOLANGCI_LINT_VERSION};
+
+WORKDIR /home/dev/ws
+
+ENTRYPOINT ["/bin/bash", "-c"]
+CMD ["while true; do sleep 10; done"]

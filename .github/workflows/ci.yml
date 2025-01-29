@@ -58,11 +58,13 @@ jobs:
         uses: mattdowdell/go-installer@v0.1.0
         with:
           package: github.com/daixiang0/gci
+          version: v0.13.5
 
       - name: Install gofumpt
         uses: mattdowdell/go-installer@v0.1.0
         with:
           package: mvdan.cc/gofumpt
+          version: v0.7.0
 
       - name: Install mockery
         uses: mattdowdell/go-installer@v0.1.0
@@ -74,7 +76,7 @@ jobs:
         uses: mattdowdell/go-installer@v0.1.0
         with:
           package: connectrpc.com/connect/cmd/protoc-gen-connect-go
-          version: v1.18.0
+          version: v1.18.1
 
       - name: Install protoc-gen-go
         uses: mattdowdell/go-installer@v0.1.0
@@ -105,7 +107,7 @@ jobs:
       - name: Lint Go
         uses: golangci/golangci-lint-action@v6
         with:
-          version: 'latest'
+          version: v1.63.4
           args: --timeout=10m
 
       - name: Lint Protobuf
