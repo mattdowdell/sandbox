@@ -12,6 +12,7 @@ linters:
     - ineffassign
     - staticcheck
     - typecheck
+    - contextcheck
     - durationcheck
     - copyloopvar
     - gocheckcompilerdirectives

@@ -28,13 +28,8 @@ const (
 	defaultSemVer = "v0.0.0-dev"
 )
 
-var (
-	SemVer                      = ""
-	DisableDeprecationWarnings  bool
-	DisabledDeprecationWarnings []string
-	seenWarnings                []string
-	deferredCalls               []func()
-)
+// SemVer is the version of mockery at build time.
+var SemVer = ""
 
 var ErrPkgNotExist = errors.New("package does not exist")
 
@@ -47,12 +42,6 @@ func GetSemverInfo() string {
 		return version.Main.Version
 	}
 	return defaultSemVer
-}
-
-func LogDeprecationWarnings() {
-	for _, warn := range deferredCalls {
-		warn()
-	}
 }
 
 func getMinorSemver(semver string) string {
@@ -97,6 +86,7 @@ func GetLogger(levelStr string) (zerolog.Logger, error) {
 		With().
 		Str("version", GetSemverInfo()).
 		Logger()
+
 	return log, nil
 }
 
@@ -118,32 +108,6 @@ func Info(ctx context.Context, prefix string, message string, fields map[string]
 	event.Msgf("%s: %s", prefix, message)
 }
 
-func WarnDeprecated(name, message string, fields map[string]any) {
-	log, _ := GetLogger("warn")
-	ctx := log.WithContext(context.Background())
-	if DisableDeprecationWarnings {
-		return
-	}
-	for _, disabledWarning := range DisabledDeprecationWarnings {
-		if disabledWarning == name {
-			return
-		}
-	}
-	for _, seenWarning := range seenWarnings {
-		if seenWarning == name {
-			return
-		}
-	}
-	seenWarnings = append(seenWarnings, name)
-	if fields == nil {
-		fields = map[string]any{}
-	}
-	fields["deprecation-name"] = name
-	if _, ok := fields["url"]; !ok {
-		fields["url"] = DocsURL(fmt.Sprintf("/deprecations/#%s", name))
-	}
-
-	deferredCalls = append(deferredCalls, func() {
-		Warn(ctx, "DEPRECATION", message, fields)
-	})
+func WarnDeprecated(ctx context.Context, message string, fields map[string]any) {
+	Warn(ctx, "DEPRECATION", message, fields)
 }
