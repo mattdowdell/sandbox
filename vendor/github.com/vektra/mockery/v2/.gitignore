@@ -1,0 +1,10 @@
+mockery.prof
+dist
+.idea
+docs/ve
+ve
+.cache
+coverage.txt
+site/
+.task/
+tools/tools

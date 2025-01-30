@@ -2,17 +2,15 @@
 
 ## Dependencies
 
-Core:
-- [`podman`](#todo)
-- [`podman-compose`](#todo)
-- [`just`](#todo)
+```sh
+# macos
+brew install just
 
-Others (TODO: put these in a dev image?):
-- trivy
-- go
-- buf
-- gofumpt
-- gci
-- wire
-- mockery
-- golangci-lint
+# linux
+curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to /usr/local/bin
+```
+
+TODO:
+- `podman`
+- `podman-compose`
+
