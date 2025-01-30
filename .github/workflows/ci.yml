@@ -58,36 +58,37 @@ jobs:
         uses: mattdowdell/go-installer@v0.1.0
         with:
           package: github.com/daixiang0/gci
-          version: v0.13.5
+          version-file: go.mod
 
       - name: Install gofumpt
         uses: mattdowdell/go-installer@v0.1.0
         with:
           package: mvdan.cc/gofumpt
-          version: v0.7.0
+          version-file: go.mod
 
       - name: Install mockery
         uses: mattdowdell/go-installer@v0.1.0
         with:
           package: github.com/vektra/mockery/v2
-          version: v2.50.4
+          version-file: go.mod
 
       - name: Install protoc-gen-connect-go
         uses: mattdowdell/go-installer@v0.1.0
         with:
           package: connectrpc.com/connect/cmd/protoc-gen-connect-go
-          version: v1.18.1
+          version-file: go.mod
 
       - name: Install protoc-gen-go
         uses: mattdowdell/go-installer@v0.1.0
         with:
           package: google.golang.org/protobuf/cmd/protoc-gen-go
-          version: v1.36.1
+          version-file: go.mod
 
       - name: Install wire
         uses: mattdowdell/go-installer@v0.1.0
         with:
           package: github.com/google/wire/cmd/wire
+          version-file: go.mod
 
       - name: Checks
         run: just checks dirty

@@ -1,4 +1,4 @@
-# TODO: link docs
+# https://docs.docker.com/reference/dockerfile/
 #
 # TODO: document use of mirror.gcr.io
 # https://cloud.google.com/artifact-registry/docs/pull-cached-dockerhub-images
