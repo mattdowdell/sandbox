@@ -55,37 +55,37 @@ jobs:
         uses: extractions/setup-just@v2
 
       - name: Install gci
-        uses: mattdowdell/go-installer@version-file
+        uses: mattdowdell/go-installer@v0.2.0
         with:
           package: github.com/daixiang0/gci
           version-file: go.mod
 
       - name: Install gofumpt
-        uses: mattdowdell/go-installer@version-file
+        uses: mattdowdell/go-installer@v0.2.0
         with:
           package: mvdan.cc/gofumpt
           version-file: go.mod
 
       - name: Install mockery
-        uses: mattdowdell/go-installer@version-file
+        uses: mattdowdell/go-installer@v0.2.0
         with:
           package: github.com/vektra/mockery/v2
           version-file: go.mod
 
       - name: Install protoc-gen-connect-go
-        uses: mattdowdell/go-installer@version-file
+        uses: mattdowdell/go-installer@v0.2.0
         with:
           package: connectrpc.com/connect/cmd/protoc-gen-connect-go
           version-file: go.mod
 
       - name: Install protoc-gen-go
-        uses: mattdowdell/go-installer@version-file
+        uses: mattdowdell/go-installer@v0.2.0
         with:
           package: google.golang.org/protobuf/cmd/protoc-gen-go
           version-file: go.mod
 
       - name: Install wire
-        uses: mattdowdell/go-installer@version-file
+        uses: mattdowdell/go-installer@v0.2.0
         with:
           package: github.com/google/wire/cmd/wire
           version-file: go.mod
