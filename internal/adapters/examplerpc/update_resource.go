@@ -22,7 +22,7 @@ func (h *Handler) UpdateResource(
 		return nil, ErrInternal
 	}
 
-	output, err := h.resourceCreator.Execute(ctx, input)
+	output, err := h.resourceUpdater.Execute(ctx, input)
 	if err != nil {
 		slog.DebugContext(ctx, "usecase error", slogx.Err(err))
 		return nil, ErrInternal

@@ -6,7 +6,6 @@ package main
 import (
 	"context"
 
-	"connectrpc.com/connect"
 	"github.com/google/wire"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore"
@@ -64,6 +63,7 @@ func ProvideApp(ctx context.Context) (*App, error) {
 		validatex.New,
 		otelconnectx.NewFromConfig,
 		collectInterceptors,
+		rpcserver.NewRecoverer,
 		collectHandlerOptions,
 		// handlers
 		examplerpc.New,
@@ -77,42 +77,4 @@ func ProvideApp(ctx context.Context) (*App, error) {
 	)
 
 	return &App{}, nil
-}
-
-// collectHandlers merges multiple Handler implementations into a slice.
-//
-// While wire can cast a struct to an interface, it gets confused if multiple instances of a type
-// are present. For more details, see https://github.com/google/wire/issues/207.
-func collectHandlers(
-	example *examplerpc.Handler,
-	reflect *reflectrpc.Handler,
-	health *healthrpc.Handler,
-) []rpcserver.Handler {
-	return []rpcserver.Handler{
-		example,
-		reflect,
-		health,
-	}
-}
-
-// ...
-//
-// TODO: document that the ordering here is important
-func collectInterceptors(
-	validate *validatex.Interceptor,
-	otelconnect *otelconnectx.Interceptor,
-) []connect.Interceptor {
-	return []connect.Interceptor{
-		otelconnect,
-		validate,
-	}
-}
-
-// ...
-func collectHandlerOptions(
-	interceptors []connect.Interceptor,
-) []connect.HandlerOption {
-	return []connect.HandlerOption{
-		connect.WithInterceptors(interceptors...),
-	}
 }
