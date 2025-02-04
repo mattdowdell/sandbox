@@ -7,7 +7,6 @@
 package main
 
 import (
-	"connectrpc.com/connect"
 	"context"
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
@@ -62,7 +61,11 @@ func ProvideApp(ctx context.Context) (*App, error) {
 		return nil, err
 	}
 	v2 := collectInterceptors(interceptor, otelconnectInterceptor)
-	v3 := collectHandlerOptions(v2)
+	recoverer, err := rpcserver.NewRecoverer()
+	if err != nil {
+		return nil, err
+	}
+	v3 := collectHandlerOptions(v2, recoverer)
 	server := rpcserver.NewFromConfig(rpcserverConfig, v, v3)
 	tracerProviderConfig := mainConfig.Tracer
 	tracerProviderShutdown, err := otelx.NewTracerProvider(ctx, tracerProviderConfig)
@@ -76,42 +79,4 @@ func ProvideApp(ctx context.Context) (*App, error) {
 	}
 	app := NewApp(appConfig, logger, server, tracerProviderShutdown, meterProviderShutdown)
 	return app, nil
-}
-
-// wire.go:
-
-// collectHandlers merges multiple Handler implementations into a slice.
-//
-// While wire can cast a struct to an interface, it gets confused if multiple instances of a type
-// are present. For more details, see https://github.com/google/wire/issues/207.
-func collectHandlers(
-	example *examplerpc.Handler,
-	reflect *reflectrpc.Handler,
-	health *healthrpc.Handler,
-) []rpcserver.Handler {
-	return []rpcserver.Handler{
-		example,
-		reflect,
-		health,
-	}
-}
-
-// ...
-//
-// TODO: document that the ordering here is important
-func collectInterceptors(
-	validate *validatex.Interceptor,
-	otelconnect *otelconnectx.Interceptor,
-) []connect.Interceptor {
-	return []connect.Interceptor{
-		otelconnect,
-		validate,
-	}
-}
-
-// ...
-func collectHandlerOptions(
-	interceptors []connect.Interceptor,
-) []connect.HandlerOption {
-	return []connect.HandlerOption{connect.WithInterceptors(interceptors...)}
 }

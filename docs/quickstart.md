@@ -2,6 +2,8 @@
 
 ## Dependencies
 
+### Just
+
 ```sh
 # macos
 brew install just
@@ -10,7 +12,17 @@ brew install just
 curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to /usr/local/bin
 ```
 
-TODO:
-- `podman`
-- `podman-compose`
+### Docker
+
+```sh
+# macos
+brew install docker docker-credential-helper docker-compose colima
+
+mkdir -p ~/.docker
+echo '{\n\t"auths": {},\n\t"credsStore": "osxkeychain",\n\t"currentContext": "colima",\n\t"cliPluginsExtraDirs": [\n\t\t"/opt/homebrew/lib/docker/cli-plugins"\n\t]\n}' > ~/.docker/config.json
+
+colima start
+
+docker context ls
+```
 

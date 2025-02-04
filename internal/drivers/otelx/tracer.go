@@ -5,7 +5,8 @@ import (
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
-	"go.opentelemetry.io/otel/sdk/trace"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // ...
@@ -32,11 +33,19 @@ func NewTracerProvider(
 		return nil, err
 	}
 
-	provider := trace.NewTracerProvider(
-		trace.WithBatcher(exporter),
-		trace.WithResource(res),
+	provider := sdktrace.NewTracerProvider(
+		sdktrace.WithBatcher(exporter),
+		sdktrace.WithResource(res),
 	)
 	otel.SetTracerProvider(provider)
 
 	return provider.Shutdown, nil
+}
+
+// ...
+func Tracer() trace.Tracer {
+	pkg := packageName(1 /*skip*/)
+	ver := packageVersion(pkg)
+
+	return otel.Tracer(pkg, trace.WithInstrumentationVersion(ver))
 }

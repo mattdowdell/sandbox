@@ -5,7 +5,8 @@ import (
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp"
-	"go.opentelemetry.io/otel/sdk/metric"
+	"go.opentelemetry.io/otel/metric"
+	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 )
 
 // ...
@@ -32,11 +33,19 @@ func NewMeterProvider(
 		return nil, err
 	}
 
-	provider := metric.NewMeterProvider(
-		metric.WithReader(metric.NewPeriodicReader(exporter)),
-		metric.WithResource(res),
+	provider := sdkmetric.NewMeterProvider(
+		sdkmetric.WithReader(sdkmetric.NewPeriodicReader(exporter)),
+		sdkmetric.WithResource(res),
 	)
 	otel.SetMeterProvider(provider)
 
 	return provider.Shutdown, nil
+}
+
+// ...
+func Meter() metric.Meter {
+	pkg := packageName(1 /*skip*/)
+	ver := packageVersion(pkg)
+
+	return otel.Meter(pkg, metric.WithInstrumentationVersion(ver))
 }

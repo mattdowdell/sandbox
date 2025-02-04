@@ -6,19 +6,15 @@ default:
 
 # Start the development environment.
 dev-up:
-    podman compose \
-        --podman-run-args='--replace' \
-        up \
-        --detach \
-        --build
+    docker compose up --detach --build
 
 # Exec into the development environment.
 dev-exec:
-    podman compose exec dev bash -l
+    docker compose exec dev bash -l
 
 # Stop the development environment.
 dev-down:
-    podman compose down -v
+    docker compose down -v
 
 # Restart the development environment.
 dev-restart: dev-down dev-up
