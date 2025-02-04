@@ -92,9 +92,7 @@ jobs:
 
       - name: Checks
         run: |
-          just checks
-          go version
-          just dirty
+          just checks dirty
 
   lint:
     name: Lint
