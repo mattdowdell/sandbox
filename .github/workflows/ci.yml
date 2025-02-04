@@ -91,7 +91,8 @@ jobs:
           version-file: go.mod
 
       - name: Checks
-        run: just checks dirty
+        run: |
+          just checks dirty
 
   lint:
     name: Lint
