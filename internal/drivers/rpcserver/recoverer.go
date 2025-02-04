@@ -17,7 +17,15 @@ import (
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
-// ...
+// Recoverer handles the recovery from panics and should be used with [connect.WithRecover].
+//
+// When a panic occurs, the following are performed:
+//
+// - A log record is produced containing the panic value and stacktrace.
+// - If available, the current span's status is set to error and the panic value is recorded as an event.
+// - The "rpc.server.panics" counter metric is incremented. This metric includes the "rpc.service" and "rpc.method" attributes.
+//
+// [connect.WithRecover]: https://pkg.go.dev/connectrpc.com/connect#WithRecover
 type Recoverer struct {
 	panics metric.Int64Counter
 }
