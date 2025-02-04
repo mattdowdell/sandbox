@@ -5,6 +5,7 @@ filename: "mock_{{ .InterfaceName | snakecase }}.go"
 issue-845-fix: true
 mockname: "{{ .InterfaceName }}"
 outpkg: "mock{{ .PackageName }}"
+resolve-type-alias: False
 with-expecter: true
 
 packages:
