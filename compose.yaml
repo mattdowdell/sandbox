@@ -31,11 +31,20 @@ services:
       test: [ "CMD", "/example-health" ]
       start_period: "30s"
       start_interval: "1s"
+    depends_on:
+      jaeger:
+        condition: service_healthy
+      victoria-metrics:
+        condition: service_healthy
 
   jaeger:
     image: "mirror.gcr.io/jaegertracing/jaeger:2.2.0"
     ports:
       - "127.0.0.1:16686:16686"
+    healthcheck:
+      test: [ "CMD", "wget", "-qO", "/dev/null", "http://localhost:16686/" ]
+      start_period: "30s"
+      start_interval: "1s"
 
   # TODO: use plain prometheus?
   #       avoids need for grafana plugin, but modifies meter provider to enable scraping
