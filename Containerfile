@@ -23,3 +23,4 @@ FROM gcr.io/distroless/static-debian12:nonroot@sha256:6cd937e9155bdfd805d1b94e03
 
 ARG SERVICE
 COPY --from=build /go/bin/${SERVICE} /${SERVICE}
+COPY --from=build /go/bin/example-health /example-health

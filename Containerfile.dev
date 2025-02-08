@@ -55,5 +55,4 @@ RUN set -eux; \
 
 WORKDIR /home/dev/ws
 
-ENTRYPOINT ["/bin/bash", "-c"]
-CMD ["while true; do sleep 10; done"]
+CMD ["sleep", "inf"]

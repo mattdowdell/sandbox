@@ -1,4 +1,4 @@
-# https://github.com/compose-spec/compose-spec/blob/main/spec.md
+# https://docs.docker.com/reference/compose-file/
 
 services:
   dev:
@@ -6,6 +6,7 @@ services:
     build:
       context: .
       dockerfile: Containerfile.dev
+    init: true
     hostname: example-dev
     volumes:
       - ".:/home/dev/ws"
@@ -26,11 +27,24 @@ services:
       OTEL_GO_X_DEPRECATED_RUNTIME_METRICS: "false"
     ports:
       - "127.0.0.1:5000:5000"
+    healthcheck:
+      test: [ "CMD", "/example-health" ]
+      start_period: "30s"
+      start_interval: "1s"
+    depends_on:
+      jaeger:
+        condition: service_healthy
+      victoria-metrics:
+        condition: service_healthy
 
   jaeger:
     image: "mirror.gcr.io/jaegertracing/jaeger:2.2.0"
     ports:
       - "127.0.0.1:16686:16686"
+    healthcheck:
+      test: [ "CMD", "wget", "-qO", "/dev/null", "http://localhost:16686/" ]
+      start_period: "30s"
+      start_interval: "1s"
 
   # TODO: use plain prometheus?
   #       avoids need for grafana plugin, but modifies meter provider to enable scraping
@@ -38,6 +52,10 @@ services:
     image: "mirror.gcr.io/victoriametrics/victoria-metrics:latest" # TODO: pick tag
     ports:
       - "127.0.0.1:8428:8428"
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://127.0.0.1:8428/-/healthy" ]
+      start_period: "30s"
+      start_interval: "1s"
 
   grafana:
     image: "mirror.gcr.io/grafana/grafana:latest"
@@ -55,5 +73,9 @@ services:
       - "./config/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro"
       - "./config/dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml:ro"
       - "./config/dashboards:/etc/dashboards:rw"
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/health" ]
+      start_period: "30s"
+      start_interval: "1s"
 
 

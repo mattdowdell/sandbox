@@ -4,6 +4,8 @@ go 1.23.4
 
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.31.0-20230824200731-b9b8148056b9.1
+	buf.build/gen/go/grpc/grpc/connectrpc/go v1.18.1-20250124201648-9327911dce6e.1
+	buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.2-20250124201648-9327911dce6e.1
 	connectrpc.com/connect v1.18.1
 	connectrpc.com/grpchealth v1.3.0
 	connectrpc.com/grpcreflect v1.3.0

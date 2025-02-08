@@ -6,7 +6,7 @@ default:
 
 # Start the development environment.
 dev-up:
-    docker compose up --detach --build
+    docker compose up --detach --build --wait
 
 # Exec into the development environment.
 dev-exec:
