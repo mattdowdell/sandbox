@@ -33,11 +33,13 @@ func run(ctx context.Context) int {
 		return exit.Failure
 	}
 
-	if status := resp.Msg.GetStatus(); status != healthv1.HealthCheckResponse_SERVING {
-		logger.InfoContext(ctx, "service not serving", slog.String("status", status.String()))
+	status := resp.Msg.GetStatus()
+
+	if status != healthv1.HealthCheckResponse_SERVING {
+		logger.InfoContext(ctx, "service not serving", slogx.HealthStatus(status))
 		return exit.Failure
 	}
 
-	logger.DebugContext(ctx, "service is serving")
+	logger.DebugContext(ctx, "service is serving", slogx.HealthStatus(status))
 	return exit.Success
 }

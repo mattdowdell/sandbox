@@ -1,6 +1,7 @@
 package slogx
 
 import (
+	"fmt"
 	"log/slog"
 	"runtime/debug"
 
@@ -10,6 +11,11 @@ import (
 // ...
 func Err(err error) slog.Attr {
 	return slog.String("error", err.Error())
+}
+
+// ...
+func HealthStatus(status fmt.Stringer) slog.Attr {
+	return slog.String("health_status", status.String())
 }
 
 // ...
