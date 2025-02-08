@@ -9,6 +9,9 @@ licenses:
   - id: BSD-3-Clause
     statement: Permissive license.
 
+  - id: BSD-2-Clause
+    statement: Permissive license.
+
   - id: ISC
     statement: Permissive license.
 

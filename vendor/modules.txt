@@ -2,6 +2,12 @@
 ## explicit
 buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate
 buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate/priv
+# buf.build/gen/go/grpc/grpc/connectrpc/go v1.18.1-20250124201648-9327911dce6e.1
+## explicit; go 1.21
+buf.build/gen/go/grpc/grpc/connectrpc/go/grpc/health/v1/healthv1connect
+# buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.2-20250124201648-9327911dce6e.1
+## explicit; go 1.21
+buf.build/gen/go/grpc/grpc/protocolbuffers/go/grpc/health/v1
 # connectrpc.com/connect v1.18.1
 ## explicit; go 1.21
 connectrpc.com/connect
