@@ -11,9 +11,8 @@ FROM mirror.gcr.io/golang:1.23-bookworm@sha256:2e838582004fab0931693a3a84743cecc
 
 WORKDIR /go/src
 
-COPY . .
-
-RUN CGO_ENABLED=0 go build -trimpath -ldflags="-buildid= -s -w" -o /go/bin/ ./cmd/...;
+RUN --mount=type=bind,target=. \
+    CGO_ENABLED=0 go build -trimpath -ldflags="-buildid= -s -w" -o /go/bin/ ./cmd/...;
 
 # --------------
 # Runtime target

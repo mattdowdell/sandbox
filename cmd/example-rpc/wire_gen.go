@@ -68,12 +68,12 @@ func ProvideApp(ctx context.Context) (*App, error) {
 	v3 := collectHandlerOptions(v2, recoverer)
 	server := rpcserver.NewFromConfig(rpcserverConfig, v, v3)
 	tracerProviderConfig := mainConfig.Tracer
-	tracerProviderShutdown, err := otelx.NewTracerProvider(ctx, tracerProviderConfig)
+	tracerProviderShutdown, err := otelx.NewTracerProviderFromConfig(ctx, tracerProviderConfig)
 	if err != nil {
 		return nil, err
 	}
 	meterProviderConfig := mainConfig.Meter
-	meterProviderShutdown, err := otelx.NewMeterProvider(ctx, meterProviderConfig)
+	meterProviderShutdown, err := otelx.NewMeterProviderFromConfig(ctx, meterProviderConfig)
 	if err != nil {
 		return nil, err
 	}

@@ -12,7 +12,9 @@ import (
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
+// ...
 type AppConfig struct {
+	// ...
 	ShutdownTimeout time.Duration `koanf:"shutdowntimeout" default:"30s"`
 }
 
