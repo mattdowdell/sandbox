@@ -6,7 +6,7 @@
 
 `connectrpc.com/validate` provides a [Connect][connect-go] interceptor that
 takes the tedium out of data validation. Rather than hand-writing repetitive
-documentation and code &mdash; verifing that `User.email` is valid, or that
+documentation and code &mdash; verifying that `User.email` is valid, or that
 `User.age` falls within reasonable bounds &mdash; you can instead encode those
 constraints into your Protobuf schemas and automatically enforce them at
 runtime.
@@ -94,7 +94,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	mux := http.NewServeMux()
 	mux.Handle(userv1connect.NewUserServiceHandler(
 		&userv1connect.UnimplementedUserServiceHandler{},
@@ -133,6 +133,10 @@ Registry][bsr]: this repository contains an [example
 schema](internal/proto/example/user/v1/user.proto) with constraints,
 [buf.yaml](internal/proto/buf.yaml) and [buf.gen.yaml](buf.gen.yaml)
 configuration files, and `make generate` [recipe](Makefile).
+
+### Does the interceptor validate responses?
+
+No. On both clients and servers, the interceptor only validates requests.
 
 ## Ecosystem
 

@@ -34,9 +34,9 @@ And others coming soon:
 
 - TypeScript: `protovalidate-ts`
 
-## Installation
+For `Connect` see [connectrpc/validate-go](https://github.com/connectrpc/validate-go).
 
-**Requires the `go` toolchain (≥ v1.18)**
+## Installation
 
 To install the package, use the `go get` command from within your Go module:
 
@@ -74,7 +74,7 @@ message Transaction {
   uint64 id = 1 [(buf.validate.field).uint64.gt = 999];
   google.protobuf.Timestamp purchase_date = 2;
   google.protobuf.Timestamp delivery_date = 3;
-  
+
   string price = 4 [(buf.validate.field).cel = {
     id: "transaction.price",
     message: "price must be positive and include a valid currency symbol ($ or £)",
@@ -94,9 +94,10 @@ message Transaction {
 `protovalidate-go` assumes the constraint extensions are imported into
 the generated code via `buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go`.
 
-If you are using Buf [managed mode](https://buf.build/docs/generate/managed-mode/) to augment Go code generation, ensure 
+If you are using Buf [managed mode](https://buf.build/docs/generate/managed-mode/) to augment Go code generation, ensure
 that the `protovalidate` module is excluded in your [`buf.gen.yaml`](https://buf.build/docs/configuration/v1/buf-gen-yaml#except):
 
+**`buf.gen.yaml` v1**
 ```yaml
 version: v1
 # <snip>
@@ -108,6 +109,18 @@ managed:
 # <snip>
 ```
 
+**`buf.gen.yaml` v2**
+```yaml
+version: v2
+# <snip>
+managed:
+  enabled: true
+  disable:
+    - file_option: go_package_prefix
+      module: buf.build/bufbuild/protovalidate
+# <snip>
+```
+
 ### Example
 
 ```go
@@ -116,7 +129,7 @@ package main
 import (
 	"fmt"
 	"time"
-	
+
 	pb "github.com/path/to/generated/protos"
 	"github.com/bufbuild/protovalidate-go"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -129,13 +142,7 @@ func main() {
 		PurchaseDate: timestamppb.New(time.Now()),
 		DeliveryDate: timestamppb.New(time.Now().Add(time.Hour)),
 	}
-
-	v, err := protovalidate.New()
-	if err != nil {
-		fmt.Println("failed to initialize validator:", err)
-	}
-
-	if err = v.Validate(msg); err != nil {
+	if err = protovalidate.Validate(msg); err != nil {
 		fmt.Println("validation failed:", err)
 	} else {
 		fmt.Println("validation succeeded")
@@ -145,25 +152,25 @@ func main() {
 
 ### Lazy mode
 
-`protovalidate-go` defaults to lazily construct validation logic for Protobuf 
-message types the first time they are encountered. A validator's internal 
-cache can be pre-warmed with the `WithMessages` or `WithDescriptors` options 
+`protovalidate-go` defaults to lazily construct validation logic for Protobuf
+message types the first time they are encountered. A validator's internal
+cache can be pre-warmed with the `WithMessages` or `WithDescriptors` options
 during initialization:
 
 ```go
 validator, err := protovalidate.New(
   protovalidate.WithMessages(
-    &pb.MyFoo{}, 
-    &pb.MyBar{}, 
+    &pb.MyFoo{},
+    &pb.MyBar{},
   ),
 )
 ```
 
-Lazy mode requires usage of a mutex to keep the validator thread-safe, which 
-results in about 50% of CPU time spent obtaining a read lock. While [performance](#performance)
-is sub-microsecond, the mutex overhead can be further reduced by disabling lazy 
-mode with the `WithDisableLazy` option. Note that all expected messages must be
-provided during initialization of the validator:
+Lazy mode uses a copy on write cache stategy to reduce the required locking.
+While [performance](#performance) is sub-microsecond, the overhead can be
+further reduced by disabling lazy mode with the `WithDisableLazy` option.
+Note that all expected messages must be provided during initialization of the
+validator:
 
 ```go
 validator, err := protovalidate.New(
@@ -175,51 +182,31 @@ validator, err := protovalidate.New(
 )
 ```
 
-### Support legacy `protoc-gen-validate` constraints
+### Legacy `protoc-gen-validate` constraints
 
-The `protovalidate-go` module comes with a `legacy` package which adds opt-in support
-for existing `protoc-gen-validate` constraints. Provide the`legacy.WithLegacySupport` 
-option when initializing the validator:
-
-```go
-validator, err := protovalidate.New(
-  legacy.WithLegacySupport(legacy.ModeMerge),
-)
-```
-
-`protoc-gen-validate` code generation is **not** used by `protovalidate-go`. The 
-`legacy` package assumes the `protoc-gen-validate` extensions are imported into
-the generated code via `github.com/envoyproxy/protoc-gen-validate/validate`.
-
-A [migration tool](https://github.com/bufbuild/protovalidate/tree/main/tools/protovalidate-migrate) is also available to incrementally upgrade legacy constraints in `.proto` files.
+`protoc-gen-validate` code generation is **not** used by `protovalidate-go`. A [migration tool](https://github.com/bufbuild/protovalidate/tree/main/tools/protovalidate-migrate) is available to upgrade legacy constraints in `.proto` files.
 
 ## Performance
 
-[Benchmarks](validator_bench_test.go) are provided to test a variety of use-cases. Generally, after the 
-initial cold start, validation on a message is sub-microsecond 
+[Benchmarks](validator_bench_test.go) are provided to test a variety of use-cases. Generally, after the
+initial cold start, validation on a message is sub-microsecond
 and only allocates in the event of a validation error.
 
 ```
-[circa 15 May 2023]
+[circa 14 September 2023]
 goos: darwin
 goarch: arm64
 pkg: github.com/bufbuild/protovalidate-go
 BenchmarkValidator
-BenchmarkValidator/ColdStart
-BenchmarkValidator/ColdStart-10         	    4372	    276457 ns/op	  470780 B/op	    9255 allocs/op
-BenchmarkValidator/Lazy/Valid
-BenchmarkValidator/Lazy/Valid-10        	 9022392	     134.1 ns/op	       0 B/op	       0 allocs/op
-BenchmarkValidator/Lazy/Invalid
-BenchmarkValidator/Lazy/Invalid-10      	 3416996	     355.9 ns/op	     632 B/op	      14 allocs/op
-BenchmarkValidator/Lazy/FailFast
-BenchmarkValidator/Lazy/FailFast-10     	 6751131	     172.6 ns/op	     168 B/op	       3 allocs/op
-BenchmarkValidator/PreWarmed/Valid
-BenchmarkValidator/PreWarmed/Valid-10   	17557560	     69.10 ns/op	       0 B/op	       0 allocs/op
-BenchmarkValidator/PreWarmed/Invalid
-BenchmarkValidator/PreWarmed/Invalid-10 	 3621961	     332.9 ns/op	     632 B/op	      14 allocs/op
-BenchmarkValidator/PreWarmed/FailFast
-BenchmarkValidator/PreWarmed/FailFast-10	13960359	     92.22 ns/op	     168 B/op	       3 allocs/op
+BenchmarkValidator/ColdStart-10              4192  246278 ns/op  437698 B/op  5955 allocs/op
+BenchmarkValidator/Lazy/Valid-10         11816635   95.08 ns/op       0 B/op     0 allocs/op
+BenchmarkValidator/Lazy/Invalid-10        2983478   380.5 ns/op     649 B/op    15 allocs/op
+BenchmarkValidator/Lazy/FailFast-10      12268683   98.22 ns/op     168 B/op     3 allocs/op
+BenchmarkValidator/PreWarmed/Valid-10    12209587   90.36 ns/op       0 B/op     0 allocs/op
+BenchmarkValidator/PreWarmed/Invalid-10   3098940   394.1 ns/op     649 B/op    15 allocs/op
+BenchmarkValidator/PreWarmed/FailFast-10 12291523   99.27 ns/op     168 B/op     3 allocs/op
 PASS
+
 ```
 
 ### Ecosystem
