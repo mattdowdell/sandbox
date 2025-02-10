@@ -1285,6 +1285,15 @@
         }
       ],
       "title": "Error Codes",
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "Value",
+            "renamePattern": "OK"
+          }
+        }
+      ],
       "type": "piechart"
     },
     {
@@ -1488,11 +1497,20 @@
         }
       ],
       "title": "By Error Code",
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "Value",
+            "renamePattern": "OK"
+          }
+        }
+      ],
       "type": "timeseries"
     }
   ],
   "preload": false,
-  "refresh": "",
+  "refresh": "1m",
   "schemaVersion": 40,
   "tags": [],
   "templating": {
