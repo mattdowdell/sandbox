@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 3,
   "links": [],
   "panels": [
     {
@@ -52,7 +52,7 @@
           "showLineNumbers": false,
           "showMiniMap": false
         },
-        "content": "This dashboard provides visualisations for 3 of the 4 golden signals: Errors,\nLatency and Traffic.\n\nIt aims to track compliance with the following [SLOs][1]:\n\n* 99% of requests must be served within 100ms.\n* 99% of requests must result in a success response.\n\nThe following [error codes][2] are included in error response calculations.\n\n- `unknown`\n- `deadline_exceeded`\n- `unimplemented`\n- `internal`\n- `unavailable`\n- `data_loss`\n\n[1]: https://sre.google/sre-book/service-level-objectives/\n[2]: https://connectrpc.com/docs/protocol#error-codes",
+        "content": "This dashboard provides visualisations for 3 of the 4 golden signals: Errors,\nLatency and Traffic.\n\nIt aims to track compliance with the following [SLOs][1]:\n\n* 99% of requests must be served within 100ms.\n* 99% of requests must result in a success response.\n\nThe following [error codes][2] are classed as internal errors included in error response calculations.\n\n- `unknown`\n- `deadline_exceeded`\n- `unimplemented`\n- `internal`\n- `unavailable`\n- `data_loss`\n\n[1]: https://sre.google/sre-book/service-level-objectives/\n[2]: https://connectrpc.com/docs/protocol#error-codes",
         "mode": "markdown"
       },
       "pluginVersion": "11.5.0",
@@ -481,7 +481,7 @@
         {
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.5, sum(increase(rpc.server.duration_bucket{rpc.system=\"connect_rpc\",service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.connect_rpc.error_code=~\"unknown|deadline_exceeded|unimplemented|internal|unavailable|data_loss\"}[$__rate_interval])) by (le))",
+          "expr": "histogram_quantile(0.5, sum(increase(rpc.server.duration_bucket{rpc.system=\"connect_rpc\",service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.connect_rpc.error_code!~\"unknown|deadline_exceeded|unimplemented|internal|unavailable|data_loss\"}[$__rate_interval])) by (le))",
           "format": "time_series",
           "instant": false,
           "legendFormat": "p50",
@@ -621,7 +621,7 @@
         {
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.9, sum(increase(rpc.server.duration_bucket{rpc.system=\"connect_rpc\",service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.connect_rpc.error_code=~\"unknown|deadline_exceeded|unimplemented|internal|unavailable|data_loss\"}[$__rate_interval])) by (le))",
+          "expr": "histogram_quantile(0.9, sum(increase(rpc.server.duration_bucket{rpc.system=\"connect_rpc\",service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.connect_rpc.error_code!~\"unknown|deadline_exceeded|unimplemented|internal|unavailable|data_loss\"}[$__rate_interval])) by (le))",
           "format": "time_series",
           "instant": false,
           "legendFormat": "p50",
@@ -761,7 +761,7 @@
         {
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.99, sum(increase(rpc.server.duration_bucket{rpc.system=\"connect_rpc\",service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.connect_rpc.error_code=~\"unknown|deadline_exceeded|unimplemented|internal|unavailable|data_loss\"}[$__rate_interval])) by (le))",
+          "expr": "histogram_quantile(0.99, sum(increase(rpc.server.duration_bucket{rpc.system=\"connect_rpc\",service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.connect_rpc.error_code!~\"unknown|deadline_exceeded|unimplemented|internal|unavailable|data_loss\"}[$__rate_interval])) by (le))",
           "format": "time_series",
           "instant": false,
           "legendFormat": "p50",
@@ -1055,7 +1055,7 @@
             "uid": "victoriametrics"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.5, sum(increase(rpc.server.duration_bucket{rpc.system=\"connect_rpc\",service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.connect_rpc.error_code=~\"unknown|deadline_exceeded|unimplemented|internal|unavailable|data_loss\"}[$__rate_interval])) by (le))",
+          "expr": "histogram_quantile(0.5, sum(increase(rpc.server.duration_bucket{rpc.system=\"connect_rpc\",service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.connect_rpc.error_code!~\"unknown|deadline_exceeded|unimplemented|internal|unavailable|data_loss\"}[$__rate_interval])) by (le))",
           "legendFormat": "p50",
           "range": true,
           "refId": "A"
@@ -1066,7 +1066,7 @@
             "uid": "victoriametrics"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.9, sum(increase(rpc.server.duration_bucket{rpc.system=\"connect_rpc\",service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.connect_rpc.error_code=~\"unknown|deadline_exceeded|unimplemented|internal|unavailable|data_loss\"}[$__rate_interval])) by (le))",
+          "expr": "histogram_quantile(0.9, sum(increase(rpc.server.duration_bucket{rpc.system=\"connect_rpc\",service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.connect_rpc.error_code!~\"unknown|deadline_exceeded|unimplemented|internal|unavailable|data_loss\"}[$__rate_interval])) by (le))",
           "hide": false,
           "legendFormat": "p90",
           "range": true,
@@ -1078,7 +1078,7 @@
             "uid": "victoriametrics"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum(increase(rpc.server.duration_bucket{rpc.system=\"connect_rpc\",service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.connect_rpc.error_code=~\"unknown|deadline_exceeded|unimplemented|internal|unavailable|data_loss\"}[$__rate_interval])) by (le))",
+          "expr": "histogram_quantile(0.99, sum(increase(rpc.server.duration_bucket{rpc.system=\"connect_rpc\",service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.connect_rpc.error_code!~\"unknown|deadline_exceeded|unimplemented|internal|unavailable|data_loss\"}[$__rate_interval])) by (le))",
           "hide": false,
           "legendFormat": "p99",
           "range": true,
@@ -1279,12 +1279,12 @@
         {
           "editorMode": "code",
           "expr": "sum by(rpc.connect_rpc.error_code) (increase(rpc.server.duration_count{rpc.system=\"connect_rpc\",service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\"}[$__rate_interval]))",
-          "legendFormat": "__auto",
+          "legendFormat": "{{rpc.connect_rpc.error_code}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Status Codes",
+      "title": "Error Codes",
       "type": "piechart"
     },
     {
@@ -1419,7 +1419,27 @@
               "mode": "off"
             }
           },
-          "mappings": [],
+          "mappings": [
+            {
+              "options": {
+                "Value": {
+                  "index": 1,
+                  "text": "OK"
+                }
+              },
+              "type": "value"
+            },
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "index": 0,
+                  "text": "OK"
+                }
+              },
+              "type": "special"
+            }
+          ],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -1462,12 +1482,12 @@
           "editorMode": "code",
           "expr": "sum by(rpc.connect_rpc.error_code) (increase(rpc.server.duration_count{rpc.system=\"connect_rpc\",service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\"}[$__rate_interval]))",
           "hide": false,
-          "legendFormat": "__auto",
+          "legendFormat": "{{rpc.connect_rpc.error_code}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "By Status Code",
+      "title": "By Error Code",
       "type": "timeseries"
     }
   ],
