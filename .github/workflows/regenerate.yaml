@@ -18,15 +18,17 @@ jobs:
     steps:
       - name: Debug
         run: |
-          echo ${{ github }}
-          echo ${{ github.event }}
-          echo ${{ github.event.issue }}
+          echo ${{ toJSON(github) }}
+          echo ${{ toJSON(github.event) }}
+          echo ${{ toJSON(github.event.issue) }}
 
   regenerate:
     name: Regenerate
     runs-on: ubuntu-latest
     if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '/regenerate') }}
     steps:
+      # TODO: add :+1: reaction to acknowledge regenerate comment
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -96,3 +98,4 @@ jobs:
           git add .
           # git commit -m "Regenerate code"
           # git push
+
