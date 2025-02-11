@@ -18,7 +18,7 @@ type TracerProviderConfig struct {
 // TracerProviderShutdown provides a dedicated type for the tracer provider shutdown function.
 type TracerProviderShutdown func(context.Context) error
 
-// NewTracerProviderFromConfig ...
+// NewMeterProviderFromConfig calls NewMeterProvider with the given configuration.
 func NewTracerProviderFromConfig(
 	ctx context.Context,
 	conf TracerProviderConfig,
@@ -26,7 +26,12 @@ func NewTracerProviderFromConfig(
 	return NewTracerProvider(ctx, conf.Endpoint)
 }
 
-// NewTracerProvider ...
+// NewTracerProvider creates a new [trace.TracerProvider] and sets it as the default using
+// [otel.SetTracerProvider]. The returned function should be called when the process exits to
+// publish any lingering spans.
+//
+// [trace.TracerProvider]: https://pkg.go.dev/go.opentelemetry.io/otel/trace#TracerProvider
+// [otel.SetTracerProvider]: https://pkg.go.dev/go.opentelemetry.io/otel#SetTracerProvider
 func NewTracerProvider(
 	ctx context.Context,
 	endpoint string,
@@ -55,7 +60,7 @@ func NewTracerProvider(
 // avoid computing the caller's package details unnecessarily.
 //
 // [otel.Tracer]: https://pkg.go.dev/go.opentelemetry.io/otel#Tracer
-// [trace.Tracer]: go.opentelemetry.io/otel/trace#Tracer
+// [trace.Tracer]: https://pkg.go.dev/go.opentelemetry.io/otel/trace#Tracer
 func Tracer() trace.Tracer {
 	pkg := packageName(1 /*skip*/)
 	ver := packageVersion(pkg)

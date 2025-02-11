@@ -18,7 +18,7 @@ type MeterProviderConfig struct {
 // MeterProviderShutdown provides a dedicated type for the meter provider shutdown function.
 type MeterProviderShutdown func(context.Context) error
 
-// NewMeterProviderFromConfig ...
+// NewMeterProviderFromConfig calls NewMeterProvider with the given configuration.
 func NewMeterProviderFromConfig(
 	ctx context.Context,
 	conf MeterProviderConfig,
@@ -26,7 +26,12 @@ func NewMeterProviderFromConfig(
 	return NewMeterProvider(ctx, conf.Endpoint)
 }
 
-// NewMeterProvider ...
+// NewMeterProvider creates a new [metric.MeterProvider] and sets it as the default using
+// [otel.SetMeterProvider]. The returned function should be called when the process exits to publish
+// any lingering metrics.
+//
+// [metric.MeterProvider]: https://pkg.go.dev/go.opentelemetry.io/otel/metric#MeterProvider
+// [otel.SetMeterProvider]: https://pkg.go.dev/go.opentelemetry.io/otel#SetMeterProvider
 func NewMeterProvider(
 	ctx context.Context,
 	endpoint string,

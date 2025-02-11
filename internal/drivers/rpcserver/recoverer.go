@@ -58,6 +58,7 @@ func (r *Recoverer) Handle(ctx context.Context, spec connect.Spec, _ http.Header
 		ctx,
 		"panicked",
 		slogx.Panic(recovered),
+		// TODO: add rpc.system; see https://github.com/connectrpc/connect-go/issues/816
 		slogx.RPCService(service),
 		slogx.RPCMethod(method),
 		slogx.Stacktrace(),
