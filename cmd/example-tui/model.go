@@ -84,7 +84,7 @@ func (m *Model) View() string {
 	var rendered []string
 
 	for i, t := range m.tabber.Tabs() {
-		style := tab.Style(i == 0, t.Active, highlightColor)
+		style := tab.Style(i == 0 /*first*/, t.Active, highlightColor)
 		rendered = append(rendered, style.Render(t.Name))
 	}
 

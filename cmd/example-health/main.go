@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -10,21 +11,40 @@ import (
 	"buf.build/gen/go/grpc/grpc/protocolbuffers/go/grpc/health/v1"
 	"connectrpc.com/connect"
 
+	"github.com/mattdowdell/sandbox/internal/drivers/config"
+	"github.com/mattdowdell/sandbox/internal/drivers/config/flagoptions"
 	"github.com/mattdowdell/sandbox/internal/drivers/exit"
 	"github.com/mattdowdell/sandbox/internal/drivers/logging"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
+
+// Config contains the service configuration.
+type Config struct {
+	Logging   logging.Config `koanf:"logging"`
+	RPCServer struct {
+		Port uint16 `koanf:"port" default:"5000"`
+	} `koanf:"rpcserver"`
+}
 
 func main() {
 	os.Exit(run(context.Background()))
 }
 
 func run(ctx context.Context) int {
-	logger := logging.New(slog.LevelInfo) // TODO: make level configurable
+	options := flagoptions.New()
+	conf := config.New(options)
+
+	c, err := config.Load[Config](conf)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to load configuration", slogx.Err(err))
+		return exit.Failure
+	}
+
+	logger := logging.New(c.Logging.Level)
 
 	client := healthv1connect.NewHealthClient(
 		http.DefaultClient,
-		"http://localhost:5000", // TODO: make port configurable
+		fmt.Sprintf("http://localhost:%d", c.RPCServer.Port),
 	)
 
 	resp, err := client.Check(ctx, connect.NewRequest(&healthv1.HealthCheckRequest{}))

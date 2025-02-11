@@ -11,7 +11,7 @@ import (
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/validatex"
 )
 
-// collectHandlers merges multiple Handler implementations into a slice.
+// collectHandlers merges multiple rpcserver.Handler implementations into a slice.
 //
 // While wire can cast a struct to an interface, it gets confused if multiple instances of a type
 // are present. For more details, see https://github.com/google/wire/issues/207.
@@ -27,9 +27,16 @@ func collectHandlers(
 	}
 }
 
-// ...
+// collectHandlers merges multiple [connect.Interceptor] implementations into a slice.
 //
-// TODO: document that the ordering here is important.
+// While wire can cast a struct to an interface, it gets confused if multiple instances of a type
+// are present. For more details, see [google/wire#207].
+//
+// The ordering of interceptors in the returned slice aligns with the order they are called. To
+// avoid losing observability, the otelconnect interceptor must be called first.
+//
+// [connect.Interceptor]: https://pkg.go.dev/connectrpc.com/connect#Interceptor
+// [google/wire#207]: https://github.com/google/wire/issues/207
 func collectInterceptors(
 	validate *validatex.Interceptor,
 	otelconnect *otelconnectx.Interceptor,
@@ -40,9 +47,17 @@ func collectInterceptors(
 	}
 }
 
-// ...
+// collectHandlerOptions merges multiple [connect.HandlerOption] implementations into a slice.
 //
-// TODO: document implementations of ordering with regards to panic recovery.
+// While wire can cast a struct to an interface, it gets confused if multiple instances of a type
+// are present. For more details, see [google/wire#207].
+//
+// The panic recovery interceptor is applied last meaning it exclusively applies to the called
+// handler and not any other interceptors. See [connectrpc/connect-go#816] for further discussion.
+//
+// [connect.HandlerOption]: https://pkg.go.dev/connectrpc.com/connect#HandlerOption
+// [google/wire#207]: https://github.com/google/wire/issues/207
+// [connectrpc/connect-go#816]: https://github.com/connectrpc/connect-go/issues/816
 func collectHandlerOptions(
 	interceptors []connect.Interceptor,
 	recoverer *rpcserver.Recoverer,

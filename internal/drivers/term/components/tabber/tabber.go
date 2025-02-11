@@ -31,8 +31,12 @@ func (t *Tabber) SetWindowSize(msg tea.WindowSizeMsg) {
 	t.height = msg.Height
 }
 
+// ...
+//
+// Based on https://stackoverflow.com/a/59299881.
 func (t *Tabber) MoveLeft() {
-	t.active = (t.active - 1) % len(t.tabs)
+	l := len(t.tabs)
+	t.active = ((t.active-1)%l + l) % l
 }
 
 func (t *Tabber) MoveRight() {

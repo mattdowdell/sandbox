@@ -15,15 +15,28 @@ type MeterProviderConfig struct {
 	Endpoint string `koanf:"endpoint"`
 }
 
-// ...
+// MeterProviderShutdown provides a dedicated type for the meter provider shutdown function.
 type MeterProviderShutdown func(context.Context) error
 
-// ...
-func NewMeterProvider(
+// NewMeterProviderFromConfig calls NewMeterProvider with the given configuration.
+func NewMeterProviderFromConfig(
 	ctx context.Context,
 	conf MeterProviderConfig,
 ) (MeterProviderShutdown, error) {
-	exporter, err := otlpmetrichttp.New(ctx, otlpmetrichttp.WithEndpointURL(conf.Endpoint))
+	return NewMeterProvider(ctx, conf.Endpoint)
+}
+
+// NewMeterProvider creates a new [metric.MeterProvider] and sets it as the default using
+// [otel.SetMeterProvider]. The returned function should be called when the process exits to publish
+// any lingering metrics.
+//
+// [metric.MeterProvider]: https://pkg.go.dev/go.opentelemetry.io/otel/metric#MeterProvider
+// [otel.SetMeterProvider]: https://pkg.go.dev/go.opentelemetry.io/otel#SetMeterProvider
+func NewMeterProvider(
+	ctx context.Context,
+	endpoint string,
+) (MeterProviderShutdown, error) {
+	exporter, err := otlpmetrichttp.New(ctx, otlpmetrichttp.WithEndpointURL(endpoint))
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +55,12 @@ func NewMeterProvider(
 	return provider.Shutdown, nil
 }
 
-// ...
+// Meter wraps [otel.Meter] to provide a [metric.Meter] with the package name and version
+// automatically set based on the direct caller. It is advised to cache the result when possible to
+// avoid computing the caller's package details unnecessarily.
+//
+// [otel.Meter]: https://pkg.go.dev/go.opentelemetry.io/otel#Meter
+// [metric.Meter]: https://pkg.go.dev/go.opentelemetry.io/otel/metric#Meter
 func Meter() metric.Meter {
 	pkg := packageName(1 /*skip*/)
 	ver := packageVersion(pkg)
