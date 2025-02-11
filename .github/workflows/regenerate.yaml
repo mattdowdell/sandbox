@@ -18,9 +18,13 @@ jobs:
     steps:
       - name: Debug
         run: |
-          echo ${{ toJSON(github) }}
-          echo ${{ toJSON(github.event) }}
-          echo ${{ toJSON(github.event.issue) }}
+          echo '${{ toJSON(github) }}'
+          echo '${{ toJSON(github.event) }}'
+          echo '${{ toJSON(github.event.issue) }}'
+
+          gh pr view '${{ github.event.issue.number }}'' \
+            --template '{{ .headRefName }} (#{{ .number }})' \
+            --json headRefName,number
 
   regenerate:
     name: Regenerate
