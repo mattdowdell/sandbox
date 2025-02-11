@@ -2,13 +2,26 @@ name: Regenerate
 
 on:
   issue_comment:
-    types: [created, edited, deleted]
+    types:
+      - created
+      - edited
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  debug:
+    name: Debug
+    runs-on: ubuntu-latest
+    if: ${{ github.event.issue.pull_request }}
+    steps:
+      - name: Debug
+        run: |
+          echo ${{ github }}
+          echo ${{ github.event }}
+          echo ${{ github.event.issue }}
+
   regenerate:
     name: Regenerate
     runs-on: ubuntu-latest
@@ -77,6 +90,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+          git status
+          git diff
+
           git add .
-          git commit -m "Regenerate code"
-          git push
+          # git commit -m "Regenerate code"
+          # git push
