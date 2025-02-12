@@ -11,8 +11,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  debug:
-    regenerate: Regenerate
+  regenerate:
+    name: Regenerate
     permissions:
       contents: read # TODO: update to write
       pull-requests: read # TODO: update to write?
