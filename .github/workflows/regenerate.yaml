@@ -13,6 +13,9 @@ concurrency:
 jobs:
   debug:
     name: Debug
+    permissions:
+      contents: read # TODO: update to write
+      pull-requests: read # TODO: update to write?
     runs-on: ubuntu-latest
     if: ${{ github.event.issue.pull_request }}
     steps:
