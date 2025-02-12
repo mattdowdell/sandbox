@@ -27,6 +27,8 @@ jobs:
           gh pr view '${{ github.event.issue.number }}' \
             --template '{{ .headRefName }} (#{{ .number }})' \
             --json headRefName,number
+        env:
+          GH_TOKEN: ${{ github.token }}
 
   # regenerate:
   #   name: Regenerate
