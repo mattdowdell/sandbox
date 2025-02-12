@@ -14,8 +14,8 @@ jobs:
   regenerate:
     name: Regenerate
     permissions:
-      contents: read # TODO: update to write
-      pull-requests: write # TODO: update to write?
+      contents: read # TODO: update to write?
+      pull-requests: write # for obtaining head ref + reaction acknowledgement
     runs-on: ubuntu-latest
     if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '/regenerate') }}
     steps:
@@ -32,11 +32,11 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             /repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions \
-            -f "content=+1" || true
+            -f "content=+1"
         env:
           GH_TOKEN: ${{ github.token }}
 
-      - name: PR HEAD reference
+      - name: PR branch
         id: ref
         run: |
           echo "ref=`gh pr view '${{ github.event.issue.number }}' \
@@ -51,7 +51,7 @@ jobs:
         with:
           ref: ${{ steps.ref.outputs.ref }}
 
-      - name: Install tools
+      - name: Setup checks
         uses: ./.github/actions/setup-checks
 
       - name: Regenerate
