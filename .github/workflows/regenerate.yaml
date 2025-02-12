@@ -15,7 +15,7 @@ jobs:
     name: Regenerate
     permissions:
       contents: read # TODO: update to write
-      pull-requests: read # TODO: update to write?
+      pull-requests: write # TODO: update to write?
     runs-on: ubuntu-latest
     if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '/regenerate') }}
     steps:
@@ -51,81 +51,68 @@ jobs:
         with:
           ref: ${{ steps.ref.outputs.ref }}
 
-  # regenerate:
-  #   name: Regenerate
-  #   runs-on: ubuntu-latest
-  #   if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '/regenerate') }}
-  #   steps:
-  #     # TODO: add :+1: reaction to acknowledge regenerate comment
-  #     # https://github.com/cli/cli/issues/6161#issuecomment-2650577115
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
 
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-  #       with:
-  #         ref: ${{ github.head_ref }}
+      - name: Install Buf
+        uses: bufbuild/buf-action@v1
+        with:
+          setup_only: true
 
-  #     - name: Install Go
-  #       uses: actions/setup-go@v5
-  #       with:
-  #         go-version-file: 'go.mod'
+      - name: Install Just
+        uses: extractions/setup-just@v2
 
-  #     - name: Install Buf
-  #       uses: bufbuild/buf-action@v1
-  #       with:
-  #         setup_only: true
+      - name: Install gci
+        uses: mattdowdell/go-installer@v0.2.0
+        with:
+          package: github.com/daixiang0/gci
+          version-file: go.mod
 
-  #     - name: Install Just
-  #       uses: extractions/setup-just@v2
+      - name: Install gofumpt
+        uses: mattdowdell/go-installer@v0.2.0
+        with:
+          package: mvdan.cc/gofumpt
+          version-file: go.mod
 
-  #     - name: Install gci
-  #       uses: mattdowdell/go-installer@v0.2.0
-  #       with:
-  #         package: github.com/daixiang0/gci
-  #         version-file: go.mod
+      - name: Install mockery
+        uses: mattdowdell/go-installer@v0.2.0
+        with:
+          package: github.com/vektra/mockery/v2
+          version-file: go.mod
 
-  #     - name: Install gofumpt
-  #       uses: mattdowdell/go-installer@v0.2.0
-  #       with:
-  #         package: mvdan.cc/gofumpt
-  #         version-file: go.mod
+      - name: Install protoc-gen-connect-go
+        uses: mattdowdell/go-installer@v0.2.0
+        with:
+          package: connectrpc.com/connect/cmd/protoc-gen-connect-go
+          version-file: go.mod
 
-  #     - name: Install mockery
-  #       uses: mattdowdell/go-installer@v0.2.0
-  #       with:
-  #         package: github.com/vektra/mockery/v2
-  #         version-file: go.mod
+      - name: Install protoc-gen-go
+        uses: mattdowdell/go-installer@v0.2.0
+        with:
+          package: google.golang.org/protobuf/cmd/protoc-gen-go
+          version-file: go.mod
 
-  #     - name: Install protoc-gen-connect-go
-  #       uses: mattdowdell/go-installer@v0.2.0
-  #       with:
-  #         package: connectrpc.com/connect/cmd/protoc-gen-connect-go
-  #         version-file: go.mod
+      - name: Install wire
+        uses: mattdowdell/go-installer@v0.2.0
+        with:
+          package: github.com/google/wire/cmd/wire
+          version-file: go.mod
 
-  #     - name: Install protoc-gen-go
-  #       uses: mattdowdell/go-installer@v0.2.0
-  #       with:
-  #         package: google.golang.org/protobuf/cmd/protoc-gen-go
-  #         version-file: go.mod
+      - name: Regenerate
+        run: |
+          just checks
 
-  #     - name: Install wire
-  #       uses: mattdowdell/go-installer@v0.2.0
-  #       with:
-  #         package: github.com/google/wire/cmd/wire
-  #         version-file: go.mod
+      - name: Commit diff
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-  #     - name: Regenerate
-  #       run: |
-  #         just checks
+          git status
+          git diff
 
-  #     - name: Commit diff
-  #       run: |
-  #         git config user.name "github-actions[bot]"
-  #         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-  #         git status
-  #         git diff
-
-  #         git add .
-  #         # git commit -m "Regenerate code"
-  #         # git push
+          git add .
+          # git commit -m "Regenerate code"
+          # git push
 
