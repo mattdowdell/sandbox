@@ -22,7 +22,7 @@ jobs:
           # echo '${{ toJSON(github.event) }}'
           # echo '${{ toJSON(github.event.issue) }}'
 
-          gh pr view '${{ github.event.issue.number }}'' \
+          gh pr view '${{ github.event.issue.number }}' \
             --template '{{ .headRefName }} (#{{ .number }})' \
             --json headRefName,number
 
