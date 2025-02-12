@@ -6,25 +6,15 @@ on:
       - created
       - edited
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   regenerate:
     name: Regenerate
     permissions:
-      contents: read # TODO: update to write?
+      contents: write      # for pushing updates after regenerating
       pull-requests: write # for obtaining head ref + reaction acknowledgement
     runs-on: ubuntu-latest
     if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '/regenerate') }}
     steps:
-      - name: Debug
-        run: |
-          cat << 'EOF'
-          ${{ toJSON(github) }}
-          EOF
-
       - name: Acknowledge
         run: |
           gh api \
@@ -51,14 +41,6 @@ jobs:
         with:
           ref: ${{ steps.ref.outputs.ref }}
 
-      - name: Debug
-        run: |
-          pwd
-          ls -alph
-          ls -alph .github
-          ls -alph .github/actions/
-          ls -alph .github/actions/setup-checks
-
       - name: Setup checks
         uses: ./.github/actions/setup-checks
 
@@ -68,13 +50,15 @@ jobs:
 
       - name: Commit diff
         run: |
+          if git diff --quiet -- .
+          then
+            echo "regenerate found no changes"
+            exit 0
+          fi
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git status
-          git diff
-
           git add .
-          # git commit -m "Regenerate code"
-          # git push
-
+          git commit -m "Regenerate code"
+          git push
