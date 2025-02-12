@@ -6,10 +6,6 @@ on:
       - created
       - edited
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   regenerate:
     name: Regenerate
@@ -19,12 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '/regenerate') }}
     steps:
-      - name: Debug
-        run: |
-          cat << 'EOF'
-          ${{ toJSON(github) }}
-          EOF
-
       - name: Acknowledge
         run: |
           gh api \
@@ -50,14 +40,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ steps.ref.outputs.ref }}
-
-      - name: Debug
-        run: |
-          pwd
-          ls -alph
-          ls -alph .github
-          ls -alph .github/actions/
-          ls -alph .github/actions/setup-checks
 
       - name: Setup checks
         uses: ./.github/actions/setup-checks
