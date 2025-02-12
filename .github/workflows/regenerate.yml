@@ -51,21 +51,8 @@ jobs:
         with:
           ref: ${{ steps.ref.outputs.ref }}
 
-      - name: Install Go
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: 'go.mod'
-
-      - name: Install Buf
-        uses: bufbuild/buf-action@v1
-        with:
-          setup_only: true
-
-      - name: Install Just
-        uses: extractions/setup-just@v2
-
       - name: Install tools
-        uses: ./.github/actions/install-tools
+        uses: ./.github/actions/setup-checks
 
       - name: Regenerate
         run: |
