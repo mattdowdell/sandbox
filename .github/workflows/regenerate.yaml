@@ -27,19 +27,14 @@ jobs:
 
       - name: Acknowledge
         run: |
-          gh api \
-            --method POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            /repos/${{ github.repository }}/issues/${{  }}/reactions -f "content=$2
-
           gh api
             --method POST \
             -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer <YOUR-TOKEN>" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             /repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions \
             -f "content=+1" || true
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: PR HEAD reference
         id: ref
