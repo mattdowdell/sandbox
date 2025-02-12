@@ -51,6 +51,14 @@ jobs:
         with:
           ref: ${{ steps.ref.outputs.ref }}
 
+      - name: Debug
+        run: |
+          pwd
+          ls -alph
+          ls -alph .github
+          ls -alph .github/actions/
+          ls -alph .github/actions/setup-checks
+
       - name: Setup checks
         uses: ./.github/actions/setup-checks
 
