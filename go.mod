@@ -3,7 +3,7 @@ module github.com/mattdowdell/sandbox
 go 1.23.4
 
 require (
-	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.4-20250130201111-63bb56e20495.1
+	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.5-20250130201111-63bb56e20495.1
 	buf.build/gen/go/grpc/grpc/connectrpc/go v1.18.1-20250124201648-9327911dce6e.1
 	buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.2-20250124201648-9327911dce6e.1
 	connectrpc.com/connect v1.18.1
@@ -35,7 +35,7 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.34.0
 	go.opentelemetry.io/otel/trace v1.34.0
 	golang.org/x/net v0.35.0
-	google.golang.org/protobuf v1.36.4
+	google.golang.org/protobuf v1.36.5
 	mvdan.cc/gofumpt v0.7.0
 )
 
