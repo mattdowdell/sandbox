@@ -16,90 +16,93 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.issue.pull_request }}
     steps:
-      - name: Debug
+      - name: Echo
         run: |
-          # echo '${{ toJSON(github) }}'
-          # echo '${{ toJSON(github.event) }}'
-          # echo '${{ toJSON(github.event.issue) }}'
+          cat << 'EOF'
+          ${{ toJSON(github) }}
+          EOF
 
+      - name: PR Number to Head Ref
+        run: |
           gh pr view '${{ github.event.issue.number }}' \
             --template '{{ .headRefName }} (#{{ .number }})' \
             --json headRefName,number
 
-  regenerate:
-    name: Regenerate
-    runs-on: ubuntu-latest
-    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '/regenerate') }}
-    steps:
-      # TODO: add :+1: reaction to acknowledge regenerate comment
+  # regenerate:
+  #   name: Regenerate
+  #   runs-on: ubuntu-latest
+  #   if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '/regenerate') }}
+  #   steps:
+  #     # TODO: add :+1: reaction to acknowledge regenerate comment
+  #     # https://github.com/cli/cli/issues/6161#issuecomment-2650577115
 
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #       with:
+  #         ref: ${{ github.head_ref }}
 
-      - name: Install Go
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: 'go.mod'
+  #     - name: Install Go
+  #       uses: actions/setup-go@v5
+  #       with:
+  #         go-version-file: 'go.mod'
 
-      - name: Install Buf
-        uses: bufbuild/buf-action@v1
-        with:
-          setup_only: true
+  #     - name: Install Buf
+  #       uses: bufbuild/buf-action@v1
+  #       with:
+  #         setup_only: true
 
-      - name: Install Just
-        uses: extractions/setup-just@v2
+  #     - name: Install Just
+  #       uses: extractions/setup-just@v2
 
-      - name: Install gci
-        uses: mattdowdell/go-installer@v0.2.0
-        with:
-          package: github.com/daixiang0/gci
-          version-file: go.mod
+  #     - name: Install gci
+  #       uses: mattdowdell/go-installer@v0.2.0
+  #       with:
+  #         package: github.com/daixiang0/gci
+  #         version-file: go.mod
 
-      - name: Install gofumpt
-        uses: mattdowdell/go-installer@v0.2.0
-        with:
-          package: mvdan.cc/gofumpt
-          version-file: go.mod
+  #     - name: Install gofumpt
+  #       uses: mattdowdell/go-installer@v0.2.0
+  #       with:
+  #         package: mvdan.cc/gofumpt
+  #         version-file: go.mod
 
-      - name: Install mockery
-        uses: mattdowdell/go-installer@v0.2.0
-        with:
-          package: github.com/vektra/mockery/v2
-          version-file: go.mod
+  #     - name: Install mockery
+  #       uses: mattdowdell/go-installer@v0.2.0
+  #       with:
+  #         package: github.com/vektra/mockery/v2
+  #         version-file: go.mod
 
-      - name: Install protoc-gen-connect-go
-        uses: mattdowdell/go-installer@v0.2.0
-        with:
-          package: connectrpc.com/connect/cmd/protoc-gen-connect-go
-          version-file: go.mod
+  #     - name: Install protoc-gen-connect-go
+  #       uses: mattdowdell/go-installer@v0.2.0
+  #       with:
+  #         package: connectrpc.com/connect/cmd/protoc-gen-connect-go
+  #         version-file: go.mod
 
-      - name: Install protoc-gen-go
-        uses: mattdowdell/go-installer@v0.2.0
-        with:
-          package: google.golang.org/protobuf/cmd/protoc-gen-go
-          version-file: go.mod
+  #     - name: Install protoc-gen-go
+  #       uses: mattdowdell/go-installer@v0.2.0
+  #       with:
+  #         package: google.golang.org/protobuf/cmd/protoc-gen-go
+  #         version-file: go.mod
 
-      - name: Install wire
-        uses: mattdowdell/go-installer@v0.2.0
-        with:
-          package: github.com/google/wire/cmd/wire
-          version-file: go.mod
+  #     - name: Install wire
+  #       uses: mattdowdell/go-installer@v0.2.0
+  #       with:
+  #         package: github.com/google/wire/cmd/wire
+  #         version-file: go.mod
 
-      - name: Regenerate
-        run: |
-          just checks
+  #     - name: Regenerate
+  #       run: |
+  #         just checks
 
-      - name: Commit diff
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+  #     - name: Commit diff
+  #       run: |
+  #         git config user.name "github-actions[bot]"
+  #         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git status
-          git diff
+  #         git status
+  #         git diff
 
-          git add .
-          # git commit -m "Regenerate code"
-          # git push
+  #         git add .
+  #         # git commit -m "Regenerate code"
+  #         # git push
 
