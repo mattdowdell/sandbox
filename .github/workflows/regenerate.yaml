@@ -25,7 +25,7 @@ jobs:
       - name: PR Number to Head Ref
         run: |
           gh pr view '${{ github.event.issue.number }}' \
-            --repository ${{ github.repository }} \
+            --repo ${{ github.repository }} \
             --template '{{ .headRefName }} (#{{ .number }})' \
             --json headRefName,number
         env:
