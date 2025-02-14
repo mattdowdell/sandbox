@@ -17,37 +17,37 @@ runs:
       uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2.0.0
 
     - name: Install gci
-      uses: mattdowdell/go-installer@v0.3.0
+      uses: mattdowdell/go-installer@7af1f9ff5af1447fd122d6b144ddce2562b76e09 # v0.3.0
       with:
         package: github.com/daixiang0/gci
         version-file: go.mod
 
     - name: Install gofumpt
-      uses: mattdowdell/go-installer@v0.3.0
+      uses: mattdowdell/go-installer@7af1f9ff5af1447fd122d6b144ddce2562b76e09 # v0.3.0
       with:
         package: mvdan.cc/gofumpt
         version-file: go.mod
 
     - name: Install mockery
-      uses: mattdowdell/go-installer@v0.3.0
+      uses: mattdowdell/go-installer@7af1f9ff5af1447fd122d6b144ddce2562b76e09 # v0.3.0
       with:
         package: github.com/vektra/mockery/v2
         version-file: go.mod
 
     - name: Install protoc-gen-connect-go
-      uses: mattdowdell/go-installer@v0.3.0
+      uses: mattdowdell/go-installer@7af1f9ff5af1447fd122d6b144ddce2562b76e09 # v0.3.0
       with:
         package: connectrpc.com/connect/cmd/protoc-gen-connect-go
         version-file: go.mod
 
     - name: Install protoc-gen-go
-      uses: mattdowdell/go-installer@v0.3.0
+      uses: mattdowdell/go-installer@7af1f9ff5af1447fd122d6b144ddce2562b76e09 # v0.3.0
       with:
         package: google.golang.org/protobuf/cmd/protoc-gen-go
         version-file: go.mod
 
     - name: Install wire
-      uses: mattdowdell/go-installer@v0.3.0
+      uses: mattdowdell/go-installer@7af1f9ff5af1447fd122d6b144ddce2562b76e09 # v0.3.0
       with:
         package: github.com/google/wire/cmd/wire
         version-file: go.mod
