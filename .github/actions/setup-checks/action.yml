@@ -1,21 +1,20 @@
-name: "Install Tools"
-description: "TODO"
+name: "Setup Checks"
 
 runs:
   using: "composite"
   steps:
     - name: Install Go
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
       with:
         go-version-file: "go.mod"
 
     - name: Install Buf
-      uses: bufbuild/buf-action@v1
+      uses: bufbuild/buf-action@b46cbc051dd8fd10a3c2213e784498790d3fe388 # v1.0.3
       with:
         setup_only: true
 
     - name: Install Just
-      uses: extractions/setup-just@v2
+      uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2.0.0
 
     - name: Install gci
       uses: mattdowdell/go-installer@v0.2.0
