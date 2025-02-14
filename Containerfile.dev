@@ -32,7 +32,7 @@ USER ${USER_NAME}
 RUN set -eux; \
 	echo "export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin" >> /home/dev/.bashrc
 
-ARG GOLANGCI_LINT_VERSION=v1.63.4
+ARG GOLANGCI_LINT_VERSION=v1.64.5
 RUN set -eux; \
 	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | \
 	sh -s -- -b $(go env GOPATH)/bin ${GOLANGCI_LINT_VERSION};
