@@ -44,6 +44,8 @@ vendor-go:
 # Install go tools.
 install-tools:
     cat tools.go | grep _ | awk -F'"' '{print $2}' | xargs -tI % go install %
+    @# TODO: provide via tools.go; currently depends on outdated protovalidate-go
+    go install github.com/bufbuild/buf/cmd/buf@latest
 
 # Run all formatters.
 fmt: fmt-buf fmt-go fmt-just
