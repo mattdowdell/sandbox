@@ -6,6 +6,7 @@ db:
 
 exit-code: 1
 ignorefile: .trivyignore.yaml
+ignore-policy: config/trivyignore.rego
 
 scan:
   scanners:

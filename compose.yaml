@@ -5,7 +5,7 @@ services:
     image: example-dev:local
     build:
       context: .
-      dockerfile: Containerfile.dev
+      target: dev
     init: true
     hostname: example-dev
     volumes:
@@ -16,7 +16,6 @@ services:
     build:
       context: .
       target: runtime
-      dockerfile: Containerfile
       args:
         SERVICE: example-rpc
     entrypoint: ["/example-rpc"]

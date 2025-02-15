@@ -1,0 +1,43 @@
+name: Tag
+
+inputs:
+  format:
+    description: "One of: incrementing, year-month, year-week."
+    required: false
+    default: "incrementing"
+
+outputs:
+  short:
+    description: "The output of 'git describe'."
+    value: ${{ steps.describe.outputs.short }}
+  long:
+    description: "The output of 'git describe --long'."
+    value: ${{ steps.describe.outputs.long }}
+
+runs:
+  using: "composite"
+  steps:
+    # TODO: check we have a deep checkout
+    - name: Check
+      shell: bash
+      run: |
+        echo "Not implemented"
+
+    # TODO: if on default branch, create tag
+    # TODO: apply different formats
+    # 1. incrementing - endlessly increments vX.Y.Z, with rollover limit (default: 100)
+    # 2. year-month   - YYYY.MM.X, where X is incremented for each build that month
+    # 3. year-week    - YYYY.WW.X, where X is incremented for each build that week
+    - name: Tag
+      if: github.ref_name == github.event.repository.default_branch
+      shell: bash
+      run: |
+        echo "Not implemented"
+
+    - name: Describe
+      id: describe
+      shell: bash
+      run: |
+        echo "short=`git describe --always --match 'v[0-9]*'`" >> $GITHUB_OUTPUT
+        echo "long=`git describe --long --always --match 'v[0-9]*'`" >> $GITHUB_OUTPUT
+
