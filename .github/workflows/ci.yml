@@ -169,4 +169,4 @@ jobs:
         uses: ./.github/actions/container-build
         with:
           service: example-rpc
-          tag: ${{ needs.tag.outputs.long }}
+          version: ${{ needs.tag.outputs.long }}
