@@ -1,6 +1,5 @@
 # https://just.systems/man/en/
 
-
 [private]
 default:
     @just --list
