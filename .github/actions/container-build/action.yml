@@ -2,26 +2,30 @@ name: Container Build
 
 inputs:
   service:
-    description: "TODO"
+    description: "The service to build, used as a build argument."
     required: true
-  tag:
-    description: "TODO"
+  version:
+    description: "The version of the image, used for tagging and annotations."
     required: true
 
 runs:
   using: "composite"
   steps:
     - name: Build
-      uses: docker/build-push-action@v6
+      uses: docker/build-push-action@ca877d9245402d1537745e0e356eab47c3520991 # v6.13.0
       with:
+        annotations:
+          org.opencontainers.image.revision=${{ github.sha }}
+          org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+          org.opencontainers.image.version=${{ inputs.version }}
         build-args:
           SERVICE=${{ inputs.service }}
-        load: true # to enable scans
+        load: true
         push: false # TODO: support pushing?
-        tags: ${{ inputs.service }}:${{ inputs.tag }} # TODO: add registry/repository
+        tags: ${{ inputs.service }}:${{ inputs.version }} # TODO: add registry/repository
         target: runtime
-        # TODO: provenance
-        # TODO: sbom
+        # TODO: provenance=max
+        # TODO: sbom=true
 
     - name: Scan
       uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 # 0.29.0
