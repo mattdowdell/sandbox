@@ -1,0 +1,34 @@
+name: Container Build
+
+inputs:
+  service:
+    description: "TODO"
+    required: true
+  tag:
+    description: "TODO"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Build
+      uses: docker/build-push-action@v6
+      with:
+        push: false # TODO: support pushing?
+        tags: ${{ inputs.service }}:${{ inputs.tag }} # TODO: add registry/repository
+        target: runtime
+        context: .
+        build-args:
+          SERVICE=${{ inputs.service }}
+        # TODO: provenance
+        # TODO: sbom
+
+    - name: Scan
+      uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 # 0.29.0
+      with:
+        image-ref: ${{ inputs.service }}:${{ inputs.tag }}
+        scan-type: image
+        trivy-config: trivy.yaml
+
+    # TODO: publish to github for default branch builds
+    # https://github.com/actions/starter-workflows/blob/main/code-scanning/trivy.yml
