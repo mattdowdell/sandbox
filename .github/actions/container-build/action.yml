@@ -14,12 +14,12 @@ runs:
     - name: Build
       uses: docker/build-push-action@v6
       with:
+        build-args:
+          SERVICE=${{ inputs.service }}
+        load: true # to enable scans
         push: false # TODO: support pushing?
         tags: ${{ inputs.service }}:${{ inputs.tag }} # TODO: add registry/repository
         target: runtime
-        context: .
-        build-args:
-          SERVICE=${{ inputs.service }}
         # TODO: provenance
         # TODO: sbom
 
