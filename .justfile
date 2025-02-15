@@ -1,5 +1,6 @@
 # https://just.systems/man/en/
 
+
 [private]
 default:
     @just --list
@@ -130,8 +131,21 @@ container-build-rpc: (_container-build "example-rpc")
 
 [private]
 _container-build service:
-    podman build \
+    docker buildx build \
         --target runtime \
         --build-arg SERVICE={{ service }} \
         --tag {{ service }}:local \
         .
+
+# Scan all containers.
+container-scan: container-scan-rpc
+
+# Scan the example-rpc container
+container-scan-rpc: (_container-scan "example-rpc")
+
+[private]
+_container-scan service:
+    trivy image \
+        --config trivy.yaml \
+        --docker-host unix://{{ env('HOME') }}/.colima/default/docker.sock \
+        {{ service }}:local
