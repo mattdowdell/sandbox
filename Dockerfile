@@ -1,7 +1,7 @@
 # https://docs.docker.com/reference/dockerfile/
 #
-# TODO: document use of mirror.gcr.io
-# https://cloud.google.com/artifact-registry/docs/pull-cached-dockerhub-images
+# mirror.gcr.io caches of popular docker hub images, but does not add rate limiting.
+# See https://cloud.google.com/artifact-registry/docs/pull-cached-dockerhub-images.
 
 # -----------
 # Base target
@@ -34,12 +34,9 @@ COPY --from=build /go/bin/example-health /example-health
 # Devenv target
 # -------------
 
-FROM base AS dev
+FROM mirror.gcr.io/golangci/golangci-lint:v1.64.5@sha256:9faef4dda4304c4790a14c5b8c8cd8c2715a8cb754e13f61d8ceaa358f5a454a as golangci-lint
 
-RUN set -eux; \
-    apt-get update; \
-    apt-get install -y --no-install-recommends tini; \
-    rm -rf /var/lib/apt/lists/*;
+FROM base AS dev
 
 RUN set -eux; \
     curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | \
@@ -50,23 +47,17 @@ RUN set -eux; \
     curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | \
     sh -s -- -b /usr/local/bin ${TRIVY_VERSION};
 
-ARG USER_NAME=dev
-ARG USER_COMMENT=Dev
-ARG USER_UID=1000
-ARG USER_GID=1000
 RUN set -eux; \
-    groupadd --gid ${USER_GID} ${USER_NAME}; \
-    useradd --comment ${USER_COMMENT} --create-home --gid ${USER_GID} --uid ${USER_UID} ${USER_NAME}
+    useradd --comment Dev --create-home --user-group dev;
 
 ENV GOPATH=''
-USER ${USER_NAME}
+USER dev
 RUN set -eux; \
-    echo "export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin" >> /home/dev/.bashrc
+    echo "export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin" >> /home/dev/.bashrc; \
+    mkdir -p /home/dev/ws; \
+    git config --global --add safe.directory /home/dev/ws;
 
-ARG GOLANGCI_LINT_VERSION=v1.64.5
-RUN set -eux; \
-    curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | \
-    sh -s -- -b $(go env GOPATH)/bin ${GOLANGCI_LINT_VERSION};
+COPY --from=golangci-lint /usr/bin/golangci-lint /usr/bin/golangci-lint
 
 WORKDIR /home/dev/ws
 
