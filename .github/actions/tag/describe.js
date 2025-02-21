@@ -15,6 +15,7 @@ module.exports = async ({ core, exec }) => {
   const long = await exec.getExecOutput("git", [
     "describe",
     "--always",
+    "--long",
     "--match",
     "'v[0-9]*'",
   ]);
