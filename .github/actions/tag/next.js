@@ -104,6 +104,8 @@ function increment(version) {
  * Create the given version as an annotated git tag.
  */
 async function create(exec, version) {
+  await configure(exec);
+
   await exec.exec("git", [
     "tag",
     "--annotate",
@@ -114,4 +116,12 @@ async function create(exec, version) {
 
   // TODO: push tag
   // await exec.exec("git", ["push", `v${version}`]);
+}
+
+/**
+ *
+ */
+async function configure(exec) {
+  await exec.exec("git", ["config", "user.name", "github-actions[bot]"]);
+  await exec.exec("git", ["config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"]);
 }
