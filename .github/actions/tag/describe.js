@@ -6,7 +6,7 @@
 module.exports = async ({ core, exec }) => {
   const short = await exec.getExecOutput(
     "git",
-    ["describe", "--always", "--match", "'v[0-9]*'"],
+    ["describe", "--match", "'v[0-9]*'"],
     { ignoreReturnCode: true },
   );
 
@@ -20,7 +20,6 @@ module.exports = async ({ core, exec }) => {
 
   const long = await exec.getExecOutput("git", [
     "describe",
-    "--always",
     "--long",
     "--match",
     "'v[0-9]*'",
