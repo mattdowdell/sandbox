@@ -4,6 +4,8 @@
  *
  */
 module.exports = async ({ core, exec }) => {
+  // TODO: on error, fallback to 0.0.0-0-g<short commit>
+
   const short = await exec.getExecOutput("git", [
     "describe",
     "--always",

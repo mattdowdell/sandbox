@@ -4,9 +4,14 @@ inputs:
   format:
     # TODO: implement incrementing, year-week.
     # year-week will be awkward because of how ISO weeks work, see Go's time ISOWeek for inspiration.
+    #
+    # TODO: replace with minimum, let the caller decide whether to use YYYY.MM.0, or X.Y.Z, etc.
     description: "One of: incrementing, year-month, year-week."
     required: false
     default: "year-month"
+
+  # TODO: add rollover support, e.g. rollover: true, false
+  # TODO: add rollover_max support, e.g. limit: 10 (default: 100).
 
 outputs:
   short:
