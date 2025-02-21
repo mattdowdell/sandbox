@@ -1,17 +1,22 @@
 name: Tag
+description: "TODO"
 
 inputs:
-  format:
-    # TODO: implement incrementing, year-week.
-    # year-week will be awkward because of how ISO weeks work, see Go's time ISOWeek for inspiration.
-    #
-    # TODO: replace with minimum, let the caller decide whether to use YYYY.MM.0, or X.Y.Z, etc.
-    description: "One of: incrementing, year-month, year-week."
+  # TODO: add support for inputs
+  minimum:
+    description: "The minimum version to use. This can either be an initial version, or it can force the version to jump forward."
     required: false
-    default: "year-month"
+    default: "0.0.0"
 
-  # TODO: add rollover support, e.g. rollover: true, false
-  # TODO: add rollover_max support, e.g. limit: 10 (default: 100).
+  rollover:
+    description: "Whether to increment the next-last version segment and reset the last version segment to 0 when the limit is reached."
+    required: false
+    default: "false"
+
+  limit:
+    description: "The number to trigger a rollover at."
+    required: false
+    default: "100"
 
 outputs:
   short:
@@ -39,6 +44,10 @@ runs:
 
           const script = require(path.join(process.env.GITHUB_ACTION_PATH, 'next.js'));
           await script({ core, exec });
+      env:
+        minimum: ${{ inputs.minimum }}
+        rollover: ${{ inputs.rollover }}
+        limit: ${{ inputs.limit }}
 
     - name: Create
       # TODO: uncomment
