@@ -14,7 +14,7 @@ module.exports = async ({ exec }) => {
 /**
  * Create the given version as an annotated git tag and push the result.
  */
-async function createandPush({ exec, version }) {
+async function createAndPush({ exec, version }) {
   await exec.exec("git", [
     "tag",
     "--annotate",
