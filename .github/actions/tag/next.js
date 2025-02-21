@@ -3,7 +3,7 @@
 /**
  *
  */
-module.exports = async ({ exec }) => {
+module.exports = async ({ core, exec }) => {
   const fallback = makeFallback();
 
   const current = exec.getExecOutput(
@@ -13,7 +13,7 @@ module.exports = async ({ exec }) => {
   );
 
   if (current.exitCode != 0) {
-    await create(exec, fallback);
+    core.setOutput("next", fallback);
     return;
   }
 
@@ -21,7 +21,7 @@ module.exports = async ({ exec }) => {
   const cmp = compare(fallback, describe);
 
   if (cmp == -1) {
-    await create(exec, fallback);
+    core.setOutput("next", fallback);
     return;
   }
 
@@ -30,7 +30,7 @@ module.exports = async ({ exec }) => {
   }
 
   const next = increment(describe);
-  await create(exec, next);
+  core.setOutput("next", next);
 
   return;
 };
