@@ -27,6 +27,10 @@ runs:
         # TODO: provenance=max
         # TODO: sbom=true
 
+    - name: Debug
+      run: |
+        docker images
+
     - name: Scan
       uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 # 0.29.0
       with:
