@@ -28,6 +28,7 @@ runs:
         # TODO: sbom=true
 
     - name: Debug
+      shell: bash
       run: |
         docker images
 
