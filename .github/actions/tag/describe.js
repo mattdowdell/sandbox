@@ -4,15 +4,19 @@
  *
  */
 module.exports = async ({ core, exec }) => {
-  // TODO: on error, fallback to 0.0.0-0-g<short commit>
+  const short = await exec.getExecOutput(
+    "git",
+    ["describe", "--always", "--match", "'v[0-9]*'"],
+    { ignoreReturnCode: true },
+  );
 
-  const short = await exec.getExecOutput("git", [
-    "describe",
-    "--always",
-    "--match",
-    "'v[0-9]*'",
-  ]);
-  core.setOutput("short", short.stdout);
+  if (short.exitCode != 0) {
+    const fallback = await makeFallback({ exec });
+
+    core.setOutput("short", fallback);
+    core.setOutput("long", fallback);
+    return;
+  }
 
   const long = await exec.getExecOutput("git", [
     "describe",
@@ -21,5 +25,19 @@ module.exports = async ({ core, exec }) => {
     "--match",
     "'v[0-9]*'",
   ]);
+
+  core.setOutput("short", short.stdout);
   core.setOutput("long", long.stdout);
 };
+
+/**
+ *
+ */
+async function makeFallback({ exec }) {
+  const commit = await exec.getExecOutput("git", [
+    "rev-parse",
+    "--short",
+    "HEAD",
+  ]);
+  return `v0.0.0-0-g${commit.stdout}`;
+}

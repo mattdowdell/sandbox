@@ -1,4 +1,4 @@
-/*global module*/
+/*global module, process*/
 
 /**
  *
@@ -17,7 +17,7 @@ module.exports = async ({ core, exec }) => {
 
   const next = increment({ describe, rollover, limit });
 
-  if (compare({minimum, next}) <= 0) {
+  if (compare({ minimum, next }) <= 0) {
     core.setOutput("next", minimum);
     return;
   }
@@ -35,11 +35,11 @@ async function current({ exec }) {
     { ignoreReturnCode: true },
   );
 
-  if (current.exitCode != 0) {
+  if (result.exitCode != 0) {
     return { ok: false };
   }
 
-  const describe = current.stdout.replace(/^v/, "");
+  const describe = result.stdout.replace(/^v/, "");
   return { describe, ok: true };
 }
 
@@ -55,8 +55,8 @@ function compare({ minimum, next }) {
     return 0;
   }
 
-  const m = minimum.split(".").map(p => parseInt(p));
-  const n = next.split(".").map(p => parseInt(p));
+  const m = minimum.split(".").map((p) => parseInt(p));
+  const n = next.split(".").map((p) => parseInt(p));
 
   // TODO: decide what to do if the lengths are different
   for (let i = 0; i < m.length; i++) {
@@ -65,7 +65,7 @@ function compare({ minimum, next }) {
     }
 
     if (m[i] < n[i]) {
-      return 1
+      return 1;
     }
   }
 
@@ -76,7 +76,10 @@ function compare({ minimum, next }) {
  * Increment a version.
  */
 function increment({ describe, rollover, limit }) {
-  const parts = version.split("-", 1)[0].split(".").map(p => parseInt(p));
+  const parts = describe
+    .split("-", 1)[0]
+    .split(".")
+    .map((p) => parseInt(p));
 
   for (let i = parts.length - 1; i >= 0; i--) {
     parts[i]++;
@@ -88,5 +91,5 @@ function increment({ describe, rollover, limit }) {
     parts[i] = 0;
   }
 
-  return parts.map(p => p.toString()).join(".");
+  return parts.map((p) => p.toString()).join(".");
 }
