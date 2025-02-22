@@ -11,17 +11,21 @@ module.exports = async ({ core, exec }) => {
   const { describe, ok } = await current({ exec });
 
   if (!ok || describe == minimum) {
+    console.debug(`selecting minimum as fallback: ${minimum}`);
     core.setOutput("next", minimum);
     return;
   }
 
   const next = increment({ describe, rollover, limit });
+  console.debug(`calculated next: ${next}`);
 
   if (compare({ minimum, next }) <= 0) {
+    console.debug(`selected higher minimum: ${minimum}`);
     core.setOutput("next", minimum);
     return;
   }
 
+  console.debug(`selected next: ${next}`);
   core.setOutput("next", next);
 };
 

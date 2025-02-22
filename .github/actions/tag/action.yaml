@@ -2,11 +2,10 @@ name: Tag
 description: "TODO"
 
 inputs:
-  # TODO: add support for inputs
   minimum:
     description: "The minimum version to use. This can either be an initial version, or be used to force the version to jump forward."
     required: false
-    default: "0.0.0"
+    default: "0.0.1"
 
   rollover:
     description: "Whether to rollover the version when the limit is reached."
