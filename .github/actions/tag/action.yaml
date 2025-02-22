@@ -4,12 +4,12 @@ description: "TODO"
 inputs:
   # TODO: add support for inputs
   minimum:
-    description: "The minimum version to use. This can either be an initial version, or it can force the version to jump forward."
+    description: "The minimum version to use. This can either be an initial version, or be used to force the version to jump forward."
     required: false
     default: "0.0.0"
 
   rollover:
-    description: "Whether to increment the next-last version segment and reset the last version segment to 0 when the limit is reached."
+    description: "Whether to rollover the version when the limit is reached."
     required: false
     default: "false"
 

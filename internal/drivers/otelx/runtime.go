@@ -6,7 +6,8 @@ import (
 	"strings"
 )
 
-// ...
+// packageName returns the package name of the caller, using skip to ignore 0 or more stack frames
+// to identify the correct caller.
 func packageName(skip int) string {
 	//nolint:dogsled // only need the program counter
 	pc, _, _, _ := runtime.Caller(1 + skip)
@@ -25,11 +26,12 @@ func packageName(skip int) string {
 	return fn[:i+j]
 }
 
-// ...
+// packageVersion returns the version of the given package, or "(unknown)" if no version could be
+// identified.
 func packageVersion(pkg string) string {
 	info, ok := debug.ReadBuildInfo()
 	if !ok {
-		return "unknown"
+		return "(unknown)"
 	}
 
 	mods := map[string]string{}
