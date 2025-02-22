@@ -176,5 +176,5 @@ jobs:
         uses: ./.github/actions/container-build
         with:
           service: example-rpc
-          # version: ${{ needs.tag.outputs.long }}
-          version: ${{ github.sha }}
+          version: ${{ needs.tag.outputs.long }}
+          # version: ${{ github.sha }}
