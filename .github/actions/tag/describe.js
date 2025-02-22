@@ -26,8 +26,8 @@ module.exports = async ({ core, exec }) => {
     "v[0-9]*",
   ]);
 
-  core.setOutput("short", short.stdout.replace(/^v/, ""));
-  core.setOutput("long", long.stdout.replace(/^v/, ""));
+  core.setOutput("short", short.stdout.replace(/^v/, "").trim());
+  core.setOutput("long", long.stdout.replace(/^v/, "").trim());
 };
 
 /**
@@ -40,5 +40,5 @@ async function makeFallback({ exec }) {
     "HEAD",
   ]);
 
-  return `0.0.0-0-g${commit.stdout}`;
+  return `0.0.0-0-g${commit.stdout.trim()}`;
 }
