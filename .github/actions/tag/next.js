@@ -43,7 +43,7 @@ async function current({ exec }) {
     return { ok: false };
   }
 
-  const describe = result.stdout.replace(/^v/, "");
+  const describe = result.stdout.replace(/^v/, "").trim();
   return { describe, ok: true };
 }
 

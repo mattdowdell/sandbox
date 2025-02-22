@@ -23,8 +23,7 @@ async function createAndPush({ exec, version }) {
     `Version ${version}`,
   ]);
 
-  // TODO: push tag
-  // await exec.exec("git", ["push", `v${version}`]);
+  await exec.exec("git", ["push", `v${version}`]);
 }
 
 /**

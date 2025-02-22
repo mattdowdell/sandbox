@@ -38,109 +38,109 @@ jobs:
           INCLUDES: ${{ steps.size.outputs.includes }}
           EXCLUDES: ${{ steps.size.outputs.excludes }}
 
-  # checks:
-  #   name: Checks
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-  #       with:
-  #         persist-credentials: false
+  checks:
+    name: Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
 
-  #     - name: Setup checks
-  #       uses: ./.github/actions/setup-checks
+      - name: Setup checks
+        uses: ./.github/actions/setup-checks
 
-  #     - name: Checks
-  #       run: |
-  #         just checks dirty
+      - name: Checks
+        run: |
+          just checks dirty
 
-  # lint:
-  #   name: Lint
-  #   needs:
-  #     - checks
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-  #       with:
-  #         persist-credentials: false
+  lint:
+    name: Lint
+    needs:
+      - checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
 
-  #     - name: Install Go
-  #       uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
-  #       with:
-  #         go-version-file: 'go.mod'
+      - name: Install Go
+        uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
+        with:
+          go-version-file: 'go.mod'
 
-  #     - name: Get version
-  #       id: version
-  #       run: |
-  #         ./tools/docker-base-tag.sh Dockerfile mirror.gcr.io/golangci/golangci-lint >> $GITHUB_OUTPUT
+      - name: Get version
+        id: version
+        run: |
+          ./tools/docker-base-tag.sh Dockerfile mirror.gcr.io/golangci/golangci-lint >> $GITHUB_OUTPUT
 
-  #     - name: Lint Go
-  #       uses: golangci/golangci-lint-action@2226d7cb06a077cd73e56eedd38eecad18e5d837 # v6.5.0
-  #       with:
-  #         version: ${{ steps.version.outputs.tag }}
-  #         args: --timeout=10m
+      - name: Lint Go
+        uses: golangci/golangci-lint-action@2226d7cb06a077cd73e56eedd38eecad18e5d837 # v6.5.0
+        with:
+          version: ${{ steps.version.outputs.tag }}
+          args: --timeout=10m
 
-  #     - name: Lint Protobuf
-  #       uses: bufbuild/buf-action@b46cbc051dd8fd10a3c2213e784498790d3fe388 # v1.0.3
-  #       with:
-  #         pr_comment: false
-  #         format: false
-  #         breaking: false
+      - name: Lint Protobuf
+        uses: bufbuild/buf-action@b46cbc051dd8fd10a3c2213e784498790d3fe388 # v1.0.3
+        with:
+          pr_comment: false
+          format: false
+          breaking: false
 
-  # unit:
-  #   name: Unit test
-  #   needs:
-  #     - checks
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-  #       with:
-  #         persist-credentials: false
+  unit:
+    name: Unit test
+    needs:
+      - checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
 
-  #     - name: Install Go
-  #       uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
-  #       with:
-  #         go-version-file: 'go.mod'
+      - name: Install Go
+        uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
+        with:
+          go-version-file: 'go.mod'
 
-  #     - name: Install Just
-  #       uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2.0.0
+      - name: Install Just
+        uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2.0.0
 
-  #     - name: Unit test
-  #       run: just unit
+      - name: Unit test
+        run: just unit
 
-  #     # TODO: report coverage to PR
-  #     # maybe gwatts/go-coverage-action?
+      # TODO: report coverage to PR
+      # maybe gwatts/go-coverage-action?
 
-  # scan:
-  #   name: Scan
-  #   needs:
-  #     - checks
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-  #       with:
-  #         persist-credentials: false
+  scan:
+    name: Scan
+    needs:
+      - checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
 
-  #     - name: Run scanner
-  #       uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 # 0.29.0
-  #       with:
-  #         scan-type: fs
-  #         trivy-config: trivy.yaml
+      - name: Run scanner
+        uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 # 0.29.0
+        with:
+          scan-type: fs
+          trivy-config: trivy.yaml
 
-  #     # TODO: publish to github for default branch builds
-  #     # https://github.com/actions/starter-workflows/blob/main/code-scanning/trivy.yml
+      # TODO: publish to github for default branch builds
+      # https://github.com/actions/starter-workflows/blob/main/code-scanning/trivy.yml
 
   # TODO: functional tests
 
   tag:
     name: Tag
-    # needs:
-    #   - lint
-    #   - unit
-    #   - scan
+    needs:
+      - lint
+      - unit
+      - scan
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -177,4 +177,3 @@ jobs:
         with:
           service: example-rpc
           version: ${{ needs.tag.outputs.long }}
-          # version: ${{ github.sha }}
