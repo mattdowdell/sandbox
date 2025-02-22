@@ -1,10 +1,21 @@
 name: Tag
+description: "TODO"
 
 inputs:
-  format:
-    description: "One of: incrementing, year-month, year-week."
+  minimum:
+    description: "The minimum version to use. This can either be an initial version, or be used to force the version to jump forward."
     required: false
-    default: "incrementing"
+    default: "0.0.1"
+
+  rollover:
+    description: "Whether to rollover the version when the limit is reached."
+    required: false
+    default: "false"
+
+  limit:
+    description: "The number to trigger a rollover at."
+    required: false
+    default: "100"
 
 outputs:
   short:
@@ -23,21 +34,39 @@ runs:
       run: |
         echo "Not implemented"
 
-    # TODO: if on default branch, create tag
-    # TODO: apply different formats
-    # 1. incrementing - endlessly increments vX.Y.Z, with rollover limit (default: 100)
-    # 2. year-month   - YYYY.MM.X, where X is incremented for each build that month
-    # 3. year-week    - YYYY.WW.X, where X is incremented for each build that week
-    - name: Tag
+    - name: Next
+      id: next
+      uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+      with:
+        script: |
+          const path = require('path');
+
+          const script = require(path.join(process.env.GITHUB_ACTION_PATH, 'next.js'));
+          await script({ core, exec });
+      env:
+        minimum: ${{ inputs.minimum }}
+        rollover: ${{ inputs.rollover }}
+        limit: ${{ inputs.limit }}
+
+    - name: Create
       if: github.ref_name == github.event.repository.default_branch
-      shell: bash
-      run: |
-        echo "Not implemented"
+      uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+      with:
+        script: |
+          const path = require('path');
+
+          const script = require(path.join(process.env.GITHUB_ACTION_PATH, 'create.js'));
+          await script({ exec });
+      env:
+        version: ${{ steps.next.outputs.next }}
 
     - name: Describe
       id: describe
-      shell: bash
-      run: |
-        echo "short=`git describe --always --match 'v[0-9]*'`" >> $GITHUB_OUTPUT
-        echo "long=`git describe --long --always --match 'v[0-9]*'`" >> $GITHUB_OUTPUT
+      uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+      with:
+        script: |
+          const path = require('path');
+
+          const script = require(path.join(process.env.GITHUB_ACTION_PATH, 'describe.js'));
+          await script({ core, exec });
 

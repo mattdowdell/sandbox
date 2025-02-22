@@ -34,7 +34,7 @@ COPY --from=build /go/bin/example-health /example-health
 # Devenv target
 # -------------
 
-FROM mirror.gcr.io/golangci/golangci-lint:v1.64.5@sha256:9faef4dda4304c4790a14c5b8c8cd8c2715a8cb754e13f61d8ceaa358f5a454a as golangci-lint
+FROM mirror.gcr.io/golangci/golangci-lint:v1.64.5@sha256:9faef4dda4304c4790a14c5b8c8cd8c2715a8cb754e13f61d8ceaa358f5a454a AS golangci-lint
 
 FROM base AS dev
 
