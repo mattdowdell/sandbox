@@ -6,12 +6,13 @@
 module.exports = async ({ core, exec }) => {
   const short = await exec.getExecOutput(
     "git",
-    ["describe", "--match", "'v[0-9]*'"],
+    ["describe", "--match", "v[0-9]*"],
     { ignoreReturnCode: true },
   );
 
   if (short.exitCode != 0) {
     const fallback = await makeFallback({ exec });
+    console.debug(`no tags found, using fallback: ${fallback}`);
 
     core.setOutput("short", fallback);
     core.setOutput("long", fallback);
@@ -22,7 +23,7 @@ module.exports = async ({ core, exec }) => {
     "describe",
     "--long",
     "--match",
-    "'v[0-9]*'",
+    "v[0-9]*",
   ]);
 
   core.setOutput("short", short.stdout.replace(/^v/, ""));

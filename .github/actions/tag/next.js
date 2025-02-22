@@ -11,7 +11,7 @@ module.exports = async ({ core, exec }) => {
   const { describe, ok } = await current({ exec });
 
   if (!ok || describe == minimum) {
-    console.debug(`selecting minimum as fallback: ${minimum}`);
+    console.debug(`no existing tags, defaulting to minimum: ${minimum}`);
     core.setOutput("next", minimum);
     return;
   }
@@ -20,12 +20,12 @@ module.exports = async ({ core, exec }) => {
   console.debug(`calculated next: ${next}`);
 
   if (compare({ minimum, next }) <= 0) {
-    console.debug(`selected higher minimum: ${minimum}`);
+    console.debug(`minimum (${minimum}) >= next (${next}), using minimum`);
     core.setOutput("next", minimum);
     return;
   }
 
-  console.debug(`selected next: ${next}`);
+  console.debug(`next (${next}) > minimum (${minimum}), using next`);
   core.setOutput("next", next);
 };
 
@@ -35,7 +35,7 @@ module.exports = async ({ core, exec }) => {
 async function current({ exec }) {
   const result = exec.getExecOutput(
     "git",
-    ["describe", "--match", "'v[0-9]*"],
+    ["describe", "--match", "v[0-9]*"],
     { ignoreReturnCode: true },
   );
 
