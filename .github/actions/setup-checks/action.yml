@@ -28,6 +28,12 @@ runs:
         package: mvdan.cc/gofumpt
         version-file: go.mod
 
+    - name: Install jet
+      uses: mattdowdell/go-installer@7af1f9ff5af1447fd122d6b144ddce2562b76e09 # v0.3.0
+      with:
+        package: github.com/go-jet/jet/v2/cmd/jet
+        version-file: go.mod
+
     - name: Install mockery
       uses: mattdowdell/go-installer@7af1f9ff5af1447fd122d6b144ddce2562b76e09 # v0.3.0
       with:
