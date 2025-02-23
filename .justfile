@@ -1,20 +1,49 @@
 # https://just.systems/man/en/
 
+is_docker := path_exists("/.dockerenv")
+db_host := if is_docker == "true" { "postgres" } else { "localhost" }
+db_port := "5432"
+db_user := "postgres"
+db_pass := "secret"
+
 [private]
 default:
     @just --list
 
 # Start the development environment.
 dev-up:
-    docker compose up --detach --build --wait
+    docker compose \
+        --file compose.yaml \
+        --file compose-dev.yaml \
+        up \
+        --detach \
+        --build \
+        --wait
 
 # Exec into the development environment.
 dev-exec:
-    docker compose exec dev bash -l
+    docker compose \
+        --file compose.yaml \
+        --file compose-dev.yaml \
+        exec dev \
+        bash -l
+
+# List containers in the development environment.
+dev-ps:
+    docker compose \
+        --file compose.yaml \
+        --file compose-dev.yaml \
+        ps \
+        --all
 
 # Stop the development environment.
 dev-down:
-    docker compose down -v
+    docker compose \
+        --file compose.yaml \
+        --file compose-dev.yaml \
+        down \
+        --volumes \
+        --remove-orphans
 
 # Restart the development environment.
 dev-restart: dev-down dev-up
@@ -77,16 +106,27 @@ gen-buf:
     buf generate --clean --config buf.yaml
 
 # Run the Go generators.
-gen-go: gen-go-wire gen-go-mockery
+gen-go: gen-go-jet gen-go-mockery gen-go-wire
 
-# Run the Go wire generator.
-gen-go-wire:
-    wire gen ./cmd/...
+# Run the Go jet generator
+gen-go-jet:
+    jet \
+        -source=postgres \
+        -host={{ db_host }} \
+        -port={{ db_port }} \
+        -user={{ db_user }} \
+        -password={{ db_pass }} \
+        -dbname=postgres \
+        -path ./internal/adapters/datastore/models/
 
 # Run the Go mockery generator.
 gen-go-mockery:
     rm -rf mocks/
     mockery
+
+# Run the Go wire generator.
+gen-go-wire:
+    wire gen ./cmd/...
 
 # Check for uncommitted changes.
 [private]
@@ -121,6 +161,20 @@ scan: scan-trivy
 # Scan the repository for issues using Trivy.
 scan-trivy:
     trivy fs --config trivy.yaml .
+
+# Exec into the database.
+db-exec:
+    PGPASSWORD={{ db_pass }} psql \
+        --host {{ db_host }} \
+        --username {{ db_user }}
+
+# Insert sample data into the database.
+db-sample:
+    PGPASSWORD={{ db_pass }} psql \
+        --host {{ db_host }} \
+        --username {{ db_user }} \
+        --echo-all \
+        --file ./tools/sample.sql
 
 # Build all containers.
 container-build: container-build-rpc

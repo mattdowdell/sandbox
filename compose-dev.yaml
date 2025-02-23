@@ -1,0 +1,13 @@
+# https://docs.docker.com/reference/compose-file/
+
+services:
+  dev:
+    image: example-dev:local
+    build:
+      context: .
+      target: dev
+    init: true
+    hostname: example-dev
+    volumes:
+      - ".:/home/dev/ws"
+    restart: always
