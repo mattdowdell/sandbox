@@ -28,5 +28,5 @@ func (s *Stub) GetResource(ctx context.Context, id uuid.UUID) (*entities.Resourc
 		return nil, err
 	}
 
-	return modelhelpers.ResourceToDomain(resource), nil
+	return modelhelpers.ResourceToDomain(&resource), nil
 }

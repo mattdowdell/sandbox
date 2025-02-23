@@ -10,14 +10,14 @@ func AuditEventsToDomain(inputs []model.AuditEvents) []*entities.AuditEvent {
 	outputs := make([]*entities.AuditEvent, 0, len(inputs))
 
 	for _, input := range inputs {
-		outputs = append(outputs, AuditEventToDomain(input))
+		outputs = append(outputs, AuditEventToDomain(&input))
 	}
 
 	return outputs
 }
 
 // ...
-func AuditEventToDomain(input model.AuditEvents) *entities.AuditEvent {
+func AuditEventToDomain(input *model.AuditEvents) *entities.AuditEvent {
 	return &entities.AuditEvent{
 		ID:           input.ID,
 		Operation:    entities.ParseOperation(input.Operation),

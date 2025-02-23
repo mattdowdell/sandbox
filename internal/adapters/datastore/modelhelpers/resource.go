@@ -10,14 +10,14 @@ func ResourcesToDomain(inputs []model.Resources) []*entities.Resource {
 	outputs := make([]*entities.Resource, 0, len(inputs))
 
 	for _, input := range inputs {
-		outputs = append(outputs, ResourceToDomain(input))
+		outputs = append(outputs, ResourceToDomain(&input))
 	}
 
 	return outputs
 }
 
 // ...
-func ResourceToDomain(input model.Resources) *entities.Resource {
+func ResourceToDomain(input *model.Resources) *entities.Resource {
 	return &entities.Resource{
 		ID:        input.ID,
 		Name:      input.Name,
