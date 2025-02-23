@@ -1,20 +1,34 @@
 /*global module, process*/
 
 /**
+ * Create a tag for the given version.
  *
+ * A "v" is prepending to support Go tagging conventions.
  */
-module.exports = async ({ exec }) => {
+module.exports = async ({ core, exec }) => {
   await configure({ exec });
 
-  // TODO: detect when the version already exists.
   const version = process.env.version;
-  await createAndPush({ exec, version });
+
+  await create({ core, exec, version });
+  await push({ exec, version });
 };
 
 /**
- * Create the given version as an annotated git tag and push the result.
+ * Create the given version as an annotated git tag.
  */
-async function createAndPush({ exec, version }) {
+async function create({ core, exec, version }) {
+  const result = await exec.exec(
+    "git",
+    ["rev-list", "--max-count", "1", `v${version}`],
+    { ignoreReturnCode: true },
+  );
+
+  if (result.exitCode == 0) {
+    core.info(`tag v${version} exists, skipping create`);
+    return;
+  }
+
   await exec.exec("git", [
     "tag",
     "--annotate",
@@ -22,12 +36,17 @@ async function createAndPush({ exec, version }) {
     "--message",
     `Version ${version}`,
   ]);
-
-  await exec.exec("git", ["push", `v${version}`]);
 }
 
 /**
- *
+ * Push the created tag.
+ */
+async function push({ exec, version }) {
+  await exec.exec("git", ["push", "origin", `v${version}`]);
+}
+
+/**
+ * Configure the git client to take the identity of the github-actions bot.
  */
 async function configure({ exec }) {
   await exec.exec("git", ["config", "user.name", "github-actions[bot]"]);

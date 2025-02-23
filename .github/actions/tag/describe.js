@@ -1,7 +1,10 @@
 /*global module*/
 
 /**
+ * Get the output of "git describe" and "git describe --long" without the "v" prefix.
  *
+ * For pull requests, the output is identical. For default branch builds, short will omit the
+ * "-<count>-g<commit>" suffix.
  */
 module.exports = async ({ core, exec }) => {
   const short = await exec.getExecOutput(
@@ -12,7 +15,7 @@ module.exports = async ({ core, exec }) => {
 
   if (short.exitCode != 0) {
     const fallback = await makeFallback({ exec });
-    console.debug(`no tags found, using fallback: ${fallback}`);
+    core.info(`no tags found, using fallback: ${fallback}`);
 
     core.setOutput("short", fallback);
     core.setOutput("long", fallback);
@@ -31,7 +34,10 @@ module.exports = async ({ core, exec }) => {
 };
 
 /**
+ * Create a fallback describe output for when no tags have been created.
  *
+ * It is assumed that this will only be used for when no tags have been created, such as for the
+ * very first pull request.
  */
 async function makeFallback({ exec }) {
   const commit = await exec.getExecOutput("git", [
