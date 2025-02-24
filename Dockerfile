@@ -38,6 +38,15 @@ FROM mirror.gcr.io/golangci/golangci-lint:v1.64.5@sha256:9faef4dda4304c4790a14c5
 
 FROM base AS dev
 
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+        postgresql-client \
+    ;
+
+
 RUN set -eux; \
     curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | \
     bash -s -- --to /usr/local/bin;

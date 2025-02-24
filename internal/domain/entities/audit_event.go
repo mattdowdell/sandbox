@@ -18,6 +18,23 @@ const (
 )
 
 // ...
+func ParseOperation(input string) Operation {
+	switch input {
+	case "created":
+		return OperationCreated
+
+	case "updated":
+		return OperationModified
+
+	case "deleted":
+		return OperationDeleted
+
+	default:
+		return 0
+	}
+}
+
+// ...
 func (o Operation) String() string {
 	switch o {
 	case OperationCreated:
@@ -42,6 +59,17 @@ const (
 	ResourceTypeResource ResourceType = iota + 1
 	// other resource types here.
 )
+
+// ...
+func ParseResourceType(input string) ResourceType {
+	switch input {
+	case "resource":
+		return ResourceTypeResource
+
+	default:
+		return 0
+	}
+}
 
 // ...
 func (r ResourceType) String() string {

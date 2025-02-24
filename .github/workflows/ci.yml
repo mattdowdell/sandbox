@@ -50,6 +50,14 @@ jobs:
       - name: Setup checks
         uses: ./.github/actions/setup-checks
 
+      - name: Start database
+        uses: hoverkraft-tech/compose-action@8be2d741e891ac9b8ac20825e6f3904149599925 # v2.2.0
+        with:
+          compose-file: compose.yaml
+          up-flags: --build --wait
+          down-flags: --volumes --remove-orphans
+          services: postgres
+
       - name: Checks
         run: |
           just checks dirty
@@ -133,14 +141,32 @@ jobs:
       # TODO: publish to github for default branch builds
       # https://github.com/actions/starter-workflows/blob/main/code-scanning/trivy.yml
 
-  # TODO: functional tests
-
-  tag:
-    name: Tag
+  functional:
+    name: Functional Tests
     needs:
       - lint
       - unit
       - scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Start
+        uses: hoverkraft-tech/compose-action@8be2d741e891ac9b8ac20825e6f3904149599925 # v2.2.0
+        with:
+          compose-file: compose.yaml
+          up-flags: --build --wait
+          down-flags: --volumes --remove-orphans
+
+      # TODO: run tests
+
+  tag:
+    name: Tag
+    needs:
+      - functional
     permissions:
       contents: write
     runs-on: ubuntu-latest
