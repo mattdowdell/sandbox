@@ -9,6 +9,7 @@ env | sort
 whoami
 
 /app/zizmor \
+	--cache-dir /home/zizmor/.cache/zizmor \
 	--persona "${INPUT_PERSONA:-regular}" \
 	--format "${INPUT_FORMAT:-plain}" \
 	--min-severity "${INPUT_MIN_SEVERITY:-unknown}" \
