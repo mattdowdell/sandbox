@@ -142,11 +142,17 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Get trivy version
+        id: trivy-version
+        run: |
+          ./tools/docker-base-tag.sh Dockerfile.dev ghcr.io/aquasecurity/trivy >> $GITHUB_OUTPUT
+
       - name: Run trivy
         uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 # 0.29.0
         with:
           scan-type: fs
           trivy-config: trivy.yaml
+          version: v${{ steps.trivy-version.outputs.tag }}
 
       # TODO: publish to github for default branch builds?
       # https://github.com/actions/starter-workflows/blob/main/code-scanning/trivy.yml
