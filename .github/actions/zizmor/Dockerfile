@@ -2,9 +2,9 @@
 
 FROM ghcr.io/woodruffw/zizmor:1.4.1@sha256:dbd8fffd06c51b0ea80dff6115547a0b4fe97fc67785d82f198ecf36d8a32ebe
 
-COPY --chown=root:root --chmod=555 "./entrypoint.py" "/entrypoint.py"
+COPY --chmod=555 entrypoint.sh /
 
-RUN useradd --comment Zizmor --create-home --user-group zizmor;
+RUN useradd zizmor
 USER zizmor
 
-ENTRYPOINT ["/entrypoint.py"]
+ENTRYPOINT ["/entrypoint.sh"]

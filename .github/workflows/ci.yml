@@ -81,7 +81,7 @@ jobs:
       - name: Get version
         id: version
         run: |
-          ./tools/docker-base-tag.sh Dockerfile mirror.gcr.io/golangci/golangci-lint >> $GITHUB_OUTPUT
+          ./tools/docker-base-tag.sh Dockerfile.dev mirror.gcr.io/golangci/golangci-lint >> $GITHUB_OUTPUT
 
       - name: Lint Go
         uses: golangci/golangci-lint-action@2226d7cb06a077cd73e56eedd38eecad18e5d837 # v6.5.0
@@ -145,9 +145,7 @@ jobs:
         uses: ./.github/actions/zizmor
         with:
           persona: pedantic
-          inputs: |
-            .github/actions/*/*.yml
-            .github/workflows/*.yml
+          inputs: .github/actions/*/*.yml .github/workflows/*.yml
 
   functional:
     name: Functional Tests
