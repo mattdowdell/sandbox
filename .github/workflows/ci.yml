@@ -132,7 +132,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Run scanner
+      - name: Run trivy
         uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 # 0.29.0
         with:
           scan-type: fs
@@ -140,6 +140,14 @@ jobs:
 
       # TODO: publish to github for default branch builds
       # https://github.com/actions/starter-workflows/blob/main/code-scanning/trivy.yml
+
+      - name: Run zizmor
+        uses: ./.github/actions/zizmor
+        with:
+          persona: pedantic
+          inputs: |
+            .github/actions/*/*.yml
+            .github/workflows/*.yml
 
   functional:
     name: Functional Tests
