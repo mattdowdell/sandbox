@@ -39,17 +39,3 @@ inputs:
 runs:
   using: 'docker'
   image: 'Dockerfile'
-  args:
-    - "--persona"
-    - ${{ inputs.persona }}
-    - "--gh-token"
-    - ${{ inputs.github-token }}
-    - "--format"
-    - ${{ inputs.format }}
-    - "--min-severity"
-    - ${{ inputs.min-severity }}
-    - "--min-confidence"
-    - ${{ inputs.min-confidence }}
-    - "--collect"
-    - ${{ inputs.collect }}
-    - ${{ inputs.inputs }}
