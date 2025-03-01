@@ -156,7 +156,11 @@ unit:
     go test -count=1 -cover ./...
 
 # Scan the repository for issues.
-scan: scan-trivy
+scan: scan-gitleaks scan-trivy scan-zizmor
+
+# Scan the repository for secrets with Gitleaks.
+scan-gitleaks:
+    gitleaks dir
 
 # Scan the repository for issues using Trivy.
 scan-trivy:
