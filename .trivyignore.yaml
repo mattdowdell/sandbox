@@ -23,7 +23,6 @@ misconfigurations:
   - id: AVD-DS-0002
     paths:
       - Dockerfile
-      - .github/actions/zizmor/Dockerfile # TODO: create a user
     statement: User defined in distroless base image.
 
   # https://avd.aquasec.com/misconfig/dockerfile/general/avd-ds-0026/
