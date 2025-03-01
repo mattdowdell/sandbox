@@ -41,7 +41,7 @@ runs:
     - name: Cosign
       shell: bash
       run: |
-        cosign sign --oidc-provider github-actions --yes ${service}:${version}@${digest}
+        cosign sign --yes ${service}:${version}@${digest}
       env:
         service: ${{ inputs.service }}
         version: ${{ inputs.version }}
