@@ -9,11 +9,16 @@
 
 FROM mirror.gcr.io/golang:1.23-bookworm@sha256:6260304a09fb81a1983db97c9e6bfc1779ebce33d39581979a511b3c7991f076 AS base
 
+# ------------
+# Dependencies
+# ------------
+
+FROM ghcr.io/woodruffw/zizmor:1.4.1@sha256:dbd8fffd06c51b0ea80dff6115547a0b4fe97fc67785d82f198ecf36d8a32ebe AS zizmor
+FROM mirror.gcr.io/golangci/golangci-lint:v1.64.5@sha256:9faef4dda4304c4790a14c5b8c8cd8c2715a8cb754e13f61d8ceaa358f5a454a AS golangci-lint
+
 # -------------
 # Devenv target
 # -------------
-
-FROM mirror.gcr.io/golangci/golangci-lint:v1.64.5@sha256:9faef4dda4304c4790a14c5b8c8cd8c2715a8cb754e13f61d8ceaa358f5a454a AS golangci-lint
 
 FROM base AS dev
 
@@ -45,6 +50,7 @@ RUN set -eux; \
     git config --global --add safe.directory /home/dev/ws;
 
 COPY --from=golangci-lint /usr/bin/golangci-lint /usr/bin/golangci-lint
+COPY --from=zizmor /app/zizmor /usr/bin/zizmor
 
 WORKDIR /home/dev/ws
 

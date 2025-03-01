@@ -11,4 +11,4 @@ export GH_TOKEN="${INPUT_GITHUB_TOKEN}"
 	--min-severity "${INPUT_MIN_SEVERITY:-unknown}" \
 	--min-confidence "${INPUT_MIN_CONFIDENCE:-unknown}" \
 	--collect "${INPUT_COLLECT:-all}" \
-	"${INPUT_INPUTS[@]}"
+	${INPUT_INPUTS[@]}
