@@ -4,7 +4,7 @@ buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate
 # buf.build/gen/go/grpc/grpc/connectrpc/go v1.18.1-20250124201648-9327911dce6e.1
 ## explicit; go 1.21
 buf.build/gen/go/grpc/grpc/connectrpc/go/grpc/health/v1/healthv1connect
-# buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.5-20250124201648-9327911dce6e.1
+# buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.5-20250221201120-75d553e65b34.1
 ## explicit; go 1.21
 buf.build/gen/go/grpc/grpc/protocolbuffers/go/grpc/health/v1
 # cel.dev/expr v0.19.1
