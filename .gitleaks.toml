@@ -1,0 +1,10 @@
+# https://github.com/gitleaks/gitleaks?tab=readme-ov-file#configuration
+
+title = "Gitleaks configuration"
+
+[extend]
+useDefault = true
+
+[[rules.allowlists]]
+description = "Ignore Trivy database in CI"
+paths = [".cache/trivy/db/trivy.db"]
