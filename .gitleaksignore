@@ -1,3 +1,0 @@
-# Trivy database downloaded during CI
-.cache/trivy/db/trivy.db:generic-api-key
-.cache/trivy/db/trivy.db:sourcegraph-access-token
