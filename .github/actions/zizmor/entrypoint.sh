@@ -1,12 +1,8 @@
 #!/bin/bash
 
 set -euo pipefail
-set -x
 
 export GH_TOKEN="${INPUT_GITHUB_TOKEN}"
-
-env | sort
-whoami
 
 /app/zizmor \
 	--cache-dir /home/zizmor/.cache/zizmor \
