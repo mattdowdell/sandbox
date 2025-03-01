@@ -5,6 +5,9 @@ set -x
 
 export GH_TOKEN="${INPUT_GITHUB_TOKEN}"
 
+env | sort
+whoami
+
 /app/zizmor \
 	--persona "${INPUT_PERSONA:-regular}" \
 	--format "${INPUT_FORMAT:-plain}" \
