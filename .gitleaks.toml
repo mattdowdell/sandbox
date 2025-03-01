@@ -5,8 +5,9 @@ title = "Gitleaks configuration"
 [extend]
 useDefault = true
 
-[[rules.allowlists]]
-description = "Ignore Trivy database in CI"
+[allowlist]
+description = "Global allow list"
 paths = [
+	# Ignore Trivy database downloaded during CI
 	'''\.cache/trivy/db/trivy\.db''',
 ]
