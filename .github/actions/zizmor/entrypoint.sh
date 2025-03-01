@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -euo pipefail
+set -x
 
 export GH_TOKEN="${INPUT_GITHUB_TOKEN}"
 
@@ -9,5 +10,5 @@ export GH_TOKEN="${INPUT_GITHUB_TOKEN}"
 	--format "${INPUT_FORMAT:-plain}" \
 	--min-severity "${INPUT_MIN_SEVERITY:-unknown}" \
 	--min-confidence "${INPUT_MIN_CONFIDENCE:-unknown}" \
-	--collect "${INPUT_COLLECT:-all}"
+	--collect "${INPUT_COLLECT:-all}" \
 	"${INPUT_INPUTS}"
