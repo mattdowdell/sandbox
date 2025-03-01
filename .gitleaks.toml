@@ -7,4 +7,6 @@ useDefault = true
 
 [[rules.allowlists]]
 description = "Ignore Trivy database in CI"
-paths = [".cache/trivy/db/trivy.db"]
+paths = [
+	'''\.cache/trivy/db/trivy\.db''',
+]
