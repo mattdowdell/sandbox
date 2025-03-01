@@ -13,29 +13,27 @@ import (
 // ...
 type UpdateResource struct {
 	clock repositories.Clock
-	store repositories.Resource
 }
 
 // ...
 func NewUpdateResource(
 	clock repositories.Clock,
-	store repositories.Resource,
 ) *UpdateResource {
 	return &UpdateResource{
 		clock: clock,
-		store: store,
 	}
 }
 
 // ...
 func (u *UpdateResource) Execute(
 	ctx context.Context,
+	store repositories.Resource,
 	resource *entities.Resource,
 ) (*entities.Resource, error) {
 	resource.Update(u.clock.Now())
 
 	// TODO: handle conflict
-	if err := u.store.UpdateResource(ctx, resource); err != nil {
+	if err := store.UpdateResource(ctx, resource); err != nil {
 		slog.ErrorContext(ctx, "failed to update resource", slogx.Err(err))
 		return nil, errors.New("internal error")
 	}

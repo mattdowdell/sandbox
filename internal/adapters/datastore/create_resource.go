@@ -9,7 +9,7 @@ import (
 )
 
 // ...
-func (s *Stub) CreateResource(ctx context.Context, resource *entities.Resource) error {
+func (d *Datastore) CreateResource(ctx context.Context, resource *entities.Resource) error {
 	m := modelhelpers.ResourceFromDomain(resource)
 
 	stmt := table.Resources.
@@ -21,7 +21,7 @@ func (s *Stub) CreateResource(ctx context.Context, resource *entities.Resource) 
 		).
 		MODEL(m)
 
-	if _, err := stmt.ExecContext(ctx, s.db); err != nil {
+	if _, err := stmt.ExecContext(ctx, d.db); err != nil {
 		return err
 	}
 

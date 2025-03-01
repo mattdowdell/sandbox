@@ -13,6 +13,7 @@ require (
 	connectrpc.com/grpcreflect v1.3.0
 	connectrpc.com/otelconnect v0.7.1
 	connectrpc.com/validate v0.2.0
+	github.com/XSAM/otelsql v0.37.0
 	github.com/charmbracelet/bubbletea v1.3.3
 	github.com/charmbracelet/lipgloss v1.0.0
 	github.com/creasty/defaults v1.8.0
@@ -20,6 +21,7 @@ require (
 	github.com/go-jet/jet/v2 v2.12.0
 	github.com/google/uuid v1.6.0
 	github.com/google/wire v0.6.0
+	github.com/jackc/pgx/v5 v5.7.2
 	github.com/knadh/koanf/maps v0.1.1
 	github.com/knadh/koanf/parsers/json v0.1.0
 	github.com/knadh/koanf/parsers/toml v0.1.0
@@ -73,8 +75,9 @@ require (
 	github.com/jackc/pgio v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgproto3/v2 v2.3.3 // indirect
-	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
+	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/pgtype v1.14.4 // indirect
+	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jinzhu/copier v0.4.0 // indirect
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect

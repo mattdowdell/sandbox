@@ -11,24 +11,19 @@ import (
 )
 
 // ...
-type ListResources struct {
-	store repositories.Resource
-}
+type ListResources struct {}
 
 // ...
-func NewListResources(
-	store repositories.Resource,
-) *ListResources {
-	return &ListResources{
-		store: store,
-	}
+func NewListResources() *ListResources {
+	return &ListResources{}
 }
 
 // ...
 func (u *ListResources) Execute(
 	ctx context.Context,
+	store repositories.Resource,
 ) ([]*entities.Resource, error) {
-	resources, err := u.store.ListResources(ctx)
+	resources, err := store.ListResources(ctx)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to list resources", slogx.Err(err))
 		return nil, errors.New("internal error")

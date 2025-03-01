@@ -12,25 +12,20 @@ import (
 )
 
 // ...
-type DeleteResource struct {
-	store repositories.Resource
-}
+type DeleteResource struct {}
 
 // ...
-func NewDeleteResource(
-	store repositories.Resource,
-) *DeleteResource {
-	return &DeleteResource{
-		store: store,
-	}
+func NewDeleteResource() *DeleteResource {
+	return &DeleteResource{}
 }
 
 // ...
 func (u *DeleteResource) Execute(
 	ctx context.Context,
+	store repositories.Resource,
 	id uuid.UUID,
 ) error {
-	if err := u.store.DeleteResource(ctx, id); err != nil {
+	if err := store.DeleteResource(ctx, id); err != nil {
 		slog.ErrorContext(ctx, "failed to delete resource", slogx.Err(err))
 		return errors.New("internal error")
 	}
