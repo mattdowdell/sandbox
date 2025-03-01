@@ -162,6 +162,10 @@ scan: scan-trivy
 scan-trivy:
     trivy fs --config trivy.yaml .
 
+# Scan actions and workflows using Zizmor.
+scan-zizmor:
+    zizmor --persona pedantic .github/actions/*/*.yml .github/workflows/*.yml
+
 # Exec into the database.
 db-exec:
     PGPASSWORD={{ db_pass }} psql \
@@ -169,12 +173,12 @@ db-exec:
         --username {{ db_user }}
 
 # Insert sample data into the database.
-db-sample:
+db-seed:
     PGPASSWORD={{ db_pass }} psql \
         --host {{ db_host }} \
         --username {{ db_user }} \
         --echo-all \
-        --file ./tools/sample.sql
+        --file ./tools/seed.sql
 
 # Build all containers.
 container-build: container-build-rpc
