@@ -1,0 +1,2 @@
+# Trivy database downloaded during CI
+.cache/trivy/db/trivy.db
