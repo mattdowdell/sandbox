@@ -17,10 +17,10 @@ inputs:
     description: The GitHub API token to use.
     default: ${{ github.token }}
     required: false
-  # github_hostname:
-  #   description: The GitHub Server Hostname.
-  #   default: ""
-  #   required: false
+  github_hostname:
+    description: The GitHub Server Hostname.
+    default: ""
+    required: false
   no_online_audits:
     description: Perform only offline audits.
     default: "false"
@@ -73,4 +73,5 @@ runs:
     - "--collect=${{ inputs.collect }}"
   env:
     GH_TOKEN: ${{ inputs.github_token }}
+    GH_HOST: ${{ inputs.github_hostname }}
     ZIZMOR_NO_ONLINE_AUDITS: ${{ inputs.no_online_audits }}
