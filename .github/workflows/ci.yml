@@ -161,7 +161,6 @@ jobs:
         uses: ./.github/actions/zizmor
         with:
           persona: pedantic
-          inputs: .github/actions/*/*.yml .github/workflows/*.yml
 
       - name: Run gitleaks
         uses: ./.github/actions/gitleaks
