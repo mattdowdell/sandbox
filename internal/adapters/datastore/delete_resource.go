@@ -10,12 +10,12 @@ import (
 )
 
 // ...
-func (s *Stub) DeleteResource(ctx context.Context, id uuid.UUID) error {
+func (d *Datastore) DeleteResource(ctx context.Context, id uuid.UUID) error {
 	stmt := table.Resources.
 		DELETE().
 		WHERE(table.Resources.ID.EQ(postgres.UUID(id)))
 
-	if _, err := stmt.ExecContext(ctx, s.db); err != nil {
+	if _, err := stmt.ExecContext(ctx, d.db); err != nil {
 		return err
 	}
 

@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/wire"
 
+	"github.com/mattdowdell/sandbox/internal/adapters/common"
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/healthrpc"
@@ -18,6 +19,7 @@ import (
 	"github.com/mattdowdell/sandbox/internal/drivers/config/flagoptions"
 	"github.com/mattdowdell/sandbox/internal/drivers/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
+	"github.com/mattdowdell/sandbox/internal/drivers/pgsql"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/otelconnectx"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/validatex"
@@ -31,19 +33,20 @@ func ProvideApp(ctx context.Context) (*App, error) {
 		flagoptions.New,
 		config.New,
 		LoadConfig,
-		wire.FieldsOf(new(Config), "App", "Logging", "Meter", "OtelConnect", "RPCServer", "Tracer"),
+		wire.FieldsOf(new(Config), "App", "Database", "Logging", "Meter", "OtelConnect", "RPCServer", "Tracer"),
 		// observability
 		logging.NewAsDefaultFromConfig,
 		otelx.NewTracerProviderFromConfig,
 		otelx.NewMeterProviderFromConfig,
+		// providers
+		pgsql.NewFromConfig,
+		datastore.NewProvider,
+		wire.Bind(new(common.Provider), new(*datastore.Provider)),
 		// repositories
 		clock.New,
 		wire.Bind(new(repositories.Clock), new(*clock.Clock)),
 		uuidgen.New,
 		wire.Bind(new(repositories.UUIDGenerator), new(*uuidgen.Generator)),
-		datastore.NewStub,
-		wire.Bind(new(repositories.Resource), new(*datastore.Stub)),
-		wire.Bind(new(repositories.AuditEvent), new(*datastore.Stub)),
 		// usecases
 		usecases.NewCreateResource,
 		wire.Bind(new(examplerpc.ResourceCreator), new(*usecases.CreateResource)),

@@ -12,7 +12,7 @@ import (
 // ...
 //
 // TODO: decide how to implement this, use poller or notify?
-func (s *Stub) WatchAuditEvents(ctx context.Context, ch chan<- *entities.AuditEvent) error {
+func (d *Datastore) WatchAuditEvents(ctx context.Context, ch chan<- *entities.AuditEvent) error {
 	ticker := time.NewTicker(time.Second * 2) //nolint:mnd // ignore in stub
 
 	for {

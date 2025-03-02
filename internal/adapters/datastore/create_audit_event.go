@@ -9,7 +9,7 @@ import (
 )
 
 // ...
-func (s *Stub) CreateAuditEvent(ctx context.Context, event *entities.AuditEvent) error {
+func (d *Datastore) CreateAuditEvent(ctx context.Context, event *entities.AuditEvent) error {
 	m := modelhelpers.AuditEventFromDomain(event)
 
 	stmt := table.AuditEvents.
@@ -23,7 +23,7 @@ func (s *Stub) CreateAuditEvent(ctx context.Context, event *entities.AuditEvent)
 		).
 		MODEL(m)
 
-	if _, err := stmt.ExecContext(ctx, s.db); err != nil {
+	if _, err := stmt.ExecContext(ctx, d.db); err != nil {
 		return err
 	}
 

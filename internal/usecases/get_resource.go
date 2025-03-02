@@ -13,25 +13,20 @@ import (
 )
 
 // ...
-type GetResource struct {
-	store repositories.Resource
-}
+type GetResource struct{}
 
 // ...
-func NewGetResource(
-	store repositories.Resource,
-) *GetResource {
-	return &GetResource{
-		store: store,
-	}
+func NewGetResource() *GetResource {
+	return &GetResource{}
 }
 
 // ...
 func (u *GetResource) Execute(
 	ctx context.Context,
+	store repositories.Resource,
 	id uuid.UUID,
 ) (*entities.Resource, error) {
-	resource, err := u.store.GetResource(ctx, id)
+	resource, err := store.GetResource(ctx, id)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to get resource", slogx.Err(err))
 		return nil, errors.New("internal error")

@@ -10,7 +10,7 @@ import (
 )
 
 // ...
-func (s *Stub) ListAuditEvents(ctx context.Context) ([]*entities.AuditEvent, error) {
+func (d *Datastore) ListAuditEvents(ctx context.Context) ([]*entities.AuditEvent, error) {
 	stmt := table.AuditEvents.
 		SELECT(
 			table.AuditEvents.ID,
@@ -23,7 +23,7 @@ func (s *Stub) ListAuditEvents(ctx context.Context) ([]*entities.AuditEvent, err
 		ORDER_BY(table.Resources.ID.ASC())
 
 	var events []model.AuditEvents
-	if err := stmt.QueryContext(ctx, s.db, &events); err != nil {
+	if err := stmt.QueryContext(ctx, d.db, &events); err != nil {
 		return nil, err
 	}
 

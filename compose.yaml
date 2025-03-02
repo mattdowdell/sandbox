@@ -10,6 +10,11 @@ services:
         SERVICE: example-rpc
     entrypoint: ["/example-rpc"]
     environment:
+      APP_DATABASE_HOSTNAME: "postgres"
+      APP_DATABASE_USERNAME: "postgres"
+      APP_DATABASE_PASSWORD: "secret"
+      APP_DATABASE_NAME: "postgres"
+      APP_DATABASE_SSLMODE: "disable"
       APP_RPCSERVER_HOST: "0.0.0.0"
       APP_METERPROVIDER_ENDPOINT: "http://victoria-metrics:8428/opentelemetry/v1/metrics"
       APP_TRACERPROVIDER_ENDPOINT: "http://jaeger:4318"

@@ -11,7 +11,7 @@ import (
 )
 
 // ...
-func (s *Stub) UpdateResource(ctx context.Context, resource *entities.Resource) error {
+func (d *Datastore) UpdateResource(ctx context.Context, resource *entities.Resource) error {
 	m := modelhelpers.ResourceFromDomain(resource)
 
 	stmt := table.Resources.
@@ -22,7 +22,7 @@ func (s *Stub) UpdateResource(ctx context.Context, resource *entities.Resource) 
 		WHERE(table.Resources.ID.EQ(postgres.UUID(resource.ID))).
 		MODEL(m)
 
-	if _, err := stmt.ExecContext(ctx, s.db); err != nil {
+	if _, err := stmt.ExecContext(ctx, d.db); err != nil {
 		return err
 	}
 
