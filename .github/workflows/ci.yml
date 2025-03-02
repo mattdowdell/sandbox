@@ -155,7 +155,6 @@ jobs:
         uses: ./.github/actions/zizmor
         with:
           persona: pedantic
-          inputs: .github/actions/*/*.yml .github/workflows/*.yml
 
   functional:
     name: Functional Tests

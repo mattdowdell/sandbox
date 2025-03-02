@@ -4,7 +4,8 @@ description: Static analysis for GitHub Actions.
 inputs:
   inputs:
     description: The inputs to audit.
-    required: true
+    default: ${{ github.workspace }}
+    required: false
   persona:
     description: The persona to use while auditing.
     default: regular
