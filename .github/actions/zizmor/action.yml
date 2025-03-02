@@ -23,7 +23,7 @@ inputs:
     required: false
   no_online_audits:
     description: Perform only offline audits.
-    default: ""
+    default: "false"
     required: false
   format:
     description: The output format to emit.
