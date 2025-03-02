@@ -9,6 +9,8 @@ import (
 
 	mock "github.com/stretchr/testify/mock"
 
+	repositories "github.com/mattdowdell/sandbox/internal/domain/repositories"
+
 	uuid "github.com/google/uuid"
 )
 
@@ -25,9 +27,9 @@ func (_m *ResourceGetter) EXPECT() *ResourceGetter_Expecter {
 	return &ResourceGetter_Expecter{mock: &_m.Mock}
 }
 
-// Execute provides a mock function with given fields: _a0, _a1
-func (_m *ResourceGetter) Execute(_a0 context.Context, _a1 uuid.UUID) (*entities.Resource, error) {
-	ret := _m.Called(_a0, _a1)
+// Execute provides a mock function with given fields: _a0, _a1, _a2
+func (_m *ResourceGetter) Execute(_a0 context.Context, _a1 repositories.Resource, _a2 uuid.UUID) (*entities.Resource, error) {
+	ret := _m.Called(_a0, _a1, _a2)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Execute")
@@ -35,19 +37,19 @@ func (_m *ResourceGetter) Execute(_a0 context.Context, _a1 uuid.UUID) (*entities
 
 	var r0 *entities.Resource
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*entities.Resource, error)); ok {
-		return rf(_a0, _a1)
+	if rf, ok := ret.Get(0).(func(context.Context, repositories.Resource, uuid.UUID) (*entities.Resource, error)); ok {
+		return rf(_a0, _a1, _a2)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *entities.Resource); ok {
-		r0 = rf(_a0, _a1)
+	if rf, ok := ret.Get(0).(func(context.Context, repositories.Resource, uuid.UUID) *entities.Resource); ok {
+		r0 = rf(_a0, _a1, _a2)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*entities.Resource)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
-		r1 = rf(_a0, _a1)
+	if rf, ok := ret.Get(1).(func(context.Context, repositories.Resource, uuid.UUID) error); ok {
+		r1 = rf(_a0, _a1, _a2)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -62,14 +64,15 @@ type ResourceGetter_Execute_Call struct {
 
 // Execute is a helper method to define mock.On call
 //   - _a0 context.Context
-//   - _a1 uuid.UUID
-func (_e *ResourceGetter_Expecter) Execute(_a0 interface{}, _a1 interface{}) *ResourceGetter_Execute_Call {
-	return &ResourceGetter_Execute_Call{Call: _e.mock.On("Execute", _a0, _a1)}
+//   - _a1 repositories.Resource
+//   - _a2 uuid.UUID
+func (_e *ResourceGetter_Expecter) Execute(_a0 interface{}, _a1 interface{}, _a2 interface{}) *ResourceGetter_Execute_Call {
+	return &ResourceGetter_Execute_Call{Call: _e.mock.On("Execute", _a0, _a1, _a2)}
 }
 
-func (_c *ResourceGetter_Execute_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID)) *ResourceGetter_Execute_Call {
+func (_c *ResourceGetter_Execute_Call) Run(run func(_a0 context.Context, _a1 repositories.Resource, _a2 uuid.UUID)) *ResourceGetter_Execute_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uuid.UUID))
+		run(args[0].(context.Context), args[1].(repositories.Resource), args[2].(uuid.UUID))
 	})
 	return _c
 }
@@ -79,7 +82,7 @@ func (_c *ResourceGetter_Execute_Call) Return(_a0 *entities.Resource, _a1 error)
 	return _c
 }
 
-func (_c *ResourceGetter_Execute_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entities.Resource, error)) *ResourceGetter_Execute_Call {
+func (_c *ResourceGetter_Execute_Call) RunAndReturn(run func(context.Context, repositories.Resource, uuid.UUID) (*entities.Resource, error)) *ResourceGetter_Execute_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -9,84 +9,57 @@ import (
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
+// Datastore is a unified interface for repositories.
 type Datastore interface {
 	repositories.AuditEvent
 	repositories.Resource
 }
 
+// CommitFn commits a transaction.
 type CommitFn func() error
 
+// RollbackFn rolls back a transaction. No error should be produced for a committed transaction.
 type RollbackFn func() error
 
-// ...
+// Provider provides access to either a transactional or non-transactional database.
 type Provider interface {
 	Datastore() Datastore
 	BeginTx(context.Context) (Datastore, CommitFn, RollbackFn, error)
 }
 
-// ...
+// TxFunc executes the given function within a transaction, automatically committing or rolling back
+// the transaction as necessary.
 func TxFunc(
 	ctx context.Context,
 	provider Provider,
 	fn func(Datastore) error,
 ) error {
-	conn, commit, rollback, err := provider.BeginTx(ctx)
-	if err != nil {
-		return err
-	}
+	_, _, err := TxValues(ctx, provider, func(ds Datastore) (struct{}, struct{}, error) {
+		return struct{}{}, struct{}{}, fn(ds)
+	})
 
-	defer func() {
-		if err := rollback(); err != nil {
-			slog.ErrorContext(ctx, "failed to rollback transaction", slogx.Err(err))
-		}
-	}()
-
-	if err := fn(conn); err != nil {
-		return err
-	}
-
-	if err := commit(); err != nil {
-		return fmt.Errorf("failed to commit transaction: %w", err)
-	}
-
-	return nil
+	return err
 }
 
-// ...
+// TxValue executes the given function within a transaction, automatically committing or rolling
+// back the transaction as necessary. It returns the non-error value returned by fn on success.
 func TxValue[T any](
 	ctx context.Context,
 	provider Provider,
 	fn func(Datastore) (T, error),
 ) (T, error) {
-	conn, commit, rollback, err := provider.BeginTx(ctx)
-	if err != nil {
-		var t T
-		return t, err
-	}
+	val, _, err := TxValues(ctx, provider, func(ds Datastore) (T, struct{}, error) {
+		val, err := fn(ds)
+		return val, struct{}{}, err
+	})
 
-	defer func() {
-		if err := rollback(); err != nil {
-			slog.ErrorContext(ctx, "failed to rollback transaction", slogx.Err(err))
-		}
-	}()
-
-	val, err := fn(conn)
-	if err != nil {
-		var t T
-		return t, err
-	}
-
-	if err := commit(); err != nil {
-		var t T
-		return t, fmt.Errorf("failed to commit transaction: %w", err)
-	}
-
-	return val, nil
+	return val, err
 }
 
-// ...
+// TxValues executes the given function within a transaction, automatically committing or rolling
+// back the transaction as necessary. It returns the non-error values returned by fn on success.
 //
-//nolint:gocritic // no value gained from naming generic return values
+//nolint:gocritic // nothing gained by naming generic return values
 func TxValues[T1, T2 any](
 	ctx context.Context,
 	provider Provider,
@@ -94,6 +67,8 @@ func TxValues[T1, T2 any](
 ) (T1, T2, error) {
 	conn, commit, rollback, err := provider.BeginTx(ctx)
 	if err != nil {
+		slog.ErrorContext(ctx, "failed to begin transaction", slogx.Err(err))
+
 		var t1 T1
 		var t2 T2
 
@@ -115,6 +90,8 @@ func TxValues[T1, T2 any](
 	}
 
 	if err := commit(); err != nil {
+		slog.ErrorContext(ctx, "failed to commit transaction", slogx.Err(err))
+
 		var t1 T1
 		var t2 T2
 

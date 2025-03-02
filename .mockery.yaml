@@ -2,7 +2,7 @@
 
 dir: 'mocks/{{ trimPrefix .PackagePath "github.com/mattdowdell/sandbox/internal/" | dir }}/mock{{ .PackagePath | base }}'
 disable-version-string: true
-filename: "mock_{{ .InterfaceName | snakecase }}.go"
+filename: "{{ .InterfaceName | snakecase }}.go"
 issue-845-fix: true
 mockname: "{{ .InterfaceName }}"
 outpkg: "mock{{ .PackageName }}"
@@ -10,6 +10,9 @@ resolve-type-alias: false
 with-expecter: true
 
 packages:
+  github.com/mattdowdell/sandbox/internal/adapters/common:
+    config:
+      all: true
   github.com/mattdowdell/sandbox/internal/adapters/examplerpc:
     config:
       all: true

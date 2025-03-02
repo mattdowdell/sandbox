@@ -3,6 +3,7 @@ package datastore
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"github.com/go-jet/jet/v2/qrm"
 
@@ -32,7 +33,7 @@ func (p *Provider) BeginTx(
 
 	ds := NewDatastore(tx)
 
-	return ds, tx.Commit, tx.Rollback, nil
+	return ds, tx.Commit, wrapRollback(tx.Rollback), nil
 }
 
 // ...
@@ -49,5 +50,18 @@ type Datastore struct {
 func NewDatastore(db qrm.DB) *Datastore {
 	return &Datastore{
 		db: db,
+	}
+}
+
+// ...
+func wrapRollback(fn common.RollbackFn) common.RollbackFn {
+	return func() error {
+		if err := fn(); err != nil {
+			if !errors.Is(err, sql.ErrTxDone) {
+				return err
+			}
+		}
+
+		return nil
 	}
 }

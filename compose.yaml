@@ -10,8 +10,8 @@ services:
         SERVICE: example-rpc
     entrypoint: ["/example-rpc"]
     environment:
-      APP_DATABASE_HOST: "postgres"
-      APP_DATABASE_USER: "postgres"
+      APP_DATABASE_HOSTNAME: "postgres"
+      APP_DATABASE_USERNAME: "postgres"
       APP_DATABASE_PASSWORD: "secret"
       APP_DATABASE_NAME: "postgres"
       APP_DATABASE_SSLMODE: "disable"

@@ -16,9 +16,9 @@ import (
 
 // ...
 type Config struct {
-	Hostname     string        `koanf:"host"`
+	Hostname     string        `koanf:"hostname"`
 	Port         uint16        `koanf:"port" default:"5432"`
-	User         string        `koanf:"username"`
+	Username     string        `koanf:"username"`
 	Password     string        `koanf:"password"`
 	Name         string        `koanf:"name"`
 	SSLMode      string        `koanf:"sslmode" default:"verify-full"`
@@ -46,7 +46,7 @@ func NewFromConfig(conf Config) (*sql.DB, error) {
 	return New(
 		conf.Hostname,
 		conf.Port,
-		conf.User,
+		conf.Username,
 		conf.Name,
 		conf.SSLMode,
 		conf.toOptions()...,
