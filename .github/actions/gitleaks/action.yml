@@ -1,0 +1,9 @@
+name: Gitleaks
+description: Scan git repositories for secrets
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - "dir"
+    - "--verbose"

@@ -5,16 +5,16 @@ go 1.24
 toolchain go1.24.0
 
 require (
-	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.5-20250130201111-63bb56e20495.1
-	buf.build/gen/go/grpc/grpc/connectrpc/go v1.18.1-20250124201648-9327911dce6e.1
-	buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.5-20250124201648-9327911dce6e.1
+	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.5-20250219170025-d39267d9df8f.1
+	buf.build/gen/go/grpc/grpc/connectrpc/go v1.18.1-20250221201120-75d553e65b34.1
+	buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.5-20250221201120-75d553e65b34.1
 	connectrpc.com/connect v1.18.1
 	connectrpc.com/grpchealth v1.3.0
 	connectrpc.com/grpcreflect v1.3.0
-	connectrpc.com/otelconnect v0.7.1
+	connectrpc.com/otelconnect v0.7.2
 	connectrpc.com/validate v0.2.0
 	github.com/XSAM/otelsql v0.37.0
-	github.com/charmbracelet/bubbletea v1.3.3
+	github.com/charmbracelet/bubbletea v1.3.4
 	github.com/charmbracelet/lipgloss v1.0.0
 	github.com/creasty/defaults v1.8.0
 	github.com/daixiang0/gci v0.13.5
@@ -30,7 +30,7 @@ require (
 	github.com/knadh/koanf/providers/file v1.1.2
 	github.com/knadh/koanf/v2 v2.1.2
 	github.com/stretchr/testify v1.10.0
-	github.com/vektra/mockery/v2 v2.52.2
+	github.com/vektra/mockery/v2 v2.52.4
 	go.opentelemetry.io/contrib/instrumentation/runtime v0.59.0
 	go.opentelemetry.io/otel v1.34.0
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp v1.34.0

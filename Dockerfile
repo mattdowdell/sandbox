@@ -7,7 +7,7 @@
 # Base target
 # -----------
 
-FROM mirror.gcr.io/golang:1.23-bookworm@sha256:6260304a09fb81a1983db97c9e6bfc1779ebce33d39581979a511b3c7991f076 AS base
+FROM mirror.gcr.io/golang:1.24-bookworm@sha256:b970e6d47c09fdd34179acef5c4fecaf6410f0b597a759733b3cbea04b4e604a AS base
 
 # ------------
 # Build target
@@ -29,45 +29,3 @@ FROM gcr.io/distroless/static-debian12:nonroot@sha256:6ec5aa99dc335666e79dc64e4a
 ARG SERVICE
 COPY --from=build /go/bin/${SERVICE} /${SERVICE}
 COPY --from=build /go/bin/example-health /example-health
-
-# -------------
-# Devenv target
-# -------------
-
-FROM mirror.gcr.io/golangci/golangci-lint:v1.64.5@sha256:9faef4dda4304c4790a14c5b8c8cd8c2715a8cb754e13f61d8ceaa358f5a454a AS golangci-lint
-
-FROM base AS dev
-
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    set -eux; \
-    apt-get update; \
-    apt-get install -y --no-install-recommends \
-        postgresql-client \
-    ;
-
-
-RUN set -eux; \
-    curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | \
-    bash -s -- --to /usr/local/bin;
-
-ARG TRIVY_VERSION=v0.59.1
-RUN set -eux; \
-    curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | \
-    sh -s -- -b /usr/local/bin ${TRIVY_VERSION};
-
-RUN set -eux; \
-    useradd --comment Dev --create-home --user-group dev;
-
-ENV GOPATH=''
-USER dev
-RUN set -eux; \
-    echo "export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin" >> /home/dev/.bashrc; \
-    mkdir -p /home/dev/ws; \
-    git config --global --add safe.directory /home/dev/ws;
-
-COPY --from=golangci-lint /usr/bin/golangci-lint /usr/bin/golangci-lint
-
-WORKDIR /home/dev/ws
-
-CMD ["sleep", "inf"]

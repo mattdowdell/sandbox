@@ -1,0 +1,57 @@
+# https://docs.docker.com/reference/dockerfile/
+#
+# mirror.gcr.io caches of popular docker hub images, but does not add rate limiting.
+# See https://cloud.google.com/artifact-registry/docs/pull-cached-dockerhub-images.
+
+# -----------
+# Base target
+# -----------
+
+FROM mirror.gcr.io/golang:1.24-bookworm@sha256:b970e6d47c09fdd34179acef5c4fecaf6410f0b597a759733b3cbea04b4e604a AS base
+
+# ------------
+# Dependencies
+# ------------
+
+FROM ghcr.io/gitleaks/gitleaks:v8.24.0@sha256:2bcceac45179b3a91bff11a824d0fb952585b429e54fc928728b1d4d5c3e5176 AS gitleaks
+FROM mirror.gcr.io/golangci/golangci-lint:v1.64.5@sha256:9faef4dda4304c4790a14c5b8c8cd8c2715a8cb754e13f61d8ceaa358f5a454a AS golangci-lint
+FROM ghcr.io/aquasecurity/trivy:0.59.1@sha256:029e990b328d149bf0a9ffe355919041e1f86192db2df47e217f8a36dd42ceac AS trivy
+FROM ghcr.io/woodruffw/zizmor:1.4.1@sha256:dbd8fffd06c51b0ea80dff6115547a0b4fe97fc67785d82f198ecf36d8a32ebe AS zizmor
+
+
+# -------------
+# Devenv target
+# -------------
+
+FROM base AS dev
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+        postgresql-client \
+    ;
+
+RUN set -eux; \
+    curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | \
+    bash -s -- --to /usr/local/bin;
+
+RUN set -eux; \
+    useradd --comment Dev --create-home --user-group dev;
+
+ENV GOPATH=''
+USER dev
+RUN set -eux; \
+    echo "export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin" >> /home/dev/.bashrc; \
+    mkdir -p /home/dev/ws; \
+    git config --global --add safe.directory /home/dev/ws;
+
+COPY --from=gitleaks /usr/bin/gitleaks /usr/bin/gitleaks
+COPY --from=golangci-lint /usr/bin/golangci-lint /usr/bin/golangci-lint
+COPY --from=trivy /usr/local/bin/trivy /usr/bin/trivy
+COPY --from=zizmor /app/zizmor /usr/bin/zizmor
+
+WORKDIR /home/dev/ws
+
+CMD ["sleep", "inf"]

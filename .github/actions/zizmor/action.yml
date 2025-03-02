@@ -1,0 +1,44 @@
+name: Zizmor
+description: Static analysis for GitHub Actions.
+
+inputs:
+  inputs:
+    description: The inputs to audit.
+    default: ${{ github.workspace }}
+    required: false
+  persona:
+    description: The persona to use while auditing.
+    default: regular
+    required: false
+  github_token:
+    description: The GitHub API token to use.
+    default: ${{ github.token }}
+    required: false
+  format:
+    description: The output format to emit.
+    default: plain
+    required: false
+  min_severity:
+    description: Filter all results below this severity
+    default: 'unknown'
+    required: false
+  min_confidence:
+    description: Filter all results below this confidence
+    default: 'unknown'
+    required: false
+  collect:
+    description: Control which kinds of inputs are collected for auditing.
+    default: 'all'
+    required: false
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - "--persona=${{ inputs.persona }}"
+    - "--format=${{ inputs.format }}"
+    - "--min-severity=${{ inputs.min_severity }}"
+    - "--min-confidence=${{ inputs.min_confidence }}"
+    - "--collect=${{ inputs.collect }}"
+  env:
+    GH_TOKEN: ${{ inputs.github_token }}
