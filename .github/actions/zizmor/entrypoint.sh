@@ -1,5 +1,5 @@
 #!/bin/bash
 
-set -euo pipefail
-
-/app/zizmor ${INPUT_INPUTS[@]}
+cmd=(/app/zizmor $@ ${INPUT_INPUTS[@]})
+echo "Running command: ${cmd}"
+${cmd[@]}
