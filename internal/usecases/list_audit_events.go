@@ -11,7 +11,7 @@ import (
 )
 
 // ...
-type ListAuditEvents struct {}
+type ListAuditEvents struct{}
 
 // ...
 func NewListAuditEvents() *ListAuditEvents {

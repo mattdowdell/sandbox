@@ -21,6 +21,7 @@ require (
 	github.com/go-jet/jet/v2 v2.12.0
 	github.com/google/uuid v1.6.0
 	github.com/google/wire v0.6.0
+	github.com/jackc/pgerrcode v0.0.0-20240316143900-6e2875d9b438
 	github.com/jackc/pgx/v5 v5.7.2
 	github.com/knadh/koanf/maps v0.1.1
 	github.com/knadh/koanf/parsers/json v0.1.0

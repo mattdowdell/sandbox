@@ -1,12 +1,16 @@
-package sqlx
+package pgsql
 
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/XSAM/otelsql"
-	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/jackc/pgerrcode"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/stdlib"
 	"go.opentelemetry.io/otel/semconv/v1.26.0"
 )
 
@@ -35,21 +39,17 @@ func (c *Config) toOptions() []Option {
 	return options
 }
 
-type DB struct {
-	db *sql.DB
-}
-
 // ...
-func NewFromConfig(conf Config, options ...Option) (*DB, error) {
-	options = append(options, conf.toOptions()...)
-
+//
+//nolint:gocritic // called once, little gain from passing by pointer
+func NewFromConfig(conf Config) (*sql.DB, error) {
 	return New(
 		conf.Hostname,
 		conf.Port,
 		conf.User,
 		conf.Name,
 		conf.SSLMode,
-		options...,
+		conf.toOptions()...,
 	)
 }
 
@@ -61,7 +61,7 @@ func New(
 	name string,
 	sslmode string,
 	options ...Option,
-) (*DB, error) {
+) (*sql.DB, error) {
 	opts := defaultOptions()
 	for _, option := range options {
 		option.apply(opts)
@@ -72,9 +72,31 @@ func New(
 	}
 
 	dsn := makeDSN(host, port, user, opts.password, name, sslmode)
+	conf, err := pgx.ParseConfig(dsn)
+	if err != nil {
+		return nil, err
+	}
 
-	db, err := otelsql.Open("pgx/v5", dsn, otelsql.WithAttributes(
-		semconv.DBSystemMySQL,
+	conf.OnPgError = func(_ *pgconn.PgConn, err *pgconn.PgError) bool {
+		// automatically close on any fatal errors
+		if strings.EqualFold(err.Severity, "FATAL") {
+			return false
+		}
+
+		// this error is produced if a write is attempted in a readonly transaction
+		// it can mean that the database primary moved to standby and now only accepts reads
+		// closing to refreshes the ip address and so enables self-healing
+		if err.Code == pgerrcode.ReadOnlySQLTransaction {
+			return false
+		}
+
+		return true
+	}
+
+	conn := stdlib.RegisterConnConfig(conf)
+
+	db, err := otelsql.Open("pgx/v5", conn, otelsql.WithAttributes(
+		semconv.DBSystemPostgreSQL,
 	))
 	if err != nil {
 		return nil, err
@@ -82,7 +104,13 @@ func New(
 
 	opts.apply(db)
 
-	return nil, nil
+	if err := otelsql.RegisterDBStatsMetrics(db, otelsql.WithAttributes(
+		semconv.DBSystemPostgreSQL,
+	)); err != nil {
+		return nil, err
+	}
+
+	return db, nil
 }
 
 // ...

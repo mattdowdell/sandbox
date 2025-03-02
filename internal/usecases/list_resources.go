@@ -11,7 +11,7 @@ import (
 )
 
 // ...
-type ListResources struct {}
+type ListResources struct{}
 
 // ...
 func NewListResources() *ListResources {

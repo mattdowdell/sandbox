@@ -1,17 +1,43 @@
 package datastore
 
 import (
+	"context"
+	"database/sql"
+
 	"github.com/go-jet/jet/v2/qrm"
 
-	"github.com/mattdowdell/sandbox/internal/domain/repositories"
+	"github.com/mattdowdell/sandbox/internal/adapters/common"
 )
 
-type Stub struct {
-	db qrm.DB
+// ...
+type Provider struct {
+	db *sql.DB
 }
 
-func NewStub() *Stub {
-	return &Stub{}
+// ...
+func NewProvider(db *sql.DB) *Provider {
+	return &Provider{
+		db: db,
+	}
+}
+
+// ...
+func (p *Provider) BeginTx(
+	ctx context.Context,
+) (common.Datastore, common.CommitFn, common.RollbackFn, error) {
+	tx, err := p.db.BeginTx(ctx, nil /*opts*/)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	ds := NewDatastore(tx)
+
+	return ds, tx.Commit, tx.Rollback, nil
+}
+
+// ...
+func (p *Provider) Datastore() common.Datastore {
+	return NewDatastore(p.db)
 }
 
 // ...
@@ -20,14 +46,7 @@ type Datastore struct {
 }
 
 // ...
-func NewResource(db qrm.DB) repositories.Resource {
-	return &Datastore{
-		db: db,
-	}
-}
-
-// ...
-func NewAuditEvent(db qrm.DB) repositories.AuditEvent {
+func NewDatastore(db qrm.DB) *Datastore {
 	return &Datastore{
 		db: db,
 	}

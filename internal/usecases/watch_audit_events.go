@@ -10,7 +10,7 @@ import (
 )
 
 // ...
-type WatchAuditEvents struct {}
+type WatchAuditEvents struct{}
 
 // ...
 func NewWatchAuditEvents() *WatchAuditEvents {

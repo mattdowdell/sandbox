@@ -1,4 +1,4 @@
-package sqlx
+package pgsql
 
 import (
 	"database/sql"
@@ -53,30 +53,60 @@ func (o *dbOptions) apply(db *sql.DB) {
 	}
 }
 
+type passwordOpt string
+
 // ...
 func WithPassword(password string) Option {
-	return nil
+	return passwordOpt(password)
+}
+
+func (o passwordOpt) apply(opts *dbOptions) {
+	opts.password = string(o)
 }
 
 // TODO: support RDS IAM postgres auth
 // see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.IAMDBAuth.Connecting.Go.html
 
+type maxIdleTimeOpt time.Duration
+
 // ...
 func WithMaxIdleTime(d time.Duration) Option {
-	return nil
+	return maxIdleTimeOpt(d)
 }
+
+func (o maxIdleTimeOpt) apply(opts *dbOptions) {
+	opts.maxIdleTime = time.Duration(o)
+}
+
+type maxLifetimeOpt time.Duration
 
 // ...
 func WithMaxLifetime(d time.Duration) Option {
-	return nil
+	return maxLifetimeOpt(d)
 }
+
+func (o maxLifetimeOpt) apply(opts *dbOptions) {
+	opts.maxLifetime = time.Duration(o)
+}
+
+type maxIdleConnsOpt int
 
 // ...
 func WithMaxIdleConns(count int) Option {
-	return nil
+	return maxIdleConnsOpt(count)
 }
+
+func (o maxIdleConnsOpt) apply(opts *dbOptions) {
+	opts.maxIdleConns = int(o)
+}
+
+type maxOpenConnsOpt int
 
 // ...
 func WithMaxOpenConns(count int) Option {
-	return nil
+	return maxOpenConnsOpt(count)
+}
+
+func (o maxOpenConnsOpt) apply(opts *dbOptions) {
+	opts.maxOpenConns = int(o)
 }

@@ -12,7 +12,7 @@ import (
 )
 
 // ...
-type DeleteResource struct {}
+type DeleteResource struct{}
 
 // ...
 func NewDeleteResource() *DeleteResource {

@@ -17,6 +17,7 @@ import (
 	"github.com/mattdowdell/sandbox/internal/drivers/config/flagoptions"
 	"github.com/mattdowdell/sandbox/internal/drivers/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
+	"github.com/mattdowdell/sandbox/internal/drivers/pgsql"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/otelconnectx"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/validatex"
@@ -37,17 +38,22 @@ func ProvideApp(ctx context.Context) (*App, error) {
 	loggingConfig := mainConfig.Logging
 	logger := logging.NewAsDefaultFromConfig(loggingConfig)
 	rpcserverConfig := mainConfig.RPCServer
+	pgsqlConfig := mainConfig.Database
+	db, err := pgsql.NewFromConfig(pgsqlConfig)
+	if err != nil {
+		return nil, err
+	}
+	provider := datastore.NewProvider(db)
 	clockClock := clock.New()
 	generator := uuidgen.New()
-	stub := datastore.NewStub()
-	createResource := usecases.NewCreateResource(clockClock, generator, stub)
-	getResource := usecases.NewGetResource(stub)
-	listResources := usecases.NewListResources(stub)
-	updateResource := usecases.NewUpdateResource(clockClock, stub)
-	deleteResource := usecases.NewDeleteResource(stub)
-	listAuditEvents := usecases.NewListAuditEvents(stub)
-	watchAuditEvents := usecases.NewWatchAuditEvents(stub)
-	handler := examplerpc.New(createResource, getResource, listResources, updateResource, deleteResource, listAuditEvents, watchAuditEvents)
+	createResource := usecases.NewCreateResource(clockClock, generator)
+	getResource := usecases.NewGetResource()
+	listResources := usecases.NewListResources()
+	updateResource := usecases.NewUpdateResource(clockClock)
+	deleteResource := usecases.NewDeleteResource()
+	listAuditEvents := usecases.NewListAuditEvents()
+	watchAuditEvents := usecases.NewWatchAuditEvents()
+	handler := examplerpc.New(provider, createResource, getResource, listResources, updateResource, deleteResource, listAuditEvents, watchAuditEvents)
 	reflectrpcHandler := reflectrpc.New()
 	healthrpcHandler := healthrpc.New()
 	v := collectHandlers(handler, reflectrpcHandler, healthrpcHandler)

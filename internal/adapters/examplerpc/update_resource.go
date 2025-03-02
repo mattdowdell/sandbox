@@ -7,7 +7,9 @@ import (
 	"connectrpc.com/connect"
 
 	"github.com/mattdowdell/sandbox/gen/example/v1"
+	"github.com/mattdowdell/sandbox/internal/adapters/common"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc/models"
+	"github.com/mattdowdell/sandbox/internal/domain/entities"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
@@ -22,10 +24,12 @@ func (h *Handler) UpdateResource(
 		return nil, ErrInternal
 	}
 
-	output, err := h.resourceUpdater.Execute(ctx, input)
+	output, err := common.TxValue(ctx, h.provider, func(ds common.Datastore) (*entities.Resource, error) {
+		return h.resourceCreator.Execute(ctx, ds, input)
+	})
 	if err != nil {
-		slog.DebugContext(ctx, "usecase error", slogx.Err(err))
-		return nil, ErrInternal
+		slog.DebugContext(ctx, "failed to update resource", slogx.Err(err))
+		return nil, ErrInternal // TODO: use more granular errors
 	}
 
 	return connect.NewResponse(&examplev1.UpdateResourceResponse{

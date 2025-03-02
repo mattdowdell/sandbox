@@ -13,7 +13,7 @@ import (
 )
 
 // ...
-type GetResource struct {}
+type GetResource struct{}
 
 // ...
 func NewGetResource() *GetResource {
