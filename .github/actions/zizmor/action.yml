@@ -20,7 +20,7 @@ inputs:
     required: false
   github_hostname:
     description: The GitHub Server Hostname.
-    default: ""
+    default: ${{ github.server_url }}
     required: false
   no_online_audits:
     description: Perform only offline audits.
