@@ -15,6 +15,7 @@ permissions: {}
 jobs:
   size:
     name: Size
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -42,6 +43,7 @@ jobs:
 
   checks:
     name: Checks
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -68,6 +70,10 @@ jobs:
 
   lint:
     name: Lint
+    if: |
+      always() &&
+      github.event_name == 'pull_request' &&
+      (needs.checks.result == 'success' || needs.checks.result == 'skipped')
     needs:
       - checks
     runs-on: ubuntu-latest
@@ -104,6 +110,9 @@ jobs:
 
   unit:
     name: Unit test
+    if: |
+      always() &&
+      (needs.checks.result == 'success' || needs.checks.result == 'skipped')
     needs:
       - checks
     runs-on: ubuntu-latest
@@ -131,6 +140,9 @@ jobs:
 
   scan:
     name: Scan
+    if: |
+      always() &&
+      (needs.checks.result == 'success' || needs.checks.result == 'skipped')
     needs:
       - checks
     runs-on: ubuntu-latest
@@ -167,6 +179,11 @@ jobs:
 
   functional:
     name: Functional Tests
+    if: |
+      always() &&
+      (needs.lint.result == 'success' || needs.lint.result == 'skipped') &&
+      needs.unit.result == 'success' &&
+      needs.scan.result == 'success'
     needs:
       - lint
       - unit
@@ -191,6 +208,9 @@ jobs:
 
   tag:
     name: Tag
+    if: |
+      always() &&
+      needs.functional.result == 'success'
     needs:
       - functional
     permissions:
@@ -212,6 +232,9 @@ jobs:
 
   build:
     name: Build
+    if: |
+      always() &&
+      needs.tag.result == 'success'
     needs:
       - tag
     runs-on: ubuntu-latest
