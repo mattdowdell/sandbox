@@ -3,12 +3,21 @@
 apiVersion: 1
 datasources:
   - name: "VictoriaMetrics"
-    type: "victoriametrics-datasource"
+    type: "victoriametrics-metrics-datasource"
     uid: "victoriametrics"
     url: "http://victoria-metrics:8428/"
     access: "proxy"
     basicAuth: false
     isDefault: true
+    editable: false
+
+  - name: "VictoriaMetrics (Prometheus)"
+    type: "prometheus"
+    uid: "victoriametrics-prometheus"
+    url: "http://victoria-metrics:8428/"
+    access: "proxy"
+    basicAuth: false
+    isDefault: false
     editable: false
 
   - name: "Jaeger"
