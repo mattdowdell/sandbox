@@ -11,4 +11,5 @@ import (
 	_ "github.com/vektra/mockery/v2"
 	_ "google.golang.org/protobuf/cmd/protoc-gen-go"
 	_ "mvdan.cc/gofumpt"
+	_ "github.com/cucumber/godog/cmd/godog"
 )
