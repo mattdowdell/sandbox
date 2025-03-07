@@ -11,15 +11,6 @@ datasources:
     isDefault: true
     editable: false
 
-  - name: "VictoriaMetrics (Prometheus)"
-    type: "prometheus"
-    uid: "victoriametrics-prometheus"
-    url: "http://victoria-metrics:8428/"
-    access: "proxy"
-    basicAuth: false
-    isDefault: false
-    editable: false
-
   - name: "Jaeger"
     type: "jaeger"
     uid: "jaeger"
