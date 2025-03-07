@@ -72,15 +72,14 @@ services:
     restart: always
 
   grafana:
-    image: "mirror.gcr.io/grafana/grafana:latest"
+    image: "mirror.gcr.io/grafana/grafana:latest" # TODO: pick tag
     environment:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
       GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
       GF_AUTH_BASIC_ENABLED: "false"
-      # while victoria-metrics is somewhat compatible with prometheus, it differs just enough that
+      # while victoriametrics is somewhat compatible with prometheus, it differs just enough that
       # some parts are broken, see https://github.com/grafana/grafana/issues/42615
-      GF_INSTALL_PLUGINS: "https://github.com/VictoriaMetrics/victoriametrics-datasource/releases/download/v0.10.3/victoriametrics-datasource-v0.10.3.zip;victoriametrics-datasource"
-      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: "victoriametrics-datasource"
+      GF_INSTALL_PLUGINS: "victoriametrics-metrics-datasource"
     ports:
       - "127.0.0.1:3000:3000"
     volumes:
