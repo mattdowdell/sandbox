@@ -39,7 +39,7 @@ func ProvideApp(ctx context.Context) (*App, error) {
 	logger := logging.NewAsDefaultFromConfig(loggingConfig)
 	rpcserverConfig := mainConfig.RPCServer
 	pgsqlConfig := mainConfig.Database
-	db, err := pgsql.NewFromConfig(pgsqlConfig)
+	db, err := pgsql.NewFromConfig(ctx, pgsqlConfig)
 	if err != nil {
 		return nil, err
 	}
