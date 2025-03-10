@@ -4,9 +4,16 @@ inputs:
   service:
     description: "The service to build, used as a build argument."
     required: true
+  repository:
+    description: "The container repository, used for tagging."
+    required: true
   version:
     description: "The version of the image, used for tagging and annotations."
     required: true
+  push:
+    description: "Whether to push the built image."
+    default: "false"
+    required: false
 
 runs:
   using: "composite"
@@ -21,8 +28,8 @@ runs:
         build-args:
           SERVICE=${{ inputs.service }}
         load: true
-        push: false # TODO: support pushing?
-        tags: ${{ inputs.service }}:${{ inputs.version }} # TODO: add registry/repository
+        push: ${{ inputs.push }}
+        tags: ${{ inputs.repository }}:${{ inputs.version }}
         target: runtime
         # TODO: provenance=max
         # TODO: sbom=true
@@ -30,7 +37,7 @@ runs:
     - name: Scan
       uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 # 0.29.0
       with:
-        image-ref: ${{ inputs.service }}:${{ inputs.version }}
+        image-ref: ${{ inputs.repository }}:${{ inputs.version }}
         scan-type: image
         trivy-config: trivy.yaml
 

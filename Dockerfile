@@ -3,22 +3,19 @@
 # mirror.gcr.io caches of popular docker hub images, but does not add rate limiting.
 # See https://cloud.google.com/artifact-registry/docs/pull-cached-dockerhub-images.
 
-# -----------
-# Base target
-# -----------
-
-FROM mirror.gcr.io/golang:1.24-bookworm@sha256:b970e6d47c09fdd34179acef5c4fecaf6410f0b597a759733b3cbea04b4e604a AS base
-
 # ------------
 # Build target
 # ------------
 
-FROM base AS build
+FROM --platform=$BUILDPLATFORM mirror.gcr.io/golang:1.24-bookworm@sha256:b970e6d47c09fdd34179acef5c4fecaf6410f0b597a759733b3cbea04b4e604a AS build
 
 WORKDIR /go/src
 
-RUN --mount=type=bind,target=. \
-    CGO_ENABLED=0 go build -trimpath -ldflags="-buildid= -s -w" -o /go/bin/ ./cmd/...;
+ARG TARGETOS TARGETARCH
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=bind,target=. \
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH \
+    go build -trimpath -ldflags="-buildid= -s -w" -o /go/bin/ ./cmd/...;
 
 # --------------
 # Runtime target

@@ -6,6 +6,9 @@ db_port := "5432"
 db_user := "postgres"
 db_pass := "secret"
 
+# TODO: document
+export BUILDKIT_PROGRESS := "plain"
+
 [private]
 default:
     @just --list
@@ -164,11 +167,15 @@ scan-gitleaks:
 
 # Scan the repository for issues using Trivy.
 scan-trivy:
-    trivy fs --config trivy.yaml .
+    trivy fs .
 
 # Scan actions and workflows using Zizmor.
 scan-zizmor:
     zizmor --persona pedantic .github/actions/*/*.yml .github/workflows/*.yml
+
+# Build all binaries.
+build:
+    CGO_ENABLED=0 go build -trimpath -ldflags="-buildid= -s -w" -o ./dist/ ./cmd/...;
 
 # Exec into the database.
 db-exec:
