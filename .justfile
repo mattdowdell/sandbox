@@ -5,8 +5,6 @@ db_host := if is_docker == "true" { "postgres" } else { "localhost" }
 db_port := "5432"
 db_user := "postgres"
 db_pass := "secret"
-
-# TODO: document
 export BUILDKIT_PROGRESS := "plain"
 
 [private]
