@@ -505,7 +505,7 @@ github.com/vektra/mockery/v2/pkg/stackerr
 ## explicit; go 1.22.0
 go.opentelemetry.io/auto/sdk
 go.opentelemetry.io/auto/sdk/internal/telemetry
-# go.opentelemetry.io/contrib/instrumentation/runtime v0.59.0
+# go.opentelemetry.io/contrib/instrumentation/runtime v0.60.0
 ## explicit; go 1.22.0
 go.opentelemetry.io/contrib/instrumentation/runtime
 go.opentelemetry.io/contrib/instrumentation/runtime/internal/deprecatedruntime
