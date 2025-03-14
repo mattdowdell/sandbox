@@ -154,6 +154,19 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Install Go
+        uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Install Just
+        uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2.0.0
+
+      # required for trivy to find licenses
+      # see https://trivy.dev/latest/docs/coverage/language/golang/#license
+      - name: Populate Go mod cache
+        run: just tidy-go
+
       - name: Get trivy version
         id: trivy-version
         run: |

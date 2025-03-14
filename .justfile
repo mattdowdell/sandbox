@@ -164,7 +164,7 @@ scan-gitleaks:
 
 # Scan the repository for issues using Trivy.
 scan-trivy:
-    trivy fs --config trivy.yaml .
+    trivy fs .
 
 # Scan actions and workflows using Zizmor.
 scan-zizmor:
