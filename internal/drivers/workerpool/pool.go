@@ -81,7 +81,7 @@ func New[T, U any](
 // the workers and block.
 func (p *Pool[T, U]) Start(ctx context.Context) {
 	p.starter.Do(func() {
-		go p.startCollector()
+		go p.startCollector(ctx)
 
 		var wg sync.WaitGroup
 
@@ -100,71 +100,71 @@ func (p *Pool[T, U]) Start(ctx context.Context) {
 	})
 }
 
-func (p *Pool[T, U]) startCollector() {
+func (p *Pool[T, U]) startCollector(ctx context.Context) {
+	defer func() {
+		if r := recover(); r != nil {
+			slog.ErrorContext(ctx, "collector panicked, restarting", slogx.Panic(r), slogx.Stacktrace())
+
+			go p.startCollector(ctx)
+			return
+		}
+
+		// signal that collection has completed
+		close(p.complete)
+	}()
+
 	for r := range p.results {
 		p.collector.Collect(r)
 	}
-
-	// signal that collection has completed
-	close(p.complete)
 }
 
 func (p *Pool[T, U]) startWorker(ctx context.Context, wg *sync.WaitGroup) {
-	defer func() {
-		wg.Done()
-	}()
-
+	fmt.Println("startWorker")
 	defer func() {
 		if r := recover(); r != nil {
-			slog.ErrorContext(ctx, "worker panicked", slogx.Panic(r), slogx.Stacktrace())
+			slog.ErrorContext(ctx, "worker panicked, restarting", slogx.Panic(r)) // , slogx.Stacktrace())
+
+			wg.Add(1)
+			go p.startWorker(ctx, wg)
 		}
+
+		wg.Done()
 	}()
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
 	for {
+		fmt.Printf("working: %#v\n", p.queue)
 		select {
 		// handle the parent context being closed
 		case <-ctx.Done():
 			return
 
 		case item, ok := <-p.queue:
+			fmt.Println("item:", item, ok)
 			// handle Wait being called
 			if !ok {
 				return
 			}
 
-			p.results <- p.handler.Handle(ctx, item)
+			result := p.handler.Handle(ctx, item)
+			p.results <- result
 		}
 	}
-}
-
-// Started returns a channel that is closed when all worker threads have started.
-//
-// This is intended for use in testing so tests can reliably determine the effects of stopping or
-// waiting.
-func (p *Pool[T, U]) Started() <-chan struct{} {
-	return p.started
-}
-
-// Started returns a channel that is closed when all worker threads have stopped.
-//
-// This is intended for use in testing so tests can reliably determine the effects of stopping or
-// waiting.
-func (p *Pool[T, U]) Complete() <-chan struct{} {
-	return p.complete
 }
 
 // Add adds an item of work to the work queue and blocks until a worker thread has taken the item.
 // ErrQueueClosed is returned if an item is added after Wait has been called.
 func (p *Pool[T, U]) Add(item T) error {
+	fmt.Println("adding", item)
 	select {
 	case <-p.waiting:
 		return ErrQueueClosed
 
 	default:
 		p.queue <- item
+		fmt.Println("added", item)
 		return nil
 	}
 }
