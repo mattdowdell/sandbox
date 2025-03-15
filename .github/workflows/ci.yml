@@ -96,13 +96,13 @@ jobs:
           ./tools/docker-base-tag.sh Dockerfile.dev mirror.gcr.io/golangci/golangci-lint >> $GITHUB_OUTPUT
 
       - name: Lint Go
-        uses: golangci/golangci-lint-action@2226d7cb06a077cd73e56eedd38eecad18e5d837 # v6.5.0
+        uses: golangci/golangci-lint-action@4696ba8babb6127d732c3c6dde519db15edab9ea # v6.5.1
         with:
           version: ${{ steps.version.outputs.tag }}
           args: --timeout=10m
 
       - name: Lint Protobuf
-        uses: bufbuild/buf-action@b46cbc051dd8fd10a3c2213e784498790d3fe388 # v1.0.3
+        uses: bufbuild/buf-action@1b8e0a0e793562b7850d7e6ff0228b5c0b16111c # v1.1.0
         with:
           pr_comment: false
           format: false
@@ -154,13 +154,26 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Install Go
+        uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Install Just
+        uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2.0.0
+
+      # required for trivy to find licenses
+      # see https://trivy.dev/latest/docs/coverage/language/golang/#license
+      - name: Populate Go mod cache
+        run: just tidy-go
+
       - name: Get trivy version
         id: trivy-version
         run: |
           ./tools/docker-base-tag.sh Dockerfile.dev ghcr.io/aquasecurity/trivy >> $GITHUB_OUTPUT
 
       - name: Run trivy
-        uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 # 0.29.0
+        uses: aquasecurity/trivy-action@6c175e9c4083a92bbca2f9724c8a5e33bc2d97a5 # 0.30.0
         with:
           scan-type: fs
           trivy-config: trivy.yaml

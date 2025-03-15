@@ -24,6 +24,8 @@ updates:
       time: "08:00"
     reviewers:
       - "mattdowdell"
+    # lots of go dependencies, increase limit accordingly
+    open-pull-requests-limit: 20
 
   - package-ecosystem: "docker"
     directories:
