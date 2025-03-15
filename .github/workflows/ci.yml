@@ -266,4 +266,5 @@ jobs:
         uses: ./.github/actions/container-build
         with:
           service: example-rpc
+          repository: ghcr.io/mattdowdell/sandbox/example-rpc
           version: ${{ needs.tag.outputs.long }}

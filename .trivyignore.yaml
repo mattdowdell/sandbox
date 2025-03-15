@@ -1,6 +1,6 @@
 ---
-# TODO: document ignore expectations
 # https://trivy.dev/latest/docs/configuration/filtering/#trivyignoreyaml
+# TODO: document ignore expectations
 
 licenses:
   - id: Apache-2.0
@@ -31,6 +31,7 @@ misconfigurations:
   # https://avd.aquasec.com/misconfig/dockerfile/general/avd-ds-0002/
   - id: AVD-DS-0002
     paths:
+      - .github/actions/gitleaks/Dockerfile
       - .github/actions/zizmor/Dockerfile
     statement: |
       Docker-based actions must run as root.

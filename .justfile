@@ -5,6 +5,7 @@ db_host := if is_docker == "true" { "postgres" } else { "localhost" }
 db_port := "5432"
 db_user := "postgres"
 db_pass := "secret"
+export BUILDKIT_PROGRESS := "plain"
 
 [private]
 default:
@@ -169,6 +170,10 @@ scan-trivy:
 # Scan actions and workflows using Zizmor.
 scan-zizmor:
     zizmor --persona pedantic .github/actions/*/*.yml .github/workflows/*.yml
+
+# Build all binaries.
+build:
+    CGO_ENABLED=0 go build -trimpath -ldflags="-buildid= -s -w" -o ./dist/ ./cmd/...;
 
 # Exec into the database.
 db-exec:

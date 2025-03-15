@@ -2,7 +2,7 @@
 
 services:
   rpc:
-    image: "example-rpc:local"
+    image: "ghcr.io/mattdowdell/sandbox/example-rpc:local"
     build:
       context: .
       target: runtime
@@ -30,10 +30,13 @@ services:
         condition: service_healthy
       victoria-metrics:
         condition: service_healthy
+      victoria-logs:
+        condition: service_healthy
     restart: always
 
   postgres:
     image: "mirror.gcr.io/postgres:17"
+    pull_policy: "always"
     environment:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "secret"
@@ -51,6 +54,7 @@ services:
 
   jaeger:
     image: "mirror.gcr.io/jaegertracing/jaeger:2.2.0"
+    pull_policy: "always"
     ports:
       - "127.0.0.1:16686:16686"
     healthcheck:
@@ -63,6 +67,7 @@ services:
   #       avoids need for grafana plugin, but modifies meter provider to enable scraping
   victoria-metrics:
     image: "mirror.gcr.io/victoriametrics/victoria-metrics:latest" # TODO: pick tag
+    pull_policy: "always"
     ports:
       - "127.0.0.1:8428:8428"
     healthcheck:
@@ -71,15 +76,27 @@ services:
       start_interval: "1s"
     restart: always
 
+  victoria-logs:
+    image: "mirror.gcr.io/victoriametrics/victoria-logs:latest" # TODO: pick tag
+    pull_policy: "always"
+    ports:
+      - "127.0.0.1:9428:9428"
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://127.0.0.1:9428/-/healthy" ]
+      start_period: "30s"
+      start_interval: "1s"
+    restart: always
+
   grafana:
     image: "mirror.gcr.io/grafana/grafana:latest" # TODO: pick tag
+    pull_policy: "always"
     environment:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
       GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
       GF_AUTH_BASIC_ENABLED: "false"
       # while victoriametrics is somewhat compatible with prometheus, it differs just enough that
       # some parts are broken, see https://github.com/grafana/grafana/issues/42615
-      GF_INSTALL_PLUGINS: "victoriametrics-metrics-datasource"
+      GF_INSTALL_PLUGINS: "victoriametrics-metrics-datasource,victoriametrics-logs-datasource"
     ports:
       - "127.0.0.1:3000:3000"
     volumes:
