@@ -152,8 +152,9 @@ lint-fix-go:
     golangci-lint run --fix
 
 # Run the Go unit tests.
-unit:
-    go test -count=1 -cover ./...
+unit timeout="30s":
+    go test -race -timeout={{ timeout }} -count=1 -cover -coverprofile=cover.out ./...
+    go tool cover -html cover.out -o cover.html
 
 # Scan the repository for issues.
 scan: scan-gitleaks scan-trivy scan-zizmor

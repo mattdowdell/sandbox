@@ -19,6 +19,9 @@ packages:
   github.com/mattdowdell/sandbox/internal/drivers/rpcserver:
     config:
       all: true
+  github.com/mattdowdell/sandbox/internal/drivers/workerpool:
+    config:
+      all: true
   github.com/mattdowdell/sandbox/internal/domain/repositories:
     config:
       all: true
