@@ -19,7 +19,7 @@ func Example() {
 	go pool.Start(ctx)
 
 	for i := range 10 {
-		if err := pool.Add(i); err != nil {
+		if err := pool.Add(ctx, i); err != nil {
 			slog.ErrorContext(ctx, "failed to add item to queue", slogx.Err(err))
 			return
 		}

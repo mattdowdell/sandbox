@@ -18,7 +18,6 @@ const (
 )
 
 func Test_New_Success(t *testing.T) {
-	t.Skip()
 	// arrange
 	handler := mockworkerpool.NewHandler[int, int](t)
 	collector := mockworkerpool.NewCollector[int](t)
@@ -32,7 +31,6 @@ func Test_New_Success(t *testing.T) {
 }
 
 func Test_New_Error(t *testing.T) {
-	t.Skip()
 	// arrange
 	handler := mockworkerpool.NewHandler[int, int](t)
 	collector := mockworkerpool.NewCollector[int](t)
@@ -46,7 +44,6 @@ func Test_New_Error(t *testing.T) {
 }
 
 func Test_Pool_Start(t *testing.T) {
-	t.Skip()
 	// arrange
 	handler := mockworkerpool.NewHandler[int, int](t)
 	collector := mockworkerpool.NewCollector[int](t)
@@ -69,7 +66,6 @@ func Test_Pool_Start(t *testing.T) {
 }
 
 func Test_Pool_Wait_Success(t *testing.T) {
-	t.Skip()
 	// arrange
 	handler := mockworkerpool.NewHandler[int, int](t)
 	collector := mockworkerpool.NewCollector[int](t)
@@ -90,7 +86,6 @@ func Test_Pool_Wait_Success(t *testing.T) {
 }
 
 func Test_Pool_Wait_Error(t *testing.T) {
-	t.Skip()
 	// arrange
 	handler := mockworkerpool.NewHandler[int, int](t)
 	collector := mockworkerpool.NewCollector[int](t)
@@ -115,7 +110,6 @@ func Test_Pool_Wait_Error(t *testing.T) {
 }
 
 func Test_Pool_Add_Success(t *testing.T) {
-	t.Skip()
 	// arrange
 	var results []int
 
@@ -148,7 +142,7 @@ func Test_Pool_Add_Success(t *testing.T) {
 
 	// act
 	for i := range 5 {
-		require.NoError(t, pool.Add(i))
+		require.NoError(t, pool.Add(t.Context(), i))
 	}
 
 	// assert
@@ -159,7 +153,6 @@ func Test_Pool_Add_Success(t *testing.T) {
 }
 
 func Test_Pool_Add_Error(t *testing.T) {
-	t.Skip()
 	// arrange
 	handler := mockworkerpool.NewHandler[int, int](t)
 	collector := mockworkerpool.NewCollector[int](t)
@@ -175,7 +168,7 @@ func Test_Pool_Add_Error(t *testing.T) {
 	require.NoError(t, pool.Wait(t.Context()))
 
 	// act
-	err = pool.Add(1)
+	err = pool.Add(t.Context(), 1)
 
 	// assert
 	assert.EqualError(t, err, "worker pool queue has been closed")
@@ -191,55 +184,8 @@ func Test_Pool_Start_HandlerPanicRecovered(t *testing.T) {
 			panic(value)
 		}).
 		Once()
-	handler.
-		EXPECT().
-		Handle(mock.AnythingOfType("*context.cancelCtx"), 2).
-		RunAndReturn(func(_ context.Context, value int) int {
-			return value * 2
-		}).
-		Once()
 
 	collector := mockworkerpool.NewCollector[int](t)
-	collector.EXPECT().Collect(4).Return().Once()
-
-	pool, err := workerpool.New(2 /*size*/, handler, collector)
-	require.NoError(t, err)
-
-	go func() {
-		pool.Start(t.Context())
-	}()
-
-	<-pool.Started()
-
-	// act
-	require.NoError(t, pool.Add(1))
-	require.NoError(t, pool.Add(2))
-
-	// assert
-	require.NoError(t, pool.Wait(t.Context()))
-}
-
-func Test_Pool_Start_CollectorPanicRecovered(t *testing.T) {
-	t.Skip()
-	// arrange
-	handler := mockworkerpool.NewHandler[int, int](t)
-	handler.
-		EXPECT().
-		Handle(mock.AnythingOfType("*context.cancelCtx"), mock.AnythingOfType("int")).
-		RunAndReturn(func(_ context.Context, value int) int {
-			return value * 2
-		}).
-		Twice()
-
-	collector := mockworkerpool.NewCollector[int](t)
-	collector.
-		EXPECT().
-		Collect(2).
-		RunAndReturn(func (value int) {
-			panic(value)
-		}).
-		Once()
-	collector.EXPECT().Collect(4).Return().Once()
 
 	pool, err := workerpool.New(1 /*size*/, handler, collector)
 	require.NoError(t, err)
@@ -251,9 +197,44 @@ func Test_Pool_Start_CollectorPanicRecovered(t *testing.T) {
 	<-pool.Started()
 
 	// act
-	require.NoError(t, pool.Add(1))
-	require.NoError(t, pool.Add(2))
+	require.NoError(t, pool.Add(t.Context(), 1))
 
 	// assert
-	require.NoError(t, pool.Wait(t.Context()))
+	<-pool.Complete()
+}
+
+func Test_Pool_Start_CollectorPanicRecovered(t *testing.T) {
+	// arrange
+	handler := mockworkerpool.NewHandler[int, int](t)
+	handler.
+		EXPECT().
+		Handle(mock.AnythingOfType("*context.cancelCtx"), mock.AnythingOfType("int")).
+		RunAndReturn(func(_ context.Context, value int) int {
+			return value * 2
+		}).
+		Once()
+
+	collector := mockworkerpool.NewCollector[int](t)
+	collector.
+		EXPECT().
+		Collect(2).
+		RunAndReturn(func (value int) {
+			panic(value)
+		}).
+		Once()
+
+	pool, err := workerpool.New(1 /*size*/, handler, collector)
+	require.NoError(t, err)
+
+	go func() {
+		pool.Start(t.Context())
+	}()
+
+	<-pool.Started()
+
+	// act
+	require.NoError(t, pool.Add(t.Context(), 1))
+
+	// assert
+	<-pool.Complete()
 }

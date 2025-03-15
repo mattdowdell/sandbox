@@ -23,6 +23,7 @@ import (
 var (
 	ErrInvalidSize = errors.New("size must be > 0")
 	ErrQueueClosed = errors.New("worker pool queue has been closed")
+	ErrFailedAdd  = errors.New("failed to add to queue")
 	ErrFailedWait  = errors.New("failed to wait for workers")
 )
 
@@ -103,10 +104,7 @@ func (p *Pool[T, U]) Start(ctx context.Context) {
 func (p *Pool[T, U]) startCollector(ctx context.Context) {
 	defer func() {
 		if r := recover(); r != nil {
-			slog.ErrorContext(ctx, "collector panicked, restarting", slogx.Panic(r), slogx.Stacktrace())
-
-			go p.startCollector(ctx)
-			return
+			slog.ErrorContext(ctx, "collector panicked", slogx.Panic(r), slogx.Stacktrace())
 		}
 
 		// signal that collection has completed
@@ -119,13 +117,9 @@ func (p *Pool[T, U]) startCollector(ctx context.Context) {
 }
 
 func (p *Pool[T, U]) startWorker(ctx context.Context, wg *sync.WaitGroup) {
-	fmt.Println("startWorker")
 	defer func() {
 		if r := recover(); r != nil {
-			slog.ErrorContext(ctx, "worker panicked, restarting", slogx.Panic(r)) // , slogx.Stacktrace())
-
-			wg.Add(1)
-			go p.startWorker(ctx, wg)
+			slog.ErrorContext(ctx, "worker panicked", slogx.Panic(r), slogx.Stacktrace())
 		}
 
 		wg.Done()
@@ -135,14 +129,12 @@ func (p *Pool[T, U]) startWorker(ctx context.Context, wg *sync.WaitGroup) {
 	defer cancel()
 
 	for {
-		fmt.Printf("working: %#v\n", p.queue)
 		select {
 		// handle the parent context being closed
 		case <-ctx.Done():
 			return
 
 		case item, ok := <-p.queue:
-			fmt.Println("item:", item, ok)
 			// handle Wait being called
 			if !ok {
 				return
@@ -156,16 +148,19 @@ func (p *Pool[T, U]) startWorker(ctx context.Context, wg *sync.WaitGroup) {
 
 // Add adds an item of work to the work queue and blocks until a worker thread has taken the item.
 // ErrQueueClosed is returned if an item is added after Wait has been called.
-func (p *Pool[T, U]) Add(item T) error {
-	fmt.Println("adding", item)
+func (p *Pool[T, U]) Add(ctx context.Context, item T) error {
 	select {
 	case <-p.waiting:
 		return ErrQueueClosed
 
 	default:
-		p.queue <- item
-		fmt.Println("added", item)
-		return nil
+		select {
+		case <-ctx.Done():
+			return fmt.Errorf("%w: %w", ErrFailedAdd, ctx.Err())
+
+		case p.queue <- item:
+			return nil
+		}
 	}
 }
 
