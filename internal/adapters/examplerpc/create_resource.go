@@ -7,9 +7,7 @@ import (
 	"connectrpc.com/connect"
 
 	"github.com/mattdowdell/sandbox/gen/example/v1"
-	"github.com/mattdowdell/sandbox/internal/adapters/common"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc/models"
-	"github.com/mattdowdell/sandbox/internal/domain/entities"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
@@ -20,9 +18,7 @@ func (h *Handler) CreateResource(
 ) (*connect.Response[examplev1.CreateResourceResponse], error) {
 	input := models.ResourceCreateToDomain(req.Msg.GetResource())
 
-	output, err := common.TxValue(ctx, h.provider, func(ds common.Datastore) (*entities.Resource, error) {
-		return h.resourceCreator.Execute(ctx, ds, input)
-	})
+	output, err := h.resource.Create(ctx, input)
 	if err != nil {
 		slog.DebugContext(ctx, "failed to create resource", slogx.Err(err))
 		return nil, ErrInternal // TODO: use more granular errors

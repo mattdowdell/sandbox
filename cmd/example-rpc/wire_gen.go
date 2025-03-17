@@ -12,6 +12,7 @@ import (
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/healthrpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/reflectrpc"
+	"github.com/mattdowdell/sandbox/internal/adapters/usecasefacades"
 	"github.com/mattdowdell/sandbox/internal/drivers/clock"
 	"github.com/mattdowdell/sandbox/internal/drivers/config"
 	"github.com/mattdowdell/sandbox/internal/drivers/config/flagoptions"
@@ -51,9 +52,11 @@ func ProvideApp(ctx context.Context) (*App, error) {
 	listResources := usecases.NewListResources()
 	updateResource := usecases.NewUpdateResource(clockClock)
 	deleteResource := usecases.NewDeleteResource()
+	resource := usecasefacades.NewResource(provider, createResource, getResource, listResources, updateResource, deleteResource)
 	listAuditEvents := usecases.NewListAuditEvents()
 	watchAuditEvents := usecases.NewWatchAuditEvents()
-	handler := examplerpc.New(provider, createResource, getResource, listResources, updateResource, deleteResource, listAuditEvents, watchAuditEvents)
+	auditEvent := usecasefacades.NewAuditEvent(provider, listAuditEvents, watchAuditEvents)
+	handler := examplerpc.New(resource, auditEvent)
 	reflectrpcHandler := reflectrpc.New()
 	healthrpcHandler := healthrpc.New()
 	v := collectHandlers(handler, reflectrpcHandler, healthrpcHandler)
