@@ -16,6 +16,9 @@ packages:
   github.com/mattdowdell/sandbox/internal/adapters/examplerpc:
     config:
       all: true
+  github.com/mattdowdell/sandbox/internal/adapters/usecasefacades:
+    config:
+      all: true
   github.com/mattdowdell/sandbox/internal/drivers/rpcserver:
     config:
       all: true

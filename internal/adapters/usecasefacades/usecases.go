@@ -1,4 +1,4 @@
-package examplerpc
+package usecasefacades
 
 import (
 	"context"

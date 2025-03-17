@@ -13,6 +13,7 @@ import (
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/healthrpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/reflectrpc"
+	"github.com/mattdowdell/sandbox/internal/adapters/usecasefacades"
 	"github.com/mattdowdell/sandbox/internal/domain/repositories"
 	"github.com/mattdowdell/sandbox/internal/drivers/clock"
 	"github.com/mattdowdell/sandbox/internal/drivers/config"
@@ -49,19 +50,24 @@ func ProvideApp(ctx context.Context) (*App, error) {
 		wire.Bind(new(repositories.UUIDGenerator), new(*uuidgen.Generator)),
 		// usecases
 		usecases.NewCreateResource,
-		wire.Bind(new(examplerpc.ResourceCreator), new(*usecases.CreateResource)),
+		wire.Bind(new(usecasefacades.ResourceCreator), new(*usecases.CreateResource)),
 		usecases.NewGetResource,
-		wire.Bind(new(examplerpc.ResourceGetter), new(*usecases.GetResource)),
+		wire.Bind(new(usecasefacades.ResourceGetter), new(*usecases.GetResource)),
 		usecases.NewListResources,
-		wire.Bind(new(examplerpc.ResourceLister), new(*usecases.ListResources)),
+		wire.Bind(new(usecasefacades.ResourceLister), new(*usecases.ListResources)),
 		usecases.NewUpdateResource,
-		wire.Bind(new(examplerpc.ResourceUpdater), new(*usecases.UpdateResource)),
+		wire.Bind(new(usecasefacades.ResourceUpdater), new(*usecases.UpdateResource)),
 		usecases.NewDeleteResource,
-		wire.Bind(new(examplerpc.ResourceDeleter), new(*usecases.DeleteResource)),
+		wire.Bind(new(usecasefacades.ResourceDeleter), new(*usecases.DeleteResource)),
 		usecases.NewListAuditEvents,
-		wire.Bind(new(examplerpc.AuditEventLister), new(*usecases.ListAuditEvents)),
+		wire.Bind(new(usecasefacades.AuditEventLister), new(*usecases.ListAuditEvents)),
 		usecases.NewWatchAuditEvents,
-		wire.Bind(new(examplerpc.AuditEventWatcher), new(*usecases.WatchAuditEvents)),
+		wire.Bind(new(usecasefacades.AuditEventWatcher), new(*usecases.WatchAuditEvents)),
+		// facades
+		usecasefacades.NewResource,
+		wire.Bind(new(examplerpc.ResourceFacade), new(*usecasefacades.Resource)),
+		usecasefacades.NewAuditEvent,
+		wire.Bind(new(examplerpc.AuditEventFacade), new(*usecasefacades.AuditEvent)),
 		// middleware
 		validatex.New,
 		otelconnectx.NewFromConfig,

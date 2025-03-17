@@ -14,7 +14,9 @@ import (
 // collectHandlers merges multiple rpcserver.Handler implementations into a slice.
 //
 // While wire can cast a struct to an interface, it gets confused if multiple instances of a type
-// are present. For more details, see https://github.com/google/wire/issues/207.
+// are present. For more details, see [google/wire#207].
+//
+// [google/wire#207]: https://github.com/google/wire/issues/207.
 func collectHandlers(
 	example *examplerpc.Handler,
 	reflect *reflectrpc.Handler,

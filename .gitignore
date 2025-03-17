@@ -26,3 +26,6 @@ go.work.sum
 
 # Build oututs
 dist/
+
+# Unit test output
+cover.html
