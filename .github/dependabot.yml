@@ -37,3 +37,12 @@ updates:
       time: "08:00"
     reviewers:
       - "mattdowdell"
+
+  - package-ecosystem: "docker-compose"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+    reviewers:
+      - "mattdowdell"
