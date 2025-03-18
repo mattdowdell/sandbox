@@ -14,6 +14,7 @@ WORKDIR /go/src
 ARG TARGETOS TARGETARCH
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=bind,target=. \
+    echo SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH; \
     CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH \
     go build -trimpath -ldflags="-buildid= -s -w" -o /go/bin/ ./cmd/...;
 

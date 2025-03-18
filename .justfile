@@ -199,7 +199,7 @@ container-build-rpc: (_container-build "example-rpc")
 
 [private]
 _container-build service:
-    docker buildx build \
+    SOURCE_DATE_EPOCH=0 docker buildx build \
         --target runtime \
         --build-arg SERVICE={{ service }} \
         --tag {{ service }}:local \

@@ -27,12 +27,16 @@ runs:
           org.opencontainers.image.version=${{ inputs.version }}
         build-args:
           SERVICE=${{ inputs.service }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
         load: true
         push: ${{ inputs.push }}
         tags: ${{ inputs.repository }}:${{ inputs.version }}
         target: runtime
         # TODO: provenance=max
         # TODO: sbom=true
+      env:
+        SOURCE_DATE_EPOCH: 0
 
     - name: Scan
       uses: aquasecurity/trivy-action@6c175e9c4083a92bbca2f9724c8a5e33bc2d97a5 # 0.30.0
