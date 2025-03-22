@@ -12,10 +12,12 @@ FROM --platform=$BUILDPLATFORM mirror.gcr.io/golang:1.24-bookworm@sha256:d7d795d
 WORKDIR /go/src
 
 ARG TARGETOS TARGETARCH
+ARG SOURCE_DATE_EPOCH=0
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=bind,target=. \
     CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH \
-    go build -trimpath -ldflags="-buildid= -s -w" -o /go/bin/ ./cmd/...;
+    go build -trimpath -ldflags="-buildid= -s -w" -o /go/bin/ ./cmd/...; \
+    touch --date=@${SOURCE_DATE_EPOCH} /go/bin/*;
 
 # --------------
 # Runtime target

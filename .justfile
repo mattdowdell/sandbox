@@ -6,6 +6,7 @@ db_port := "5432"
 db_user := "postgres"
 db_pass := "secret"
 export BUILDKIT_PROGRESS := "plain"
+now := shell("date +%s")
 
 [private]
 default:
@@ -199,9 +200,13 @@ container-build-rpc: (_container-build "example-rpc")
 
 [private]
 _container-build service:
-    docker buildx build \
+    SOURCE_DATE_EPOCH=0 docker buildx build \
+        --pull \
+        --no-cache \
         --target runtime \
         --build-arg SERVICE={{ service }} \
+        --build-arg SOURCE_DATE_EPOCH=0 \
+        --tag {{ service }}:{{ now }} \
         --tag {{ service }}:local \
         .
 
