@@ -14,7 +14,7 @@ FROM mirror.gcr.io/golang:1.24-bookworm@sha256:d7d795d0a9f51b00d9c9bfd17388c2c62
 # ------------
 
 FROM ghcr.io/gitleaks/gitleaks:v8.24.0@sha256:2bcceac45179b3a91bff11a824d0fb952585b429e54fc928728b1d4d5c3e5176 AS gitleaks
-FROM mirror.gcr.io/golangci/golangci-lint:v1.64.7@sha256:c2f5e6aaa7f89e7ab49f6bd45d8ce4ee5a030b132a5fbcac68b7959914a5a890 AS golangci-lint
+FROM mirror.gcr.io/golangci/golangci-lint:v1.64.8@sha256:2987913e27f4eca9c8a39129d2c7bc1e74fbcf77f181e01cea607be437aa5cb8 AS golangci-lint
 FROM ghcr.io/aquasecurity/trivy:0.60.0@sha256:91c3a842834563a6860dbaec5af7c1949df5caf988f9632ef5cbb0a5cd59d8f8 AS trivy
 FROM ghcr.io/woodruffw/zizmor:1.5.1@sha256:59c0a546bcfe4d6c040fe1532ddc2f6ccc63e59ebd6bc4f8f4ec741d1b77899d AS zizmor
 
