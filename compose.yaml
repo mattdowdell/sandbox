@@ -53,7 +53,7 @@ services:
 
 
   jaeger:
-    image: "mirror.gcr.io/jaegertracing/jaeger:2.2.0"
+    image: "mirror.gcr.io/jaegertracing/jaeger:2.4.0"
     pull_policy: "always"
     ports:
       - "127.0.0.1:16686:16686"
