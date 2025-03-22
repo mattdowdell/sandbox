@@ -42,44 +42,65 @@ colima start
 docker context ls
 ```
 
-## Development
+## Environment
 
-_For more detail, see [Development](./development.md)._
-
-The development environment can be started and entered with:
+The development environment can be started, stopped and restarted with:
 
 ```sh
-just dev-up dev-exec
+# start
+just dev-up
+
+# stop
+just dev-stop
+
+# restart
+dev dev-restart
 ```
 
-Once in the development environment, install some extra tools. These tools are updated alongside
-other dependencies, so try to run this command fairly often to stay up-to-date.
+To enter the development environment to run other commands, run:
+
+```sh
+just dev-exec
+```
+
+## Development
+
+Once in the development environment, some extra tools need to be installed. These tools are updated
+alongside other dependencies, so try to run this command fairly often to stay up-to-date. They will
+also need to be reinstalled each time the development environment gets restarted.
 
 ```sh
 just install-tools
 ```
 
-A number of recipes are available to be executed:
+There are many recipes that can be executed via `just`. The main ones are:
 
 ```sh
-just checks scan lint unit
+# sync dependencies, generate and format code
+just checks
+
+# scan the repository for issues
+just scan
+
+# lint the code
+just lint
+
+# run the unit tests
+just unit
 ```
 
 Some recipes call other recipes. For example, `checks` runs `fmt` which runs `fmt-buf` and `fmt-go`.
-These more specific recipes can be run by themselves as well:
+These more specific recipes can be run by themselves with:
 
 ```sh
 just fmt-go lint-go
 ```
 
-For a full list of recipes and what each does, run `just` by itself.
-
-To stop or restart the development environment, run the following on the host machine:
+For a full list of recipes and what each does, run:
 
 ```sh
-# stop all containers
-just dev-down
+just
 
-# restart all containers
-just dev-restart
+# or
+just --list
 ```
