@@ -22,8 +22,8 @@ type Config struct {
 }
 
 // NewAsDefaultFromConfig calls NewAsDefault with the given configuration.
-func NewAsDefaultFromConfig(config Config) *slog.Logger {
-	return NewAsDefault(config.Level, config.LegacyLevel)
+func NewAsDefaultFromConfig(config Config, options ...Option) *slog.Logger {
+	return NewAsDefault(config.Level, config.LegacyLevel, options...)
 }
 
 // NewAsDefault updates the global level with the given value and calls New with the new value.
@@ -46,8 +46,8 @@ func NewAsDefault(level, legacyLevel slog.Level, options ...Option) *slog.Logger
 }
 
 // NewFromConfig calls New with the given configuration.
-func NewFromConfig(config Config) *slog.Logger {
-	return New(config.Level)
+func NewFromConfig(config Config, options ...Option) *slog.Logger {
+	return New(config.Level, options...)
 }
 
 // New creates a new logger with the given level using a JSON handler.
@@ -57,37 +57,42 @@ func New(level slog.Leveler, options ...Option) *slog.Logger {
 		option.apply(opts)
 	}
 
-	// TODO: add trace/span id to log attrs (requires custom handler?)
-	handler := slog.NewJSONHandler(opts.writer, &slog.HandlerOptions{
-		AddSource: true,
-		Level:     level,
-		ReplaceAttr: func(groups []string, attr slog.Attr) slog.Attr {
-			if len(groups) > 0 {
-				return attr
-			}
-
-			switch attr.Key {
-			case slog.LevelKey:
-				attr.Value = slog.StringValue(strings.ToLower(attr.Value.String()))
-
-			case slog.SourceKey:
-				if opts.suppressSource {
-					return slog.Attr{}
-				}
-
-				if source, ok := attr.Value.Any().(*slog.Source); ok {
-					attr.Value = slog.StringValue(fmt.Sprintf("%s:%d", source.File, source.Line))
-				}
-
-			case slog.TimeKey:
-				if opts.suppressTime {
-					return slog.Attr{}
-				}
-			}
-
-			return attr
-		},
+	inner := slog.NewJSONHandler(opts.writer, &slog.HandlerOptions{
+		AddSource:   true,
+		Level:       level,
+		ReplaceAttr: replaceAttr(opts),
 	})
 
+	handler := Wrap(inner, opts.extractors)
+
 	return slog.New(handler)
+}
+
+func replaceAttr(opts *loggerOpts) func([]string, slog.Attr) slog.Attr {
+	return func(groups []string, attr slog.Attr) slog.Attr {
+		if len(groups) > 0 {
+			return attr
+		}
+
+		switch attr.Key {
+		case slog.LevelKey:
+			attr.Value = slog.StringValue(strings.ToLower(attr.Value.String()))
+
+		case slog.SourceKey:
+			if opts.suppressSource {
+				return slog.Attr{}
+			}
+
+			if source, ok := attr.Value.Any().(*slog.Source); ok {
+				attr.Value = slog.StringValue(fmt.Sprintf("%s:%d", source.File, source.Line))
+			}
+
+		case slog.TimeKey:
+			if opts.suppressTime {
+				return slog.Attr{}
+			}
+		}
+
+		return attr
+	}
 }

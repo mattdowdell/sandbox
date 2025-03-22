@@ -2,12 +2,19 @@ package logging_test
 
 import (
 	"bytes"
+	"fmt"
 	"log/slog"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/drivers/logging"
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
+)
+
+const (
+	testTraceID = "0123456789abcdef0123456789abcdef"
+	testSpanID  = "0123456789abcdef"
 )
 
 func Test_New(t *testing.T) {
@@ -75,4 +82,30 @@ func Test_Output(t *testing.T) {
 
 	// assert
 	assert.JSONEq(t, `{"level":"info","msg":"example"}`, b.String())
+}
+
+func Test_Output_WithExtractor(t *testing.T) {
+	// arrange
+	var b bytes.Buffer
+	extractor := otelx.NewExtractor()
+
+	logger := logging.New(
+		slog.LevelInfo,
+		logging.WithWriter(&b),
+		logging.WithSuppressSource(true),
+		logging.WithSuppressTime(true),
+		logging.WithExtractors(extractor),
+	)
+
+	ctx := otelx.MustSpan(t.Context(), testTraceID, testSpanID, true /*sampled*/)
+
+	// act
+	logger.InfoContext(ctx, "example")
+
+	// assert
+	assert.JSONEq(
+		t,
+		fmt.Sprintf(`{"level":"info","msg":"example","trace_id":%q}`, testTraceID),
+		b.String(),
+	)
 }
