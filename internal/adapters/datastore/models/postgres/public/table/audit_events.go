@@ -26,6 +26,7 @@ type auditEventsTable struct {
 
 	AllColumns     postgres.ColumnList
 	MutableColumns postgres.ColumnList
+	DefaultColumns postgres.ColumnList
 }
 
 type AuditEventsTable struct {
@@ -71,6 +72,7 @@ func newAuditEventsTableImpl(schemaName, tableName, alias string) auditEventsTab
 		ResourceTypeColumn = postgres.StringColumn("resource_type")
 		allColumns         = postgres.ColumnList{IDColumn, OperationColumn, CreatedAtColumn, SummaryColumn, ResourceIDColumn, ResourceTypeColumn}
 		mutableColumns     = postgres.ColumnList{OperationColumn, CreatedAtColumn, SummaryColumn, ResourceIDColumn, ResourceTypeColumn}
+		defaultColumns     = postgres.ColumnList{}
 	)
 
 	return auditEventsTable{
@@ -86,5 +88,6 @@ func newAuditEventsTableImpl(schemaName, tableName, alias string) auditEventsTab
 
 		AllColumns:     allColumns,
 		MutableColumns: mutableColumns,
+		DefaultColumns: defaultColumns,
 	}
 }

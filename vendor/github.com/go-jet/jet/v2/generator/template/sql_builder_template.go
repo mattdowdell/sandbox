@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/go-jet/jet/v2/generator/metadata"
 	"github.com/go-jet/jet/v2/internal/utils/dbidentifier"
-	"path"
+	"path/filepath"
 	"slices"
 	"strings"
 	"unicode"
@@ -90,7 +90,7 @@ func DefaultViewSQLBuilder(viewMetaData metadata.Table) ViewSQLBuilder {
 
 // PackageName returns package name of table sql builder types
 func (tb TableSQLBuilder) PackageName() string {
-	return path.Base(tb.Path)
+	return filepath.Base(tb.Path)
 }
 
 // UsePath returns new TableSQLBuilder with new relative path set
@@ -131,11 +131,12 @@ func (tb TableSQLBuilder) UseColumn(columnsFunc func(column metadata.Column) Tab
 
 // TableSQLBuilderColumn is template for table sql builder column
 type TableSQLBuilderColumn struct {
+	Skip bool
 	Name string
 	Type string
 }
 
-var reservedKeywords = []string{"TableName", "Table", "SchemaName", "Alias", "AllColumns", "MutableColumns"}
+var reservedKeywords = []string{"TableName", "Table", "SchemaName", "Alias", "AllColumns", "MutableColumns", "DefaultColumns"}
 
 func renameIfReserved(name string) string {
 	if slices.Contains(reservedKeywords, name) {
@@ -179,11 +180,15 @@ func getSqlBuilderColumnType(columnMetaData metadata.Column) string {
 		return "Timez"
 	case "interval":
 		return "Interval"
-	case "user-defined", "enum", "text", "character", "character varying", "bytea", "uuid",
+	case "user-defined", "enum", "text", "character", "character varying", "uuid",
 		"tsvector", "bit", "bit varying", "money", "json", "jsonb", "xml", "point", "line", "ARRAY",
-		"char", "varchar", "nvarchar", "binary", "varbinary", "bpchar", "varbit",
-		"tinyblob", "blob", "mediumblob", "longblob", "tinytext", "mediumtext", "longtext": // MySQL
+		"char", "varchar", "nvarchar", "bpchar", "varbit",
+		"tinytext", "mediumtext", "longtext": // MySQL
 		return "String"
+	case "bytea": // postgres
+		return "Bytea"
+	case "binary", "varbinary", "tinyblob", "mediumblob", "longblob", "blob": // mysql and sqlite
+		return "Blob"
 	case "real", "numeric", "decimal", "double precision", "float", "float4", "float8",
 		"double": // MySQL
 		return "Float"
@@ -228,7 +233,7 @@ func DefaultEnumSQLBuilder(enumMetaData metadata.Enum) EnumSQLBuilder {
 
 // PackageName returns enum sql builder package name
 func (e EnumSQLBuilder) PackageName() string {
-	return path.Base(e.Path)
+	return filepath.Base(e.Path)
 }
 
 // UsePath returns new EnumSQLBuilder with new path set
