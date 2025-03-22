@@ -17,7 +17,7 @@ func main() {
 }
 
 func run(ctx context.Context) int {
-	logger := logging.NewAsDefault(slog.LevelInfo)
+	logger := logging.NewAsDefault(slog.LevelInfo, slog.LevelDebug)
 
 	program := tea.NewProgram(New(), tea.WithAltScreen())
 

@@ -36,6 +36,7 @@ func ProvideApp(ctx context.Context) (*App, error) {
 		LoadConfig,
 		wire.FieldsOf(new(Config), "App", "Database", "Logging", "Meter", "OtelConnect", "RPCServer", "Tracer"),
 		// observability
+		loggerOptions,
 		logging.NewAsDefaultFromConfig,
 		otelx.NewTracerProviderFromConfig,
 		otelx.NewMeterProviderFromConfig,
