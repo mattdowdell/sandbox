@@ -34,8 +34,3 @@ ignore {
     input.PkgName = "github.com/go-sql-driver/mysql"
     input.Name = "MPL-2.0"
 }
-
-ignore {
-    input.PkgName = "github.com/hashicorp/hcl"
-    input.Name = "MPL-2.0"
-}
