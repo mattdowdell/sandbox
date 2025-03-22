@@ -175,7 +175,7 @@ github.com/chigopher/pathlib
 # github.com/creasty/defaults v1.8.0
 ## explicit; go 1.14
 github.com/creasty/defaults
-# github.com/daixiang0/gci v0.13.5
+# github.com/daixiang0/gci v0.13.6
 ## explicit; go 1.21
 github.com/daixiang0/gci
 github.com/daixiang0/gci/cmd/gci
