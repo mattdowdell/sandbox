@@ -37,7 +37,8 @@ func ProvideApp(ctx context.Context) (*App, error) {
 	}
 	appConfig := mainConfig.App
 	loggingConfig := mainConfig.Logging
-	logger := logging.NewAsDefaultFromConfig(loggingConfig)
+	v := loggerOptions()
+	logger := logging.NewAsDefaultFromConfig(loggingConfig, v...)
 	rpcserverConfig := mainConfig.RPCServer
 	pgsqlConfig := mainConfig.Database
 	db, err := pgsql.NewFromConfig(ctx, pgsqlConfig)
@@ -59,23 +60,23 @@ func ProvideApp(ctx context.Context) (*App, error) {
 	handler := examplerpc.New(resource, auditEvent)
 	reflectrpcHandler := reflectrpc.New()
 	healthrpcHandler := healthrpc.New()
-	v := collectHandlers(handler, reflectrpcHandler, healthrpcHandler)
-	v2, err := validatex.New()
+	v2 := collectHandlers(handler, reflectrpcHandler, healthrpcHandler)
+	v3, err := validatex.New()
 	if err != nil {
 		return nil, err
 	}
 	otelconnectxConfig := mainConfig.OtelConnect
-	v3, err := otelconnectx.NewFromConfig(otelconnectxConfig)
+	v4, err := otelconnectx.NewFromConfig(otelconnectxConfig)
 	if err != nil {
 		return nil, err
 	}
-	v4 := collectInterceptors(v2, v3)
+	v5 := collectInterceptors(v3, v4)
 	recoverer, err := rpcserver.NewRecoverer()
 	if err != nil {
 		return nil, err
 	}
-	v5 := collectHandlerOptions(v4, recoverer)
-	server := rpcserver.NewFromConfig(rpcserverConfig, v, v5)
+	v6 := collectHandlerOptions(v5, recoverer)
+	server := rpcserver.NewFromConfig(rpcserverConfig, v2, v6)
 	tracerProviderConfig := mainConfig.Tracer
 	tracerProviderShutdown, err := otelx.NewTracerProviderFromConfig(ctx, tracerProviderConfig)
 	if err != nil {

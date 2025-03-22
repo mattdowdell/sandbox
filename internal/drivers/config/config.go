@@ -59,27 +59,38 @@ func New(opts *Options) *Config {
 	}
 }
 
-// Load reads configuration, using it to populate a struct. See Options for information on the
-// supported configuration sources.
+// Load reads configuration using the given options, using it to populate a struct.
 //
-// The struct should contains fields with "koanf" tags identifying the configuration value to
+// Configuration is first loaded from environment variables, then files, and finally Kubernetes
+// mounts. The last loaded configuration value wins if any conflicts occur.
+//
+// The struct should contains fields with "koanf" tags identifying the configuration key to
 // assign. For example:
 //
 //	type LoggingConfig struct {
-//		Level string `koanf:"logging.level"`
+//		// reads "level" into the field
+//		Level string `koanf:"level"`
 //	}
 //
-// The "koanf" struct tag value must use "." delimited keys for nested values. The field type can be
-// anything supported by [mapstructure], or an implementation of [encoding.TextUnmarshaler].
+// The field type can be anything supported by [mapstructure], or an implementation of
+// [encoding.TextUnmarshaler]. If configuration keys contain ".", then nested structs must be used
+// to access the value. For example:
+//
+//	type Config struct {
+//		Log struct{
+//			// reads "log.level" into the field
+//			Level string `koanf:"level"`
+//		} `koanf:"log"`
+//	}
 //
 // A default value can be set using a "default" struct tag with the desired value. For example:
 //
 //	type LoggingConfig struct {
-//		Level string `koanf:"logging.level" default:"info"`
+//		Level string `koanf:"level" default:"info"`
 //	}
 //
-// A field type can be anything supported by [defaults], or an implementation of [defaults.Setter],
-// [encoding.TextUnmarshaler], or [encoding/json.Unmarshaler].
+// A default-able field type can be anything supported by [defaults], or an implementation of
+// [defaults.Setter], [encoding.TextUnmarshaler], or [encoding/json.Unmarshaler].
 //
 // [mapstructure]: https://pkg.go.dev/github.com/go-viper/mapstructure/v2
 // [encoding.TextUnmarshaler]: https://pkg.go.dev/encoding#TextUnmarshaler
@@ -87,27 +98,28 @@ func New(opts *Options) *Config {
 // [defaults.Setter]: https://pkg.go.dev/github.com/creasty/defaults#Setter
 // [encoding/json.Unmarshaler]: https://pkg.go.dev/encoding/json#Unmarshaler
 func Load[T any](conf *Config) (T, error) {
-	var val T
+	var zero T
 
 	if err := conf.loadEnv(); err != nil {
-		return val, err
+		return zero, err
 	}
 
 	if err := conf.loadFiles(); err != nil {
-		return val, err
+		return zero, err
 	}
 
 	if err := conf.loadMounts(); err != nil {
-		return val, err
+		return zero, err
 	}
 
+	var val T
+
 	if err := defaults.Set(&val); err != nil {
-		return val, err
+		return zero, err
 	}
 
 	if err := conf.inner.Unmarshal("", &val); err != nil {
-		var zeroVal T
-		return zeroVal, err
+		return zero, err
 	}
 
 	return val, nil

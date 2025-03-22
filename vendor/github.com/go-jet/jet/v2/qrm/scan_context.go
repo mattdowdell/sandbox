@@ -17,7 +17,9 @@ type ScanContext struct {
 	groupKeyInfoCache        map[string]groupKeyInfo
 	typeInfoMap              map[string]typeInfo
 
-	typesVisited typeStack // to prevent circular dependency scan
+	typesVisited    typeStack // to prevent circular dependency scan
+	columnAlias     []string
+	columnIndexRead []bool
 }
 
 // NewScanContext creates new ScanContext from rows
@@ -57,7 +59,24 @@ func NewScanContext(rows *sql.Rows) (*ScanContext, error) {
 		typeInfoMap: make(map[string]typeInfo),
 
 		typesVisited: newTypeStack(),
+
+		columnAlias:     aliases,
+		columnIndexRead: make([]bool, len(aliases)),
 	}, nil
+}
+
+func (s *ScanContext) EnsureEveryColumnRead() {
+	var neverUsedColumns []string
+
+	for index, read := range s.columnIndexRead {
+		if !read {
+			neverUsedColumns = append(neverUsedColumns, `'`+s.columnAlias[index]+`'`)
+		}
+	}
+
+	if len(neverUsedColumns) > 0 {
+		panic("jet: columns never used: " + strings.Join(neverUsedColumns, ", "))
+	}
 }
 
 func createScanSlice(columnCount int) []interface{} {
@@ -75,10 +94,18 @@ type typeInfo struct {
 	fieldMappings []fieldMapping
 }
 
+type fieldMappingType int
+
+const (
+	simpleType  fieldMappingType = iota
+	complexType                  // slice and struct are complex types supported
+	implementsScanner
+	jsonUnmarshal
+)
+
 type fieldMapping struct {
-	complexType       bool // slice and struct are complex types
-	rowIndex          int  // index in ScanContext.row
-	implementsScanner bool
+	rowIndex int // index in ScanContext.row
+	Type     fieldMappingType
 }
 
 func (s *ScanContext) getTypeInfo(structType reflect.Type, parentField *reflect.StructField) typeInfo {
@@ -100,17 +127,21 @@ func (s *ScanContext) getTypeInfo(structType reflect.Type, parentField *reflect.
 	for i := 0; i < structType.NumField(); i++ {
 		field := structType.Field(i)
 
-		newTypeName, fieldName := getTypeAndFieldName(typeName, field)
+		newTypeName, fieldName, jsonUnmarshaler := getTypeAndFieldName(typeName, field)
 		columnIndex := s.typeToColumnIndex(newTypeName, fieldName)
 
 		fieldMap := fieldMapping{
 			rowIndex: columnIndex,
 		}
 
-		if implementsScannerType(field.Type) {
-			fieldMap.implementsScanner = true
+		if jsonUnmarshaler {
+			fieldMap.Type = jsonUnmarshal
+		} else if implementsScannerType(field.Type) {
+			fieldMap.Type = implementsScanner
 		} else if !isSimpleModelType(field.Type) {
-			fieldMap.complexType = true
+			fieldMap.Type = complexType
+		} else {
+			fieldMap.Type = simpleType
 		}
 
 		newTypeInfo.fieldMappings = append(newTypeInfo.fieldMappings, fieldMap)
@@ -188,7 +219,7 @@ func (s *ScanContext) getGroupKeyInfo(
 		fieldType := indirectType(field.Type)
 
 		if isPrimaryKey(field, primaryKeyOverwrites) {
-			newTypeName, fieldName := getTypeAndFieldName(typeName, field)
+			newTypeName, fieldName, _ := getTypeAndFieldName(typeName, field)
 
 			pkIndex := s.typeToColumnIndex(newTypeName, fieldName)
 
@@ -232,6 +263,9 @@ func (s *ScanContext) typeToColumnIndex(typeName, fieldName string) int {
 // rowElemValue always returns non-ptr value,
 // invalid value is nil
 func (s *ScanContext) rowElemValue(index int) reflect.Value {
+	if s.rowNum == 1 {
+		s.columnIndexRead[index] = true
+	}
 	scannedValue := reflect.ValueOf(s.row[index])
 	return scannedValue.Elem().Elem() // no need to check validity of Elem, because s.row[index] always contains interface in interface
 }
