@@ -66,7 +66,7 @@ jobs:
 
       - name: Checks
         run: |
-          just checks dirty
+          just checks db-seed dirty
 
   lint:
     name: Lint
