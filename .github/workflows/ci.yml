@@ -64,6 +64,10 @@ jobs:
           down-flags: --volumes --remove-orphans
           services: postgres
 
+      - name: Seed
+        run: |
+          just db-seed
+
       - name: Checks
         run: |
           just checks dirty
