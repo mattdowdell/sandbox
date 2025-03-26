@@ -5,6 +5,8 @@ db_host := if is_docker == "true" { "postgres" } else { "localhost" }
 db_port := "5432"
 db_user := "postgres"
 db_pass := "secret"
+export BUILDKIT_PROGRESS := "plain"
+now := shell("date +%s")
 
 [private]
 default:
@@ -152,19 +154,29 @@ lint-fix-go:
     golangci-lint run --fix
 
 # Run the Go unit tests.
-unit:
-    go test -count=1 -cover ./...
+unit timeout="30s":
+    go test -timeout={{ timeout }} -count=1 -cover -coverprofile=cover.out ./internal/... ./pkg/...
+    @echo "Total coverage: `go tool cover -func=cover.out | tail -n 1 | awk '{print $3}'`"
+    go tool cover -html cover.out -o cover.html
 
 # Scan the repository for issues.
-scan: scan-trivy
+scan: scan-gitleaks scan-trivy scan-zizmor
+
+# Scan the repository for secrets with Gitleaks.
+scan-gitleaks:
+    gitleaks dir
 
 # Scan the repository for issues using Trivy.
 scan-trivy:
-    trivy fs --config trivy.yaml .
+    trivy fs .
 
 # Scan actions and workflows using Zizmor.
 scan-zizmor:
     zizmor --persona pedantic .github/actions/*/*.yml .github/workflows/*.yml
+
+# Build all binaries.
+build:
+    CGO_ENABLED=0 go build -trimpath -ldflags="-buildid= -s -w" -o ./dist/ ./cmd/...;
 
 # Exec into the database.
 db-exec:
@@ -188,9 +200,13 @@ container-build-rpc: (_container-build "example-rpc")
 
 [private]
 _container-build service:
-    docker buildx build \
+    SOURCE_DATE_EPOCH=0 docker buildx build \
+        --pull \
+        --no-cache \
         --target runtime \
         --build-arg SERVICE={{ service }} \
+        --build-arg SOURCE_DATE_EPOCH=0 \
+        --tag {{ service }}:{{ now }} \
         --tag {{ service }}:local \
         .
 

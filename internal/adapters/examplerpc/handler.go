@@ -13,33 +13,18 @@ var _ examplev1connect.ExampleServiceHandler = (*Handler)(nil)
 
 // Handler implements the ExampleService RPC.
 type Handler struct {
-	resourceCreator   ResourceCreator
-	resourceGetter    ResourceGetter
-	resourceLister    ResourceLister
-	resourceUpdater   ResourceUpdater
-	resourceDeleter   ResourceDeleter
-	auditEventLister  AuditEventLister
-	auditEventWatcher AuditEventWatcher
+	resource   ResourceFacade
+	auditEvent AuditEventFacade
 }
 
 // New creates a new Handler.
 func New(
-	resourceCreator ResourceCreator,
-	resourceGetter ResourceGetter,
-	resourceLister ResourceLister,
-	resourceUpdater ResourceUpdater,
-	resourceDeleter ResourceDeleter,
-	auditEventLister AuditEventLister,
-	auditEventWatcher AuditEventWatcher,
+	resource ResourceFacade,
+	auditEvent AuditEventFacade,
 ) *Handler {
 	return &Handler{
-		resourceCreator:   resourceCreator,
-		resourceGetter:    resourceGetter,
-		resourceLister:    resourceLister,
-		resourceUpdater:   resourceUpdater,
-		resourceDeleter:   resourceDeleter,
-		auditEventLister:  auditEventLister,
-		auditEventWatcher: auditEventWatcher,
+		resource:   resource,
+		auditEvent: auditEvent,
 	}
 }
 

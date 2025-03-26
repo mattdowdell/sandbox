@@ -1,0 +1,13 @@
+# https://github.com/gitleaks/gitleaks?tab=readme-ov-file#configuration
+
+title = "Gitleaks configuration"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Global allow list"
+paths = [
+	# Ignore Trivy database downloaded during CI
+	'''\.cache/trivy/db/trivy\.db''',
+]

@@ -1,6 +1,6 @@
 ---
-# TODO: document ignore expectations
 # https://trivy.dev/latest/docs/configuration/filtering/#trivyignoreyaml
+# TODO: document ignore expectations
 
 licenses:
   - id: Apache-2.0
@@ -18,12 +18,24 @@ licenses:
   - id: MIT
     statement: Permissive license.
 
+  - id: PostgreSQL
+    statement: Permissive license.
+
 misconfigurations:
   # https://avd.aquasec.com/misconfig/dockerfile/general/avd-ds-0002/
   - id: AVD-DS-0002
     paths:
       - Dockerfile
     statement: User defined in distroless base image.
+
+  # https://avd.aquasec.com/misconfig/dockerfile/general/avd-ds-0002/
+  - id: AVD-DS-0002
+    paths:
+      - .github/actions/gitleaks/Dockerfile
+      - .github/actions/zizmor/Dockerfile
+    statement: |
+      Docker-based actions must run as root.
+      https://docs.github.com/en/actions/sharing-automations/creating-actions/dockerfile-support-for-github-actions#user
 
   # https://avd.aquasec.com/misconfig/dockerfile/general/avd-ds-0026/
   - id: AVD-DS-0026

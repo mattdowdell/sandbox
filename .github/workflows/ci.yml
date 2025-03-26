@@ -15,6 +15,7 @@ permissions: {}
 jobs:
   size:
     name: Size
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -42,6 +43,7 @@ jobs:
 
   checks:
     name: Checks
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -62,12 +64,20 @@ jobs:
           down-flags: --volumes --remove-orphans
           services: postgres
 
+      - name: Seed
+        run: |
+          just db-seed
+
       - name: Checks
         run: |
           just checks dirty
 
   lint:
     name: Lint
+    if: |
+      always() &&
+      github.event_name == 'pull_request' &&
+      (needs.checks.result == 'success' || needs.checks.result == 'skipped')
     needs:
       - checks
     runs-on: ubuntu-latest
@@ -80,7 +90,7 @@ jobs:
           persist-credentials: false
 
       - name: Install Go
-        uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
+        uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b # v5.4.0
         with:
           go-version-file: 'go.mod'
 
@@ -90,13 +100,13 @@ jobs:
           ./tools/docker-base-tag.sh Dockerfile.dev mirror.gcr.io/golangci/golangci-lint >> $GITHUB_OUTPUT
 
       - name: Lint Go
-        uses: golangci/golangci-lint-action@2226d7cb06a077cd73e56eedd38eecad18e5d837 # v6.5.0
+        uses: golangci/golangci-lint-action@55c2c1448f86e01eaae002a5a3a9624417608d84 # v6.5.2
         with:
           version: ${{ steps.version.outputs.tag }}
           args: --timeout=10m
 
       - name: Lint Protobuf
-        uses: bufbuild/buf-action@b46cbc051dd8fd10a3c2213e784498790d3fe388 # v1.0.3
+        uses: bufbuild/buf-action@1b8e0a0e793562b7850d7e6ff0228b5c0b16111c # v1.1.0
         with:
           pr_comment: false
           format: false
@@ -104,6 +114,9 @@ jobs:
 
   unit:
     name: Unit test
+    if: |
+      always() &&
+      (needs.checks.result == 'success' || needs.checks.result == 'skipped')
     needs:
       - checks
     runs-on: ubuntu-latest
@@ -116,12 +129,12 @@ jobs:
           persist-credentials: false
 
       - name: Install Go
-        uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
+        uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b # v5.4.0
         with:
           go-version-file: 'go.mod'
 
       - name: Install Just
-        uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2.0.0
+        uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff # v3.0.0
 
       - name: Unit test
         run: just unit
@@ -131,6 +144,9 @@ jobs:
 
   scan:
     name: Scan
+    if: |
+      always() &&
+      (needs.checks.result == 'success' || needs.checks.result == 'skipped')
     needs:
       - checks
     runs-on: ubuntu-latest
@@ -142,23 +158,49 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Install Go
+        uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b # v5.4.0
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Install Just
+        uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff # v3.0.0
+
+      # required for trivy to find licenses
+      # see https://trivy.dev/latest/docs/coverage/language/golang/#license
+      - name: Populate Go mod cache
+        run: just tidy-go
+
+      - name: Get trivy version
+        id: trivy-version
+        run: |
+          ./tools/docker-base-tag.sh Dockerfile.dev ghcr.io/aquasecurity/trivy >> $GITHUB_OUTPUT
+
       - name: Run trivy
-        uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 # 0.29.0
+        uses: aquasecurity/trivy-action@6c175e9c4083a92bbca2f9724c8a5e33bc2d97a5 # 0.30.0
         with:
           scan-type: fs
           trivy-config: trivy.yaml
+          version: v${{ steps.trivy-version.outputs.tag }}
 
-      # TODO: publish to github for default branch builds
+      # TODO: publish to github for default branch builds?
       # https://github.com/actions/starter-workflows/blob/main/code-scanning/trivy.yml
 
       - name: Run zizmor
         uses: ./.github/actions/zizmor
         with:
           persona: pedantic
-          inputs: .github/actions/*/*.yml .github/workflows/*.yml
+
+      - name: Run gitleaks
+        uses: ./.github/actions/gitleaks
 
   functional:
     name: Functional Tests
+    if: |
+      always() &&
+      (needs.lint.result == 'success' || needs.lint.result == 'skipped') &&
+      needs.unit.result == 'success' &&
+      needs.scan.result == 'success'
     needs:
       - lint
       - unit
@@ -183,6 +225,9 @@ jobs:
 
   tag:
     name: Tag
+    if: |
+      always() &&
+      needs.functional.result == 'success'
     needs:
       - functional
     permissions:
@@ -204,17 +249,29 @@ jobs:
 
   build:
     name: Build
+    if: |
+      always() &&
+      needs.tag.result == 'success'
     needs:
       - tag
     runs-on: ubuntu-latest
     permissions:
       contents: read  # for checkout
+      packages: write # for container push
       id-token: write # for keyless image signing
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           persist-credentials: false
+
+      - name: GHCR Login
+        if: github.ref_name == github.event.repository.default_branch
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Buildx
         uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3.10.0
@@ -226,4 +283,6 @@ jobs:
         uses: ./.github/actions/container-build
         with:
           service: example-rpc
+          repository: ghcr.io/mattdowdell/sandbox/example-rpc
           version: ${{ needs.tag.outputs.long }}
+          push: ${{ github.ref_name == github.event.repository.default_branch }}

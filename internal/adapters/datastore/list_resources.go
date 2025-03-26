@@ -10,7 +10,7 @@ import (
 )
 
 // ...
-func (s *Stub) ListResources(ctx context.Context) ([]*entities.Resource, error) {
+func (d *Datastore) ListResources(ctx context.Context) ([]*entities.Resource, error) {
 	stmt := table.Resources.
 		SELECT(
 			table.Resources.ID,
@@ -21,7 +21,7 @@ func (s *Stub) ListResources(ctx context.Context) ([]*entities.Resource, error) 
 		ORDER_BY(table.Resources.ID.ASC())
 
 	var resources []model.Resources
-	if err := stmt.QueryContext(ctx, s.db, &resources); err != nil {
+	if err := stmt.QueryContext(ctx, d.db, &resources); err != nil {
 		return nil, err
 	}
 

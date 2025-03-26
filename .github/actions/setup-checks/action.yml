@@ -4,17 +4,17 @@ runs:
   using: "composite"
   steps:
     - name: Install Go
-      uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
+      uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b # v5.4.0
       with:
         go-version-file: "go.mod"
 
     - name: Install Buf
-      uses: bufbuild/buf-action@b46cbc051dd8fd10a3c2213e784498790d3fe388 # v1.0.3
+      uses: bufbuild/buf-action@1b8e0a0e793562b7850d7e6ff0228b5c0b16111c # v1.1.0
       with:
         setup_only: true
 
     - name: Install Just
-      uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2.0.0
+      uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff # v3.0.0
 
     - name: Install gci
       uses: mattdowdell/go-installer@7af1f9ff5af1447fd122d6b144ddce2562b76e09 # v0.3.0

@@ -7,14 +7,17 @@
 # Base target
 # -----------
 
-FROM mirror.gcr.io/golang:1.24-bookworm@sha256:b970e6d47c09fdd34179acef5c4fecaf6410f0b597a759733b3cbea04b4e604a AS base
+FROM mirror.gcr.io/golang:1.24-bookworm@sha256:fa1a01d362a7b9df68b021d59a124d28cae6d99ebd1a876e3557c4dd092f1b1d AS base
 
 # ------------
 # Dependencies
 # ------------
 
-FROM ghcr.io/woodruffw/zizmor:1.4.1@sha256:dbd8fffd06c51b0ea80dff6115547a0b4fe97fc67785d82f198ecf36d8a32ebe AS zizmor
-FROM mirror.gcr.io/golangci/golangci-lint:v1.64.5@sha256:9faef4dda4304c4790a14c5b8c8cd8c2715a8cb754e13f61d8ceaa358f5a454a AS golangci-lint
+FROM ghcr.io/gitleaks/gitleaks:v8.24.2@sha256:b5918eb91b8d2473cec722f066abb4352e4ffdc4ec9f4283ec143aba9ec9ebc4 AS gitleaks
+FROM mirror.gcr.io/golangci/golangci-lint:v1.64.8@sha256:2987913e27f4eca9c8a39129d2c7bc1e74fbcf77f181e01cea607be437aa5cb8 AS golangci-lint
+FROM ghcr.io/aquasecurity/trivy:0.60.0@sha256:91c3a842834563a6860dbaec5af7c1949df5caf988f9632ef5cbb0a5cd59d8f8 AS trivy
+FROM ghcr.io/woodruffw/zizmor:1.5.2@sha256:f0bbe68825022e3336389e754d4c8a28928246275e9c549251997f25318896f1 AS zizmor
+
 
 # -------------
 # Devenv target
@@ -34,11 +37,6 @@ RUN set -eux; \
     curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | \
     bash -s -- --to /usr/local/bin;
 
-ARG TRIVY_VERSION=v0.59.1
-RUN set -eux; \
-    curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | \
-    sh -s -- -b /usr/local/bin ${TRIVY_VERSION};
-
 RUN set -eux; \
     useradd --comment Dev --create-home --user-group dev;
 
@@ -49,7 +47,9 @@ RUN set -eux; \
     mkdir -p /home/dev/ws; \
     git config --global --add safe.directory /home/dev/ws;
 
+COPY --from=gitleaks /usr/bin/gitleaks /usr/bin/gitleaks
 COPY --from=golangci-lint /usr/bin/golangci-lint /usr/bin/golangci-lint
+COPY --from=trivy /usr/local/bin/trivy /usr/bin/trivy
 COPY --from=zizmor /app/zizmor /usr/bin/zizmor
 
 WORKDIR /home/dev/ws

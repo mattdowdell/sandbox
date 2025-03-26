@@ -16,7 +16,7 @@ func (h *Handler) ListAuditEvents(
 	ctx context.Context,
 	_ *connect.Request[examplev1.ListAuditEventsRequest],
 ) (*connect.Response[examplev1.ListAuditEventsResponse], error) {
-	output, err := h.auditEventLister.Execute(ctx)
+	output, err := h.auditEvent.List(ctx)
 	if err != nil {
 		slog.DebugContext(ctx, "usecase error", slogx.Err(err))
 		return nil, ErrInternal

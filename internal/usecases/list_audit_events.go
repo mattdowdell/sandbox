@@ -11,24 +11,19 @@ import (
 )
 
 // ...
-type ListAuditEvents struct {
-	store repositories.AuditEvent
-}
+type ListAuditEvents struct{}
 
 // ...
-func NewListAuditEvents(
-	store repositories.AuditEvent,
-) *ListAuditEvents {
-	return &ListAuditEvents{
-		store: store,
-	}
+func NewListAuditEvents() *ListAuditEvents {
+	return &ListAuditEvents{}
 }
 
 // ...
 func (u *ListAuditEvents) Execute(
 	ctx context.Context,
+	store repositories.AuditEvent,
 ) ([]*entities.AuditEvent, error) {
-	events, err := u.store.ListAuditEvents(ctx)
+	events, err := store.ListAuditEvents(ctx)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to list audit events", slogx.Err(err))
 		return nil, errors.New("internal error")

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/url"
-	"path"
+	"path/filepath"
 	"strconv"
 
 	"github.com/go-jet/jet/v2/generator/metadata"
@@ -56,6 +56,11 @@ func GenerateDSN(dsn, schema, destDir string, templates ...template.Template) er
 	defer db.Close()
 
 	fmt.Println("Retrieving schema information...")
+	return GenerateDB(db, schema, filepath.Join(destDir, cfg.Database), templates...)
+}
+
+// GenerateDB generates jet files using the provided *sql.DB
+func GenerateDB(db *sql.DB, schema, destDir string, templates ...template.Template) error {
 	generatorTemplate := template.Default(postgres.Dialect)
 	if len(templates) > 0 {
 		generatorTemplate = templates[0]
@@ -66,9 +71,7 @@ func GenerateDSN(dsn, schema, destDir string, templates ...template.Template) er
 		return fmt.Errorf("failed to get '%s' schema metadata: %w", schema, err)
 	}
 
-	dirPath := path.Join(destDir, cfg.Database)
-
-	err = template.ProcessSchema(dirPath, schemaMetadata, generatorTemplate)
+	err = template.ProcessSchema(destDir, schemaMetadata, generatorTemplate)
 	if err != nil {
 		return fmt.Errorf("failed to generate schema %s: %d", schemaMetadata.Name, err)
 	}

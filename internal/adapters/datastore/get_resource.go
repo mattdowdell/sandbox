@@ -13,7 +13,7 @@ import (
 )
 
 // ...
-func (s *Stub) GetResource(ctx context.Context, id uuid.UUID) (*entities.Resource, error) {
+func (d *Datastore) GetResource(ctx context.Context, id uuid.UUID) (*entities.Resource, error) {
 	stmt := table.Resources.
 		SELECT(
 			table.Resources.ID,
@@ -24,7 +24,7 @@ func (s *Stub) GetResource(ctx context.Context, id uuid.UUID) (*entities.Resourc
 		WHERE(table.Resources.ID.EQ(postgres.UUID(id)))
 
 	var resource model.Resources
-	if err := stmt.QueryContext(ctx, s.db, &resource); err != nil {
+	if err := stmt.QueryContext(ctx, d.db, &resource); err != nil {
 		return nil, err
 	}
 

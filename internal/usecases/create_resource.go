@@ -14,25 +14,23 @@ import (
 type CreateResource struct {
 	clock   repositories.Clock
 	uuidgen repositories.UUIDGenerator
-	store   repositories.Resource
 }
 
 // ...
 func NewCreateResource(
 	clock repositories.Clock,
 	uuidgen repositories.UUIDGenerator,
-	store repositories.Resource,
 ) *CreateResource {
 	return &CreateResource{
 		clock:   clock,
 		uuidgen: uuidgen,
-		store:   store,
 	}
 }
 
 // ...
 func (u *CreateResource) Execute(
 	ctx context.Context,
+	store repositories.Resource,
 	resource *entities.Resource,
 ) (*entities.Resource, error) {
 	id, err := u.uuidgen.NewV7()
@@ -44,7 +42,7 @@ func (u *CreateResource) Execute(
 	resource.Init(id, u.clock.Now())
 
 	// TODO: handle conflict
-	if err := u.store.CreateResource(ctx, resource); err != nil {
+	if err := store.CreateResource(ctx, resource); err != nil {
 		slog.ErrorContext(ctx, "failed to create resource", slogx.Err(err))
 		return nil, errors.New("internal error")
 	}

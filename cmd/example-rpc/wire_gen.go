@@ -12,11 +12,13 @@ import (
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/healthrpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/reflectrpc"
+	"github.com/mattdowdell/sandbox/internal/adapters/usecasefacades"
 	"github.com/mattdowdell/sandbox/internal/drivers/clock"
 	"github.com/mattdowdell/sandbox/internal/drivers/config"
 	"github.com/mattdowdell/sandbox/internal/drivers/config/flagoptions"
 	"github.com/mattdowdell/sandbox/internal/drivers/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
+	"github.com/mattdowdell/sandbox/internal/drivers/pgsql"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/otelconnectx"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/validatex"
@@ -35,38 +37,46 @@ func ProvideApp(ctx context.Context) (*App, error) {
 	}
 	appConfig := mainConfig.App
 	loggingConfig := mainConfig.Logging
-	logger := logging.NewAsDefaultFromConfig(loggingConfig)
+	v := loggerOptions()
+	logger := logging.NewAsDefaultFromConfig(loggingConfig, v...)
 	rpcserverConfig := mainConfig.RPCServer
+	pgsqlConfig := mainConfig.Database
+	db, err := pgsql.NewFromConfig(ctx, pgsqlConfig)
+	if err != nil {
+		return nil, err
+	}
+	provider := datastore.NewProvider(db)
 	clockClock := clock.New()
 	generator := uuidgen.New()
-	stub := datastore.NewStub()
-	createResource := usecases.NewCreateResource(clockClock, generator, stub)
-	getResource := usecases.NewGetResource(stub)
-	listResources := usecases.NewListResources(stub)
-	updateResource := usecases.NewUpdateResource(clockClock, stub)
-	deleteResource := usecases.NewDeleteResource(stub)
-	listAuditEvents := usecases.NewListAuditEvents(stub)
-	watchAuditEvents := usecases.NewWatchAuditEvents(stub)
-	handler := examplerpc.New(createResource, getResource, listResources, updateResource, deleteResource, listAuditEvents, watchAuditEvents)
+	createResource := usecases.NewCreateResource(clockClock, generator)
+	getResource := usecases.NewGetResource()
+	listResources := usecases.NewListResources()
+	updateResource := usecases.NewUpdateResource(clockClock)
+	deleteResource := usecases.NewDeleteResource()
+	resource := usecasefacades.NewResource(provider, createResource, getResource, listResources, updateResource, deleteResource)
+	listAuditEvents := usecases.NewListAuditEvents()
+	watchAuditEvents := usecases.NewWatchAuditEvents()
+	auditEvent := usecasefacades.NewAuditEvent(provider, listAuditEvents, watchAuditEvents)
+	handler := examplerpc.New(resource, auditEvent)
 	reflectrpcHandler := reflectrpc.New()
 	healthrpcHandler := healthrpc.New()
-	v := collectHandlers(handler, reflectrpcHandler, healthrpcHandler)
-	v2, err := validatex.New()
+	v2 := collectHandlers(handler, reflectrpcHandler, healthrpcHandler)
+	v3, err := validatex.New()
 	if err != nil {
 		return nil, err
 	}
 	otelconnectxConfig := mainConfig.OtelConnect
-	v3, err := otelconnectx.NewFromConfig(otelconnectxConfig)
+	v4, err := otelconnectx.NewFromConfig(otelconnectxConfig)
 	if err != nil {
 		return nil, err
 	}
-	v4 := collectInterceptors(v2, v3)
+	v5 := collectInterceptors(v3, v4)
 	recoverer, err := rpcserver.NewRecoverer()
 	if err != nil {
 		return nil, err
 	}
-	v5 := collectHandlerOptions(v4, recoverer)
-	server := rpcserver.NewFromConfig(rpcserverConfig, v, v5)
+	v6 := collectHandlerOptions(v5, recoverer)
+	server := rpcserver.NewFromConfig(rpcserverConfig, v2, v6)
 	tracerProviderConfig := mainConfig.Tracer
 	tracerProviderShutdown, err := otelx.NewTracerProviderFromConfig(ctx, tracerProviderConfig)
 	if err != nil {

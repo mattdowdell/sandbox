@@ -22,8 +22,9 @@ func (h *Handler) DeleteResource(
 		return nil, ErrInternal
 	}
 
-	if err := h.resourceDeleter.Execute(ctx, id); err != nil {
-		return nil, ErrInternal
+	if err := h.resource.Delete(ctx, id); err != nil {
+		slog.DebugContext(ctx, "failed to delete resource", slogx.Err(err))
+		return nil, ErrInternal // TODO: use more granular errors
 	}
 
 	return connect.NewResponse(&examplev1.DeleteResourceResponse{}), nil

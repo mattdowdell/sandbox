@@ -2,7 +2,7 @@
 
 services:
   rpc:
-    image: "example-rpc:local"
+    image: "ghcr.io/mattdowdell/sandbox/example-rpc:local"
     build:
       context: .
       target: runtime
@@ -10,6 +10,11 @@ services:
         SERVICE: example-rpc
     entrypoint: ["/example-rpc"]
     environment:
+      APP_DATABASE_HOSTNAME: "postgres"
+      APP_DATABASE_USERNAME: "postgres"
+      APP_DATABASE_PASSWORD: "secret"
+      APP_DATABASE_NAME: "postgres"
+      APP_DATABASE_SSLMODE: "disable"
       APP_RPCSERVER_HOST: "0.0.0.0"
       APP_METERPROVIDER_ENDPOINT: "http://victoria-metrics:8428/opentelemetry/v1/metrics"
       APP_TRACERPROVIDER_ENDPOINT: "http://jaeger:4318"
@@ -25,10 +30,13 @@ services:
         condition: service_healthy
       victoria-metrics:
         condition: service_healthy
+      victoria-logs:
+        condition: service_healthy
     restart: always
 
   postgres:
     image: "mirror.gcr.io/postgres:17"
+    pull_policy: "always"
     environment:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "secret"
@@ -45,7 +53,8 @@ services:
 
 
   jaeger:
-    image: "mirror.gcr.io/jaegertracing/jaeger:2.2.0"
+    image: "mirror.gcr.io/jaegertracing/jaeger:2.4.0"
+    pull_policy: "always"
     ports:
       - "127.0.0.1:16686:16686"
     healthcheck:
@@ -58,6 +67,7 @@ services:
   #       avoids need for grafana plugin, but modifies meter provider to enable scraping
   victoria-metrics:
     image: "mirror.gcr.io/victoriametrics/victoria-metrics:latest" # TODO: pick tag
+    pull_policy: "always"
     ports:
       - "127.0.0.1:8428:8428"
     healthcheck:
@@ -66,16 +76,27 @@ services:
       start_interval: "1s"
     restart: always
 
+  victoria-logs:
+    image: "mirror.gcr.io/victoriametrics/victoria-logs:latest" # TODO: pick tag
+    pull_policy: "always"
+    ports:
+      - "127.0.0.1:9428:9428"
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://127.0.0.1:9428/-/healthy" ]
+      start_period: "30s"
+      start_interval: "1s"
+    restart: always
+
   grafana:
-    image: "mirror.gcr.io/grafana/grafana:latest"
+    image: "mirror.gcr.io/grafana/grafana:latest" # TODO: pick tag
+    pull_policy: "always"
     environment:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
       GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
       GF_AUTH_BASIC_ENABLED: "false"
-      # while victoria-metrics is somewhat compatible with prometheus, it differs just enough that
+      # while victoriametrics is somewhat compatible with prometheus, it differs just enough that
       # some parts are broken, see https://github.com/grafana/grafana/issues/42615
-      GF_INSTALL_PLUGINS: "https://github.com/VictoriaMetrics/victoriametrics-datasource/releases/download/v0.10.3/victoriametrics-datasource-v0.10.3.zip;victoriametrics-datasource"
-      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: "victoriametrics-datasource"
+      GF_INSTALL_PLUGINS: "victoriametrics-metrics-datasource,victoriametrics-logs-datasource"
     ports:
       - "127.0.0.1:3000:3000"
     volumes:

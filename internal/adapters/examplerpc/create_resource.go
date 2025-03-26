@@ -18,10 +18,10 @@ func (h *Handler) CreateResource(
 ) (*connect.Response[examplev1.CreateResourceResponse], error) {
 	input := models.ResourceCreateToDomain(req.Msg.GetResource())
 
-	output, err := h.resourceCreator.Execute(ctx, input)
+	output, err := h.resource.Create(ctx, input)
 	if err != nil {
-		slog.DebugContext(ctx, "usecase error", slogx.Err(err))
-		return nil, ErrInternal
+		slog.DebugContext(ctx, "failed to create resource", slogx.Err(err))
+		return nil, ErrInternal // TODO: use more granular errors
 	}
 
 	return connect.NewResponse(&examplev1.CreateResourceResponse{

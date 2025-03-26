@@ -22,10 +22,10 @@ func (h *Handler) UpdateResource(
 		return nil, ErrInternal
 	}
 
-	output, err := h.resourceUpdater.Execute(ctx, input)
+	output, err := h.resource.Update(ctx, input)
 	if err != nil {
-		slog.DebugContext(ctx, "usecase error", slogx.Err(err))
-		return nil, ErrInternal
+		slog.DebugContext(ctx, "failed to update resource", slogx.Err(err))
+		return nil, ErrInternal // TODO: use more granular errors
 	}
 
 	return connect.NewResponse(&examplev1.UpdateResourceResponse{

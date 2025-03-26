@@ -17,7 +17,7 @@ func (h *Handler) WatchAuditEvents(
 	_ *connect.Request[examplev1.WatchAuditEventsRequest],
 	stream *connect.ServerStream[examplev1.WatchAuditEventsResponse],
 ) error {
-	ch := h.auditEventWatcher.Execute(ctx)
+	ch := h.auditEvent.Watch(ctx)
 
 	for {
 		select {
