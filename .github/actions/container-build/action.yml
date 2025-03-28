@@ -20,6 +20,7 @@ runs:
   steps:
     - name: Build
       uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4 # v6.15.0
+      id: build
       with:
         annotations: |
           org.opencontainers.image.revision=${{ github.sha }}
@@ -47,3 +48,13 @@ runs:
 
     # TODO: publish to github for default branch builds
     # https://github.com/actions/starter-workflows/blob/main/code-scanning/trivy.yml
+
+    - name: Cosign
+      shell: bash
+      if: inputs.push == 'true'
+      run: |
+        cosign sign --yes ${service}:${version}@${digest}
+      env:
+        service: ${{ inputs.service }}
+        version: ${{ inputs.version }}
+        digest: ${{ steps.build.outputs.digest }}
