@@ -51,7 +51,7 @@ runs:
 
     - name: Cosign
       shell: bash
-      if: ${{ inputs.push }}
+      if: inputs.push == true
       run: |
         cosign sign --yes ${service}:${version}@${digest}
       env:
