@@ -7,7 +7,6 @@ db_user := "postgres"
 db_pass := "secret"
 export BUILDKIT_PROGRESS := "plain"
 now := shell("date +%s")
-go_module := shell("go list -m")
 
 [private]
 default:
@@ -204,19 +203,10 @@ db-seed:
         --file ./tools/seed.sql
 
 # Build all containers.
-container-build: container-build-rpc
+container-build go_build_args="": (container-build-rpc go_build_args)
 
 # Build the example-rpc container.
-container-build-rpc: (_container-build "example-rpc")
-
-#
-container-build-cover: container-build-cover-rpc
-
-#
-container-build-cover-rpc: (_container-build-cover "example-rpc")
-
-[private]
-_container-build-cover service: (_container-build service "-cover")
+container-build-rpc go_build_args="": (_container-build "example-rpc" go_build_args)
 
 [private]
 _container-build service go_build_args="":
