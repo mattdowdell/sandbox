@@ -218,6 +218,9 @@ jobs:
         uses: gacts/run-and-post-run@d803f6920adc9a47eeac4cb6c93dbc2e2890c684 # v1.4.2
         with:
           run: |
+            whoami
+            chown 65532:65532 .covdata
+
             pwd
             ls -alph
             ls -alph .covdata || true
@@ -238,6 +241,7 @@ jobs:
           down-flags: --volumes --remove-orphans
 
       # TODO: run tests
+      # TODO: collect logs
 
   tag:
     name: Tag
