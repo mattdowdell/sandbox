@@ -53,8 +53,8 @@ runs:
       shell: bash
       if: inputs.push == 'true'
       run: |
-        cosign sign --yes ${service}:${version}@${digest}
+        cosign sign --yes ${repository}:${version}@${digest}
       env:
-        service: ${{ inputs.service }}
+        repository: ${{ inputs.repository }}
         version: ${{ inputs.version }}
         digest: ${{ steps.build.outputs.digest }}
