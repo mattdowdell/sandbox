@@ -218,19 +218,13 @@ jobs:
         uses: gacts/run-and-post-run@d803f6920adc9a47eeac4cb6c93dbc2e2890c684 # v1.4.2
         with:
           run: |
-            whoami
+            # hack to let container's user create coverage files
             sudo chown 65532:65532 .covdata
 
-            pwd
-            ls -alph
-            ls -alph .covdata || true
-
+            # enable coverage builds
             echo GO_BUILD_ARGS=-cover > .env
           post: |
-            pwd
-            ls -alph
-            ls -alph .covdata || true
-
+            # TODO: publish this somewhere
             go tool covdata percent -i=.covdata
 
       - name: Start
@@ -243,14 +237,15 @@ jobs:
       # TODO: run tests
 
       - name: Collect logs
+        if: always()
         run: |
-          ::group rpc
+          echo "::group::rpc logs"
           docker compose logs rpc
-          ::endgroup
+          echo "::endgroup"
 
-          ::group postgres
+          echo "::group::postgres logs"
           docker compose logs postgres
-          ::endgroup
+          echo "::endgroup"
 
   tag:
     name: Tag
