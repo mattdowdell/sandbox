@@ -23,7 +23,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 # Runtime target
 # --------------
 
-FROM gcr.io/distroless/static-debian12:nonroot@sha256:b35229a3a6398fe8f86138c74c611e386f128c20378354fc5442811700d5600d AS runtime
+FROM gcr.io/distroless/static-debian12:nonroot@sha256:c0f429e16b13e583da7e5a6ec20dd656d325d88e6819cafe0adb0828976529dc AS runtime
 
 ARG SERVICE
 COPY --from=build /go/bin/${SERVICE} /${SERVICE}
