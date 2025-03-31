@@ -1,7 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
+    "config:best-practices"
   ],
   "ignorePaths": [],
   "postUpdateOptions" : [
@@ -21,7 +21,19 @@
     },
     {
       "matchPackageNames": ["google.golang.org/genproto/googleapis/**"],
-      "groupName": "googleapis"
+      "groupName": "googleapis",
+      "schedule": ["* * 1 * *"]
+    },
+    {
+      "matchPackageNames": ["golang.org/x/**"],
+      "groupName": "golang.org/x"
+    },
+    {
+      "description": "Group dependencies for examples in one PR",
+      "matchFileNames": ["examples/**"],
+      "matchManagers": ["gomod"],
+      "matchDepTypes": ["indirect"],
+      "groupName": "examples"
     }
   ]
 }
