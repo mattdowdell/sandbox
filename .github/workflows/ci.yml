@@ -106,7 +106,7 @@ jobs:
           args: --timeout=10m
 
       - name: Lint Protobuf
-        uses: bufbuild/buf-action@1b8e0a0e793562b7850d7e6ff0228b5c0b16111c # v1.1.0
+        uses: bufbuild/buf-action@5150a1eef5c10b6a5cf8a69fc872f24a09473195 # v1.1.1
         with:
           pr_comment: false
           format: false
