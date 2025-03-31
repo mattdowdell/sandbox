@@ -219,7 +219,7 @@ jobs:
         with:
           run: |
             whoami
-            chown 65532:65532 .covdata
+            sudo chown 65532:65532 .covdata
 
             pwd
             ls -alph
