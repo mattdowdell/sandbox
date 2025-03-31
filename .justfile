@@ -7,6 +7,7 @@ db_user := "postgres"
 db_pass := "secret"
 export BUILDKIT_PROGRESS := "plain"
 now := shell("date +%s")
+go_module := shell("go list -m")
 
 [private]
 default:
@@ -159,6 +160,16 @@ unit timeout="30s":
     @echo "Total coverage: `go tool cover -func=cover.out | tail -n 1 | awk '{print $3}'`"
     go tool cover -html cover.out -o cover.html
 
+# Summarise functional test coverage.
+functional-cover:
+    go tool covdata textfmt -i=.covdata -o functional.out
+    @echo "Total coverage: `go tool cover -func=cover.out | tail -n 1 | awk '{print $3}'`"
+    go tool cover -html functional.out -o functional.html
+
+# Delete functional test coverage artifacts.
+functional-cover-clean:
+    rm -f .covdata/cov*
+
 # Scan the repository for issues.
 scan: scan-gitleaks scan-trivy scan-zizmor
 
@@ -198,14 +209,23 @@ container-build: container-build-rpc
 # Build the example-rpc container.
 container-build-rpc: (_container-build "example-rpc")
 
+#
+container-build-cover: container-build-cover-rpc
+
+#
+container-build-cover-rpc: (_container-build-cover "example-rpc")
+
 [private]
-_container-build service:
+_container-build-cover service: (_container-build service "-cover")
+
+[private]
+_container-build service go_build_args="":
     SOURCE_DATE_EPOCH=0 docker buildx build \
         --pull \
-        --no-cache \
         --target runtime \
         --build-arg SERVICE={{ service }} \
         --build-arg SOURCE_DATE_EPOCH=0 \
+        --build-arg GO_BUILD_ARGS="{{ go_build_args }}" \
         --tag {{ service }}:{{ now }} \
         --tag {{ service }}:local \
         .

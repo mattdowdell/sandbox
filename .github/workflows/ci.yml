@@ -214,6 +214,14 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Setup coverage
+        uses: gacts/run-and-post-run@d803f6920adc9a47eeac4cb6c93dbc2e2890c684 # v1.4.2
+        with:
+          run: |
+            echo GO_BUILD_ARGS=-cover > .env
+          post: |
+            go tool covdata percent -i=.covdata
+
       - name: Start
         uses: hoverkraft-tech/compose-action@8be2d741e891ac9b8ac20825e6f3904149599925 # v2.2.0
         with:

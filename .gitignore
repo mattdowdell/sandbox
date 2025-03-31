@@ -27,5 +27,8 @@ go.work.sum
 # Build oututs
 dist/
 
-# Unit test output
+# Coverage outputs
 cover.html
+.covdata/**
+!.covdata/.gitkeep
+functional.html

@@ -8,8 +8,10 @@ services:
       target: runtime
       args:
         SERVICE: example-rpc
+        GO_BUILD_ARGS: ${GO_BUILD_ARGS:-}
     entrypoint: ["/example-rpc"]
     environment:
+      GOCOVERDIR: "/covdata"
       APP_DATABASE_HOSTNAME: "postgres"
       APP_DATABASE_USERNAME: "postgres"
       APP_DATABASE_PASSWORD: "secret"
@@ -21,6 +23,8 @@ services:
       OTEL_GO_X_DEPRECATED_RUNTIME_METRICS: "false"
     ports:
       - "127.0.0.1:5000:5000"
+    volumes:
+      - "./.covdata:/covdata"
     healthcheck:
       test: [ "CMD", "/example-health" ]
       start_period: "30s"
