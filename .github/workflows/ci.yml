@@ -241,7 +241,16 @@ jobs:
           down-flags: --volumes --remove-orphans
 
       # TODO: run tests
-      # TODO: collect logs
+
+      - name: Collect logs
+        run: |
+          ::group rpc
+          docker compose logs rpc
+          ::endgroup
+
+          ::group postgres
+          docker compose logs postgres
+          ::endgroup
 
   tag:
     name: Tag
