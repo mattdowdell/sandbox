@@ -241,11 +241,11 @@ jobs:
         run: |
           echo "::group::rpc logs"
           docker compose logs rpc
-          echo "::endgroup"
+          echo "::endgroup::"
 
           echo "::group::postgres logs"
           docker compose logs postgres
-          echo "::endgroup"
+          echo "::endgroup::"
 
   tag:
     name: Tag
