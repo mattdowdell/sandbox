@@ -1,5 +1,7 @@
 # https://just.systems/man/en/
 
+import '.bingo.just'
+
 is_docker := path_exists("/.dockerenv")
 db_host := if is_docker == "true" { "postgres" } else { "localhost" }
 db_port := "5432"
@@ -57,9 +59,9 @@ checks: tidy vendor gen fmt
 tidy: tidy-buf tidy-go
 
 # Tidy Protobuf dependencies.
-tidy-buf:
-    buf dep prune
-    buf dep update
+tidy-buf: install-buf
+    {{ buf }} dep prune
+    {{ buf }} dep update
 
 # Tidy Go dependencies
 tidy-go:
@@ -75,20 +77,18 @@ vendor-go:
 # Install go tools.
 install-tools:
     cat tools.go | grep _ | awk -F'"' '{print $2}' | xargs -tI % go install %
-    @# TODO: provide via tools.go; currently depends on outdated protovalidate-go
-    go install github.com/bufbuild/buf/cmd/buf@latest
 
 # Run all formatters.
 fmt: fmt-buf fmt-go fmt-just
 
 # Run the Protobuf formatter.
-fmt-buf:
-    buf format --config buf.yaml --write
+fmt-buf: install-buf
+    {{ buf }} format --config buf.yaml --write
 
 # Run the Go formatter.
-fmt-go:
-    gofumpt -l -w .
-    gci write \
+fmt-go: install-gofumpt install-gci
+    {{ gofumpt }} -l -w .
+    {{ gci }} write \
         --skip-vendor \
         --skip-generated \
         -s standard \
@@ -104,15 +104,15 @@ fmt-just:
 gen: gen-buf gen-go
 
 # Run the Protobuf generator.
-gen-buf:
-    buf generate --clean --config buf.yaml
+gen-buf: install-buf
+    {{ buf }} generate --clean --config buf.yaml
 
 # Run the Go generators.
 gen-go: gen-go-jet gen-go-mockery gen-go-wire
 
 # Run the Go jet generator
-gen-go-jet:
-    jet \
+gen-go-jet: install-jet
+    {{ jet }} \
         -source=postgres \
         -host={{ db_host }} \
         -port={{ db_port }} \
@@ -122,13 +122,13 @@ gen-go-jet:
         -path ./internal/adapters/datastore/models/
 
 # Run the Go mockery generator.
-gen-go-mockery:
+gen-go-mockery: install-mockery
     rm -rf mocks/
-    mockery
+    {{ mockery }}
 
 # Run the Go wire generator.
-gen-go-wire:
-    wire gen ./cmd/...
+gen-go-wire: install-wire
+    {{ wire }} gen ./cmd/...
 
 # Check for uncommitted changes.
 [private]
@@ -139,8 +139,8 @@ dirty:
 lint: lint-buf lint-go
 
 # Run the Protobuf linter.
-lint-buf:
-    buf lint --config buf.yaml
+lint-buf: install-buf
+    {{ buf }} lint --config buf.yaml
 
 # Run the Go linter.
 lint-go:
