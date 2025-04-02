@@ -9,8 +9,6 @@ echo
 echo 'gopath := shell("go env GOPATH")'
 echo
 
-
-
 for tool in $tools
 do
 	filename=`bingo list | grep $tool | awk '{print $2}'`

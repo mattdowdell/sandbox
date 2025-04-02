@@ -1,6 +1,6 @@
 # https://just.systems/man/en/
 
-import '.bingo.just'
+import '.tools.just'
 
 is_docker := path_exists("/.dockerenv")
 db_host := if is_docker == "true" { "postgres" } else { "localhost" }
