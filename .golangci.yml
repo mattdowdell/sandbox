@@ -1,5 +1,6 @@
 # https://golangci-lint.run/usage/configuration/
 
+version: "2"
 linters:
   enable:
     - asciicheck
@@ -12,11 +13,9 @@ linters:
     - dogsled
     - dupl
     - durationcheck
-    - errcheck
     - exhaustive
     - fatcontext
     - forcetypeassert
-    - gci
     - gocheckcompilerdirectives
     - gochecknoinits
     - gochecksumtype
@@ -24,15 +23,11 @@ linters:
     - goconst
     - gocritic
     - godot
-    - gofumpt
     - gomoddirectives
     - goprintffuncname
     - gosec
-    - gosimple
-    - govet
     - grouper
     - iface
-    - ineffassign
     - importas
     - intrange
     - makezero
@@ -55,50 +50,70 @@ linters:
     - spancheck
     - sqlclosecheck
     - staticcheck
-    - stylecheck
     - tagliatelle
     - testifylint
     - testpackage
     - thelper
     - unconvert
     - unparam
-    - unused
     - usestdlibvars
     - usetesting
     - wastedassign
     - whitespace
 
-linters-settings:
-  gci:
-    sections:
-      - standard
-      - default
-      - localmodule
-    skip-generated: true
+  settings:
+    gocognit:
+      min-complexity: 15
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - style
+        - performance
+        - experimental
+        - opinionated
+    sloglint:
+      attr-only: true
+      context: all
+      static-msg: true
+      no-raw-keys: true
+      key-naming-case: snake
+      forbidden-keys:
+        - time
+        - level
+        - msg
+        - source
 
-  gocognit:
-    min-complexity: 15
-
-  gocritic:
-    enabled-tags:
-      - diagnostic
-      - style
-      - performance
-      - experimental
-      - opinionated
-
-  sloglint:
-    attr-only: true
-    context: "all"
-    static-msg: true
-    no-raw-keys: true
-    key-naming-case: snake
-    forbidden-keys:
-      - time
-      - level
-      - msg
-      - source
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
 
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
+
+formatters:
+  enable:
+    - gci
+    - gofumpt
+
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - localmodule
+
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
