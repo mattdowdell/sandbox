@@ -2,6 +2,8 @@ package main
 
 import (
 	"connectrpc.com/connect"
+	"connectrpc.com/otelconnect"
+	"connectrpc.com/validate"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/healthrpc"
@@ -9,8 +11,6 @@ import (
 	"github.com/mattdowdell/sandbox/internal/drivers/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver"
-	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/otelconnectx"
-	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/validatex"
 )
 
 // loggerOptions provides logger configuration options.
@@ -51,12 +51,12 @@ func collectHandlers(
 // [connect.Interceptor]: https://pkg.go.dev/connectrpc.com/connect#Interceptor
 // [google/wire#207]: https://github.com/google/wire/issues/207
 func collectInterceptors(
-	validate *validatex.Interceptor,
-	otelconnect *otelconnectx.Interceptor,
+	validate_ *validate.Interceptor,
+	otelconnect *otelconnect.Interceptor,
 ) []connect.Interceptor {
 	return []connect.Interceptor{
 		otelconnect,
-		validate,
+		validate_,
 	}
 }
 
