@@ -61,22 +61,22 @@ func ProvideApp(ctx context.Context) (*App, error) {
 	reflectrpcHandler := reflectrpc.New()
 	healthrpcHandler := healthrpc.New()
 	v2 := collectHandlers(handler, reflectrpcHandler, healthrpcHandler)
-	v3, err := validatex.New()
+	interceptor, err := validatex.New()
 	if err != nil {
 		return nil, err
 	}
 	otelconnectxConfig := mainConfig.OtelConnect
-	v4, err := otelconnectx.NewFromConfig(otelconnectxConfig)
+	otelconnectInterceptor, err := otelconnectx.NewFromConfig(otelconnectxConfig)
 	if err != nil {
 		return nil, err
 	}
-	v5 := collectInterceptors(v3, v4)
+	v3 := collectInterceptors(interceptor, otelconnectInterceptor)
 	recoverer, err := rpcserver.NewRecoverer()
 	if err != nil {
 		return nil, err
 	}
-	v6 := collectHandlerOptions(v5, recoverer)
-	server := rpcserver.NewFromConfig(rpcserverConfig, v2, v6)
+	v4 := collectHandlerOptions(v3, recoverer)
+	server := rpcserver.NewFromConfig(rpcserverConfig, v2, v4)
 	tracerProviderConfig := mainConfig.Tracer
 	tracerProviderShutdown, err := otelx.NewTracerProviderFromConfig(ctx, tracerProviderConfig)
 	if err != nil {
