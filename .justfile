@@ -97,7 +97,7 @@ fmt-just:
     just --unstable --fmt
 
 # Run all code generators.
-gen: gen-buf gen-go
+gen: gen-buf gen-go gen-just
 
 # Run the Protobuf generator.
 gen-buf: install-buf install-protoc-gen-connect-go install-protoc-gen-go
@@ -125,6 +125,10 @@ gen-go-mockery: install-mockery
 # Run the Go wire generator.
 gen-go-wire: install-wire
     {{ wire }} gen ./cmd/...
+
+# Run the justfile generator.
+gen-just:
+    ./tools/regen-tools.sh > .tools.just
 
 # Check for uncommitted changes.
 [private]
