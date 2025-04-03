@@ -7,7 +7,6 @@ import (
 	"connectrpc.com/connect"
 
 	"github.com/mattdowdell/sandbox/gen/example/v1"
-	"github.com/mattdowdell/sandbox/internal/adapters/common"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc/models"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
@@ -23,9 +22,7 @@ func (h *Handler) DeleteResource(
 		return nil, ErrInternal
 	}
 
-	if err := common.TxFunc(ctx, h.provider, func(ds common.Datastore) error {
-		return h.resourceDeleter.Execute(ctx, ds, id)
-	}); err != nil {
+	if err := h.resource.Delete(ctx, id); err != nil {
 		slog.DebugContext(ctx, "failed to delete resource", slogx.Err(err))
 		return nil, ErrInternal // TODO: use more granular errors
 	}

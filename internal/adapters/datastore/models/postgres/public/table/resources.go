@@ -24,6 +24,7 @@ type resourcesTable struct {
 
 	AllColumns     postgres.ColumnList
 	MutableColumns postgres.ColumnList
+	DefaultColumns postgres.ColumnList
 }
 
 type ResourcesTable struct {
@@ -67,6 +68,7 @@ func newResourcesTableImpl(schemaName, tableName, alias string) resourcesTable {
 		UpdatedAtColumn = postgres.TimestampzColumn("updated_at")
 		allColumns      = postgres.ColumnList{IDColumn, NameColumn, CreatedAtColumn, UpdatedAtColumn}
 		mutableColumns  = postgres.ColumnList{NameColumn, CreatedAtColumn, UpdatedAtColumn}
+		defaultColumns  = postgres.ColumnList{}
 	)
 
 	return resourcesTable{
@@ -80,5 +82,6 @@ func newResourcesTableImpl(schemaName, tableName, alias string) resourcesTable {
 
 		AllColumns:     allColumns,
 		MutableColumns: mutableColumns,
+		DefaultColumns: defaultColumns,
 	}
 }

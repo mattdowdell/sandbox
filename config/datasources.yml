@@ -11,6 +11,15 @@ datasources:
     isDefault: true
     editable: false
 
+  - name: "VictoriaLogs"
+    type: "victoriametrics-logs-datasource"
+    uid: "victorialogs"
+    url: "http://victoria-logs:9428/"
+    access: "proxy"
+    basicAuth: false
+    isDefault: false
+    editable: false
+
   - name: "Jaeger"
     type: "jaeger"
     uid: "jaeger"
