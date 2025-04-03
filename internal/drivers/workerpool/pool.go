@@ -23,19 +23,19 @@ import (
 var (
 	ErrInvalidSize = errors.New("size must be > 0")
 	ErrQueueClosed = errors.New("worker pool queue has been closed")
-	ErrFailedAdd  = errors.New("failed to add to queue")
+	ErrFailedAdd   = errors.New("failed to add to queue")
 	ErrFailedWait  = errors.New("failed to wait for workers")
 )
 
 // Handler implementations handle a work item from the queue. Implementations must be thread safe.
 type Handler[T, U any] interface {
-	Handle(context.Context, T) U
+	Handle(context.Context, T) Result[U]
 }
 
 // Collector implementations receive results from the handler. Implementations do not need to be
 // thread safe.
 type Collector[U any] interface {
-	Collect(U)
+	Collect(Result[U])
 }
 
 // Pool provides a pool of workers. Each worker calls a handler to complete a work item. Results are
@@ -45,7 +45,7 @@ type Pool[T, U any] struct {
 	handler   Handler[T, U]
 	collector Collector[U]
 	queue     chan T
-	results   chan U
+	results   chan Result[U]
 	started   chan struct{}
 	waiting   chan struct{}
 	complete  chan struct{}
@@ -68,7 +68,7 @@ func New[T, U any](
 		handler:   handler,
 		collector: collector,
 		queue:     make(chan T),
-		results:   make(chan U),
+		results:   make(chan Result[U]),
 		started:   make(chan struct{}),
 		waiting:   make(chan struct{}),
 		complete:  make(chan struct{}),
@@ -119,14 +119,18 @@ func (p *Pool[T, U]) startCollector(ctx context.Context) {
 func (p *Pool[T, U]) startWorker(ctx context.Context, wg *sync.WaitGroup) {
 	defer func() {
 		if r := recover(); r != nil {
-			slog.ErrorContext(ctx, "worker panicked", slogx.Panic(r), slogx.Stacktrace())
+			p.results <- Err[U](fmt.Errorf("recovered: %v", r))
+
+			slog.ErrorContext(ctx, "restarting panicked worker", slogx.Panic(r), slogx.Stacktrace())
+			go p.startWorker(ctx, wg)
+
+			return
 		}
 
 		wg.Done()
 	}()
 
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
+	slog.InfoContext(ctx, "starting worker")
 
 	for {
 		select {

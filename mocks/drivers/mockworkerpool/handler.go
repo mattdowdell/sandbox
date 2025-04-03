@@ -5,6 +5,7 @@ package mockworkerpool
 import (
 	context "context"
 
+	workerpool "github.com/mattdowdell/sandbox/internal/drivers/workerpool"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -22,20 +23,18 @@ func (_m *Handler[T, U]) EXPECT() *Handler_Expecter[T, U] {
 }
 
 // Handle provides a mock function with given fields: _a0, _a1
-func (_m *Handler[T, U]) Handle(_a0 context.Context, _a1 T) U {
+func (_m *Handler[T, U]) Handle(_a0 context.Context, _a1 T) workerpool.Result[U] {
 	ret := _m.Called(_a0, _a1)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Handle")
 	}
 
-	var r0 U
-	if rf, ok := ret.Get(0).(func(context.Context, T) U); ok {
+	var r0 workerpool.Result[U]
+	if rf, ok := ret.Get(0).(func(context.Context, T) workerpool.Result[U]); ok {
 		r0 = rf(_a0, _a1)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(U)
-		}
+		r0 = ret.Get(0).(workerpool.Result[U])
 	}
 
 	return r0
@@ -60,12 +59,12 @@ func (_c *Handler_Handle_Call[T, U]) Run(run func(_a0 context.Context, _a1 T)) *
 	return _c
 }
 
-func (_c *Handler_Handle_Call[T, U]) Return(_a0 U) *Handler_Handle_Call[T, U] {
+func (_c *Handler_Handle_Call[T, U]) Return(_a0 workerpool.Result[U]) *Handler_Handle_Call[T, U] {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Handler_Handle_Call[T, U]) RunAndReturn(run func(context.Context, T) U) *Handler_Handle_Call[T, U] {
+func (_c *Handler_Handle_Call[T, U]) RunAndReturn(run func(context.Context, T) workerpool.Result[U]) *Handler_Handle_Call[T, U] {
 	_c.Call.Return(run)
 	return _c
 }

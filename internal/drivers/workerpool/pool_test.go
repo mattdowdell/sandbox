@@ -2,6 +2,7 @@ package workerpool_test
 
 import (
 	"context"
+	"errors"
 	"slices"
 	"testing"
 
@@ -117,17 +118,18 @@ func Test_Pool_Add_Success(t *testing.T) {
 	handler.
 		EXPECT().
 		Handle(mock.AnythingOfType("*context.cancelCtx"), mock.AnythingOfType("int")).
-		RunAndReturn(func(_ context.Context, value int) int {
-			return value * 2
+		RunAndReturn(func(_ context.Context, value int) workerpool.Result[int] {
+			return workerpool.OK(value * 2)
 		}).
 		Times(5)
 
 	collector := mockworkerpool.NewCollector[int](t)
 	collector.
 		EXPECT().
-		Collect(mock.AnythingOfType("int")).
-		RunAndReturn(func(value int) {
-			results = append(results, value)
+		Collect(mock.AnythingOfType("workerpool.Result[int]")).
+		RunAndReturn(func(result workerpool.Result[int]) {
+			require.NoError(t, result.Err)
+			results = append(results, result.OK)
 		}).
 		Times(5)
 
@@ -152,7 +154,7 @@ func Test_Pool_Add_Success(t *testing.T) {
 	assert.Equal(t, []int{0, 2, 4, 6, 8}, results)
 }
 
-func Test_Pool_Add_Error(t *testing.T) {
+func Test_Pool_Add_Closed(t *testing.T) {
 	// arrange
 	handler := mockworkerpool.NewHandler[int, int](t)
 	collector := mockworkerpool.NewCollector[int](t)
@@ -180,12 +182,29 @@ func Test_Pool_Start_HandlerPanicRecovered(t *testing.T) {
 	handler.
 		EXPECT().
 		Handle(mock.AnythingOfType("*context.cancelCtx"), 1).
-		RunAndReturn(func(_ context.Context, value int) int {
+		RunAndReturn(func(_ context.Context, value int) workerpool.Result[int] {
 			panic(value)
+		}).
+		Once()
+	handler.
+		EXPECT().
+		Handle(mock.AnythingOfType("*context.cancelCtx"), 2).
+		RunAndReturn(func(_ context.Context, value int) workerpool.Result[int] {
+			return workerpool.OK(value * 2)
 		}).
 		Once()
 
 	collector := mockworkerpool.NewCollector[int](t)
+	collector.
+		EXPECT().
+		Collect(workerpool.Err[int](errors.New("recovered: 1"))).
+		Return().
+		Once()
+	collector.
+		EXPECT().
+		Collect(workerpool.OK(4)).
+		Return().
+		Once()
 
 	pool, err := workerpool.New(1 /*size*/, handler, collector)
 	require.NoError(t, err)
@@ -198,9 +217,10 @@ func Test_Pool_Start_HandlerPanicRecovered(t *testing.T) {
 
 	// act
 	require.NoError(t, pool.Add(t.Context(), 1))
+	require.NoError(t, pool.Add(t.Context(), 2))
 
 	// assert
-	<-pool.Complete()
+	assert.NoError(t, pool.Wait(t.Context()))
 }
 
 func Test_Pool_Start_CollectorPanicRecovered(t *testing.T) {
@@ -209,20 +229,21 @@ func Test_Pool_Start_CollectorPanicRecovered(t *testing.T) {
 	handler.
 		EXPECT().
 		Handle(mock.AnythingOfType("*context.cancelCtx"), mock.AnythingOfType("int")).
-		RunAndReturn(func(_ context.Context, value int) int {
-			return value * 2
+		RunAndReturn(func(_ context.Context, value int) workerpool.Result[int] {
+			return workerpool.OK(value * 2)
 		}).
 		Once()
 
 	collector := mockworkerpool.NewCollector[int](t)
 	collector.
 		EXPECT().
-		Collect(2).
-		RunAndReturn(func (value int) {
-			panic(value)
+		Collect(workerpool.OK(2)).
+		RunAndReturn(func(_ workerpool.Result[int]) {
+			panic(1)
 		}).
 		Once()
 
+	// use a single goroutine to show that a new worker is started on panic
 	pool, err := workerpool.New(1 /*size*/, handler, collector)
 	require.NoError(t, err)
 

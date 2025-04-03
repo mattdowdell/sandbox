@@ -32,12 +32,16 @@ func Example() {
 
 type Handler struct{}
 
-func (h *Handler) Handle(_ context.Context, input int) int {
-	return input * 2
+func (h *Handler) Handle(_ context.Context, input int) workerpool.Result[int] {
+	return workerpool.OK(input * 2)
 }
 
 type Collector struct{}
 
-func (c *Collector) Collect(output int) {
-	fmt.Println(output)
+func (c *Collector) Collect(result workerpool.Result[int]) {
+	if result.IsOK() {
+		fmt.Println("ok:", result.OK)
+	} else {
+		fmt.Println("err:", result.Err)
+	}
 }
