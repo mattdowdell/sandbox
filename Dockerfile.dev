@@ -52,6 +52,9 @@ COPY --from=golangci-lint /usr/bin/golangci-lint /usr/bin/golangci-lint
 COPY --from=trivy /usr/local/bin/trivy /usr/bin/trivy
 COPY --from=zizmor /app/zizmor /usr/bin/zizmor
 
+RUN set -eux; \
+    go install github.com/bwplotka/bingo@latest;
+
 WORKDIR /home/dev/ws
 
 CMD ["sleep", "inf"]

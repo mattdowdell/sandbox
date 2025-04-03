@@ -51,12 +51,12 @@ func collectHandlers(
 // [connect.Interceptor]: https://pkg.go.dev/connectrpc.com/connect#Interceptor
 // [google/wire#207]: https://github.com/google/wire/issues/207
 func collectInterceptors(
-	validate_ *validate.Interceptor,
+	validat *validate.Interceptor,
 	otelconnect *otelconnect.Interceptor,
 ) []connect.Interceptor {
 	return []connect.Interceptor{
 		otelconnect,
-		validate_,
+		validat,
 	}
 }
 

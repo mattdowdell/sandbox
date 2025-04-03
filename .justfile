@@ -74,10 +74,6 @@ vendor: vendor-go
 vendor-go:
     go mod vendor
 
-# Install go tools.
-install-tools:
-    cat tools.go | grep _ | awk -F'"' '{print $2}' | xargs -tI % go install %
-
 # Run all formatters.
 fmt: fmt-buf fmt-go fmt-just
 
@@ -104,7 +100,7 @@ fmt-just:
 gen: gen-buf gen-go
 
 # Run the Protobuf generator.
-gen-buf: install-buf
+gen-buf: install-buf install-protoc-gen-connect-go install-protoc-gen-go
     {{ buf }} generate --clean --config buf.yaml
 
 # Run the Go generators.

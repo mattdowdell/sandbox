@@ -11,12 +11,19 @@ echo
 
 for tool in $tools
 do
-	filename=`bingo list | grep $tool | awk '{print $2}'`
+	filename=`bingo list | grep "\b$tool\b" | awk '{print $2}'`
 
 	echo "${tool} := join(gopath, \"bin\", \"$filename\")"
 	echo
 	echo "[private]"
-	echo "@install-${tool}:"
-	echo "    bingo get ${tool}"
+	echo "install-${tool}:"
+	if [[ "$tool" == protoc-gen-* ]]
+	then
+		# use symlink for protoc plugins
+		# avoids needing to maintain versions in buf.gen.yaml
+		echo "    bingo get -l ${tool}"
+	else
+		echo "    bingo get ${tool}"
+	fi
 	echo
 done

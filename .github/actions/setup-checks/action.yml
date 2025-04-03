@@ -20,15 +20,3 @@ runs:
       uses: mattdowdell/go-installer@7af1f9ff5af1447fd122d6b144ddce2562b76e09 # v0.3.0
       with:
         package: github.com/bwplotka/bingo
-
-    - name: Install protoc-gen-connect-go
-      uses: mattdowdell/go-installer@7af1f9ff5af1447fd122d6b144ddce2562b76e09 # v0.3.0
-      with:
-        package: connectrpc.com/connect/cmd/protoc-gen-connect-go
-        version-file: go.mod
-
-    - name: Install protoc-gen-go
-      uses: mattdowdell/go-installer@7af1f9ff5af1447fd122d6b144ddce2562b76e09 # v0.3.0
-      with:
-        package: google.golang.org/protobuf/cmd/protoc-gen-go
-        version-file: go.mod
