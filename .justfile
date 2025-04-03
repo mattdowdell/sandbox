@@ -174,7 +174,7 @@ scan: scan-gitleaks scan-trivy scan-zizmor
 
 # Scan the repository for secrets with Gitleaks.
 scan-gitleaks:
-    gitleaks dir
+    gitleaks dir --verbose
 
 # Scan the repository for issues using Trivy.
 scan-trivy:
