@@ -36,7 +36,8 @@ type Collector[U any] interface {
 // passed to Collector.Collect as normal. The goroutine for the worker that saw the panic is then
 // restarted.
 //
-// If Collector.Collect panics, the collector is restarted, but the collected value is lost.
+// If Collector.Collect panics, the collector is restarted, but the collected value being
+// processed during the panic is lost.
 type Pool[T, U any] struct {
 	size      int
 	handler   Handler[T, U]
