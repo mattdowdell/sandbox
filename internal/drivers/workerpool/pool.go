@@ -1,12 +1,3 @@
-// Package workerpool provides an experimental thread pool of workers.
-//
-// The worker pool creates a number of threads to process work items based on a pre-determined size.
-// Once the workers have started, the work items can be added to the queue. Each worker receives an
-// item from the queue and then passes it to a handler for processing. The handler returns the
-// result of the processing, which is then passed to the collector to aggregate the results.
-//
-// Once all work items have been added to the queue, the pool can be waited upon until the collector
-// has been provided all the results.
 package workerpool
 
 import (
@@ -40,6 +31,12 @@ type Collector[U any] interface {
 
 // Pool provides a pool of workers. Each worker calls a handler to complete a work item. Results are
 // then passed to a collector for aggregation.
+//
+// If Handler.Handle panics, the recovered value is converted to an error, wrapped in a Result, and
+// passed to Collector.Collect as normal. The goroutine for the worker that saw the panic is then
+// restarted.
+//
+// If Collector.Collect panics, the collector is restarted, but the collected value is lost.
 type Pool[T, U any] struct {
 	size      int
 	handler   Handler[T, U]
@@ -104,7 +101,10 @@ func (p *Pool[T, U]) Start(ctx context.Context) {
 func (p *Pool[T, U]) startCollector(ctx context.Context) {
 	defer func() {
 		if r := recover(); r != nil {
-			slog.ErrorContext(ctx, "collector panicked", slogx.Panic(r), slogx.Stacktrace())
+			slog.ErrorContext(ctx, "restarting panicked collector", slogx.Panic(r), slogx.Stacktrace())
+			go p.startCollector(ctx)
+
+			return
 		}
 
 		// signal that collection has completed
@@ -129,8 +129,6 @@ func (p *Pool[T, U]) startWorker(ctx context.Context, wg *sync.WaitGroup) {
 
 		wg.Done()
 	}()
-
-	slog.InfoContext(ctx, "starting worker")
 
 	for {
 		select {

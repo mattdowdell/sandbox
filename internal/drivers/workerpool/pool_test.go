@@ -232,7 +232,7 @@ func Test_Pool_Start_CollectorPanicRecovered(t *testing.T) {
 		RunAndReturn(func(_ context.Context, value int) workerpool.Result[int] {
 			return workerpool.OK(value * 2)
 		}).
-		Once()
+		Twice()
 
 	collector := mockworkerpool.NewCollector[int](t)
 	collector.
@@ -241,6 +241,11 @@ func Test_Pool_Start_CollectorPanicRecovered(t *testing.T) {
 		RunAndReturn(func(_ workerpool.Result[int]) {
 			panic(1)
 		}).
+		Once()
+	collector.
+		EXPECT().
+		Collect(workerpool.OK(4)).
+		Return().
 		Once()
 
 	// use a single goroutine to show that a new worker is started on panic
@@ -255,7 +260,8 @@ func Test_Pool_Start_CollectorPanicRecovered(t *testing.T) {
 
 	// act
 	require.NoError(t, pool.Add(t.Context(), 1))
+	require.NoError(t, pool.Add(t.Context(), 2))
 
 	// assert
-	<-pool.Complete()
+	assert.NoError(t, pool.Wait(t.Context()))
 }

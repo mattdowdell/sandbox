@@ -10,17 +10,17 @@ import (
 )
 
 func Test_OK(t *testing.T) {
-	// arrange
+	// no arrange necessary
 
 	// act
 	result := workerpool.OK(5)
 
 	// assert
-	assert.Equal(t, 5, result.OK)
-	assert.NoError(t, result.Err)
-
 	assert.True(t, result.IsOK())
 	assert.False(t, result.IsErr())
+
+	assert.Equal(t, 5, result.OK)
+	assert.NoError(t, result.Err)
 }
 
 func Test_Err(t *testing.T) {
@@ -31,9 +31,9 @@ func Test_Err(t *testing.T) {
 	result := workerpool.Err[int](err)
 
 	// assert
-	assert.Empty(t, result.OK)
-	assert.EqualError(t, result.Err, "example")
-
 	assert.False(t, result.IsOK())
 	assert.True(t, result.IsErr())
+
+	assert.Empty(t, result.OK)
+	assert.EqualError(t, result.Err, "example")
 }
