@@ -69,12 +69,14 @@ jobs:
 
       - name: Commit diff
         run: |
-          if git diff --quiet -- .
+          # make sure new files are included in the diff
+          git add .
+
+          if git diff HEAD --quiet -- .
           then
             echo "regenerate found no changes"
             exit 0
           fi
 
-          git add .
           git commit -m "Regenerate code"
           git push
