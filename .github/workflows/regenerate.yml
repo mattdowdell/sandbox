@@ -38,11 +38,18 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
 
+      - name: Generate token
+        id: app-token
+        uses: actions/create-github-app-token@3ff1caaa28b64c9cc276ce0a02e2ff584f3900c5 # v2.0.2
+        with:
+          app-id: ${{ secrets.REGENERATE_APP_ID }}
+          private-key: ${{ secrets.REGENERATE_APP_PEM }}
+
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           ref: ${{ steps.ref.outputs.ref }}
-          token: ${{ secrets.REGENERATE_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
           persist-credentials: true
 
       - name: Setup checks
@@ -67,9 +74,6 @@ jobs:
             echo "regenerate found no changes"
             exit 0
           fi
-
-          # git config user.name "github-actions[bot]"
-          # git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add .
           git commit -m "Regenerate code"
