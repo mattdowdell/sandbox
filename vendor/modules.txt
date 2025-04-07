@@ -262,7 +262,7 @@ github.com/jackc/pgx/v5/stdlib
 ## explicit; go 1.19
 github.com/jackc/puddle/v2
 github.com/jackc/puddle/v2/internal/genstack
-# github.com/knadh/koanf/maps v0.1.1
+# github.com/knadh/koanf/maps v0.1.2
 ## explicit; go 1.18
 github.com/knadh/koanf/maps
 # github.com/knadh/koanf/parsers/json v0.1.0
