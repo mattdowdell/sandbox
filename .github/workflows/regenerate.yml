@@ -93,9 +93,9 @@ jobs:
           git push
 
       - name: Report failure
-        if: failure()
+        # if: failure()
         run: |
           echo gh pr comment '${{ github.event.issue.number }}' \
             --repo ${{ github.repository }} \
-            --body 'Regenerate failed. See the [logs](#todo) for more info.'
+            --body 'Regenerate failed. See the [logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs/${{ github.job }}) for more info.'
 
