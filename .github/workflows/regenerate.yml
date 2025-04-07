@@ -97,13 +97,13 @@ jobs:
           USER_ID: ${{ steps.user.outputs.id }}
 
       - name: Report failure
-        # if: failure()
+        if: failure()
         run: |
           url=`gh run --repo ${{ github.repository }} view ${{ github.run_id }} --json jobs --jq '.jobs[].url'`
 
           gh pr comment '${{ github.event.issue.number }}' \
             --repo ${{ github.repository }} \
-            --body 'Regenerate failed. See the [logs](${url}) for more info.'
+            --body "Regenerate failed. See the [logs](${url}) for more info."
         env:
           GH_TOKEN: ${{ github.token }}
 
