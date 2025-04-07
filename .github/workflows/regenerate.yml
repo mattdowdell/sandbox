@@ -104,4 +104,6 @@ jobs:
           gh pr comment '${{ github.event.issue.number }}' \
             --repo ${{ github.repository }} \
             --body 'Regenerate failed. See the [logs](${url}) for more info.'
+        env:
+          GH_TOKEN: ${{ github.token }}
 
