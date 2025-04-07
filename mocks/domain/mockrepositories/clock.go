@@ -66,6 +66,98 @@ func (_c *Clock_Now_Call) RunAndReturn(run func() time.Time) *Clock_Now_Call {
 	return _c
 }
 
+// Since provides a mock function with given fields: t
+func (_m *Clock) Since(t time.Time) time.Duration {
+	ret := _m.Called(t)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Since")
+	}
+
+	var r0 time.Duration
+	if rf, ok := ret.Get(0).(func(time.Time) time.Duration); ok {
+		r0 = rf(t)
+	} else {
+		r0 = ret.Get(0).(time.Duration)
+	}
+
+	return r0
+}
+
+// Clock_Since_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Since'
+type Clock_Since_Call struct {
+	*mock.Call
+}
+
+// Since is a helper method to define mock.On call
+//   - t time.Time
+func (_e *Clock_Expecter) Since(t interface{}) *Clock_Since_Call {
+	return &Clock_Since_Call{Call: _e.mock.On("Since", t)}
+}
+
+func (_c *Clock_Since_Call) Run(run func(t time.Time)) *Clock_Since_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(time.Time))
+	})
+	return _c
+}
+
+func (_c *Clock_Since_Call) Return(_a0 time.Duration) *Clock_Since_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Clock_Since_Call) RunAndReturn(run func(time.Time) time.Duration) *Clock_Since_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Until provides a mock function with given fields: t
+func (_m *Clock) Until(t time.Time) time.Duration {
+	ret := _m.Called(t)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Until")
+	}
+
+	var r0 time.Duration
+	if rf, ok := ret.Get(0).(func(time.Time) time.Duration); ok {
+		r0 = rf(t)
+	} else {
+		r0 = ret.Get(0).(time.Duration)
+	}
+
+	return r0
+}
+
+// Clock_Until_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Until'
+type Clock_Until_Call struct {
+	*mock.Call
+}
+
+// Until is a helper method to define mock.On call
+//   - t time.Time
+func (_e *Clock_Expecter) Until(t interface{}) *Clock_Until_Call {
+	return &Clock_Until_Call{Call: _e.mock.On("Until", t)}
+}
+
+func (_c *Clock_Until_Call) Run(run func(t time.Time)) *Clock_Until_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(time.Time))
+	})
+	return _c
+}
+
+func (_c *Clock_Until_Call) Return(_a0 time.Duration) *Clock_Until_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Clock_Until_Call) RunAndReturn(run func(time.Time) time.Duration) *Clock_Until_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewClock creates a new instance of Clock. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewClock(t interface {
