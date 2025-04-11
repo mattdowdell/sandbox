@@ -13,7 +13,7 @@ WORKDIR /go/src
 
 ARG TARGETOS TARGETARCH
 ARG SOURCE_DATE_EPOCH=0
-ARG GO_BUILD_ARGS
+ARG GO_BUILD_ARGS=
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=bind,target=. \
     set -eux; \
