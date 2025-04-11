@@ -13,6 +13,7 @@ import (
 
 	"github.com/mattdowdell/sandbox/gen/example/v1"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
+	"github.com/mattdowdell/sandbox/internal/domain/apperrors"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 	"github.com/mattdowdell/sandbox/mocks/adapters/mockexamplerpc"
 )
@@ -69,4 +70,60 @@ func Test_Handler_CreateResource_Success(t *testing.T) {
 
 	assert.Equal(t, expected, resp)
 	assert.NoError(t, err)
+}
+
+func Test_Handler_CreateResource_AlreadyExists(t *testing.T) {
+	// arrange
+	facade := mockexamplerpc.NewResourceFacade(t)
+	facade.
+		EXPECT().
+		Create(t.Context(), mock.AnythingOfType("*entities.Resource")).
+		Return(nil, apperrors.ErrAlreadyExists).
+		Once()
+
+	handler := examplerpc.New(
+		facade,
+		mockexamplerpc.NewAuditEventFacade(t),
+	)
+
+	req := connect.NewRequest(&examplev1.CreateResourceRequest{
+		Resource: &examplev1.ResourceCreate{
+			Name: testResourceName,
+		},
+	})
+
+	// act
+	resp, err := handler.CreateResource(t.Context(), req)
+
+	// assert
+	assert.Nil(t, resp)
+	assert.EqualError(t, err, "already_exists: resource name in use: example")
+}
+
+func Test_Handler_CreateResource_Internal(t *testing.T) {
+	// arrange
+	facade := mockexamplerpc.NewResourceFacade(t)
+	facade.
+		EXPECT().
+		Create(t.Context(), mock.AnythingOfType("*entities.Resource")).
+		Return(nil, apperrors.ErrInternal).
+		Once()
+
+	handler := examplerpc.New(
+		facade,
+		mockexamplerpc.NewAuditEventFacade(t),
+	)
+
+	req := connect.NewRequest(&examplev1.CreateResourceRequest{
+		Resource: &examplev1.ResourceCreate{
+			Name: testResourceName,
+		},
+	})
+
+	// act
+	resp, err := handler.CreateResource(t.Context(), req)
+
+	// assert
+	assert.Nil(t, resp)
+	assert.EqualError(t, err, "internal: internal error")
 }

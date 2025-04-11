@@ -5,17 +5,18 @@ import (
 	"errors"
 	"log/slog"
 
+	"github.com/mattdowdell/sandbox/internal/domain/apperrors"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 	"github.com/mattdowdell/sandbox/internal/domain/repositories"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
-// ...
+// UpdateResource provides the business logic for updating a resource.
 type UpdateResource struct {
 	clock repositories.Clock
 }
 
-// ...
+// NewUpdateResource creates a new UpdateResource.
 func NewUpdateResource(
 	clock repositories.Clock,
 ) *UpdateResource {
@@ -24,21 +25,37 @@ func NewUpdateResource(
 	}
 }
 
-// ...
+// Execute gets a single resource.
+//
+// If the resource ID does not exist, ErrNotFound is returned. If the resource name is already in
+// use, ErrAlreadyExists is returned. Any other failure will cause ErrInternal to be returned.
 func (u *UpdateResource) Execute(
 	ctx context.Context,
 	store repositories.Resource,
-	resource *entities.Resource,
+	changes *entities.Resource,
 ) (*entities.Resource, error) {
-	resource.Update(u.clock.Now())
+	changes.Update(u.clock.Now())
 
-	// TODO: handle conflict
-	if err := store.UpdateResource(ctx, resource); err != nil {
-		slog.ErrorContext(ctx, "failed to update resource", slogx.Err(err))
-		return nil, errors.New("internal error")
+	resource, err := store.UpdateResource(ctx, changes)
+	if err != nil {
+		switch {
+		case errors.Is(err, apperrors.ErrNotFound):
+			slog.InfoContext(ctx, "resource not found", slogx.Err(err))
+
+			return nil, apperrors.ErrNotFound
+
+		case errors.Is(err, apperrors.ErrAlreadyExists):
+			slog.InfoContext(ctx, "resource exists", slogx.Err(err))
+
+			return nil, apperrors.ErrAlreadyExists
+
+		default:
+			slog.ErrorContext(ctx, "failed to update resource", slogx.Err(err))
+
+			return nil, apperrors.ErrInternal
+		}
 	}
 
 	slog.InfoContext(ctx, "updated resource")
-
 	return resource, nil
 }

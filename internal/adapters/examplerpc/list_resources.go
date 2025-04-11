@@ -18,7 +18,7 @@ func (h *Handler) ListResources(
 ) (*connect.Response[examplev1.ListResourcesResponse], error) {
 	output, err := h.resource.List(ctx)
 	if err != nil {
-		slog.DebugContext(ctx, "usecase error", slogx.Err(err))
+		slog.DebugContext(ctx, "failed to list resources", slogx.Err(err))
 		return nil, ErrInternal
 	}
 

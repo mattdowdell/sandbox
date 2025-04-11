@@ -6,11 +6,11 @@ import (
 )
 
 // ...
-func ResourcesToDomain(inputs []model.Resources) []*entities.Resource {
+func ResourcesToDomain(inputs []*model.Resources) []*entities.Resource {
 	outputs := make([]*entities.Resource, 0, len(inputs))
 
 	for _, input := range inputs {
-		outputs = append(outputs, ResourceToDomain(&input))
+		outputs = append(outputs, ResourceToDomain(input))
 	}
 
 	return outputs
@@ -27,8 +27,8 @@ func ResourceToDomain(input *model.Resources) *entities.Resource {
 }
 
 // ...
-func ResourceFromDomain(input *entities.Resource) model.Resources {
-	return model.Resources{
+func ResourceFromDomain(input *entities.Resource) *model.Resources {
+	return &model.Resources{
 		ID:        input.ID,
 		Name:      input.Name,
 		CreatedAt: input.CreatedAt,

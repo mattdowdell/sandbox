@@ -6,47 +6,47 @@ buf := join(gopath, "bin", "buf-v1.51.0")
 
 [private]
 install-buf:
-    bingo get buf
+    {{ if path_exists(buf) == "true" { "" } else { "bingo get buf" } }}
 
 gci := join(gopath, "bin", "gci-v0.13.6")
 
 [private]
 install-gci:
-    bingo get gci
+    {{ if path_exists(gci) == "true" { "" } else { "bingo get gci" } }}
 
 gofumpt := join(gopath, "bin", "gofumpt-v0.7.0")
 
 [private]
 install-gofumpt:
-    bingo get gofumpt
+    {{ if path_exists(gofumpt) == "true" { "" } else { "bingo get gofumpt" } }}
 
 jet := join(gopath, "bin", "jet-v2.13.0")
 
 [private]
 install-jet:
-    bingo get jet
+    {{ if path_exists(jet) == "true" { "" } else { "bingo get jet" } }}
 
 mockery := join(gopath, "bin", "mockery-v2.53.3")
 
 [private]
 install-mockery:
-    bingo get mockery
+    {{ if path_exists(mockery) == "true" { "" } else { "bingo get mockery" } }}
 
 protoc-gen-connect-go := join(gopath, "bin", "protoc-gen-connect-go-v1.18.1")
 
 [private]
 install-protoc-gen-connect-go:
-    bingo get -l protoc-gen-connect-go
+    {{ if path_exists(protoc-gen-connect-go) == "true" { "" } else { "bingo get protoc-gen-connect-go -l" } }}
 
 protoc-gen-go := join(gopath, "bin", "protoc-gen-go-v1.36.6")
 
 [private]
 install-protoc-gen-go:
-    bingo get -l protoc-gen-go
+    {{ if path_exists(protoc-gen-go) == "true" { "" } else { "bingo get protoc-gen-go -l" } }}
 
 wire := join(gopath, "bin", "wire-v0.6.0")
 
 [private]
 install-wire:
-    bingo get wire
+    {{ if path_exists(wire) == "true" { "" } else { "bingo get wire" } }}
 

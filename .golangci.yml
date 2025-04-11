@@ -71,6 +71,9 @@ linters:
         - performance
         - experimental
         - opinionated
+    godot:
+      exclude:
+        - "^\\s*\\[.+?\\]:\\s+" # ignore markdown ref links
     sloglint:
       attr-only: true
       context: all

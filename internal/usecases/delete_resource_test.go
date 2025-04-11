@@ -1,0 +1,72 @@
+package usecases_test
+
+import (
+	"testing"
+
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/mattdowdell/sandbox/internal/domain/apperrors"
+	"github.com/mattdowdell/sandbox/internal/usecases"
+	"github.com/mattdowdell/sandbox/mocks/domain/mockrepositories"
+)
+
+func Test_NewDeleteResource(t *testing.T) {
+	// no arrange necessary
+
+	// act
+	usecase := usecases.NewDeleteResource()
+
+	// assert
+	assert.NotNil(t, usecase)
+}
+
+func Test_DeleteResource_Success(t *testing.T) {
+	// arrange
+	id := uuid.New()
+
+	usecase := usecases.NewDeleteResource()
+
+	store := mockrepositories.NewResource(t)
+	store.EXPECT().DeleteResource(t.Context(), id).Return(nil).Once()
+
+	// act
+	err := usecase.Execute(t.Context(), store, id)
+
+	// assert
+	assert.NoError(t, err)
+}
+
+func Test_DeleteResource_Error(t *testing.T) {
+	testCases := []struct {
+		name string
+		err  error
+	}{
+		{
+			name: "not found",
+			err:  apperrors.ErrNotFound,
+		},
+		{
+			name: "internal",
+			err:  apperrors.ErrInternal,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// arrange
+			id := uuid.New()
+
+			usecase := usecases.NewDeleteResource()
+
+			store := mockrepositories.NewResource(t)
+			store.EXPECT().DeleteResource(t.Context(), id).Return(tc.err).Once()
+
+			// act
+			err := usecase.Execute(t.Context(), store, id)
+
+			// assert
+			assert.ErrorIs(t, err, tc.err)
+		})
+	}
+}

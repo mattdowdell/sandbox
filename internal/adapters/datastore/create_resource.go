@@ -2,9 +2,13 @@ package datastore
 
 import (
 	"context"
+	"fmt"
+
+	"github.com/jackc/pgerrcode"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/modelhelpers"
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/postgres/public/table"
+	"github.com/mattdowdell/sandbox/internal/domain/apperrors"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 )
 
@@ -22,7 +26,11 @@ func (d *Datastore) CreateResource(ctx context.Context, resource *entities.Resou
 		MODEL(m)
 
 	if _, err := stmt.ExecContext(ctx, d.db); err != nil {
-		return err
+		if isPgErr(err, pgerrcode.UniqueViolation) {
+			return fmt.Errorf("%w: %w", apperrors.ErrAlreadyExists, err)
+		}
+
+		return fmt.Errorf("%w: %w", apperrors.ErrInternal, err)
 	}
 
 	return nil
