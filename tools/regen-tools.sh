@@ -17,13 +17,15 @@ do
 	echo
 	echo "[private]"
 	echo "install-${tool}:"
+
+	# use symlink for protoc plugins
+	# avoids needing to maintain versions in buf.gen.yaml
 	if [[ "$tool" == protoc-gen-* ]]
 	then
-		# use symlink for protoc plugins
-		# avoids needing to maintain versions in buf.gen.yaml
-		echo "    bingo get -l ${tool}"
+		echo "    {{ if path_exists(${tool}) == \"true\" { \"\" } else { \"bingo get ${tool} -l\" } }}"
 	else
-		echo "    bingo get ${tool}"
+		echo "    {{ if path_exists(${tool}) == \"true\" { \"\" } else { \"bingo get ${tool}\" } }}"
 	fi
+
 	echo
 done

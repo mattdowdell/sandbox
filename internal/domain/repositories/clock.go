@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-// ...
+// Clock implementations provide the current time and operations based on the current time.
 type Clock interface {
 	// Now returns the current time in UTC.
 	Now() time.Time

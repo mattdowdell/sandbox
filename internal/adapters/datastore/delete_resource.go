@@ -2,11 +2,13 @@ package datastore
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-jet/jet/v2/postgres"
 	"github.com/google/uuid"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/postgres/public/table"
+	"github.com/mattdowdell/sandbox/internal/domain/apperrors"
 )
 
 // ...
@@ -15,9 +17,24 @@ func (d *Datastore) DeleteResource(ctx context.Context, id uuid.UUID) error {
 		DELETE().
 		WHERE(table.Resources.ID.EQ(postgres.UUID(id)))
 
-	if _, err := stmt.ExecContext(ctx, d.db); err != nil {
+	result, err := stmt.ExecContext(ctx, d.db)
+	if err != nil {
 		return err
 	}
 
-	return nil
+	count, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("%w: %w", apperrors.ErrInternal, err)
+	}
+
+	switch count {
+	case 0:
+		return fmt.Errorf("%w: %s", apperrors.ErrNotFound, id)
+
+	case 1:
+		return nil
+
+	default:
+		return fmt.Errorf("%w: too many deletes: %d", apperrors.ErrInternal, count)
+	}
 }
