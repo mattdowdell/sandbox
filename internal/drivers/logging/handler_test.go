@@ -1,7 +1,6 @@
 package logging_test
 
 import (
-	"io"
 	"log/slog"
 	"testing"
 
@@ -12,10 +11,7 @@ import (
 
 func Test_Handler_WithAttrs(t *testing.T) {
 	// arrange
-	handler := logging.Wrap(
-		slog.NewTextHandler(io.Discard, nil /*opts*/),
-		nil, /*extractors*/
-	)
+	handler := logging.Wrap(slog.DiscardHandler, nil /*extractors*/)
 
 	// act
 	h := handler.WithAttrs([]slog.Attr{
@@ -28,10 +24,7 @@ func Test_Handler_WithAttrs(t *testing.T) {
 
 func Test_Handler_WithGroup(t *testing.T) {
 	// arrange
-	handler := logging.Wrap(
-		slog.NewTextHandler(io.Discard, nil /*opts*/),
-		nil, /*extractors*/
-	)
+	handler := logging.Wrap(slog.DiscardHandler, nil /*extractors*/)
 
 	// act
 	h := handler.WithGroup("example")

@@ -52,10 +52,10 @@ func collectHandlers(
 // [google/wire#207]: https://github.com/google/wire/issues/207
 func collectInterceptors(
 	validat *validate.Interceptor,
-	otelconnect *otelconnect.Interceptor,
+	otelconnec *otelconnect.Interceptor,
 ) []connect.Interceptor {
 	return []connect.Interceptor{
-		otelconnect,
+		otelconnec,
 		validat,
 	}
 }
