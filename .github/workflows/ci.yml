@@ -29,7 +29,15 @@ jobs:
 
       - name: Size
         id: size
-        uses: mattdowdell/pr-sizer@45266d54471a64e7698eac319d2ee8b6cb13cc3d # v0.1.0
+        uses: mattdowdell/pr-sizer@main # v0.1.0
+        with:
+          # temp test whether case-insensitive labels work
+          xs-label: size/xs
+          s-label: size/s
+          m-label: size/m
+          l-label: size/l
+          xl-label: size/xl
+          xxl-label: size/xxl
 
       - name: Outputs
         run: |
