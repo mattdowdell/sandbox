@@ -1,12 +1,15 @@
 # https://github.com/github-linguist/linguist/blob/main/docs/overrides.md
 
 # generated files
-go.sum                             linguist-generated
+*.sum                              linguist-generated
 buf.lock                           linguist-generated
 wire_gen.go                        linguist-generated
 gen/example/**                     linguist-generated
 mocks/**                           linguist-generated
 internal/adapters/datastore/models linguist-generated
+.tools.just                        linguist-generated
+.bingo/Variables.mk                linguist-generated
+.bingo/variables.env               linguist-generated
 
 # vendored files
 vendor/** linguist-vendored

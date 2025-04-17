@@ -1,10 +1,14 @@
 # https://just.systems/man/en/
 
+import '.tools.just'
+
 is_docker := path_exists("/.dockerenv")
 db_host := if is_docker == "true" { "postgres" } else { "localhost" }
 db_port := "5432"
 db_user := "postgres"
 db_pass := "secret"
+export BUILDKIT_PROGRESS := "plain"
+now := shell("date +%s")
 
 [private]
 default:
@@ -55,9 +59,9 @@ checks: tidy vendor gen fmt
 tidy: tidy-buf tidy-go
 
 # Tidy Protobuf dependencies.
-tidy-buf:
-    buf dep prune
-    buf dep update
+tidy-buf: install-buf
+    {{ buf }} dep prune
+    {{ buf }} dep update
 
 # Tidy Go dependencies
 tidy-go:
@@ -70,23 +74,17 @@ vendor: vendor-go
 vendor-go:
     go mod vendor
 
-# Install go tools.
-install-tools:
-    cat tools.go | grep _ | awk -F'"' '{print $2}' | xargs -tI % go install %
-    @# TODO: provide via tools.go; currently depends on outdated protovalidate-go
-    go install github.com/bufbuild/buf/cmd/buf@latest
-
 # Run all formatters.
 fmt: fmt-buf fmt-go fmt-just
 
 # Run the Protobuf formatter.
-fmt-buf:
-    buf format --config buf.yaml --write
+fmt-buf: install-buf
+    {{ buf }} format --config buf.yaml --write
 
 # Run the Go formatter.
-fmt-go:
-    gofumpt -l -w .
-    gci write \
+fmt-go: install-gofumpt install-gci
+    {{ gofumpt }} -l -w .
+    {{ gci }} write \
         --skip-vendor \
         --skip-generated \
         -s standard \
@@ -99,18 +97,18 @@ fmt-just:
     just --unstable --fmt
 
 # Run all code generators.
-gen: gen-buf gen-go
+gen: gen-buf gen-go gen-just
 
 # Run the Protobuf generator.
-gen-buf:
-    buf generate --clean --config buf.yaml
+gen-buf: install-buf install-protoc-gen-connect-go install-protoc-gen-go
+    {{ buf }} generate --clean --config buf.yaml
 
 # Run the Go generators.
 gen-go: gen-go-jet gen-go-mockery gen-go-wire
 
 # Run the Go jet generator
-gen-go-jet:
-    jet \
+gen-go-jet: install-jet
+    {{ jet }} \
         -source=postgres \
         -host={{ db_host }} \
         -port={{ db_port }} \
@@ -120,13 +118,17 @@ gen-go-jet:
         -path ./internal/adapters/datastore/models/
 
 # Run the Go mockery generator.
-gen-go-mockery:
+gen-go-mockery: install-mockery
     rm -rf mocks/
-    mockery
+    {{ mockery }}
 
 # Run the Go wire generator.
-gen-go-wire:
-    wire gen ./cmd/...
+gen-go-wire: install-wire
+    {{ wire }} gen ./cmd/...
+
+# Run the justfile generator.
+gen-just:
+    ./tools/regen-tools.sh > .tools.just
 
 # Check for uncommitted changes.
 [private]
@@ -137,8 +139,8 @@ dirty:
 lint: lint-buf lint-go
 
 # Run the Protobuf linter.
-lint-buf:
-    buf lint --config buf.yaml
+lint-buf: install-buf
+    {{ buf }} lint --config buf.yaml
 
 # Run the Go linter.
 lint-go:
@@ -152,23 +154,39 @@ lint-fix-go:
     golangci-lint run --fix
 
 # Run the Go unit tests.
-unit:
-    go test -count=1 -cover ./...
+unit timeout="30s":
+    go test -timeout={{ timeout }} -count=1 -cover -coverprofile=cover.out ./internal/... ./pkg/...
+    @echo "Total coverage: `go tool cover -func=cover.out | tail -n 1 | awk '{print $3}'`"
+    go tool cover -html cover.out -o cover.html
+
+# Summarise functional test coverage.
+functional-cover:
+    go tool covdata textfmt -i=.covdata -o functional.out
+    @echo "Total coverage: `go tool cover -func=cover.out | tail -n 1 | awk '{print $3}'`"
+    go tool cover -html functional.out -o functional.html
+
+# Delete functional test coverage artifacts.
+functional-cover-clean:
+    rm -f .covdata/cov*
 
 # Scan the repository for issues.
 scan: scan-gitleaks scan-trivy scan-zizmor
 
 # Scan the repository for secrets with Gitleaks.
 scan-gitleaks:
-    gitleaks dir
+    gitleaks dir --verbose
 
 # Scan the repository for issues using Trivy.
 scan-trivy:
-    trivy fs --config trivy.yaml .
+    trivy fs .
 
 # Scan actions and workflows using Zizmor.
 scan-zizmor:
     zizmor --persona pedantic .github/actions/*/*.yml .github/workflows/*.yml
+
+# Build all binaries.
+build:
+    CGO_ENABLED=0 go build -trimpath -ldflags="-buildid= -s -w" -o ./dist/ ./cmd/...;
 
 # Exec into the database.
 db-exec:
@@ -185,16 +203,20 @@ db-seed:
         --file ./tools/seed.sql
 
 # Build all containers.
-container-build: container-build-rpc
+container-build go_build_args="": (container-build-rpc go_build_args)
 
 # Build the example-rpc container.
-container-build-rpc: (_container-build "example-rpc")
+container-build-rpc go_build_args="": (_container-build "example-rpc" go_build_args)
 
 [private]
-_container-build service:
-    docker buildx build \
+_container-build service go_build_args="":
+    SOURCE_DATE_EPOCH=0 docker buildx build \
+        --pull \
         --target runtime \
         --build-arg SERVICE={{ service }} \
+        --build-arg SOURCE_DATE_EPOCH=0 \
+        --build-arg GO_BUILD_ARGS="{{ go_build_args }}" \
+        --tag {{ service }}:{{ now }} \
         --tag {{ service }}:local \
         .
 

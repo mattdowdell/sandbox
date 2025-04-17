@@ -2,14 +2,14 @@ package examplerpc
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 
 	"connectrpc.com/connect"
 
 	"github.com/mattdowdell/sandbox/gen/example/v1"
-	"github.com/mattdowdell/sandbox/internal/adapters/common"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc/models"
-	"github.com/mattdowdell/sandbox/internal/domain/entities"
+	"github.com/mattdowdell/sandbox/internal/domain/apperrors"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
@@ -24,12 +24,20 @@ func (h *Handler) UpdateResource(
 		return nil, ErrInternal
 	}
 
-	output, err := common.TxValue(ctx, h.provider, func(ds common.Datastore) (*entities.Resource, error) {
-		return h.resourceCreator.Execute(ctx, ds, input)
-	})
+	output, err := h.resource.Update(ctx, input)
 	if err != nil {
 		slog.DebugContext(ctx, "failed to update resource", slogx.Err(err))
-		return nil, ErrInternal // TODO: use more granular errors
+
+		switch {
+		case errors.Is(err, apperrors.ErrNotFound):
+			return nil, ErrResourceNotFound(input.ID)
+
+		case errors.Is(err, apperrors.ErrAlreadyExists):
+			return nil, ErrResourceAlreadyExists(input.Name)
+
+		default:
+			return nil, ErrInternal
+		}
 	}
 
 	return connect.NewResponse(&examplev1.UpdateResourceResponse{

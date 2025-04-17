@@ -1,8 +1,10 @@
 package pgsql
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+	"net"
 	"strings"
 	"time"
 
@@ -17,11 +19,13 @@ import (
 // ...
 type Config struct {
 	Hostname     string        `koanf:"hostname"`
-	Port         uint16        `koanf:"port" default:"5432"`
+	Port         string        `koanf:"port" default:"5432"`
 	Username     string        `koanf:"username"`
 	Password     string        `koanf:"password"`
+	UseIAMAuth   bool          `koanf:"useiamauth"`
 	Name         string        `koanf:"name"`
 	SSLMode      string        `koanf:"sslmode" default:"verify-full"`
+	Region       string        `koanf:"region"`
 	MaxIdleTime  time.Duration `koanf:"maxidletime" default:"5m"`
 	MaxLifetime  time.Duration `koanf:"maxlifetime" default:"5m"`
 	MaxIdleConns int           `koanf:"maxidleconns"`
@@ -36,14 +40,20 @@ func (c *Config) toOptions() []Option {
 		options = append(options, WithPassword(c.Password))
 	}
 
+	if c.UseIAMAuth {
+		endpoint := net.JoinHostPort(c.Hostname, c.Port)
+		options = append(options, WithIAMAuth(endpoint, c.Region, c.Username))
+	}
+
 	return options
 }
 
 // ...
 //
 //nolint:gocritic // called once, little gain from passing by pointer
-func NewFromConfig(conf Config) (*sql.DB, error) {
+func NewFromConfig(ctx context.Context, conf Config) (*sql.DB, error) {
 	return New(
+		ctx,
 		conf.Hostname,
 		conf.Port,
 		conf.Username,
@@ -55,8 +65,9 @@ func NewFromConfig(conf Config) (*sql.DB, error) {
 
 // ...
 func New(
+	ctx context.Context,
 	host string,
-	port uint16,
+	port string,
 	user string,
 	name string,
 	sslmode string,
@@ -64,7 +75,9 @@ func New(
 ) (*sql.DB, error) {
 	opts := defaultOptions()
 	for _, option := range options {
-		option.apply(opts)
+		if err := option.apply(ctx, opts); err != nil {
+			return nil, fmt.Errorf("failed to create db: %w", err)
+		}
 	}
 
 	if err := opts.validate(); err != nil {
@@ -116,14 +129,14 @@ func New(
 // ...
 func makeDSN(
 	host string,
-	port uint16,
+	port string,
 	user string,
 	password string,
 	name string,
 	sslmode string,
 ) string {
 	return fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 		host,
 		port,
 		user,

@@ -23,3 +23,12 @@ go.work.sum
 
 # MacOS artifacts
 .DS_Store
+
+# Build oututs
+dist/
+
+# Coverage outputs
+cover.html
+.covdata/**
+!.covdata/.gitkeep
+functional.html

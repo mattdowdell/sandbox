@@ -7,7 +7,7 @@ import (
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 )
 
-// ...
+// ResourcesFromDomain converts multiple audit events into the equivalent Protobuf messages.
 func AuditEventsFromDomain(input []*entities.AuditEvent) []*examplev1.AuditEvent {
 	output := make([]*examplev1.AuditEvent, 0, len(input))
 
@@ -18,7 +18,7 @@ func AuditEventsFromDomain(input []*entities.AuditEvent) []*examplev1.AuditEvent
 	return output
 }
 
-// ...
+// ResourcesFromDomain converts an audit event into the equivalent Protobuf message.
 func AuditEventFromDomain(input *entities.AuditEvent) *examplev1.AuditEvent {
 	return &examplev1.AuditEvent{
 		Id:           input.ID.String(),
@@ -30,7 +30,10 @@ func AuditEventFromDomain(input *entities.AuditEvent) *examplev1.AuditEvent {
 	}
 }
 
-// ...
+// operationFromDomain converts an operation into the equivalent Protobuf enum variant.
+//
+// Unknown values are not rejected under the assumption that invalid results will be rejected by
+// Protobuf validation.
 func operationFromDomain(input entities.Operation) examplev1.Operation {
 	switch input {
 	case entities.OperationCreated:
@@ -47,7 +50,10 @@ func operationFromDomain(input entities.Operation) examplev1.Operation {
 	}
 }
 
-// ...
+// resourceTypeFromDomain converts a resource type into the equivalent Protobuf enum variant.
+//
+// Unknown values are not rejected under the assumption that invalid results will be rejected by
+// Protobuf validation.
 func resourceTypeFromDomain(input entities.ResourceType) string {
 	switch input {
 	case entities.ResourceTypeResource:

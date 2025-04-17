@@ -2,10 +2,12 @@ package datastore
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/modelhelpers"
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/postgres/public/model"
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/postgres/public/table"
+	"github.com/mattdowdell/sandbox/internal/domain/apperrors"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 )
 
@@ -20,9 +22,9 @@ func (d *Datastore) ListResources(ctx context.Context) ([]*entities.Resource, er
 		).
 		ORDER_BY(table.Resources.ID.ASC())
 
-	var resources []model.Resources
+	var resources []*model.Resources
 	if err := stmt.QueryContext(ctx, d.db, &resources); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: %w", apperrors.ErrInternal, err)
 	}
 
 	return modelhelpers.ResourcesToDomain(resources), nil

@@ -7,16 +7,16 @@
 # Base target
 # -----------
 
-FROM mirror.gcr.io/golang:1.24-bookworm@sha256:b970e6d47c09fdd34179acef5c4fecaf6410f0b597a759733b3cbea04b4e604a AS base
+FROM mirror.gcr.io/golang:1.24-bookworm@sha256:00eccd446e023d3cd9566c25a6e6a02b90db3e1e0bbe26a48fc29cd96e800901 AS base
 
 # ------------
 # Dependencies
 # ------------
 
-FROM ghcr.io/gitleaks/gitleaks:v8.24.0@sha256:2bcceac45179b3a91bff11a824d0fb952585b429e54fc928728b1d4d5c3e5176 AS gitleaks
-FROM mirror.gcr.io/golangci/golangci-lint:v1.64.5@sha256:9faef4dda4304c4790a14c5b8c8cd8c2715a8cb754e13f61d8ceaa358f5a454a AS golangci-lint
-FROM ghcr.io/aquasecurity/trivy:0.59.1@sha256:029e990b328d149bf0a9ffe355919041e1f86192db2df47e217f8a36dd42ceac AS trivy
-FROM ghcr.io/woodruffw/zizmor:1.4.1@sha256:dbd8fffd06c51b0ea80dff6115547a0b4fe97fc67785d82f198ecf36d8a32ebe AS zizmor
+FROM ghcr.io/gitleaks/gitleaks:v8.24.3@sha256:e1b35e12a8c6fa8901f060459cfb6b2fc4c484d3afbe3b029733a3bbfab07055 AS gitleaks
+FROM mirror.gcr.io/golangci/golangci-lint:v2.1.1@sha256:99f0436251a88d55b4e68441ac58dc4a6f387cc928430dcd83610bca28cbee78 AS golangci-lint
+FROM ghcr.io/aquasecurity/trivy:0.61.0@sha256:6967db29ce5294d054121e94b3cb1262de858af63b4547bb1bade66a4306f2e4 AS trivy
+FROM ghcr.io/woodruffw/zizmor:1.5.2@sha256:f0bbe68825022e3336389e754d4c8a28928246275e9c549251997f25318896f1 AS zizmor
 
 
 # -------------
@@ -51,6 +51,9 @@ COPY --from=gitleaks /usr/bin/gitleaks /usr/bin/gitleaks
 COPY --from=golangci-lint /usr/bin/golangci-lint /usr/bin/golangci-lint
 COPY --from=trivy /usr/local/bin/trivy /usr/bin/trivy
 COPY --from=zizmor /app/zizmor /usr/bin/zizmor
+
+RUN set -eux; \
+    go install github.com/bwplotka/bingo@latest;
 
 WORKDIR /home/dev/ws
 

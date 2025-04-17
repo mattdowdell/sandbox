@@ -2,12 +2,14 @@ package examplerpc
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 
 	"connectrpc.com/connect"
 
 	"github.com/mattdowdell/sandbox/gen/example/v1"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc/models"
+	"github.com/mattdowdell/sandbox/internal/domain/apperrors"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
@@ -22,9 +24,14 @@ func (h *Handler) GetResource(
 		return nil, ErrInternal
 	}
 
-	output, err := h.resourceGetter.Execute(ctx, h.provider.Datastore(), id)
+	output, err := h.resource.Get(ctx, id)
 	if err != nil {
-		slog.DebugContext(ctx, "usecase error", slogx.Err(err))
+		slog.DebugContext(ctx, "failed to get resource", slogx.Err(err))
+
+		if errors.Is(err, apperrors.ErrNotFound) {
+			return nil, ErrResourceNotFound(id)
+		}
+
 		return nil, ErrInternal
 	}
 

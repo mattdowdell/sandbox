@@ -51,6 +51,8 @@ const (
 const (
 	// HealthCheckProcedure is the fully-qualified name of the Health's Check RPC.
 	HealthCheckProcedure = "/grpc.health.v1.Health/Check"
+	// HealthListProcedure is the fully-qualified name of the Health's List RPC.
+	HealthListProcedure = "/grpc.health.v1.Health/List"
 	// HealthWatchProcedure is the fully-qualified name of the Health's Watch RPC.
 	HealthWatchProcedure = "/grpc.health.v1.Health/Watch"
 )
@@ -64,9 +66,19 @@ type HealthClient interface {
 	//
 	// Clients should set a deadline when calling Check, and can declare the
 	// server unhealthy if they do not receive a timely response.
-	//
-	// Check implementations should be idempotent and side effect free.
 	Check(context.Context, *connect.Request[v1.HealthCheckRequest]) (*connect.Response[v1.HealthCheckResponse], error)
+	// List provides a non-atomic snapshot of the health of all the available
+	// services.
+	//
+	// The server may respond with a RESOURCE_EXHAUSTED error if too many services
+	// exist.
+	//
+	// Clients should set a deadline when calling List, and can declare the server
+	// unhealthy if they do not receive a timely response.
+	//
+	// Clients should keep in mind that the list of health services exposed by an
+	// application can change over the lifetime of the process.
+	List(context.Context, *connect.Request[v1.HealthListRequest]) (*connect.Response[v1.HealthListResponse], error)
 	// Performs a watch for the serving status of the requested service.
 	// The server will immediately send back a message indicating the current
 	// serving status.  It will then subsequently send a new message whenever
@@ -102,6 +114,12 @@ func NewHealthClient(httpClient connect.HTTPClient, baseURL string, opts ...conn
 			connect.WithSchema(healthMethods.ByName("Check")),
 			connect.WithClientOptions(opts...),
 		),
+		list: connect.NewClient[v1.HealthListRequest, v1.HealthListResponse](
+			httpClient,
+			baseURL+HealthListProcedure,
+			connect.WithSchema(healthMethods.ByName("List")),
+			connect.WithClientOptions(opts...),
+		),
 		watch: connect.NewClient[v1.HealthCheckRequest, v1.HealthCheckResponse](
 			httpClient,
 			baseURL+HealthWatchProcedure,
@@ -114,12 +132,18 @@ func NewHealthClient(httpClient connect.HTTPClient, baseURL string, opts ...conn
 // healthClient implements HealthClient.
 type healthClient struct {
 	check *connect.Client[v1.HealthCheckRequest, v1.HealthCheckResponse]
+	list  *connect.Client[v1.HealthListRequest, v1.HealthListResponse]
 	watch *connect.Client[v1.HealthCheckRequest, v1.HealthCheckResponse]
 }
 
 // Check calls grpc.health.v1.Health.Check.
 func (c *healthClient) Check(ctx context.Context, req *connect.Request[v1.HealthCheckRequest]) (*connect.Response[v1.HealthCheckResponse], error) {
 	return c.check.CallUnary(ctx, req)
+}
+
+// List calls grpc.health.v1.Health.List.
+func (c *healthClient) List(ctx context.Context, req *connect.Request[v1.HealthListRequest]) (*connect.Response[v1.HealthListResponse], error) {
+	return c.list.CallUnary(ctx, req)
 }
 
 // Watch calls grpc.health.v1.Health.Watch.
@@ -136,9 +160,19 @@ type HealthHandler interface {
 	//
 	// Clients should set a deadline when calling Check, and can declare the
 	// server unhealthy if they do not receive a timely response.
-	//
-	// Check implementations should be idempotent and side effect free.
 	Check(context.Context, *connect.Request[v1.HealthCheckRequest]) (*connect.Response[v1.HealthCheckResponse], error)
+	// List provides a non-atomic snapshot of the health of all the available
+	// services.
+	//
+	// The server may respond with a RESOURCE_EXHAUSTED error if too many services
+	// exist.
+	//
+	// Clients should set a deadline when calling List, and can declare the server
+	// unhealthy if they do not receive a timely response.
+	//
+	// Clients should keep in mind that the list of health services exposed by an
+	// application can change over the lifetime of the process.
+	List(context.Context, *connect.Request[v1.HealthListRequest]) (*connect.Response[v1.HealthListResponse], error)
 	// Performs a watch for the serving status of the requested service.
 	// The server will immediately send back a message indicating the current
 	// serving status.  It will then subsequently send a new message whenever
@@ -170,6 +204,12 @@ func NewHealthHandler(svc HealthHandler, opts ...connect.HandlerOption) (string,
 		connect.WithSchema(healthMethods.ByName("Check")),
 		connect.WithHandlerOptions(opts...),
 	)
+	healthListHandler := connect.NewUnaryHandler(
+		HealthListProcedure,
+		svc.List,
+		connect.WithSchema(healthMethods.ByName("List")),
+		connect.WithHandlerOptions(opts...),
+	)
 	healthWatchHandler := connect.NewServerStreamHandler(
 		HealthWatchProcedure,
 		svc.Watch,
@@ -180,6 +220,8 @@ func NewHealthHandler(svc HealthHandler, opts ...connect.HandlerOption) (string,
 		switch r.URL.Path {
 		case HealthCheckProcedure:
 			healthCheckHandler.ServeHTTP(w, r)
+		case HealthListProcedure:
+			healthListHandler.ServeHTTP(w, r)
 		case HealthWatchProcedure:
 			healthWatchHandler.ServeHTTP(w, r)
 		default:
@@ -193,6 +235,10 @@ type UnimplementedHealthHandler struct{}
 
 func (UnimplementedHealthHandler) Check(context.Context, *connect.Request[v1.HealthCheckRequest]) (*connect.Response[v1.HealthCheckResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("grpc.health.v1.Health.Check is not implemented"))
+}
+
+func (UnimplementedHealthHandler) List(context.Context, *connect.Request[v1.HealthListRequest]) (*connect.Response[v1.HealthListResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("grpc.health.v1.Health.List is not implemented"))
 }
 
 func (UnimplementedHealthHandler) Watch(context.Context, *connect.Request[v1.HealthCheckRequest], *connect.ServerStream[v1.HealthCheckResponse]) error {

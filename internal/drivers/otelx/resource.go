@@ -25,7 +25,7 @@ func newResource() (*resource.Resource, error) {
 
 	info, ok := debug.ReadBuildInfo()
 	if ok {
-		// TODO: will only start working in Go 1.24 with `go build`
+		// requires go 1.24+ and -buildvcs=true
 		version = info.Main.Version
 	}
 

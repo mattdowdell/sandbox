@@ -6,7 +6,6 @@ import (
 	"connectrpc.com/connect"
 
 	"github.com/mattdowdell/sandbox/gen/example/v1/examplev1connect"
-	"github.com/mattdowdell/sandbox/internal/adapters/common"
 )
 
 // Non-allocating compile-time check for interface implementation.
@@ -14,36 +13,18 @@ var _ examplev1connect.ExampleServiceHandler = (*Handler)(nil)
 
 // Handler implements the ExampleService RPC.
 type Handler struct {
-	provider          common.Provider
-	resourceCreator   ResourceCreator
-	resourceGetter    ResourceGetter
-	resourceLister    ResourceLister
-	resourceUpdater   ResourceUpdater
-	resourceDeleter   ResourceDeleter
-	auditEventLister  AuditEventLister
-	auditEventWatcher AuditEventWatcher
+	resource   ResourceFacade
+	auditEvent AuditEventFacade
 }
 
 // New creates a new Handler.
 func New(
-	provider common.Provider,
-	resourceCreator ResourceCreator,
-	resourceGetter ResourceGetter,
-	resourceLister ResourceLister,
-	resourceUpdater ResourceUpdater,
-	resourceDeleter ResourceDeleter,
-	auditEventLister AuditEventLister,
-	auditEventWatcher AuditEventWatcher,
+	resource ResourceFacade,
+	auditEvent AuditEventFacade,
 ) *Handler {
 	return &Handler{
-		provider:          provider,
-		resourceCreator:   resourceCreator,
-		resourceGetter:    resourceGetter,
-		resourceLister:    resourceLister,
-		resourceUpdater:   resourceUpdater,
-		resourceDeleter:   resourceDeleter,
-		auditEventLister:  auditEventLister,
-		auditEventWatcher: auditEventWatcher,
+		resource:   resource,
+		auditEvent: auditEvent,
 	}
 }
 

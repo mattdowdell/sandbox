@@ -10,4 +10,6 @@ description = "Global allow list"
 paths = [
 	# Ignore Trivy database downloaded during CI
 	'''\.cache/trivy/db/trivy\.db''',
+	# Ignore bingo go.sum files
+	'''\.bingo/\S+.sum''',
 ]

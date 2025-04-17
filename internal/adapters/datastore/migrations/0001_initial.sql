@@ -3,7 +3,7 @@
 -- For storing resource data.
 CREATE TABLE resources (
 	id UUID PRIMARY KEY,
-	name TEXT NOT NULL,
+	name TEXT NOT NULL UNIQUE,
 	created_at TIMESTAMPTZ (0) NOT NULL,
 	updated_at TIMESTAMPTZ (0) NOT NULL
 );

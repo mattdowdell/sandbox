@@ -1,6 +1,3 @@
 # https://docs.docker.com/reference/dockerfile/
 
-FROM ghcr.io/gitleaks/gitleaks:v8.24.0@sha256:2bcceac45179b3a91bff11a824d0fb952585b429e54fc928728b1d4d5c3e5176
-
-RUN adduser -D gitleaks
-USER gitleaks
+FROM ghcr.io/gitleaks/gitleaks:v8.24.3@sha256:e1b35e12a8c6fa8901f060459cfb6b2fc4c484d3afbe3b029733a3bbfab07055

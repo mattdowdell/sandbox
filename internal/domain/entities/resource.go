@@ -17,11 +17,11 @@ type Resource struct {
 // ...
 func (r *Resource) Init(id uuid.UUID, now time.Time) {
 	r.ID = id
-	r.CreatedAt = now
-	r.UpdatedAt = now
+	r.CreatedAt = now.Round(time.Second)
+	r.UpdatedAt = now.Round(time.Second)
 }
 
 // ...
 func (r *Resource) Update(now time.Time) {
-	r.UpdatedAt = now
+	r.UpdatedAt = now.Round(time.Second)
 }

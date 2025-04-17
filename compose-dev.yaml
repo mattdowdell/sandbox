@@ -2,11 +2,12 @@
 
 services:
   dev:
-    image: example-dev:local
+    image: "ghcr.io/mattdowdell/sandbox/example-dev:local"
     build:
       context: .
       target: dev
       dockerfile: Dockerfile.dev
+      pull: true
     init: true
     hostname: example-dev
     volumes:
