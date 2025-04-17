@@ -7,8 +7,7 @@ wire_gen.go                        linguist-generated
 gen/example/**                     linguist-generated
 mocks/**                           linguist-generated
 internal/adapters/datastore/models linguist-generated
-# temp test whether setting attr to true works
-.tools.just                        linguist-generated=true
+.tools.just                        linguist-generated
 .bingo/Variables.mk                linguist-generated
 .bingo/variables.env               linguist-generated
 
