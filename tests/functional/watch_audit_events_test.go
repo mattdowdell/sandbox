@@ -1,5 +1,6 @@
 package functional_test
 
+/*
 import (
 	"github.com/stretchr/testify/suite"
 )
@@ -23,3 +24,4 @@ func (s *WatchAuditEvents) Test_InvalidArgument() {}
 func (s *WatchAuditEvents) Test_PermissionDenied() {}
 
 func (s *WatchAuditEvents) Test_Unauthenticated() {}
+*/

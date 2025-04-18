@@ -30,10 +30,10 @@ func (h *Handler) UpdateResource(
 
 		switch {
 		case errors.Is(err, apperrors.ErrNotFound):
-			return nil, ErrResourceNotFound(input.ID)
+			return nil, ErrResourceNotFound
 
 		case errors.Is(err, apperrors.ErrAlreadyExists):
-			return nil, ErrResourceAlreadyExists(input.Name)
+			return nil, ErrResourceAlreadyExists
 
 		default:
 			return nil, ErrInternal

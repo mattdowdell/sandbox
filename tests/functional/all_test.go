@@ -38,26 +38,22 @@ Key requirements:
 
 var opts = godog.Options{}
 
+//nolint:gochecknoinits // only way to configure flags
 func init() {
 	godog.BindFlags("godog.", flag.CommandLine, &opts)
 }
 
-func TestFeatures(t *testing.T) {
+func TestCreateResource(t *testing.T) {
 	o := opts
 	o.TestingT = t
 
-	status := godog.TestSuite{
-		Name:                 "create_resource",
-		Options:              &o,
-		// TestSuiteInitializer: InitializeTestSuite,
-		ScenarioInitializer:  InitializeScenario,
-	}.Run()
+	suite := godog.TestSuite{
+		Name:                "create_resource",
+		ScenarioInitializer: InitCreateResource,
+		Options:             &opts,
+	}
 
-	// if status == 2 {
-	// 	t.SkipNow()
-	// }
-
-	if status != 0 {
-		t.Fatalf("zero status code expected, %d received", status)
+	if status := suite.Run(); status != 0 {
+		t.Fatalf("non-zero status code received: %d", status)
 	}
 }

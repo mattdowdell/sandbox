@@ -1,5 +1,6 @@
 package functional_test
 
+/*
 import (
 	"github.com/stretchr/testify/suite"
 )
@@ -27,3 +28,4 @@ func (s *UpdateResource) Test_AlreadyExists() {}
 func (s *UpdateResource) Test_PermissionDenied() {}
 
 func (s *UpdateResource) Test_Unauthenticated() {}
+*/

@@ -1,5 +1,6 @@
 package functional_test
 
+/*
 import (
 	"github.com/stretchr/testify/suite"
 )
@@ -25,3 +26,4 @@ func (s *DeleteResource) Test_NotFound() {}
 func (s *DeleteResource) Test_PermissionDenied() {}
 
 func (s *DeleteResource) Test_Unauthenticated() {}
+*/

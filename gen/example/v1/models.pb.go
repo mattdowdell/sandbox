@@ -82,14 +82,14 @@ func (Operation) EnumDescriptor() ([]byte, []int) {
 // ...
 type Resource struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// ...
+	// The generated ID for the resource.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// ...
+	// The user-defined name of the resource.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	// ...
-	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"` // not empty
-	// ...
-	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"` // not empty
+	// When the resource was created.
+	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	// When the resource was last updated.
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -154,8 +154,9 @@ func (x *Resource) GetUpdatedAt() *timestamppb.Timestamp {
 
 // ...
 type ResourceCreate struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The name for the new resource.
+	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -200,8 +201,9 @@ func (x *ResourceCreate) GetName() string {
 // ...
 type ResourceUpdate struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// ...
-	Id            string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// The ID of the resource.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// The new name for the resource.
 	Name          string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -254,18 +256,18 @@ func (x *ResourceUpdate) GetName() string {
 // ...
 type AuditEvent struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// ...
+	// The generated ID of the audit event.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// ...
 	Operation Operation `protobuf:"varint,2,opt,name=operation,proto3,enum=example.v1.Operation" json:"operation,omitempty"`
 	// ...
-	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"` // not empty
+	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	// ...
-	Summary string `protobuf:"bytes,4,opt,name=summary,proto3" json:"summary,omitempty"` // min/max length
+	Summary string `protobuf:"bytes,4,opt,name=summary,proto3" json:"summary,omitempty"` // TODO: min/max length
 	// ...
 	ResourceId string `protobuf:"bytes,5,opt,name=resource_id,json=resourceId,proto3" json:"resource_id,omitempty"`
 	// ...
-	ResourceType  string `protobuf:"bytes,6,opt,name=resource_type,json=resourceType,proto3" json:"resource_type,omitempty"` // min/max length
+	ResourceType  string `protobuf:"bytes,6,opt,name=resource_type,json=resourceType,proto3" json:"resource_type,omitempty"` // TODO: min/max length
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -347,26 +349,27 @@ var File_example_v1_models_proto protoreflect.FileDescriptor
 const file_example_v1_models_proto_rawDesc = "" +
 	"\n" +
 	"\x17example/v1/models.proto\x12\n" +
-	"example.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xc3\x01\n" +
+	"example.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xf3\x02\n" +
 	"\bResource\x12\x18\n" +
 	"\x02id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\x02id\x12'\n" +
-	"\x04name\x18\x02 \x01(\tB\x13\xbaH\x10r\x0e\x10\x03\x18d2\b^[ -~]+$R\x04name\x129\n" +
+	"\x04name\x18\x02 \x01(\tB\x13\xbaH\x10r\x0e\x10\x03\x18d2\b^[ -~]+$R\x04name\x12W\n" +
 	"\n" +
-	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
+	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampB\x1c\xbaH\x19\xb2\x01\x16\"\a\b\xff\x82\xd1\xff\xaf\a2\v\b\x80\x92\xb8Ø\xfe\xff\xff\xff\x01R\tcreatedAt\x12W\n" +
 	"\n" +
-	"updated_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"9\n" +
+	"updated_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampB\x1c\xbaH\x19\xb2\x01\x16\"\a\b\xff\x82\xd1\xff\xaf\a2\v\b\x80\x92\xb8Ø\xfe\xff\xff\xff\x01R\tupdatedAt:r\xbaHo\x1am\n" +
+	"\x1cupdated_at_before_created_at\x12)updated_at cannot be less than created_at\x1a\"this.updated_at >= this.created_at\"9\n" +
 	"\x0eResourceCreate\x12'\n" +
 	"\x04name\x18\x01 \x01(\tB\x13\xbaH\x10r\x0e\x10\x03\x18d2\b^[ -~]+$R\x04name\"S\n" +
 	"\x0eResourceUpdate\x12\x18\n" +
 	"\x02id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\x02id\x12'\n" +
-	"\x04name\x18\x02 \x01(\tB\x13\xbaH\x10r\x0e\x10\x03\x18d2\b^[ -~]+$R\x04name\"\x8c\x02\n" +
+	"\x04name\x18\x02 \x01(\tB\x13\xbaH\x10r\x0e\x10\x03\x18d2\b^[ -~]+$R\x04name\"\xaa\x02\n" +
 	"\n" +
 	"AuditEvent\x12\x18\n" +
 	"\x02id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\x02id\x12?\n" +
 	"\toperation\x18\x02 \x01(\x0e2\x15.example.v1.OperationB\n" +
-	"\xbaH\a\x82\x01\x04\x10\x01 \x00R\toperation\x129\n" +
+	"\xbaH\a\x82\x01\x04\x10\x01 \x00R\toperation\x12W\n" +
 	"\n" +
-	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12\x18\n" +
+	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampB\x1c\xbaH\x19\xb2\x01\x16\"\a\b\xff\x82\xd1\xff\xaf\a2\v\b\x80\x92\xb8Ø\xfe\xff\xff\xff\x01R\tcreatedAt\x12\x18\n" +
 	"\asummary\x18\x04 \x01(\tR\asummary\x12)\n" +
 	"\vresource_id\x18\x05 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\n" +
 	"resourceId\x12#\n" +

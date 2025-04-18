@@ -1,5 +1,6 @@
 package functional_test
 
+/*
 import (
 	"github.com/stretchr/testify/suite"
 )
@@ -23,3 +24,4 @@ func (s *ListResources) Test_InvalidArgument() {}
 func (s *ListResources) Test_PermissionDenied() {}
 
 func (s *ListResources) Test_Unauthenticated() {}
+*/
