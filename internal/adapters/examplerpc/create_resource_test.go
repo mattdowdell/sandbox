@@ -97,7 +97,7 @@ func Test_Handler_CreateResource_AlreadyExists(t *testing.T) {
 
 	// assert
 	assert.Nil(t, resp)
-	assert.EqualError(t, err, "already_exists: resource name in use: example")
+	assert.EqualError(t, err, "already_exists: resource name already in use")
 }
 
 func Test_Handler_CreateResource_Internal(t *testing.T) {
