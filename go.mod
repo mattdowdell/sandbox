@@ -27,7 +27,7 @@ require (
 	github.com/knadh/koanf/parsers/toml v0.1.0
 	github.com/knadh/koanf/parsers/yaml v1.0.0
 	github.com/knadh/koanf/providers/env v1.0.0
-	github.com/knadh/koanf/providers/file v1.1.2
+	github.com/knadh/koanf/providers/file v1.2.0
 	github.com/knadh/koanf/v2 v2.1.2
 	github.com/stretchr/testify v1.10.0
 	go.opentelemetry.io/contrib/instrumentation/runtime v0.60.0
@@ -66,7 +66,7 @@ require (
 	github.com/charmbracelet/x/term v0.2.1 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f // indirect
-	github.com/fsnotify/fsnotify v1.8.0 // indirect
+	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
