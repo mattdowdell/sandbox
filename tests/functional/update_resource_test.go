@@ -24,8 +24,4 @@ func (s *UpdateResource) Test_InvalidArgument() {}
 func (s *UpdateResource) Test_NotFound() {}
 
 func (s *UpdateResource) Test_AlreadyExists() {}
-
-func (s *UpdateResource) Test_PermissionDenied() {}
-
-func (s *UpdateResource) Test_Unauthenticated() {}
 */

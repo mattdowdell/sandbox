@@ -1,19 +1,17 @@
 Feature: Delete Resource
   Support delete operations for Resources.
 
-  Rule: IDs must be a UUID
-
     Scenario: Delete resource with a valid ID
-      Given the ID of an existing Resource
+      Given an existing Resource ID
       When I delete the Resource
       Then I should succeed
 
     Scenario: Delete non-existent resource
-      Given a nil UUID
+      Given a non-existent Resource ID
       When I delete the Resource
-      Then I should receive NotFound with message: TODO
+      Then I should fail with code=not_found, msg=resource does not exist
 
     Scenario: Delete resource with invalid ID
-      Given an invalid ID
+      Given an invalid Resource ID
       When I delete the Resource
-      Then I should receive InvalidArgument with message: TODO
+      Then I should fail with code=invalid_argument, msg=validation error: - id: value must be a valid UUID [string.uuid]

@@ -161,7 +161,10 @@ unit timeout="30s":
 
 # Run the functional tests.
 functional:
-    go test -v -count=1 ./tests/functional/
+    go test ./tests/functional/ \
+        --godog.strict \
+        --test.v \
+        --test.count=1
 
 # Summarise functional test coverage.
 functional-cover:
