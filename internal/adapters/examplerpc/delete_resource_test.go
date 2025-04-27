@@ -1,7 +1,6 @@
 package examplerpc_test
 
 import (
-	"fmt"
 	"testing"
 
 	"connectrpc.com/connect"
@@ -88,7 +87,7 @@ func Test_Handler_DeleteResource_NotFound(t *testing.T) {
 
 	// assert
 	assert.Nil(t, resp)
-	assert.EqualError(t, err, fmt.Sprintf("not_found: resource not found: %s", id))
+	assert.EqualError(t, err, "not_found: resource does not exist")
 }
 
 func Test_Handler_DeleteResource_Internal(t *testing.T) {

@@ -32,7 +32,7 @@ func (h *Handler) DeleteResource(
 		slog.DebugContext(ctx, "failed to delete resource", slogx.Err(err))
 
 		if errors.Is(err, apperrors.ErrNotFound) {
-			return nil, ErrResourceNotFound(id)
+			return nil, ErrResourceNotFound
 		}
 
 		return nil, ErrInternal

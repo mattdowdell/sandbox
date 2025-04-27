@@ -29,7 +29,7 @@ func (h *Handler) GetResource(
 		slog.DebugContext(ctx, "failed to get resource", slogx.Err(err))
 
 		if errors.Is(err, apperrors.ErrNotFound) {
-			return nil, ErrResourceNotFound(id)
+			return nil, ErrResourceNotFound
 		}
 
 		return nil, ErrInternal

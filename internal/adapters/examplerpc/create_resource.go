@@ -25,7 +25,7 @@ func (h *Handler) CreateResource(
 		slog.DebugContext(ctx, "failed to create resource", slogx.Err(err))
 
 		if errors.Is(err, apperrors.ErrAlreadyExists) {
-			return nil, ErrResourceAlreadyExists(input.Name)
+			return nil, ErrResourceAlreadyExists
 		}
 
 		return nil, ErrInternal

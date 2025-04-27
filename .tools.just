@@ -14,6 +14,12 @@ gci := join(gopath, "bin", "gci-v0.13.6")
 install-gci:
     {{ if path_exists(gci) == "true" { "" } else { "bingo get gci" } }}
 
+godog := join(gopath, "bin", "godog-v0.15.0")
+
+[private]
+install-godog:
+    {{ if path_exists(godog) == "true" { "" } else { "bingo get godog" } }}
+
 gofumpt := join(gopath, "bin", "gofumpt-v0.7.0")
 
 [private]

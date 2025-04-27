@@ -34,3 +34,18 @@ ignore {
     input.PkgName = "github.com/go-sql-driver/mysql"
     input.Name = "MPL-2.0"
 }
+
+ignore {
+    input.PkgName = "github.com/hashicorp/go-immutable-radix"
+    input.Name = "MPL-2.0"
+}
+
+ignore {
+    input.PkgName = "github.com/hashicorp/go-memdb"
+    input.Name = "MPL-2.0"
+}
+
+ignore {
+    input.PkgName = "github.com/hashicorp/golang-lru"
+    input.Name = "MPL-2.0"
+}

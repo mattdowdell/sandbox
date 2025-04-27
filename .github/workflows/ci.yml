@@ -214,6 +214,9 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Install Just
+        uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff # v3.0.0
+
       - name: Setup coverage
         uses: gacts/run-and-post-run@d803f6920adc9a47eeac4cb6c93dbc2e2890c684 # v1.4.2
         with:
@@ -234,7 +237,8 @@ jobs:
           up-flags: --build --wait
           down-flags: --volumes --remove-orphans
 
-      # TODO: run tests
+      - name: Functional test
+        run: just functional
 
       - name: Collect logs
         if: always()

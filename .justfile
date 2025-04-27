@@ -159,6 +159,13 @@ unit timeout="30s":
     @echo "Total coverage: `go tool cover -func=cover.out | tail -n 1 | awk '{print $3}'`"
     go tool cover -html cover.out -o cover.html
 
+# Run the functional tests.
+functional:
+    go test ./tests/functional/ \
+        --godog.strict \
+        --test.v \
+        --test.count=1
+
 # Summarise functional test coverage.
 functional-cover:
     go tool covdata textfmt -i=.covdata -o functional.out
