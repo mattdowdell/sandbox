@@ -115,10 +115,10 @@ func printableNonASCII() string {
 
 // randomString generates a string of the given length using the set of given characters.
 func randomString(chars string, length int) (string, error) {
-	input := []rune(chars)
-	output := make([]rune, 0, length)
+	in := []rune(chars)
+	out := make([]rune, 0, length)
 
-	l := big.NewInt(int64(len(input)))
+	l := big.NewInt(int64(len(in)))
 
 	for range length {
 		i, err := rand.Int(rand.Reader, l)
@@ -126,8 +126,8 @@ func randomString(chars string, length int) (string, error) {
 			return "", err
 		}
 
-		output = append(output, input[i.Int64()])
+		out = append(out, in[i.Int64()])
 	}
 
-	return string(output), nil
+	return string(out), nil
 }
