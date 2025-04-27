@@ -26,6 +26,7 @@ func New(baseURL string) *Client {
 		baseURL,
 		connect.WithInterceptors(
 			connect.UnaryInterceptorFunc(ValidateUnaryInterceptor),
+			connect.UnaryInterceptorFunc(ScenarioUnaryInterceptor),
 		),
 	)
 
@@ -64,7 +65,25 @@ func (c *Client) GetResource(ctx context.Context, id string) (*examplev1.Resourc
 		return nil, err
 	}
 
-	return resp.Msg.GetResource(), err
+	return resp.Msg.GetResource(), nil
+}
+
+// ...
+func (c *Client) UpdateResource(ctx context.Context, id, name string) (*examplev1.Resource, error) {
+	resp, err := c.inner.UpdateResource(
+		ctx,
+		connect.NewRequest(&examplev1.UpdateResourceRequest{
+			Resource: &examplev1.ResourceUpdate{
+				Id:   id,
+				Name: name,
+			},
+		}),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.Msg.GetResource(), nil
 }
 
 // ...

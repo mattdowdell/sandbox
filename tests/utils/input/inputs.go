@@ -10,6 +10,7 @@ type ctxKey int
 const (
 	nameCtxKey ctxKey = iota + 1
 	idCtxKey
+	newNameCtxKey
 )
 
 // ...
@@ -24,6 +25,20 @@ func NameFromContext(ctx context.Context) (string, error) {
 	}
 
 	return "", errors.New("name not found in context")
+}
+
+// ...
+func AddNewNameToContext(ctx context.Context, name string) context.Context {
+	return context.WithValue(ctx, newNameCtxKey, name)
+}
+
+// ...
+func NewNameFromContext(ctx context.Context) (string, error) {
+	if name, ok := ctx.Value(newNameCtxKey).(string); ok {
+		return name, nil
+	}
+
+	return "", errors.New("new name not found in context")
 }
 
 // ...

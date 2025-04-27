@@ -20,8 +20,4 @@ func (s *ListResources) TearDownSuite() {}
 func (s *ListResources) Test_Success() {}
 
 func (s *ListResources) Test_InvalidArgument() {}
-
-func (s *ListResources) Test_PermissionDenied() {}
-
-func (s *ListResources) Test_Unauthenticated() {}
 */

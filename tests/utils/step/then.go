@@ -77,10 +77,10 @@ func checkConnectErr(err error, code, msg string) error {
 	}
 
 	// TODO: figure out how to represent newlines in feature files
-	wantMsg := strings.ReplaceAll(cast.Message(), "\n", "")
+	haveMsg := strings.ReplaceAll(cast.Message(), "\n", "")
 
-	if wantMsg != msg {
-		return fmt.Errorf("unexpected msg: want: %q, have: %q", wantMsg, msg)
+	if haveMsg != msg {
+		return fmt.Errorf("unexpected msg: want: %q, have: %q", msg, haveMsg)
 	}
 
 	return nil

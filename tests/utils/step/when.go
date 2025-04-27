@@ -52,6 +52,31 @@ func GetResource(ctx context.Context) (context.Context, error) {
 }
 
 // ...
+func UpdateResource(ctx context.Context) (context.Context, error) {
+	client, err := examplev1client.FromContext(ctx)
+	if err != nil {
+		return ctx, err
+	}
+
+	id, err := input.IDFromContext(ctx)
+	if err != nil {
+		return ctx, err
+	}
+
+	name, err := input.NameFromContext(ctx)
+	if err != nil {
+		return ctx, err
+	}
+
+	resource, err := client.UpdateResource(ctx, id, name)
+	if err != nil {
+		return output.AddErrToContext(ctx, err), nil
+	}
+
+	return output.AddResourceToContext(ctx, resource), nil
+}
+
+// ...
 func DeleteResource(ctx context.Context) (context.Context, error) {
 	client, err := examplev1client.FromContext(ctx)
 	if err != nil {

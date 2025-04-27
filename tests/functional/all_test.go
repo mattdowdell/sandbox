@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"flag"
+	"fmt"
 	"testing"
 
 	"github.com/cucumber/godog"
@@ -19,7 +20,7 @@ func init() {
 	godog.BindFlags("godog.", flag.CommandLine, &opts)
 }
 
-func TestFeatures(t *testing.T) {
+func Test_ExampleService(t *testing.T) {
 	client := examplev1client.New("http://localhost:5000")
 
 	o := opts
@@ -43,6 +44,11 @@ func TestFeatures(t *testing.T) {
 }
 
 func InitializeScenario(sc *godog.ScenarioContext) {
+	sc.Before(func(ctx context.Context, scen *godog.Scenario) (context.Context, error) {
+		fmt.Println("name:", scen.Name)
+		return ctx, nil
+	})
+
 	sc.Given(`^a name of (\d+) printable ASCII characters$`, step.PrintableASCIIChars)
 	sc.Given(`^a name of (\d+) printable non-ASCII characters$`, step.PrintableNonASCIIChars)
 	sc.Given(`^an existing resource name$`, step.ExistingResourceName)
@@ -51,8 +57,9 @@ func InitializeScenario(sc *godog.ScenarioContext) {
 	sc.Given(`^an existing Resource ID$`, step.ExistingID)
 
 	sc.When(`^I create a Resource$`, step.CreateResource)
-	sc.When(`^I delete the Resource$`, step.DeleteResource)
 	sc.When(`^I get the Resource$`, step.GetResource)
+	sc.When(`^I update the Resource$`, step.UpdateResource)
+	sc.When(`^I delete the Resource$`, step.DeleteResource)
 
 	sc.Then(`^I should fail with code=(\w+), msg=(.+)$$`, step.FailWithCodeAndMsg)
 	sc.Then(`^I should receive the Resource$`, step.CheckResource)
@@ -63,6 +70,6 @@ func InitializeScenario(sc *godog.ScenarioContext) {
 			return ctx, errors.Join(err, err2)
 		}
 
-		return ctx, err
+		return ctx, nil
 	})
 }
