@@ -13,7 +13,7 @@ import (
 
 	"github.com/mattdowdell/sandbox/gen/example/v1"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
-	"github.com/mattdowdell/sandbox/internal/domain/apperrors"
+	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 	"github.com/mattdowdell/sandbox/mocks/adapters/mockexamplerpc"
 )
@@ -78,7 +78,7 @@ func Test_Handler_CreateResource_AlreadyExists(t *testing.T) {
 	facade.
 		EXPECT().
 		Create(t.Context(), mock.AnythingOfType("*entities.Resource")).
-		Return(nil, apperrors.ErrAlreadyExists).
+		Return(nil, domain.ErrAlreadyExists).
 		Once()
 
 	handler := examplerpc.New(
@@ -106,7 +106,7 @@ func Test_Handler_CreateResource_Internal(t *testing.T) {
 	facade.
 		EXPECT().
 		Create(t.Context(), mock.AnythingOfType("*entities.Resource")).
-		Return(nil, apperrors.ErrInternal).
+		Return(nil, domain.ErrInternal).
 		Once()
 
 	handler := examplerpc.New(

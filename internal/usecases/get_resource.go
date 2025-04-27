@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/mattdowdell/sandbox/internal/domain/apperrors"
+	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 	"github.com/mattdowdell/sandbox/internal/domain/repositories"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
@@ -32,15 +32,15 @@ func (u *GetResource) Execute(
 ) (*entities.Resource, error) {
 	resource, err := store.GetResource(ctx, id)
 	if err != nil {
-		if errors.Is(err, apperrors.ErrNotFound) {
+		if errors.Is(err, domain.ErrNotFound) {
 			slog.InfoContext(ctx, "resource not found", slogx.Err(err))
 
-			return nil, apperrors.ErrNotFound
+			return nil, domain.ErrNotFound
 		}
 
 		slog.ErrorContext(ctx, "failed to get resource", slogx.Err(err))
 
-		return nil, apperrors.ErrInternal
+		return nil, domain.ErrInternal
 	}
 
 	return resource, nil

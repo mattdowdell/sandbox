@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mattdowdell/sandbox/internal/domain/apperrors"
+	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 	"github.com/mattdowdell/sandbox/internal/usecases"
 	"github.com/mattdowdell/sandbox/mocks/domain/mockrepositories"
@@ -55,12 +55,12 @@ func Test_ListResources_Error(t *testing.T) {
 	usecase := usecases.NewListResources()
 
 	store := mockrepositories.NewResource(t)
-	store.EXPECT().ListResources(t.Context()).Return(nil, apperrors.ErrInternal).Once()
+	store.EXPECT().ListResources(t.Context()).Return(nil, domain.ErrInternal).Once()
 
 	// act
 	resources, err := usecase.Execute(t.Context(), store)
 
 	// assert
 	assert.Empty(t, resources)
-	assert.ErrorIs(t, err, apperrors.ErrInternal)
+	assert.ErrorIs(t, err, domain.ErrInternal)
 }

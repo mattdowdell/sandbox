@@ -12,7 +12,7 @@ import (
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/modelhelpers"
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/postgres/public/model"
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/postgres/public/table"
-	"github.com/mattdowdell/sandbox/internal/domain/apperrors"
+	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 )
 
@@ -36,14 +36,14 @@ func (d *Datastore) UpdateResource(
 
 	if err := stmt.QueryContext(ctx, d.db, &output); err != nil {
 		if errors.Is(err, qrm.ErrNoRows) {
-			return nil, fmt.Errorf("%w: %w", apperrors.ErrNotFound, err)
+			return nil, fmt.Errorf("%w: %w", domain.ErrNotFound, err)
 		}
 
 		if isPgErr(err, pgerrcode.UniqueViolation) {
-			return nil, fmt.Errorf("%w: %w", apperrors.ErrAlreadyExists, err)
+			return nil, fmt.Errorf("%w: %w", domain.ErrAlreadyExists, err)
 		}
 
-		return nil, fmt.Errorf("%w: %w", apperrors.ErrInternal, err)
+		return nil, fmt.Errorf("%w: %w", domain.ErrInternal, err)
 	}
 
 	return modelhelpers.ResourceToDomain(&output), nil

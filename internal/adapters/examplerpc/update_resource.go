@@ -9,7 +9,7 @@ import (
 
 	"github.com/mattdowdell/sandbox/gen/example/v1"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc/models"
-	"github.com/mattdowdell/sandbox/internal/domain/apperrors"
+	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
@@ -29,10 +29,10 @@ func (h *Handler) UpdateResource(
 		slog.DebugContext(ctx, "failed to update resource", slogx.Err(err))
 
 		switch {
-		case errors.Is(err, apperrors.ErrNotFound):
+		case errors.Is(err, domain.ErrNotFound):
 			return nil, ErrResourceNotFound
 
-		case errors.Is(err, apperrors.ErrAlreadyExists):
+		case errors.Is(err, domain.ErrAlreadyExists):
 			return nil, ErrResourceAlreadyExists
 
 		default:

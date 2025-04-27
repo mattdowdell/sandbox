@@ -9,7 +9,7 @@ import (
 
 	"github.com/mattdowdell/sandbox/gen/example/v1"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc/models"
-	"github.com/mattdowdell/sandbox/internal/domain/apperrors"
+	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
@@ -31,7 +31,7 @@ func (h *Handler) DeleteResource(
 	if err := h.resource.Delete(ctx, id); err != nil {
 		slog.DebugContext(ctx, "failed to delete resource", slogx.Err(err))
 
-		if errors.Is(err, apperrors.ErrNotFound) {
+		if errors.Is(err, domain.ErrNotFound) {
 			return nil, ErrResourceNotFound
 		}
 

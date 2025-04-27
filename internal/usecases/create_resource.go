@@ -5,7 +5,7 @@ import (
 	"errors"
 	"log/slog"
 
-	"github.com/mattdowdell/sandbox/internal/domain/apperrors"
+	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 	"github.com/mattdowdell/sandbox/internal/domain/repositories"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
@@ -41,21 +41,21 @@ func (u *CreateResource) Execute(
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to generate id", slogx.Err(err))
 
-		return nil, apperrors.ErrInternal
+		return nil, domain.ErrInternal
 	}
 
 	resource.Init(id, u.clock.Now())
 
 	if err := store.CreateResource(ctx, resource); err != nil {
-		if errors.Is(err, apperrors.ErrAlreadyExists) {
+		if errors.Is(err, domain.ErrAlreadyExists) {
 			slog.InfoContext(ctx, "resource exists", slogx.Err(err))
 
-			return nil, apperrors.ErrAlreadyExists
+			return nil, domain.ErrAlreadyExists
 		}
 
 		slog.ErrorContext(ctx, "failed to create resource", slogx.Err(err))
 
-		return nil, apperrors.ErrInternal
+		return nil, domain.ErrInternal
 	}
 
 	slog.InfoContext(ctx, "created resource")

@@ -4,7 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/mattdowdell/sandbox/internal/domain/apperrors"
+	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 	"github.com/mattdowdell/sandbox/internal/domain/repositories"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
@@ -29,7 +29,7 @@ func (u *ListAuditEvents) Execute(
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to list audit events", slogx.Err(err))
 
-		return nil, apperrors.ErrInternal
+		return nil, domain.ErrInternal
 	}
 
 	return events, nil

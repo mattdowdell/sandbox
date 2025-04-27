@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mattdowdell/sandbox/internal/domain/apperrors"
+	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 	"github.com/mattdowdell/sandbox/internal/usecases"
 	"github.com/mattdowdell/sandbox/mocks/domain/mockrepositories"
@@ -54,12 +54,12 @@ func Test_ListAuditEvents_Error(t *testing.T) {
 	usecase := usecases.NewListAuditEvents()
 
 	store := mockrepositories.NewAuditEvent(t)
-	store.EXPECT().ListAuditEvents(t.Context()).Return(nil, apperrors.ErrInternal).Once()
+	store.EXPECT().ListAuditEvents(t.Context()).Return(nil, domain.ErrInternal).Once()
 
 	// act
 	events, err := usecase.Execute(t.Context(), store)
 
 	// assert
 	assert.Empty(t, events)
-	assert.ErrorIs(t, err, apperrors.ErrInternal)
+	assert.ErrorIs(t, err, domain.ErrInternal)
 }

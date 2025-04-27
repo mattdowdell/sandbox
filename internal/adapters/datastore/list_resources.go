@@ -7,7 +7,7 @@ import (
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/modelhelpers"
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/postgres/public/model"
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/postgres/public/table"
-	"github.com/mattdowdell/sandbox/internal/domain/apperrors"
+	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 )
 
@@ -24,7 +24,7 @@ func (d *Datastore) ListResources(ctx context.Context) ([]*entities.Resource, er
 
 	var resources []*model.Resources
 	if err := stmt.QueryContext(ctx, d.db, &resources); err != nil {
-		return nil, fmt.Errorf("%w: %w", apperrors.ErrInternal, err)
+		return nil, fmt.Errorf("%w: %w", domain.ErrInternal, err)
 	}
 
 	return modelhelpers.ResourcesToDomain(resources), nil

@@ -30,9 +30,6 @@ A toy Go microservice intended for use as reference material.
 # ready: success
 echo '{}' | grpc-client-cli -a localhost:5000 -s Health -m Check
 
-# create: invalid argument
-echo '{}' | grpc-client-cli -a localhost:5000 -s ExampleService -m CreateResource
-
 # create: success
 echo '{"resource":{"name":"example"}}' | \
 	grpc-client-cli -a localhost:5000 -s ExampleService -m CreateResource
@@ -45,20 +42,4 @@ done
 
 # list: success
 echo '{}' | grpc-client-cli -a localhost:5000 -s ExampleService -m ListResources
-
-# get: not found
-echo '{"id":"00000000-0000-0000-0000-000000000000"}' | \
-	grpc-client-cli -a localhost:5000 -s ExampleService -m GetResource
-
-# update: not found
-echo '{"resource":{"id":"00000000-0000-0000-0000-000000000000","name":"example"}}' | \
-        grpc-client-cli -a localhost:5000 -s ExampleService -m UpdateResource
-
-# update
-echo '{"resource":{"id":"01961ee2-68d4-7708-9c97-9297e402ab59","name":"example"}}' | \
-	grpc-client-cli -a localhost:5000 -s ExampleService -m UpdateResource
-
-# delete: not found
-echo '{"id":"00000000-0000-0000-0000-000000000000"}' | \
-        grpc-client-cli -a localhost:5000 -s ExampleService -m DeleteResource
 ```

@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/mattdowdell/sandbox/internal/domain/apperrors"
+	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/repositories"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
@@ -30,15 +30,15 @@ func (u *DeleteResource) Execute(
 	id uuid.UUID,
 ) error {
 	if err := store.DeleteResource(ctx, id); err != nil {
-		if errors.Is(err, apperrors.ErrNotFound) {
+		if errors.Is(err, domain.ErrNotFound) {
 			slog.InfoContext(ctx, "resource not found", slogx.Err(err))
 
-			return apperrors.ErrNotFound
+			return domain.ErrNotFound
 		}
 
 		slog.ErrorContext(ctx, "failed to delete resource", slogx.Err(err))
 
-		return apperrors.ErrInternal
+		return domain.ErrInternal
 	}
 
 	slog.InfoContext(ctx, "deleted resource")

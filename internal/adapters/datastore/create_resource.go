@@ -8,7 +8,7 @@ import (
 
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/modelhelpers"
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/postgres/public/table"
-	"github.com/mattdowdell/sandbox/internal/domain/apperrors"
+	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 )
 
@@ -27,10 +27,10 @@ func (d *Datastore) CreateResource(ctx context.Context, resource *entities.Resou
 
 	if _, err := stmt.ExecContext(ctx, d.db); err != nil {
 		if isPgErr(err, pgerrcode.UniqueViolation) {
-			return fmt.Errorf("%w: %w", apperrors.ErrAlreadyExists, err)
+			return fmt.Errorf("%w: %w", domain.ErrAlreadyExists, err)
 		}
 
-		return fmt.Errorf("%w: %w", apperrors.ErrInternal, err)
+		return fmt.Errorf("%w: %w", domain.ErrInternal, err)
 	}
 
 	return nil
