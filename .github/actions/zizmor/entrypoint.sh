@@ -1,5 +1,5 @@
 #!/bin/sh
 
-cmd=(/app/zizmor $@ ${INPUT_INPUTS[@]})
-echo "Running command: ${cmd[@]}"
-${cmd[@]}
+cmd="/app/zizmor $@ ${INPUT_INPUTS}"
+echo "Running command: ${cmd}"
+${cmd}
