@@ -23,7 +23,7 @@
 // OS, to simplify testing and ensure portability. In this case they abstract getting the system
 // time and reading random values respectively.
 //
-// This lack of following a rigid adherance is a good example of purism to the detriment of the
+// This lack of following a rigid adherence is a good example of purism to the detriment of the
 // application. Deviations are acceptable if they can be justified and fundamental assumptions, such
 // as direction of dependencies, are not broken.
 package repositories
