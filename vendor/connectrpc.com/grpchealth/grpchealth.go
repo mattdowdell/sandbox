@@ -1,4 +1,4 @@
-// Copyright 2022-2023 The Connect Authors
+// Copyright 2022-2024 The Connect Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -91,7 +91,7 @@ func NewHandler(checker Checker, options ...connect.HandlerOption) (string, http
 		) (*connect.Response[healthv1.HealthCheckResponse], error) {
 			var checkRequest CheckRequest
 			if req.Msg != nil {
-				checkRequest.Service = req.Msg.Service
+				checkRequest.Service = req.Msg.GetService()
 			}
 			checkResponse, err := checker.Check(ctx, &checkRequest)
 			if err != nil {
@@ -176,6 +176,11 @@ func NewStaticChecker(services ...string) *StaticChecker {
 
 // SetStatus sets the health status of a service, registering a new service if
 // necessary. It's safe to call SetStatus and Check concurrently.
+//
+// If the given service name is empty, it sets a server-wide status that is
+// returned to check requests that do not request a particular service. If no
+// such status is ever set, checks that do not request a particular service
+// will get a response of StatusServing.
 func (c *StaticChecker) SetStatus(service string, status Status) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -184,13 +189,13 @@ func (c *StaticChecker) SetStatus(service string, status Status) {
 
 // Check implements Checker. It's safe to call concurrently with SetStatus.
 func (c *StaticChecker) Check(_ context.Context, req *CheckRequest) (*CheckResponse, error) {
-	if req.Service == "" {
-		return &CheckResponse{Status: StatusServing}, nil
-	}
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	if status, registered := c.statuses[req.Service]; registered {
 		return &CheckResponse{Status: status}, nil
+	}
+	if req.Service == "" {
+		return &CheckResponse{Status: StatusServing}, nil
 	}
 	return nil, connect.NewError(
 		connect.CodeNotFound,
