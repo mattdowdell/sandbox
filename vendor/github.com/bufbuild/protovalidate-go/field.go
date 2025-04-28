@@ -22,7 +22,7 @@ import (
 
 //nolint:gochecknoglobals
 var (
-	requiredRuleDescriptor = (&validate.FieldConstraints{}).ProtoReflect().Descriptor().Fields().ByName("required")
+	requiredRuleDescriptor = (&validate.FieldRules{}).ProtoReflect().Descriptor().Fields().ByName("required")
 	requiredRulePath       = &validate.FieldPath{
 		Elements: []*validate.FieldPathElement{
 			fieldPathElement(requiredRuleDescriptor),
@@ -37,29 +37,60 @@ type field struct {
 	Value value
 	// Required indicates that the field must have a set value.
 	Required bool
-	// IgnoreEmpty indicates if a field should skip validation on its zero value.
-	// This field is generally true for nullable fields or fields with the
-	// ignore_empty constraint explicitly set.
-	IgnoreEmpty bool
-	// IgnoreDefault indicates if a field should skip validation on its zero value,
-	// including for fields which have field presence and are set to the zero value.
-	IgnoreDefault bool
+	// HasPresence reports whether the field distinguishes between unpopulated
+	// and default values.
+	HasPresence bool
+	// Whether validation should be ignored for certain conditions.
+	Ignore validate.Ignore
 	// Zero is the default or zero-value for this value's type
 	Zero protoreflect.Value
+	// Err stores if there was a compilation error constructing this evaluator. It is stored
+	// here so that it can be returned as part of validating this specific field.
+	Err error
 }
 
-func (f field) Evaluate(val protoreflect.Value, failFast bool) error {
-	return f.EvaluateMessage(val.Message(), failFast)
+// shouldIgnoreAlways returns whether this field should always skip validation.
+// If true, this will take precedence and all checks are skipped.
+func (f field) shouldIgnoreAlways() bool {
+	return f.Ignore == validate.Ignore_IGNORE_ALWAYS
 }
 
-func (f field) EvaluateMessage(msg protoreflect.Message, failFast bool) (err error) {
+// shouldIgnoreEmpty returns whether this field should skip validation on its zero value.
+// This field is generally true for nullable fields or fields with the
+// ignore_empty rule explicitly set.
+func (f field) shouldIgnoreEmpty() bool {
+	return f.HasPresence || f.Ignore == validate.Ignore_IGNORE_IF_UNPOPULATED || f.Ignore == validate.Ignore_IGNORE_IF_DEFAULT_VALUE
+}
+
+// shouldIgnoreDefault returns whether this field should skip validation on its zero value,
+// including for fields which have field presence and are set to the zero value.
+func (f field) shouldIgnoreDefault() bool {
+	return f.HasPresence && f.Ignore == validate.Ignore_IGNORE_IF_DEFAULT_VALUE
+}
+
+func (f field) Evaluate(_ protoreflect.Message, val protoreflect.Value, cfg *validationConfig) error {
+	return f.EvaluateMessage(val.Message(), cfg)
+}
+
+func (f field) EvaluateMessage(msg protoreflect.Message, cfg *validationConfig) (err error) {
+	if f.shouldIgnoreAlways() {
+		return nil
+	}
+	if !cfg.filter.ShouldValidate(msg, f.Value.Descriptor) {
+		return nil
+	}
+
+	if f.Err != nil {
+		return f.Err
+	}
+
 	if f.Required && !msg.Has(f.Value.Descriptor) {
 		return &ValidationError{Violations: []*Violation{{
 			Proto: &validate.Violation{
-				Field:        fieldPath(f.Value.Descriptor),
-				Rule:         prefixRulePath(f.Value.NestedRule, requiredRulePath),
-				ConstraintId: proto.String("required"),
-				Message:      proto.String("value is required"),
+				Field:   fieldPath(f.Value.Descriptor),
+				Rule:    prefixRulePath(f.Value.NestedRule, requiredRulePath),
+				RuleId:  proto.String("required"),
+				Message: proto.String("value is required"),
 			},
 			FieldValue:      protoreflect.Value{},
 			FieldDescriptor: f.Value.Descriptor,
@@ -68,19 +99,19 @@ func (f field) EvaluateMessage(msg protoreflect.Message, failFast bool) (err err
 		}}}
 	}
 
-	if f.IgnoreEmpty && !msg.Has(f.Value.Descriptor) {
+	if f.shouldIgnoreEmpty() && !msg.Has(f.Value.Descriptor) {
 		return nil
 	}
 
 	val := msg.Get(f.Value.Descriptor)
-	if f.IgnoreDefault && val.Equal(f.Zero) {
+	if f.shouldIgnoreDefault() && val.Equal(f.Zero) {
 		return nil
 	}
-	return f.Value.Evaluate(val, failFast)
+	return f.Value.EvaluateField(msg, val, cfg, true)
 }
 
 func (f field) Tautology() bool {
-	return !f.Required && f.Value.Tautology()
+	return !f.Required && f.Value.Tautology() && f.Err == nil
 }
 
 var _ messageEvaluator = field{}

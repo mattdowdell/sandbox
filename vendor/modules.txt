@@ -1,4 +1,4 @@
-# buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.6-20250307204501-0409229c3780.1
+# buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.6-20250423154025-7712fb530c57.1
 ## explicit; go 1.22
 buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate
 # buf.build/gen/go/grpc/grpc/connectrpc/go v1.18.1-20250327203416-d75db256c5a2.1
@@ -7,8 +7,8 @@ buf.build/gen/go/grpc/grpc/connectrpc/go/grpc/health/v1/healthv1connect
 # buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.6-20250327203416-d75db256c5a2.1
 ## explicit; go 1.22
 buf.build/gen/go/grpc/grpc/protocolbuffers/go/grpc/health/v1
-# cel.dev/expr v0.19.1
-## explicit; go 1.21.1
+# cel.dev/expr v0.23.1
+## explicit; go 1.22.0
 cel.dev/expr
 # connectrpc.com/connect v1.18.1
 ## explicit; go 1.21
@@ -136,8 +136,8 @@ github.com/aws/smithy-go/transport/http/internal/io
 # github.com/aymanbagabas/go-osc52/v2 v2.0.1
 ## explicit; go 1.16
 github.com/aymanbagabas/go-osc52/v2
-# github.com/bufbuild/protovalidate-go v0.9.1
-## explicit; go 1.21.1
+# github.com/bufbuild/protovalidate-go v0.10.0
+## explicit; go 1.23.0
 github.com/bufbuild/protovalidate-go
 github.com/bufbuild/protovalidate-go/cel
 github.com/bufbuild/protovalidate-go/resolve
@@ -223,8 +223,8 @@ github.com/go-viper/mapstructure/v2/internal/errors
 # github.com/gofrs/uuid v4.3.1+incompatible
 ## explicit
 github.com/gofrs/uuid
-# github.com/google/cel-go v0.23.0
-## explicit; go 1.21.1
+# github.com/google/cel-go v0.25.0
+## explicit; go 1.22.0
 github.com/google/cel-go/cel
 github.com/google/cel-go/checker
 github.com/google/cel-go/checker/decls
@@ -233,6 +233,7 @@ github.com/google/cel-go/common/ast
 github.com/google/cel-go/common/containers
 github.com/google/cel-go/common/debug
 github.com/google/cel-go/common/decls
+github.com/google/cel-go/common/env
 github.com/google/cel-go/common/functions
 github.com/google/cel-go/common/operators
 github.com/google/cel-go/common/overloads

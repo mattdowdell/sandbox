@@ -31,7 +31,7 @@ import (
 
 //nolint:gochecknoglobals
 var (
-	celRuleDescriptor = (&validate.FieldConstraints{}).ProtoReflect().Descriptor().Fields().ByName("cel")
+	celRuleDescriptor = (&validate.FieldRules{}).ProtoReflect().Descriptor().Fields().ByName("cel")
 	celRuleField      = fieldPathElement(celRuleDescriptor)
 )
 
@@ -41,7 +41,7 @@ type builder struct {
 	mtx                   sync.Mutex                   // serializes cache writes.
 	cache                 atomic.Pointer[messageCache] // copy-on-write cache.
 	env                   *cel.Env
-	constraints           cache
+	rules                 cache
 	extensionTypeResolver protoregistry.ExtensionTypeResolver
 	allowUnknownFields    bool
 	Load                  func(desc protoreflect.MessageDescriptor) messageEvaluator
@@ -57,7 +57,7 @@ func newBuilder(
 ) *builder {
 	bldr := &builder{
 		env:                   env,
-		constraints:           newCache(),
+		rules:                 newCache(),
 		extensionTypeResolver: extensionTypeResolver,
 		allowUnknownFields:    allowUnknownFields,
 	}
@@ -122,37 +122,35 @@ func (bldr *builder) buildMessage(
 	desc protoreflect.MessageDescriptor, msgEval *message,
 	cache messageCache,
 ) {
-	msgConstraints := resolve.MessageConstraints(desc)
-	if msgConstraints.GetDisabled() {
+	msgRules := resolve.MessageRules(desc)
+	if msgRules.GetDisabled() {
 		return
 	}
 
 	steps := []func(
 		desc protoreflect.MessageDescriptor,
-		msgConstraints *validate.MessageConstraints,
+		msgRules *validate.MessageRules,
 		msg *message,
 		cache messageCache,
 	){
 		bldr.processMessageExpressions,
-		bldr.processOneofConstraints,
+		bldr.processOneofRules,
 		bldr.processFields,
 	}
 
 	for _, step := range steps {
-		if step(desc, msgConstraints, msgEval, cache); msgEval.Err != nil {
-			break
-		}
+		step(desc, msgRules, msgEval, cache)
 	}
 }
 
 func (bldr *builder) processMessageExpressions(
 	desc protoreflect.MessageDescriptor,
-	msgConstraints *validate.MessageConstraints,
+	msgRules *validate.MessageRules,
 	msgEval *message,
 	_ messageCache,
 ) {
 	exprs := expressions{
-		Constraints: msgConstraints.GetCel(),
+		Rules: msgRules.GetCel(),
 	}
 	compiledExprs, err := compile(
 		exprs,
@@ -170,90 +168,91 @@ func (bldr *builder) processMessageExpressions(
 	})
 }
 
-func (bldr *builder) processOneofConstraints(
+func (bldr *builder) processOneofRules(
 	desc protoreflect.MessageDescriptor,
-	_ *validate.MessageConstraints,
+	_ *validate.MessageRules,
 	msgEval *message,
 	_ messageCache,
 ) {
 	oneofs := desc.Oneofs()
 	for i := 0; i < oneofs.Len(); i++ {
 		oneofDesc := oneofs.Get(i)
-		oneofConstraints := resolve.OneofConstraints(oneofDesc)
+		oneofRules := resolve.OneofRules(oneofDesc)
 		oneofEval := oneof{
 			Descriptor: oneofDesc,
-			Required:   oneofConstraints.GetRequired(),
+			Required:   oneofRules.GetRequired(),
 		}
-		msgEval.Append(oneofEval)
+		msgEval.AppendNested(oneofEval)
 	}
 }
 
 func (bldr *builder) processFields(
 	desc protoreflect.MessageDescriptor,
-	_ *validate.MessageConstraints,
+	_ *validate.MessageRules,
 	msgEval *message,
 	cache messageCache,
 ) {
 	fields := desc.Fields()
 	for i := 0; i < fields.Len(); i++ {
 		fdesc := fields.Get(i)
-		fieldConstraints := resolve.FieldConstraints(fdesc)
-		fldEval, err := bldr.buildField(fdesc, fieldConstraints, cache)
+		fieldRules := resolve.FieldRules(fdesc)
+		fldEval, err := bldr.buildField(fdesc, fieldRules, cache)
 		if err != nil {
-			msgEval.Err = err
-			return
+			fldEval.Err = err
 		}
-		msgEval.Append(fldEval)
+		msgEval.AppendNested(fldEval)
 	}
 }
 
 func (bldr *builder) buildField(
 	fieldDescriptor protoreflect.FieldDescriptor,
-	fieldConstraints *validate.FieldConstraints,
+	fieldRules *validate.FieldRules,
 	cache messageCache,
 ) (field, error) {
 	fld := field{
 		Value: value{
 			Descriptor: fieldDescriptor,
 		},
-		Required: fieldConstraints.GetRequired(),
-		IgnoreEmpty: fieldDescriptor.HasPresence() ||
-			bldr.shouldIgnoreEmpty(fieldConstraints),
-		IgnoreDefault: fieldDescriptor.HasPresence() &&
-			bldr.shouldIgnoreDefault(fieldConstraints),
+		HasPresence: fieldDescriptor.HasPresence(),
+		Required:    fieldRules.GetRequired(),
+		Ignore:      fieldRules.GetIgnore(),
 	}
-	if fld.IgnoreDefault {
+	if fld.shouldIgnoreDefault() {
 		fld.Zero = bldr.zeroValue(fieldDescriptor, false)
 	}
-	err := bldr.buildValue(fieldDescriptor, fieldConstraints, &fld.Value, cache)
+	err := bldr.buildValue(fieldDescriptor, fieldRules, &fld.Value, cache)
 	return fld, err
 }
 
 func (bldr *builder) buildValue(
 	fdesc protoreflect.FieldDescriptor,
-	constraints *validate.FieldConstraints,
+	rules *validate.FieldRules,
 	valEval *value,
 	cache messageCache,
 ) (err error) {
+	if bldr.shouldIgnoreAlways(rules) {
+		return nil
+	}
+
 	steps := []func(
 		fdesc protoreflect.FieldDescriptor,
-		fieldConstraints *validate.FieldConstraints,
+		fieldRules *validate.FieldRules,
 		valEval *value,
 		cache messageCache,
 	) error{
 		bldr.processIgnoreEmpty,
 		bldr.processFieldExpressions,
 		bldr.processEmbeddedMessage,
-		bldr.processWrapperConstraints,
-		bldr.processStandardConstraints,
-		bldr.processAnyConstraints,
-		bldr.processEnumConstraints,
-		bldr.processMapConstraints,
-		bldr.processRepeatedConstraints,
+		bldr.processWrapperRules,
+		bldr.processStandardRules,
+		bldr.processAnyRules,
+		bldr.processEnumRules,
+		bldr.processMapRules,
+		bldr.processRepeatedRules,
 	}
 
 	for _, step := range steps {
-		if err = step(fdesc, constraints, valEval, cache); err != nil {
+		if err = step(fdesc, rules, valEval, cache); err != nil {
 			return err
 		}
 	}
@@ -262,13 +261,13 @@ func (bldr *builder) buildValue(
 
 func (bldr *builder) processIgnoreEmpty(
 	fdesc protoreflect.FieldDescriptor,
-	constraints *validate.FieldConstraints,
+	rules *validate.FieldRules,
 	val *value,
 	_ messageCache,
 ) error {
 	// the only time we need to ignore empty on a value is if it's evaluating a
 	// field item (repeated element or map key/value).
-	val.IgnoreEmpty = val.NestedRule != nil && bldr.shouldIgnoreEmpty(constraints)
+	val.IgnoreEmpty = val.NestedRule != nil && bldr.shouldIgnoreEmpty(rules)
 	if val.IgnoreEmpty {
 		val.Zero = bldr.zeroValue(fdesc, val.NestedRule != nil)
 	}
@@ -277,12 +276,12 @@ func (bldr *builder) processIgnoreEmpty(
 
 func (bldr *builder) processFieldExpressions(
 	fieldDesc protoreflect.FieldDescriptor,
-	fieldConstraints *validate.FieldConstraints,
+	fieldRules *validate.FieldRules,
 	eval *value,
 	_ messageCache,
 ) error {
 	exprs := expressions{
-		Constraints: fieldConstraints.GetCel(),
+		Rules: fieldRules.GetCel(),
 	}
 
 	celTyp := pvcel.ProtoFieldToType(fieldDesc, false, eval.NestedRule != nil)
@@ -301,14 +300,14 @@ func (bldr *builder) processFieldExpressions(
 				FieldType:   celRuleField.GetFieldType().Enum(),
 				FieldName:   proto.String(celRuleField.GetFieldName()),
 				Subscript: &validate.FieldPathElement_Index{
-					Index: uint64(i),
+					Index: uint64(i), //nolint:gosec // indices are guaranteed to be non-negative
 				},
 			},
 		}
 		compiledExpressions[i].Descriptor = celRuleDescriptor
 	}
 	if len(compiledExpressions) > 0 {
-		eval.Constraints = append(eval.Constraints,
+		eval.Rules = append(eval.Rules,
 			celPrograms{
 				base:       newBase(eval),
 				programSet: compiledExpressions,
@@ -320,12 +319,11 @@ func (bldr *builder) processFieldExpressions(
 
 func (bldr *builder) processEmbeddedMessage(
 	fdesc protoreflect.FieldDescriptor,
-	rules *validate.FieldConstraints,
+	_ *validate.FieldRules,
 	valEval *value,
 	cache messageCache,
 ) error {
 	if !isMessageField(fdesc) ||
-		bldr.shouldSkip(rules) ||
 		fdesc.IsMap() ||
 		(fdesc.IsList() && valEval.NestedRule == nil) {
 		return nil
@@ -337,7 +335,7 @@ func (bldr *builder) processEmbeddedMessage(
 			"failed to compile embedded type %s for %s: %w",
 			fdesc.Message().FullName(), fdesc.FullName(), err)}
 	}
-	valEval.Append(&embeddedMessage{
+	valEval.AppendNested(&embeddedMessage{
 		base:    newBase(valEval),
 		message: embedEval,
 	})
@@ -345,20 +343,19 @@ func (bldr *builder) processEmbeddedMessage(
 	return nil
 }
 
-func (bldr *builder) processWrapperConstraints(
+func (bldr *builder) processWrapperRules(
 	fdesc protoreflect.FieldDescriptor,
-	rules *validate.FieldConstraints,
+	rules *validate.FieldRules,
 	valEval *value,
 	cache messageCache,
 ) error {
 	if !isMessageField(fdesc) ||
-		bldr.shouldSkip(rules) ||
 		fdesc.IsMap() ||
 		(fdesc.IsList() && valEval.NestedRule == nil) {
 		return nil
 	}
 
-	expectedWrapperDescriptor, ok := expectedWrapperConstraints(fdesc.Message().FullName())
+	expectedWrapperDescriptor, ok := expectedWrapperRules(fdesc.Message().FullName())
 	if !ok || !rules.ProtoReflect().Has(expectedWrapperDescriptor) {
 		return nil
 	}
@@ -370,20 +367,20 @@ func (bldr *builder) processWrapperConstraints(
 	if err != nil {
 		return err
 	}
-	valEval.Append(unwrapped.Constraints)
+	valEval.Append(unwrapped.Rules)
 	return nil
 }
 
-func (bldr *builder) processStandardConstraints(
+func (bldr *builder) processStandardRules(
 	fdesc protoreflect.FieldDescriptor,
-	constraints *validate.FieldConstraints,
+	rules *validate.FieldRules,
 	valEval *value,
 	_ messageCache,
 ) error {
-	stdConstraints, err := bldr.constraints.Build(
+	stdRules, err := bldr.rules.Build(
 		bldr.env,
 		fdesc,
-		constraints,
+		rules,
 		bldr.extensionTypeResolver,
 		bldr.allowUnknownFields,
 		valEval.NestedRule != nil,
@@ -393,14 +390,14 @@ func (bldr *builder) processStandardConstraints(
 	}
 	valEval.Append(celPrograms{
 		base:       newBase(valEval),
-		programSet: stdConstraints,
+		programSet: stdRules,
 	})
 	return nil
 }
 
-func (bldr *builder) processAnyConstraints(
+func (bldr *builder) processAnyRules(
 	fdesc protoreflect.FieldDescriptor,
-	fieldConstraints *validate.FieldConstraints,
+	fieldRules *validate.FieldRules,
 	valEval *value,
 	_ messageCache,
 ) error {
@@ -417,25 +414,25 @@ func (bldr *builder) processAnyConstraints(
 	anyEval := anyPB{
 		base:              newBase(valEval),
 		TypeURLDescriptor: typeURLDesc,
-		In:                stringsToSet(fieldConstraints.GetAny().GetIn()),
-		NotIn:             stringsToSet(fieldConstraints.GetAny().GetNotIn()),
-		InValue:           fieldConstraints.GetAny().ProtoReflect().Get(inField),
-		NotInValue:        fieldConstraints.GetAny().ProtoReflect().Get(notInField),
+		In:                stringsToSet(fieldRules.GetAny().GetIn()),
+		NotIn:             stringsToSet(fieldRules.GetAny().GetNotIn()),
+		InValue:           fieldRules.GetAny().ProtoReflect().Get(inField),
+		NotInValue:        fieldRules.GetAny().ProtoReflect().Get(notInField),
 	}
 	valEval.Append(anyEval)
 	return nil
 }
 
-func (bldr *builder) processEnumConstraints(
+func (bldr *builder) processEnumRules(
 	fdesc protoreflect.FieldDescriptor,
-	fieldConstraints *validate.FieldConstraints,
+	fieldRules *validate.FieldRules,
 	valEval *value,
 	_ messageCache,
 ) error {
 	if fdesc.Kind() != protoreflect.EnumKind {
 		return nil
 	}
-	if fieldConstraints.GetEnum().GetDefinedOnly() {
+	if fieldRules.GetEnum().GetDefinedOnly() {
 		valEval.Append(definedEnum{
 			base:             newBase(valEval),
 			ValueDescriptors: fdesc.Enum().Values(),
@@ -444,9 +441,9 @@ func (bldr *builder) processEnumConstraints(
 	return nil
 }
 
-func (bldr *builder) processMapConstraints(
+func (bldr *builder) processMapRules(
 	fieldDesc protoreflect.FieldDescriptor,
-	constraints *validate.FieldConstraints,
+	rules *validate.FieldRules,
 	valEval *value,
 	cache messageCache,
 ) error {
@@ -458,23 +455,23 @@ func (bldr *builder) processMapConstraints(
 
 	err := bldr.buildValue(
 		fieldDesc.MapKey(),
-		constraints.GetMap().GetKeys(),
-		&mapEval.KeyConstraints,
+		rules.GetMap().GetKeys(),
+		&mapEval.KeyRules,
 		cache)
 	if err != nil {
 		return &CompilationError{cause: fmt.Errorf(
-			"failed to compile key constraints for map %s: %w",
+			"failed to compile key rules for map %s: %w",
 			fieldDesc.FullName(), err)}
 	}
 
 	err = bldr.buildValue(
 		fieldDesc.MapValue(),
-		constraints.GetMap().GetValues(),
-		&mapEval.ValueConstraints,
+		rules.GetMap().GetValues(),
+		&mapEval.ValueRules,
 		cache)
 	if err != nil {
 		return &CompilationError{cause: fmt.Errorf(
-			"failed to compile value constraints for map %s: %w",
+			"failed to compile value rules for map %s: %w",
 			fieldDesc.FullName(), err)}
 	}
 
@@ -482,9 +479,9 @@ func (bldr *builder) processMapConstraints(
 	return nil
 }
 
-func (bldr *builder) processRepeatedConstraints(
+func (bldr *builder) processRepeatedRules(
 	fdesc protoreflect.FieldDescriptor,
-	fieldConstraints *validate.FieldConstraints,
+	fieldRules *validate.FieldRules,
 	valEval *value,
 	cache messageCache,
 ) error {
@@ -494,27 +491,23 @@ func (bldr *builder) processRepeatedConstraints(
 
 	listEval := newListItems(valEval)
 
-	err := bldr.buildValue(fdesc, fieldConstraints.GetRepeated().GetItems(), &listEval.ItemConstraints, cache)
+	err := bldr.buildValue(fdesc, fieldRules.GetRepeated().GetItems(), &listEval.ItemRules, cache)
 	if err != nil {
 		return &CompilationError{cause: fmt.Errorf(
-			"failed to compile items constraints for repeated %v: %w", fdesc.FullName(), err)}
+			"failed to compile items rules for repeated %v: %w", fdesc.FullName(), err)}
 	}
 
 	valEval.Append(listEval)
 	return nil
 }
 
-func (bldr *builder) shouldSkip(constraints *validate.FieldConstraints) bool {
-	return constraints.GetIgnore() == validate.Ignore_IGNORE_ALWAYS
+func (bldr *builder) shouldIgnoreAlways(rules *validate.FieldRules) bool {
+	return rules.GetIgnore() == validate.Ignore_IGNORE_ALWAYS
 }
 
-func (bldr *builder) shouldIgnoreEmpty(constraints *validate.FieldConstraints) bool {
-	return constraints.GetIgnore() == validate.Ignore_IGNORE_IF_UNPOPULATED ||
-		constraints.GetIgnore() == validate.Ignore_IGNORE_IF_DEFAULT_VALUE
-}
-
-func (bldr *builder) shouldIgnoreDefault(constraints *validate.FieldConstraints) bool {
-	return constraints.GetIgnore() == validate.Ignore_IGNORE_IF_DEFAULT_VALUE
+func (bldr *builder) shouldIgnoreEmpty(rules *validate.FieldRules) bool {
+	return rules.GetIgnore() == validate.Ignore_IGNORE_IF_UNPOPULATED ||
+		rules.GetIgnore() == validate.Ignore_IGNORE_IF_DEFAULT_VALUE
 }
 
 func (bldr *builder) zeroValue(fdesc protoreflect.FieldDescriptor, forItems bool) protoreflect.Value {
