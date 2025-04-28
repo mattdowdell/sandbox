@@ -3,7 +3,7 @@ module github.com/mattdowdell/sandbox
 go 1.24
 
 require (
-	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.6-20250423154025-7712fb530c57.1
+	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.6-20250425153114-8976f5be98c1.1
 	buf.build/gen/go/grpc/grpc/connectrpc/go v1.18.1-20250327203416-d75db256c5a2.1
 	buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.6-20250327203416-d75db256c5a2.1
 	connectrpc.com/connect v1.18.1
