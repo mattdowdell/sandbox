@@ -24,32 +24,60 @@ import (
 type value struct {
 	// Descriptor is the FieldDescriptor targeted by this evaluator
 	Descriptor protoreflect.FieldDescriptor
-	// Constraints are the individual evaluators applied to a value
-	Constraints evaluators
+	// Rules are the individual evaluators applied to a value
+	Rules evaluators
+	// NestedRules are rules applied to messages nested under a
+	// value.
+	NestedRules evaluators
 	// Zero is the default or zero-value for this value's type
 	Zero protoreflect.Value
 	// NestedRule specifies the nested rule type the value is for.
 	NestedRule *validate.FieldPath
-	// IgnoreEmpty indicates that the Constraints should not be applied if the
+	// IgnoreEmpty indicates that the Rules should not be applied if the
 	// value is unset or the default (typically zero) value. This only applies to
 	// repeated elements or map keys/values with an ignore_empty rule.
 	IgnoreEmpty bool
 }
 
-func (v *value) Evaluate(val protoreflect.Value, failFast bool) error {
-	if v.IgnoreEmpty && val.Equal(v.Zero) {
-		return nil
+func (v *value) Evaluate(msg protoreflect.Message, val protoreflect.Value, cfg *validationConfig) error {
+	return v.EvaluateField(msg, val, cfg, cfg.filter.ShouldValidate(msg, v.Descriptor))
+}
+
+func (v *value) EvaluateField(
+	msg protoreflect.Message,
+	val protoreflect.Value,
+	cfg *validationConfig,
+	shouldValidate bool,
+) error {
+	var (
+		err error
+		ok  bool
+	)
+	if shouldValidate {
+		if v.IgnoreEmpty && val.Equal(v.Zero) {
+			return nil
+		}
+		if ok, err = mergeViolations(err, v.Rules.Evaluate(msg, val, cfg), cfg); !ok {
+			return err
+		}
 	}
-	return v.Constraints.Evaluate(val, failFast)
+	_, err = mergeViolations(err, v.NestedRules.Evaluate(msg, val, cfg), cfg)
+	return err
 }
 
 func (v *value) Tautology() bool {
-	return v.Constraints.Tautology()
+	return v.Rules.Tautology() && v.NestedRules.Tautology()
 }
 
 func (v *value) Append(eval evaluator) {
 	if !eval.Tautology() {
-		v.Constraints = append(v.Constraints, eval)
+		v.Rules = append(v.Rules, eval)
+	}
+}
+
+func (v *value) AppendNested(eval evaluator) {
+	if !eval.Tautology() {
+		v.NestedRules = append(v.NestedRules, eval)
 	}
 }
 

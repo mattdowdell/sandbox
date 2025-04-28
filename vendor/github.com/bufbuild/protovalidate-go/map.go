@@ -26,7 +26,7 @@ import (
 
 //nolint:gochecknoglobals
 var (
-	mapRuleDescriptor     = (&validate.FieldConstraints{}).ProtoReflect().Descriptor().Fields().ByName("map")
+	mapRuleDescriptor     = (&validate.FieldRules{}).ProtoReflect().Descriptor().Fields().ByName("map")
 	mapKeysRuleDescriptor = (&validate.MapRules{}).ProtoReflect().Descriptor().Fields().ByName("keys")
 	mapKeysRulePath       = &validate.FieldPath{
 		Elements: []*validate.FieldPathElement{
@@ -47,24 +47,24 @@ var (
 type kvPairs struct {
 	base
 
-	// KeyConstraints are checked on the map keys
-	KeyConstraints value
-	// ValueConstraints are checked on the map values
-	ValueConstraints value
+	// KeyRules are checked on the map keys
+	KeyRules value
+	// ValueRules are checked on the map values
+	ValueRules value
 }
 
 func newKVPairs(valEval *value) kvPairs {
 	return kvPairs{
-		base:             newBase(valEval),
-		KeyConstraints:   value{NestedRule: mapKeysRulePath},
-		ValueConstraints: value{NestedRule: mapValuesRulePath},
+		base:       newBase(valEval),
+		KeyRules:   value{NestedRule: mapKeysRulePath},
+		ValueRules: value{NestedRule: mapValuesRulePath},
 	}
 }
 
-func (m kvPairs) Evaluate(val protoreflect.Value, failFast bool) (err error) {
+func (m kvPairs) Evaluate(msg protoreflect.Message, val protoreflect.Value, cfg *validationConfig) (err error) {
 	var ok bool
 	val.Map().Range(func(key protoreflect.MapKey, value protoreflect.Value) bool {
-		evalErr := m.evalPairs(key, value, failFast)
+		evalErr := m.evalPairs(msg, key, value, cfg)
 		if evalErr != nil {
 			element := &validate.FieldPathElement{
 				FieldNumber: proto.Int32(m.base.FieldPathElement.GetFieldNumber()),
@@ -96,28 +96,28 @@ func (m kvPairs) Evaluate(val protoreflect.Value, failFast bool) (err error) {
 			}
 			updateViolationPaths(evalErr, element, m.base.RulePrefix.GetElements())
 		}
-		ok, err = mergeViolations(err, evalErr, failFast)
+		ok, err = mergeViolations(err, evalErr, cfg)
 		return ok
 	})
 	return err
 }
 
-func (m kvPairs) evalPairs(key protoreflect.MapKey, value protoreflect.Value, failFast bool) (err error) {
-	evalErr := m.KeyConstraints.Evaluate(key.Value(), failFast)
+func (m kvPairs) evalPairs(msg protoreflect.Message, key protoreflect.MapKey, value protoreflect.Value, cfg *validationConfig) (err error) {
+	evalErr := m.KeyRules.EvaluateField(msg, key.Value(), cfg, true)
 	markViolationForKey(evalErr)
-	ok, err := mergeViolations(err, evalErr, failFast)
+	ok, err := mergeViolations(err, evalErr, cfg)
 	if !ok {
 		return err
 	}
 
-	evalErr = m.ValueConstraints.Evaluate(value, failFast)
-	_, err = mergeViolations(err, evalErr, failFast)
+	evalErr = m.ValueRules.EvaluateField(msg, value, cfg, true)
+	_, err = mergeViolations(err, evalErr, cfg)
 	return err
 }
 
 func (m kvPairs) Tautology() bool {
-	return m.KeyConstraints.Tautology() &&
-		m.ValueConstraints.Tautology()
+	return m.KeyRules.Tautology() &&
+		m.ValueRules.Tautology()
 }
 
 func (m kvPairs) formatKey(key any) string {

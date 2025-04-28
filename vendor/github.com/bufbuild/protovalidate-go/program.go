@@ -38,19 +38,19 @@ type programSet []compiledProgram
 // either *errors.ValidationError if the input is invalid or errors.RuntimeError
 // if there is a type or range error. If failFast is true, execution stops at
 // the first failed expression.
-func (s programSet) Eval(val protoreflect.Value, failFast bool) error {
+func (s programSet) Eval(val protoreflect.Value, cfg *validationConfig) error {
 	binding := s.bindThis(val.Interface())
 	defer globalVarPool.Put(binding)
 
 	var violations []*Violation
 	for _, expr := range s {
-		violation, err := expr.eval(binding)
+		violation, err := expr.eval(binding, cfg)
 		if err != nil {
 			return err
 		}
 		if violation != nil {
 			violations = append(violations, violation)
-			if failFast {
+			if cfg.failFast {
 				break
 			}
 		}
@@ -73,12 +73,22 @@ func (s programSet) bindThis(val any) *variable {
 	case protoreflect.Map:
 		// TODO: expensive to create this copy, but getting this into a ref.Val with
 		//  traits.Mapper is not terribly feasible from this type.
-		m := make(map[any]any, value.Len())
+		bindingVal := make(map[any]any, value.Len())
 		value.Range(func(key protoreflect.MapKey, value protoreflect.Value) bool {
-			m[key.Interface()] = value.Interface()
+			// Cel operates on 64-bit integers, so if our map type is 32-bit, we
+			// need to widen to a 64-bit type in the binding due to our usage of
+			// a map[any]any.
+			switch key.Interface().(type) {
+			case int32:
+				bindingVal[key.Int()] = value.Interface()
+			case uint32:
+				bindingVal[key.Uint()] = value.Interface()
+			default:
+				bindingVal[key.Interface()] = value.Interface()
+			}
 			return true
 		})
-		binding.Val = m
+		binding.Val = bindingVal
 	default:
 		binding.Val = value
 	}
@@ -90,15 +100,15 @@ func (s programSet) bindThis(val any) *variable {
 // source Expression.
 type compiledProgram struct {
 	Program    cel.Program
-	Source     *validate.Constraint
+	Source     *validate.Rule
 	Path       []*validate.FieldPathElement
 	Value      protoreflect.Value
 	Descriptor protoreflect.FieldDescriptor
 }
 
 //nolint:nilnil // non-existence of violations is intentional
-func (expr compiledProgram) eval(bindings *variable) (*Violation, error) {
-	now := globalNowPool.Get()
+func (expr compiledProgram) eval(bindings *variable, cfg *validationConfig) (*Violation, error) {
+	now := globalNowPool.Get(cfg.nowFn)
 	defer globalNowPool.Put(now)
 	bindings.Next = now
 
@@ -114,9 +124,9 @@ func (expr compiledProgram) eval(bindings *variable) (*Violation, error) {
 		}
 		return &Violation{
 			Proto: &validate.Violation{
-				Rule:         expr.rulePath(),
-				ConstraintId: proto.String(expr.Source.GetId()),
-				Message:      proto.String(val),
+				Rule:    expr.rulePath(),
+				RuleId:  proto.String(expr.Source.GetId()),
+				Message: proto.String(val),
 			},
 			RuleValue:      expr.Value,
 			RuleDescriptor: expr.Descriptor,
@@ -127,9 +137,9 @@ func (expr compiledProgram) eval(bindings *variable) (*Violation, error) {
 		}
 		return &Violation{
 			Proto: &validate.Violation{
-				Rule:         expr.rulePath(),
-				ConstraintId: proto.String(expr.Source.GetId()),
-				Message:      proto.String(expr.Source.GetMessage()),
+				Rule:    expr.rulePath(),
+				RuleId:  proto.String(expr.Source.GetId()),
+				Message: proto.String(expr.Source.GetMessage()),
 			},
 			RuleValue:      expr.Value,
 			RuleDescriptor: expr.Descriptor,
