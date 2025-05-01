@@ -2,6 +2,7 @@ package examplerpc
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/google/uuid"
 
@@ -10,15 +11,15 @@ import (
 
 // ...
 type ResourceFacade interface {
-	Create(context.Context, *entities.Resource) (*entities.Resource, error)
-	Get(context.Context, uuid.UUID) (*entities.Resource, error)
-	List(context.Context) ([]*entities.Resource, error)
-	Update(context.Context, *entities.Resource) (*entities.Resource, error)
-	Delete(context.Context, uuid.UUID) error
+	Create(context.Context, *slog.Logger, *entities.Resource) (*entities.Resource, error)
+	Get(context.Context, *slog.Logger, uuid.UUID) (*entities.Resource, error)
+	List(context.Context, *slog.Logger) ([]*entities.Resource, error)
+	Update(context.Context, *slog.Logger, *entities.Resource) (*entities.Resource, error)
+	Delete(context.Context, *slog.Logger, uuid.UUID) error
 }
 
 // ...
 type AuditEventFacade interface {
-	List(context.Context) ([]*entities.AuditEvent, error)
-	Watch(context.Context) <-chan *entities.AuditEvent
+	List(context.Context, *slog.Logger) ([]*entities.AuditEvent, error)
+	Watch(context.Context, *slog.Logger) <-chan *entities.AuditEvent
 }

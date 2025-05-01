@@ -1,6 +1,7 @@
 package usecasefacades_test
 
 import (
+	"log/slog"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -13,6 +14,7 @@ import (
 
 func Test_AuditEvent_List(t *testing.T) {
 	// arrange
+	logger := slog.New(slog.DiscardHandler)
 	datastore := mockcommon.NewDatastore(t)
 
 	provider := mockcommon.NewProvider(t)
@@ -21,7 +23,7 @@ func Test_AuditEvent_List(t *testing.T) {
 	usecase := mockusecasefacades.NewAuditEventLister(t)
 	usecase.
 		EXPECT().
-		Execute(t.Context(), datastore).
+		Execute(t.Context(), logger, datastore).
 		Return(nil, nil).
 		Once()
 
@@ -32,7 +34,7 @@ func Test_AuditEvent_List(t *testing.T) {
 	)
 
 	// act
-	output, err := facade.List(t.Context())
+	output, err := facade.List(t.Context(), logger)
 
 	// assert
 	assert.Empty(t, output)
@@ -41,6 +43,7 @@ func Test_AuditEvent_List(t *testing.T) {
 
 func Test_AuditEvent_Watch(t *testing.T) {
 	// arrange
+	logger := slog.New(slog.DiscardHandler)
 	datastore := mockcommon.NewDatastore(t)
 
 	provider := mockcommon.NewProvider(t)
@@ -51,7 +54,7 @@ func Test_AuditEvent_Watch(t *testing.T) {
 	usecase := mockusecasefacades.NewAuditEventWatcher(t)
 	usecase.
 		EXPECT().
-		Execute(t.Context(), datastore).
+		Execute(t.Context(), logger, datastore).
 		Return(ch).
 		Once()
 
@@ -62,7 +65,7 @@ func Test_AuditEvent_Watch(t *testing.T) {
 	)
 
 	// act
-	output := facade.Watch(t.Context())
+	output := facade.Watch(t.Context(), logger)
 
 	// assert
 	assert.NotNil(t, output)

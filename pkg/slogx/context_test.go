@@ -1,4 +1,4 @@
-package logging_test
+package slogx_test
 
 import (
 	"context"
@@ -7,11 +7,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mattdowdell/sandbox/internal/drivers/logging"
+	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
 func Test_FromContext(t *testing.T) {
-	toAdd := logging.New(slog.LevelInfo)
+	toAdd := slog.New(slog.DiscardHandler)
 
 	testCases := []struct {
 		name string
@@ -28,14 +28,14 @@ func Test_FromContext(t *testing.T) {
 		{
 			name: "nil",
 			have: func(ctx context.Context) context.Context {
-				return logging.SetContext(ctx, nil /*logger*/)
+				return slogx.AddToContext(ctx, nil /*logger*/)
 			},
 			want: slog.Default(),
 		},
 		{
 			name: "present",
 			have: func(ctx context.Context) context.Context {
-				return logging.SetContext(ctx, toAdd)
+				return slogx.AddToContext(ctx, toAdd)
 			},
 			want: toAdd,
 		},
@@ -47,7 +47,7 @@ func Test_FromContext(t *testing.T) {
 			ctx := tc.have(t.Context())
 
 			// act
-			logger := logging.FromContext(ctx)
+			logger := slogx.FromContext(ctx)
 
 			// assert
 			assert.Same(t, tc.want, logger)

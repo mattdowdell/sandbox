@@ -2,6 +2,7 @@ package examplerpc_test
 
 import (
 	"context"
+	"log/slog"
 	"testing"
 	"time"
 
@@ -30,9 +31,14 @@ func Test_Handler_CreateResource_Success(t *testing.T) {
 	facade := mockexamplerpc.NewResourceFacade(t)
 	facade.
 		EXPECT().
-		Create(t.Context(), mock.AnythingOfType("*entities.Resource")).
+		Create(
+			t.Context(),
+			mock.AnythingOfType("*slog.Logger"),
+			mock.AnythingOfType("*entities.Resource"),
+		).
 		RunAndReturn(func(
 			_ context.Context,
+			_ *slog.Logger,
 			r *entities.Resource,
 		) (*entities.Resource, error) {
 			return &entities.Resource{
@@ -77,7 +83,11 @@ func Test_Handler_CreateResource_AlreadyExists(t *testing.T) {
 	facade := mockexamplerpc.NewResourceFacade(t)
 	facade.
 		EXPECT().
-		Create(t.Context(), mock.AnythingOfType("*entities.Resource")).
+		Create(
+			t.Context(),
+			mock.AnythingOfType("*slog.Logger"),
+			mock.AnythingOfType("*entities.Resource"),
+		).
 		Return(nil, apperrors.ErrAlreadyExists).
 		Once()
 
@@ -105,7 +115,11 @@ func Test_Handler_CreateResource_Internal(t *testing.T) {
 	facade := mockexamplerpc.NewResourceFacade(t)
 	facade.
 		EXPECT().
-		Create(t.Context(), mock.AnythingOfType("*entities.Resource")).
+		Create(
+			t.Context(),
+			mock.AnythingOfType("*slog.Logger"),
+			mock.AnythingOfType("*entities.Resource"),
+		).
 		Return(nil, apperrors.ErrInternal).
 		Once()
 

@@ -31,10 +31,11 @@ type Provider interface {
 // the transaction as necessary.
 func TxFunc(
 	ctx context.Context,
+	logger *slog.Logger,
 	provider Provider,
 	fn func(Datastore) error,
 ) error {
-	_, _, err := TxValues(ctx, provider, func(ds Datastore) (struct{}, struct{}, error) {
+	_, _, err := TxValues(ctx, logger, provider, func(ds Datastore) (struct{}, struct{}, error) {
 		return struct{}{}, struct{}{}, fn(ds)
 	})
 
@@ -45,10 +46,11 @@ func TxFunc(
 // back the transaction as necessary. It returns the non-error value returned by fn on success.
 func TxValue[T any](
 	ctx context.Context,
+	logger *slog.Logger,
 	provider Provider,
 	fn func(Datastore) (T, error),
 ) (T, error) {
-	val, _, err := TxValues(ctx, provider, func(ds Datastore) (T, struct{}, error) {
+	val, _, err := TxValues(ctx, logger, provider, func(ds Datastore) (T, struct{}, error) {
 		val, err := fn(ds)
 		return val, struct{}{}, err
 	})
@@ -62,12 +64,13 @@ func TxValue[T any](
 //nolint:gocritic // nothing gained by naming generic return values
 func TxValues[T1, T2 any](
 	ctx context.Context,
+	logger *slog.Logger,
 	provider Provider,
 	fn func(Datastore) (T1, T2, error),
 ) (T1, T2, error) {
 	conn, commit, rollback, err := provider.BeginTx(ctx)
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to begin transaction", slogx.Err(err))
+		logger.ErrorContext(ctx, "failed to begin transaction", slogx.Err(err))
 
 		var t1 T1
 		var t2 T2
@@ -77,7 +80,7 @@ func TxValues[T1, T2 any](
 
 	defer func() {
 		if err := rollback(); err != nil {
-			slog.ErrorContext(ctx, "failed to rollback transaction", slogx.Err(err))
+			logger.ErrorContext(ctx, "failed to rollback transaction", slogx.Err(err))
 		}
 	}()
 

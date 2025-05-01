@@ -1,4 +1,4 @@
-package logging
+package slogx
 
 import (
 	"context"
@@ -16,7 +16,7 @@ func FromContext(ctx context.Context) *slog.Logger {
 	return slog.Default()
 }
 
-// SetContext adds the given logger to the context, returning the new context.
-func SetContext(ctx context.Context, logger *slog.Logger) context.Context {
+// AddToContext adds the given logger to the context, returning the new context.
+func AddToContext(ctx context.Context, logger *slog.Logger) context.Context {
 	return context.WithValue(ctx, ctxKey{}, logger)
 }

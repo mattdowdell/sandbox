@@ -34,13 +34,13 @@ func NewCreateResource(
 // cause ErrInternal to be returned.
 func (u *CreateResource) Execute(
 	ctx context.Context,
+	logger *slog.Logger,
 	store repositories.Resource,
 	resource *entities.Resource,
 ) (*entities.Resource, error) {
 	id, err := u.uuidgen.NewV7()
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to generate id", slogx.Err(err))
-
+		logger.ErrorContext(ctx, "failed to generate id", slogx.Err(err))
 		return nil, apperrors.ErrInternal
 	}
 
@@ -48,16 +48,14 @@ func (u *CreateResource) Execute(
 
 	if err := store.CreateResource(ctx, resource); err != nil {
 		if errors.Is(err, apperrors.ErrAlreadyExists) {
-			slog.InfoContext(ctx, "resource exists", slogx.Err(err))
-
+			logger.InfoContext(ctx, "resource exists", slogx.Err(err))
 			return nil, apperrors.ErrAlreadyExists
 		}
 
-		slog.ErrorContext(ctx, "failed to create resource", slogx.Err(err))
-
+		logger.ErrorContext(ctx, "failed to create resource", slogx.Err(err))
 		return nil, apperrors.ErrInternal
 	}
 
-	slog.InfoContext(ctx, "created resource")
+	logger.InfoContext(ctx, "created resource")
 	return resource, nil
 }

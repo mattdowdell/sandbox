@@ -2,6 +2,7 @@ package common_test
 
 import (
 	"errors"
+	"log/slog"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,6 +13,7 @@ import (
 
 func Test_TxFunc(t *testing.T) {
 	// arrange
+	logger := slog.New(slog.DiscardHandler)
 	datastore := mockcommon.NewDatastore(t)
 
 	commit := mockcommon.NewCommitFn(t)
@@ -28,7 +30,7 @@ func Test_TxFunc(t *testing.T) {
 		Once()
 
 	// act
-	err := common.TxFunc(t.Context(), provider, func(_ common.Datastore) error {
+	err := common.TxFunc(t.Context(), logger, provider, func(_ common.Datastore) error {
 		return nil
 	})
 
@@ -38,6 +40,7 @@ func Test_TxFunc(t *testing.T) {
 
 func Test_TxValue(t *testing.T) {
 	// arrange
+	logger := slog.New(slog.DiscardHandler)
 	datastore := mockcommon.NewDatastore(t)
 
 	commit := mockcommon.NewCommitFn(t)
@@ -54,7 +57,7 @@ func Test_TxValue(t *testing.T) {
 		Once()
 
 	// act
-	val, err := common.TxValue(t.Context(), provider, func(_ common.Datastore) (bool, error) {
+	val, err := common.TxValue(t.Context(), logger, provider, func(_ common.Datastore) (bool, error) {
 		return true, nil
 	})
 
@@ -81,6 +84,7 @@ func Test_TxValues_Success(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// arrange
+			logger := slog.New(slog.DiscardHandler)
 			datastore := mockcommon.NewDatastore(t)
 
 			commit := mockcommon.NewCommitFn(t)
@@ -99,6 +103,7 @@ func Test_TxValues_Success(t *testing.T) {
 			// act
 			val1, val2, err := common.TxValues(
 				t.Context(),
+				logger,
 				provider,
 				func(_ common.Datastore) (bool, bool, error) {
 					return true, true, nil
@@ -194,10 +199,11 @@ func Test_TxValues_Error(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// arrange
+			logger := slog.New(slog.DiscardHandler)
 			provider := tc.provider(t)
 
 			// act
-			val1, val2, err := common.TxValues(t.Context(), provider, tc.fn)
+			val1, val2, err := common.TxValues(t.Context(), logger, provider, tc.fn)
 
 			// assert
 			assert.False(t, val1)

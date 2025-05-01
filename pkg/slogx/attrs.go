@@ -34,6 +34,11 @@ func TraceID(span trace.Span) slog.Attr {
 }
 
 // ...
+func RPCSystem(system string) slog.Attr {
+	return slog.String("rpc_system", system)
+}
+
+// ...
 func RPCService(service string) slog.Attr {
 	return slog.String("rpc_service", service)
 }

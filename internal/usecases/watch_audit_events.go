@@ -20,13 +20,14 @@ func NewWatchAuditEvents() *WatchAuditEvents {
 // ...
 func (u *WatchAuditEvents) Execute(
 	ctx context.Context,
+	logger *slog.Logger,
 	store repositories.AuditEvent,
 ) <-chan *entities.AuditEvent {
 	ch := make(chan *entities.AuditEvent, 1)
 
 	go func() {
 		if err := store.WatchAuditEvents(ctx, ch); err != nil {
-			slog.ErrorContext(ctx, "failed to watch audit events", slogx.Err(err))
+			logger.ErrorContext(ctx, "failed to watch audit events", slogx.Err(err))
 		}
 	}()
 

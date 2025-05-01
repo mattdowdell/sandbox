@@ -3,7 +3,6 @@ package examplerpc
 import (
 	"context"
 	"errors"
-	"log/slog"
 
 	"connectrpc.com/connect"
 
@@ -22,14 +21,16 @@ func (h *Handler) DeleteResource(
 	ctx context.Context,
 	req *connect.Request[examplev1.DeleteResourceRequest],
 ) (*connect.Response[examplev1.DeleteResourceResponse], error) {
+	logger := slogx.FromContext(ctx)
+
 	id, err := models.ParseID(req.Msg)
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to parse id", slogx.Err(err))
+		logger.ErrorContext(ctx, "failed to parse id", slogx.Err(err))
 		return nil, ErrInternal
 	}
 
-	if err := h.resource.Delete(ctx, id); err != nil {
-		slog.DebugContext(ctx, "failed to delete resource", slogx.Err(err))
+	if err := h.resource.Delete(ctx, logger, id); err != nil {
+		logger.DebugContext(ctx, "failed to delete resource", slogx.Err(err))
 
 		if errors.Is(err, apperrors.ErrNotFound) {
 			return nil, ErrResourceNotFound

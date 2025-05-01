@@ -2,6 +2,7 @@ package usecases_test
 
 import (
 	"errors"
+	"log/slog"
 	"testing"
 	"time"
 
@@ -42,6 +43,7 @@ func Test_CreateResource_Success(t *testing.T) {
 	uuidgen.EXPECT().NewV7().Return(id, nil).Once()
 
 	usecase := usecases.NewCreateResource(clock, uuidgen)
+	logger := slog.New(slog.DiscardHandler)
 
 	expected := &entities.Resource{
 		ID:        id,
@@ -58,7 +60,7 @@ func Test_CreateResource_Success(t *testing.T) {
 	}
 
 	// act
-	output, err := usecase.Execute(t.Context(), store, input)
+	output, err := usecase.Execute(t.Context(), logger, store, input)
 
 	// assert
 	assert.Equal(t, expected, output)
@@ -73,6 +75,7 @@ func Test_CreateResource_IDFailed(t *testing.T) {
 	uuidgen.EXPECT().NewV7().Return(uuid.Nil, errors.New("example")).Once()
 
 	usecase := usecases.NewCreateResource(clock, uuidgen)
+	logger := slog.New(slog.DiscardHandler)
 	store := mockrepositories.NewResource(t)
 
 	input := &entities.Resource{
@@ -80,7 +83,7 @@ func Test_CreateResource_IDFailed(t *testing.T) {
 	}
 
 	// act
-	output, err := usecase.Execute(t.Context(), store, input)
+	output, err := usecase.Execute(t.Context(), logger, store, input)
 
 	// assert
 	assert.Nil(t, output)
@@ -115,6 +118,7 @@ func Test_CreateResource_CreateFailed(t *testing.T) {
 			uuidgen.EXPECT().NewV7().Return(id, nil).Once()
 
 			usecase := usecases.NewCreateResource(clock, uuidgen)
+			logger := slog.New(slog.DiscardHandler)
 
 			expected := &entities.Resource{
 				ID:        id,
@@ -135,7 +139,7 @@ func Test_CreateResource_CreateFailed(t *testing.T) {
 			}
 
 			// act
-			output, err := usecase.Execute(t.Context(), store, input)
+			output, err := usecase.Execute(t.Context(), logger, store, input)
 
 			// assert
 			assert.Nil(t, output)
