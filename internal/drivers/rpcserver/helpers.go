@@ -6,7 +6,7 @@ import (
 	"connectrpc.com/connect"
 )
 
-// ...
+// SplitProcedure splits the RPC procedure into RPC service and RPC method components.
 func SplitProcedure(spec connect.Spec) (service, method string) {
 	name := strings.TrimLeft(spec.Procedure, "/")
 
@@ -18,7 +18,8 @@ func SplitProcedure(spec connect.Spec) (service, method string) {
 	return service, method
 }
 
-// ...
+// ProtocolToSystem converts the request protocol to the format used by the OpenTelemetry semantic
+// convention for RPC systems.
 func ProtocolToSystem(peer connect.Peer) string {
 	switch peer.Protocol {
 	case "grpcweb":
