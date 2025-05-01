@@ -55,7 +55,6 @@ services:
       start_interval: "1s"
     restart: always
 
-
   jaeger:
     image: "mirror.gcr.io/jaegertracing/jaeger:2.5.0"
     pull_policy: "always"
@@ -67,10 +66,8 @@ services:
       start_interval: "1s"
     restart: always
 
-  # TODO: use plain prometheus?
-  #       avoids need for grafana plugin, but modifies meter provider to enable scraping
   victoria-metrics:
-    image: "mirror.gcr.io/victoriametrics/victoria-metrics:latest" # TODO: pick tag
+    image: "mirror.gcr.io/victoriametrics/victoria-metrics:v1.116.0"
     pull_policy: "always"
     ports:
       - "127.0.0.1:8428:8428"
@@ -81,7 +78,7 @@ services:
     restart: always
 
   victoria-logs:
-    image: "mirror.gcr.io/victoriametrics/victoria-logs:latest" # TODO: pick tag
+    image: "mirror.gcr.io/victoriametrics/victoria-logs:v1.21.0-victorialogs"
     pull_policy: "always"
     ports:
       - "127.0.0.1:9428:9428"
@@ -92,7 +89,7 @@ services:
     restart: always
 
   grafana:
-    image: "mirror.gcr.io/grafana/grafana:latest" # TODO: pick tag
+    image: "mirror.gcr.io/grafana/grafana:11.6.1"
     pull_policy: "always"
     environment:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
