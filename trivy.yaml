@@ -1,4 +1,4 @@
-# TODO: document options
+# https://trivy.dev/latest/docs/references/configuration/config-file/
 
 # https://github.com/aquasecurity/trivy/discussions/7538
 db:

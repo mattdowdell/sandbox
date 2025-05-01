@@ -57,7 +57,7 @@ message Sort {
 message ListResourcesFilter {
   // ...
   repeated string id = 1 [(buf.validate.field).repeated = {
-    max_items: 10
+    max_items: 100
     unique: true
     items: {
       string: {uuid: true}
