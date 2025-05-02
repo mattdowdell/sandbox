@@ -20,6 +20,7 @@ import (
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
 	"github.com/mattdowdell/sandbox/internal/drivers/pgsql"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver"
+	logging2 "github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/otelconnectx"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/validatex"
 	"github.com/mattdowdell/sandbox/internal/drivers/uuidgen"
@@ -61,16 +62,17 @@ func ProvideApp(ctx context.Context) (*App, error) {
 	reflectrpcHandler := reflectrpc.New()
 	healthrpcHandler := healthrpc.New()
 	v2 := collectHandlers(handler, reflectrpcHandler, healthrpcHandler)
-	interceptor, err := validatex.New()
-	if err != nil {
-		return nil, err
-	}
 	otelconnectxConfig := mainConfig.OtelConnect
-	otelconnectInterceptor, err := otelconnectx.NewFromConfig(otelconnectxConfig)
+	interceptor, err := otelconnectx.NewFromConfig(otelconnectxConfig)
 	if err != nil {
 		return nil, err
 	}
-	v3 := collectInterceptors(interceptor, otelconnectInterceptor)
+	validateInterceptor, err := validatex.New()
+	if err != nil {
+		return nil, err
+	}
+	loggingInterceptor := logging2.New()
+	v3 := collectInterceptors(interceptor, validateInterceptor, loggingInterceptor)
 	recoverer, err := rpcserver.NewRecoverer()
 	if err != nil {
 		return nil, err

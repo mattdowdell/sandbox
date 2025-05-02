@@ -1,6 +1,7 @@
 package usecases_test
 
 import (
+	"log/slog"
 	"testing"
 	"time"
 
@@ -33,6 +34,7 @@ func Test_UpdateResource_Success(t *testing.T) {
 	clock.EXPECT().Now().Return(now).Once()
 
 	usecase := usecases.NewUpdateResource(clock)
+	logger := slog.New(slog.DiscardHandler)
 
 	expected := &entities.Resource{
 		ID:        id,
@@ -49,7 +51,7 @@ func Test_UpdateResource_Success(t *testing.T) {
 	}
 
 	// act
-	resource, err := usecase.Execute(t.Context(), store, changes)
+	resource, err := usecase.Execute(t.Context(), logger, store, changes)
 
 	// assert
 	assert.Equal(t, expected, resource)
@@ -85,6 +87,7 @@ func Test_UpdateResource_Error(t *testing.T) {
 			clock.EXPECT().Now().Return(now).Once()
 
 			usecase := usecases.NewUpdateResource(clock)
+			logger := slog.New(slog.DiscardHandler)
 
 			expected := &entities.Resource{
 				ID:        id,
@@ -101,7 +104,7 @@ func Test_UpdateResource_Error(t *testing.T) {
 			}
 
 			// act
-			resource, err := usecase.Execute(t.Context(), store, changes)
+			resource, err := usecase.Execute(t.Context(), logger, store, changes)
 
 			// assert
 			assert.Nil(t, resource)

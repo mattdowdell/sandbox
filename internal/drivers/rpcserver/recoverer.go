@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"connectrpc.com/connect"
 	"go.opentelemetry.io/otel/codes"
@@ -47,39 +46,25 @@ func NewRecoverer() (*Recoverer, error) {
 
 // ...
 func (r *Recoverer) Handle(ctx context.Context, spec connect.Spec, _ http.Header, recovered any) error {
-	service, method := splitProcedure(spec)
+	service, method := SplitProcedure(spec)
 
 	span := trace.SpanFromContext(ctx)
 	span.RecordError(fmt.Errorf("panic: %v", recovered))
 	span.SetStatus(codes.Error, "panicked")
 
-	logger := slogx.LoggerFromContext(ctx)
+	logger := slogx.FromContext(ctx)
 	logger.ErrorContext(
 		ctx,
 		"panicked",
 		slogx.Panic(recovered),
-		// TODO: add rpc.system; see https://github.com/connectrpc/connect-go/issues/816
-		slogx.RPCService(service),
-		slogx.RPCMethod(method),
 		slogx.Stacktrace(),
 	)
 
 	r.panics.Add(ctx, 1, metric.WithAttributes(
+		// TODO: add rpc.system; see https://github.com/connectrpc/connect-go/issues/816
 		semconv.RPCService(service),
 		semconv.RPCMethod(method),
 	))
 
 	return connect.NewError(connect.CodeInternal, errors.New("internal"))
-}
-
-// ...
-func splitProcedure(spec connect.Spec) (service, method string) {
-	name := strings.TrimLeft(spec.Procedure, "/")
-
-	service, method, ok := strings.Cut(name, "/")
-	if !ok {
-		return "", service
-	}
-
-	return service, method
 }

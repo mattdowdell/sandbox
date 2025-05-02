@@ -2,6 +2,7 @@ package examplerpc_test
 
 import (
 	"context"
+	"log/slog"
 	"testing"
 	"time"
 
@@ -25,9 +26,14 @@ func Test_Handler_UpdateResource_Success(t *testing.T) {
 	facade := mockexamplerpc.NewResourceFacade(t)
 	facade.
 		EXPECT().
-		Update(t.Context(), mock.AnythingOfType("*entities.Resource")).
+		Update(
+			t.Context(),
+			mock.AnythingOfType("*slog.Logger"),
+			mock.AnythingOfType("*entities.Resource"),
+		).
 		RunAndReturn(func(
 			_ context.Context,
+			_ *slog.Logger,
 			r *entities.Resource,
 		) (*entities.Resource, error) {
 			return &entities.Resource{

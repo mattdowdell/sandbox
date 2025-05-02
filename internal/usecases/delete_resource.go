@@ -26,21 +26,20 @@ func NewDeleteResource() *DeleteResource {
 // ErrInternal to be returned.
 func (u *DeleteResource) Execute(
 	ctx context.Context,
+	logger *slog.Logger,
 	store repositories.Resource,
 	id uuid.UUID,
 ) error {
 	if err := store.DeleteResource(ctx, id); err != nil {
 		if errors.Is(err, apperrors.ErrNotFound) {
-			slog.InfoContext(ctx, "resource not found", slogx.Err(err))
-
+			logger.InfoContext(ctx, "resource not found", slogx.Err(err))
 			return apperrors.ErrNotFound
 		}
 
-		slog.ErrorContext(ctx, "failed to delete resource", slogx.Err(err))
-
+		logger.ErrorContext(ctx, "failed to delete resource", slogx.Err(err))
 		return apperrors.ErrInternal
 	}
 
-	slog.InfoContext(ctx, "deleted resource")
+	logger.InfoContext(ctx, "deleted resource")
 	return nil
 }

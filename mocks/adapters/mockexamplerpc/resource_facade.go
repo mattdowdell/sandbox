@@ -9,6 +9,8 @@ import (
 
 	mock "github.com/stretchr/testify/mock"
 
+	slog "log/slog"
+
 	uuid "github.com/google/uuid"
 )
 
@@ -25,9 +27,9 @@ func (_m *ResourceFacade) EXPECT() *ResourceFacade_Expecter {
 	return &ResourceFacade_Expecter{mock: &_m.Mock}
 }
 
-// Create provides a mock function with given fields: _a0, _a1
-func (_m *ResourceFacade) Create(_a0 context.Context, _a1 *entities.Resource) (*entities.Resource, error) {
-	ret := _m.Called(_a0, _a1)
+// Create provides a mock function with given fields: _a0, _a1, _a2
+func (_m *ResourceFacade) Create(_a0 context.Context, _a1 *slog.Logger, _a2 *entities.Resource) (*entities.Resource, error) {
+	ret := _m.Called(_a0, _a1, _a2)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Create")
@@ -35,19 +37,19 @@ func (_m *ResourceFacade) Create(_a0 context.Context, _a1 *entities.Resource) (*
 
 	var r0 *entities.Resource
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *entities.Resource) (*entities.Resource, error)); ok {
-		return rf(_a0, _a1)
+	if rf, ok := ret.Get(0).(func(context.Context, *slog.Logger, *entities.Resource) (*entities.Resource, error)); ok {
+		return rf(_a0, _a1, _a2)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *entities.Resource) *entities.Resource); ok {
-		r0 = rf(_a0, _a1)
+	if rf, ok := ret.Get(0).(func(context.Context, *slog.Logger, *entities.Resource) *entities.Resource); ok {
+		r0 = rf(_a0, _a1, _a2)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*entities.Resource)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *entities.Resource) error); ok {
-		r1 = rf(_a0, _a1)
+	if rf, ok := ret.Get(1).(func(context.Context, *slog.Logger, *entities.Resource) error); ok {
+		r1 = rf(_a0, _a1, _a2)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -62,14 +64,15 @@ type ResourceFacade_Create_Call struct {
 
 // Create is a helper method to define mock.On call
 //   - _a0 context.Context
-//   - _a1 *entities.Resource
-func (_e *ResourceFacade_Expecter) Create(_a0 interface{}, _a1 interface{}) *ResourceFacade_Create_Call {
-	return &ResourceFacade_Create_Call{Call: _e.mock.On("Create", _a0, _a1)}
+//   - _a1 *slog.Logger
+//   - _a2 *entities.Resource
+func (_e *ResourceFacade_Expecter) Create(_a0 interface{}, _a1 interface{}, _a2 interface{}) *ResourceFacade_Create_Call {
+	return &ResourceFacade_Create_Call{Call: _e.mock.On("Create", _a0, _a1, _a2)}
 }
 
-func (_c *ResourceFacade_Create_Call) Run(run func(_a0 context.Context, _a1 *entities.Resource)) *ResourceFacade_Create_Call {
+func (_c *ResourceFacade_Create_Call) Run(run func(_a0 context.Context, _a1 *slog.Logger, _a2 *entities.Resource)) *ResourceFacade_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*entities.Resource))
+		run(args[0].(context.Context), args[1].(*slog.Logger), args[2].(*entities.Resource))
 	})
 	return _c
 }
@@ -79,22 +82,22 @@ func (_c *ResourceFacade_Create_Call) Return(_a0 *entities.Resource, _a1 error) 
 	return _c
 }
 
-func (_c *ResourceFacade_Create_Call) RunAndReturn(run func(context.Context, *entities.Resource) (*entities.Resource, error)) *ResourceFacade_Create_Call {
+func (_c *ResourceFacade_Create_Call) RunAndReturn(run func(context.Context, *slog.Logger, *entities.Resource) (*entities.Resource, error)) *ResourceFacade_Create_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// Delete provides a mock function with given fields: _a0, _a1
-func (_m *ResourceFacade) Delete(_a0 context.Context, _a1 uuid.UUID) error {
-	ret := _m.Called(_a0, _a1)
+// Delete provides a mock function with given fields: _a0, _a1, _a2
+func (_m *ResourceFacade) Delete(_a0 context.Context, _a1 *slog.Logger, _a2 uuid.UUID) error {
+	ret := _m.Called(_a0, _a1, _a2)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Delete")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) error); ok {
-		r0 = rf(_a0, _a1)
+	if rf, ok := ret.Get(0).(func(context.Context, *slog.Logger, uuid.UUID) error); ok {
+		r0 = rf(_a0, _a1, _a2)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -109,14 +112,15 @@ type ResourceFacade_Delete_Call struct {
 
 // Delete is a helper method to define mock.On call
 //   - _a0 context.Context
-//   - _a1 uuid.UUID
-func (_e *ResourceFacade_Expecter) Delete(_a0 interface{}, _a1 interface{}) *ResourceFacade_Delete_Call {
-	return &ResourceFacade_Delete_Call{Call: _e.mock.On("Delete", _a0, _a1)}
+//   - _a1 *slog.Logger
+//   - _a2 uuid.UUID
+func (_e *ResourceFacade_Expecter) Delete(_a0 interface{}, _a1 interface{}, _a2 interface{}) *ResourceFacade_Delete_Call {
+	return &ResourceFacade_Delete_Call{Call: _e.mock.On("Delete", _a0, _a1, _a2)}
 }
 
-func (_c *ResourceFacade_Delete_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID)) *ResourceFacade_Delete_Call {
+func (_c *ResourceFacade_Delete_Call) Run(run func(_a0 context.Context, _a1 *slog.Logger, _a2 uuid.UUID)) *ResourceFacade_Delete_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uuid.UUID))
+		run(args[0].(context.Context), args[1].(*slog.Logger), args[2].(uuid.UUID))
 	})
 	return _c
 }
@@ -126,14 +130,14 @@ func (_c *ResourceFacade_Delete_Call) Return(_a0 error) *ResourceFacade_Delete_C
 	return _c
 }
 
-func (_c *ResourceFacade_Delete_Call) RunAndReturn(run func(context.Context, uuid.UUID) error) *ResourceFacade_Delete_Call {
+func (_c *ResourceFacade_Delete_Call) RunAndReturn(run func(context.Context, *slog.Logger, uuid.UUID) error) *ResourceFacade_Delete_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// Get provides a mock function with given fields: _a0, _a1
-func (_m *ResourceFacade) Get(_a0 context.Context, _a1 uuid.UUID) (*entities.Resource, error) {
-	ret := _m.Called(_a0, _a1)
+// Get provides a mock function with given fields: _a0, _a1, _a2
+func (_m *ResourceFacade) Get(_a0 context.Context, _a1 *slog.Logger, _a2 uuid.UUID) (*entities.Resource, error) {
+	ret := _m.Called(_a0, _a1, _a2)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Get")
@@ -141,19 +145,19 @@ func (_m *ResourceFacade) Get(_a0 context.Context, _a1 uuid.UUID) (*entities.Res
 
 	var r0 *entities.Resource
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*entities.Resource, error)); ok {
-		return rf(_a0, _a1)
+	if rf, ok := ret.Get(0).(func(context.Context, *slog.Logger, uuid.UUID) (*entities.Resource, error)); ok {
+		return rf(_a0, _a1, _a2)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *entities.Resource); ok {
-		r0 = rf(_a0, _a1)
+	if rf, ok := ret.Get(0).(func(context.Context, *slog.Logger, uuid.UUID) *entities.Resource); ok {
+		r0 = rf(_a0, _a1, _a2)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*entities.Resource)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
-		r1 = rf(_a0, _a1)
+	if rf, ok := ret.Get(1).(func(context.Context, *slog.Logger, uuid.UUID) error); ok {
+		r1 = rf(_a0, _a1, _a2)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -168,14 +172,15 @@ type ResourceFacade_Get_Call struct {
 
 // Get is a helper method to define mock.On call
 //   - _a0 context.Context
-//   - _a1 uuid.UUID
-func (_e *ResourceFacade_Expecter) Get(_a0 interface{}, _a1 interface{}) *ResourceFacade_Get_Call {
-	return &ResourceFacade_Get_Call{Call: _e.mock.On("Get", _a0, _a1)}
+//   - _a1 *slog.Logger
+//   - _a2 uuid.UUID
+func (_e *ResourceFacade_Expecter) Get(_a0 interface{}, _a1 interface{}, _a2 interface{}) *ResourceFacade_Get_Call {
+	return &ResourceFacade_Get_Call{Call: _e.mock.On("Get", _a0, _a1, _a2)}
 }
 
-func (_c *ResourceFacade_Get_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID)) *ResourceFacade_Get_Call {
+func (_c *ResourceFacade_Get_Call) Run(run func(_a0 context.Context, _a1 *slog.Logger, _a2 uuid.UUID)) *ResourceFacade_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uuid.UUID))
+		run(args[0].(context.Context), args[1].(*slog.Logger), args[2].(uuid.UUID))
 	})
 	return _c
 }
@@ -185,14 +190,14 @@ func (_c *ResourceFacade_Get_Call) Return(_a0 *entities.Resource, _a1 error) *Re
 	return _c
 }
 
-func (_c *ResourceFacade_Get_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entities.Resource, error)) *ResourceFacade_Get_Call {
+func (_c *ResourceFacade_Get_Call) RunAndReturn(run func(context.Context, *slog.Logger, uuid.UUID) (*entities.Resource, error)) *ResourceFacade_Get_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// List provides a mock function with given fields: _a0
-func (_m *ResourceFacade) List(_a0 context.Context) ([]*entities.Resource, error) {
-	ret := _m.Called(_a0)
+// List provides a mock function with given fields: _a0, _a1
+func (_m *ResourceFacade) List(_a0 context.Context, _a1 *slog.Logger) ([]*entities.Resource, error) {
+	ret := _m.Called(_a0, _a1)
 
 	if len(ret) == 0 {
 		panic("no return value specified for List")
@@ -200,19 +205,19 @@ func (_m *ResourceFacade) List(_a0 context.Context) ([]*entities.Resource, error
 
 	var r0 []*entities.Resource
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context) ([]*entities.Resource, error)); ok {
-		return rf(_a0)
+	if rf, ok := ret.Get(0).(func(context.Context, *slog.Logger) ([]*entities.Resource, error)); ok {
+		return rf(_a0, _a1)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context) []*entities.Resource); ok {
-		r0 = rf(_a0)
+	if rf, ok := ret.Get(0).(func(context.Context, *slog.Logger) []*entities.Resource); ok {
+		r0 = rf(_a0, _a1)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]*entities.Resource)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = rf(_a0)
+	if rf, ok := ret.Get(1).(func(context.Context, *slog.Logger) error); ok {
+		r1 = rf(_a0, _a1)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -227,13 +232,14 @@ type ResourceFacade_List_Call struct {
 
 // List is a helper method to define mock.On call
 //   - _a0 context.Context
-func (_e *ResourceFacade_Expecter) List(_a0 interface{}) *ResourceFacade_List_Call {
-	return &ResourceFacade_List_Call{Call: _e.mock.On("List", _a0)}
+//   - _a1 *slog.Logger
+func (_e *ResourceFacade_Expecter) List(_a0 interface{}, _a1 interface{}) *ResourceFacade_List_Call {
+	return &ResourceFacade_List_Call{Call: _e.mock.On("List", _a0, _a1)}
 }
 
-func (_c *ResourceFacade_List_Call) Run(run func(_a0 context.Context)) *ResourceFacade_List_Call {
+func (_c *ResourceFacade_List_Call) Run(run func(_a0 context.Context, _a1 *slog.Logger)) *ResourceFacade_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context))
+		run(args[0].(context.Context), args[1].(*slog.Logger))
 	})
 	return _c
 }
@@ -243,14 +249,14 @@ func (_c *ResourceFacade_List_Call) Return(_a0 []*entities.Resource, _a1 error) 
 	return _c
 }
 
-func (_c *ResourceFacade_List_Call) RunAndReturn(run func(context.Context) ([]*entities.Resource, error)) *ResourceFacade_List_Call {
+func (_c *ResourceFacade_List_Call) RunAndReturn(run func(context.Context, *slog.Logger) ([]*entities.Resource, error)) *ResourceFacade_List_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// Update provides a mock function with given fields: _a0, _a1
-func (_m *ResourceFacade) Update(_a0 context.Context, _a1 *entities.Resource) (*entities.Resource, error) {
-	ret := _m.Called(_a0, _a1)
+// Update provides a mock function with given fields: _a0, _a1, _a2
+func (_m *ResourceFacade) Update(_a0 context.Context, _a1 *slog.Logger, _a2 *entities.Resource) (*entities.Resource, error) {
+	ret := _m.Called(_a0, _a1, _a2)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Update")
@@ -258,19 +264,19 @@ func (_m *ResourceFacade) Update(_a0 context.Context, _a1 *entities.Resource) (*
 
 	var r0 *entities.Resource
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *entities.Resource) (*entities.Resource, error)); ok {
-		return rf(_a0, _a1)
+	if rf, ok := ret.Get(0).(func(context.Context, *slog.Logger, *entities.Resource) (*entities.Resource, error)); ok {
+		return rf(_a0, _a1, _a2)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *entities.Resource) *entities.Resource); ok {
-		r0 = rf(_a0, _a1)
+	if rf, ok := ret.Get(0).(func(context.Context, *slog.Logger, *entities.Resource) *entities.Resource); ok {
+		r0 = rf(_a0, _a1, _a2)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*entities.Resource)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *entities.Resource) error); ok {
-		r1 = rf(_a0, _a1)
+	if rf, ok := ret.Get(1).(func(context.Context, *slog.Logger, *entities.Resource) error); ok {
+		r1 = rf(_a0, _a1, _a2)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -285,14 +291,15 @@ type ResourceFacade_Update_Call struct {
 
 // Update is a helper method to define mock.On call
 //   - _a0 context.Context
-//   - _a1 *entities.Resource
-func (_e *ResourceFacade_Expecter) Update(_a0 interface{}, _a1 interface{}) *ResourceFacade_Update_Call {
-	return &ResourceFacade_Update_Call{Call: _e.mock.On("Update", _a0, _a1)}
+//   - _a1 *slog.Logger
+//   - _a2 *entities.Resource
+func (_e *ResourceFacade_Expecter) Update(_a0 interface{}, _a1 interface{}, _a2 interface{}) *ResourceFacade_Update_Call {
+	return &ResourceFacade_Update_Call{Call: _e.mock.On("Update", _a0, _a1, _a2)}
 }
 
-func (_c *ResourceFacade_Update_Call) Run(run func(_a0 context.Context, _a1 *entities.Resource)) *ResourceFacade_Update_Call {
+func (_c *ResourceFacade_Update_Call) Run(run func(_a0 context.Context, _a1 *slog.Logger, _a2 *entities.Resource)) *ResourceFacade_Update_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*entities.Resource))
+		run(args[0].(context.Context), args[1].(*slog.Logger), args[2].(*entities.Resource))
 	})
 	return _c
 }
@@ -302,7 +309,7 @@ func (_c *ResourceFacade_Update_Call) Return(_a0 *entities.Resource, _a1 error) 
 	return _c
 }
 
-func (_c *ResourceFacade_Update_Call) RunAndReturn(run func(context.Context, *entities.Resource) (*entities.Resource, error)) *ResourceFacade_Update_Call {
+func (_c *ResourceFacade_Update_Call) RunAndReturn(run func(context.Context, *slog.Logger, *entities.Resource) (*entities.Resource, error)) *ResourceFacade_Update_Call {
 	_c.Call.Return(run)
 	return _c
 }

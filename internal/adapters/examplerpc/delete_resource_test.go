@@ -6,6 +6,7 @@ import (
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/mattdowdell/sandbox/gen/example/v1"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
@@ -20,7 +21,7 @@ func Test_Handler_DeleteResource_Success(t *testing.T) {
 	facade := mockexamplerpc.NewResourceFacade(t)
 	facade.
 		EXPECT().
-		Delete(t.Context(), id).
+		Delete(t.Context(), mock.AnythingOfType("*slog.Logger"), id).
 		Return(nil).
 		Once()
 
@@ -69,7 +70,7 @@ func Test_Handler_DeleteResource_NotFound(t *testing.T) {
 	facade := mockexamplerpc.NewResourceFacade(t)
 	facade.
 		EXPECT().
-		Delete(t.Context(), id).
+		Delete(t.Context(), mock.AnythingOfType("*slog.Logger"), id).
 		Return(apperrors.ErrNotFound).
 		Once()
 
@@ -97,7 +98,7 @@ func Test_Handler_DeleteResource_Internal(t *testing.T) {
 	facade := mockexamplerpc.NewResourceFacade(t)
 	facade.
 		EXPECT().
-		Delete(t.Context(), id).
+		Delete(t.Context(), mock.AnythingOfType("*slog.Logger"), id).
 		Return(apperrors.ErrInternal).
 		Once()
 

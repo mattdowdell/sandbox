@@ -2,6 +2,7 @@ package usecasefacades
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/google/uuid"
 
@@ -41,44 +42,49 @@ func NewResource(
 // ...
 func (r *Resource) Create(
 	ctx context.Context,
+	logger *slog.Logger,
 	input *entities.Resource,
 ) (*entities.Resource, error) {
-	return common.TxValue(ctx, r.provider, func(ds common.Datastore) (*entities.Resource, error) {
-		return r.creator.Execute(ctx, ds, input)
+	return common.TxValue(ctx, logger, r.provider, func(ds common.Datastore) (*entities.Resource, error) {
+		return r.creator.Execute(ctx, logger, ds, input)
 	})
 }
 
 // ...
 func (r *Resource) Get(
 	ctx context.Context,
+	logger *slog.Logger,
 	input uuid.UUID,
 ) (*entities.Resource, error) {
-	return r.getter.Execute(ctx, r.provider.Datastore(), input)
+	return r.getter.Execute(ctx, logger, r.provider.Datastore(), input)
 }
 
 // ...
 func (r *Resource) List(
 	ctx context.Context,
+	logger *slog.Logger,
 ) ([]*entities.Resource, error) {
-	return r.lister.Execute(ctx, r.provider.Datastore())
+	return r.lister.Execute(ctx, logger, r.provider.Datastore())
 }
 
 // ...
 func (r *Resource) Update(
 	ctx context.Context,
+	logger *slog.Logger,
 	input *entities.Resource,
 ) (*entities.Resource, error) {
-	return common.TxValue(ctx, r.provider, func(ds common.Datastore) (*entities.Resource, error) {
-		return r.updater.Execute(ctx, ds, input)
+	return common.TxValue(ctx, logger, r.provider, func(ds common.Datastore) (*entities.Resource, error) {
+		return r.updater.Execute(ctx, logger, ds, input)
 	})
 }
 
 // ...
 func (r *Resource) Delete(
 	ctx context.Context,
+	logger *slog.Logger,
 	input uuid.UUID,
 ) error {
-	return common.TxFunc(ctx, r.provider, func(ds common.Datastore) error {
-		return r.deleter.Execute(ctx, ds, input)
+	return common.TxFunc(ctx, logger, r.provider, func(ds common.Datastore) error {
+		return r.deleter.Execute(ctx, logger, ds, input)
 	})
 }

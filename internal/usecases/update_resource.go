@@ -31,6 +31,7 @@ func NewUpdateResource(
 // use, ErrAlreadyExists is returned. Any other failure will cause ErrInternal to be returned.
 func (u *UpdateResource) Execute(
 	ctx context.Context,
+	logger *slog.Logger,
 	store repositories.Resource,
 	changes *entities.Resource,
 ) (*entities.Resource, error) {
@@ -40,22 +41,19 @@ func (u *UpdateResource) Execute(
 	if err != nil {
 		switch {
 		case errors.Is(err, apperrors.ErrNotFound):
-			slog.InfoContext(ctx, "resource not found", slogx.Err(err))
-
+			logger.InfoContext(ctx, "resource not found", slogx.Err(err))
 			return nil, apperrors.ErrNotFound
 
 		case errors.Is(err, apperrors.ErrAlreadyExists):
-			slog.InfoContext(ctx, "resource exists", slogx.Err(err))
-
+			logger.InfoContext(ctx, "resource exists", slogx.Err(err))
 			return nil, apperrors.ErrAlreadyExists
 
 		default:
-			slog.ErrorContext(ctx, "failed to update resource", slogx.Err(err))
-
+			logger.ErrorContext(ctx, "failed to update resource", slogx.Err(err))
 			return nil, apperrors.ErrInternal
 		}
 	}
 
-	slog.InfoContext(ctx, "updated resource")
+	logger.InfoContext(ctx, "updated resource")
 	return resource, nil
 }

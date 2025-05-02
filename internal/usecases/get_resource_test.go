@@ -1,6 +1,7 @@
 package usecases_test
 
 import (
+	"log/slog"
 	"testing"
 	"time"
 
@@ -29,6 +30,7 @@ func Test_GetResource_Success(t *testing.T) {
 	now := time.Now()
 
 	usecase := usecases.NewGetResource()
+	logger := slog.New(slog.DiscardHandler)
 
 	expected := &entities.Resource{
 		ID:        id,
@@ -41,7 +43,7 @@ func Test_GetResource_Success(t *testing.T) {
 	store.EXPECT().GetResource(t.Context(), id).Return(expected, nil).Once()
 
 	// act
-	resource, err := usecase.Execute(t.Context(), store, id)
+	resource, err := usecase.Execute(t.Context(), logger, store, id)
 
 	// assert
 	assert.Equal(t, expected, resource)
@@ -69,12 +71,13 @@ func Test_GetResource_Error(t *testing.T) {
 			id := uuid.New()
 
 			usecase := usecases.NewGetResource()
+			logger := slog.New(slog.DiscardHandler)
 
 			store := mockrepositories.NewResource(t)
 			store.EXPECT().GetResource(t.Context(), id).Return(nil, tc.err).Once()
 
 			// act
-			resource, err := usecase.Execute(t.Context(), store, id)
+			resource, err := usecase.Execute(t.Context(), logger, store, id)
 
 			// assert
 			assert.Nil(t, resource)

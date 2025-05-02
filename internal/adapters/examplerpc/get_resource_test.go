@@ -2,12 +2,14 @@ package examplerpc_test
 
 import (
 	"context"
+	"log/slog"
 	"testing"
 	"time"
 
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/mattdowdell/sandbox/gen/example/v1"
@@ -24,8 +26,12 @@ func Test_Handler_GetResource_Success(t *testing.T) {
 	facade := mockexamplerpc.NewResourceFacade(t)
 	facade.
 		EXPECT().
-		Get(t.Context(), id).
-		RunAndReturn(func(_ context.Context, id uuid.UUID) (*entities.Resource, error) {
+		Get(t.Context(), mock.AnythingOfType("*slog.Logger"), id).
+		RunAndReturn(func(
+			_ context.Context,
+			_ *slog.Logger,
+			id uuid.UUID,
+		) (*entities.Resource, error) {
 			return &entities.Resource{
 				ID:        id,
 				Name:      testResourceName,
