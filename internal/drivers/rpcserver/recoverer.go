@@ -29,7 +29,7 @@ type Recoverer struct {
 	panics metric.Int64Counter
 }
 
-// ...
+// NewRecoverer creates a Recoverer.
 func NewRecoverer() (*Recoverer, error) {
 	panics, err := otelx.Meter().Int64Counter(
 		"rpc.server.panics",
@@ -44,7 +44,8 @@ func NewRecoverer() (*Recoverer, error) {
 	}, nil
 }
 
-// ...
+// Handle records a panic via logging, tracing and metrics and returns a generic internal error
+// response to be passed to the client.
 func (r *Recoverer) Handle(ctx context.Context, spec connect.Spec, _ http.Header, recovered any) error {
 	service, method := SplitProcedure(spec)
 
