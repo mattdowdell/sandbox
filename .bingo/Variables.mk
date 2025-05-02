@@ -71,3 +71,9 @@ $(WIRE): $(BINGO_DIR)/wire.mod
 	@echo "(re)installing $(GOBIN)/wire-v0.6.0"
 	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=wire.mod -o=$(GOBIN)/wire-v0.6.0 "github.com/google/wire/cmd/wire"
 
+YAMLFMT := $(GOBIN)/yamlfmt-v0.16.0
+$(YAMLFMT): $(BINGO_DIR)/yamlfmt.mod
+	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
+	@echo "(re)installing $(GOBIN)/yamlfmt-v0.16.0"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=yamlfmt.mod -o=$(GOBIN)/yamlfmt-v0.16.0 "github.com/google/yamlfmt/cmd/yamlfmt"
+

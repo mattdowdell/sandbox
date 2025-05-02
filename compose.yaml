@@ -1,3 +1,4 @@
+---
 # https://docs.docker.com/reference/compose-file/
 
 services:
@@ -26,7 +27,7 @@ services:
     volumes:
       - "./.covdata:/covdata"
     healthcheck:
-      test: [ "CMD", "/example-health" ]
+      test: ["CMD", "/example-health"]
       start_period: "30s"
       start_interval: "1s"
     depends_on:
@@ -61,7 +62,7 @@ services:
     ports:
       - "127.0.0.1:16686:16686"
     healthcheck:
-      test: [ "CMD", "wget", "-qO", "/dev/null", "http://localhost:16686/" ]
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:16686/"]
       start_period: "30s"
       start_interval: "1s"
     restart: always
@@ -72,7 +73,7 @@ services:
     ports:
       - "127.0.0.1:8428:8428"
     healthcheck:
-      test: [ "CMD", "wget", "-qO-", "http://127.0.0.1:8428/-/healthy" ]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8428/-/healthy"]
       start_period: "30s"
       start_interval: "1s"
     restart: always
@@ -83,7 +84,7 @@ services:
     ports:
       - "127.0.0.1:9428:9428"
     healthcheck:
-      test: [ "CMD", "wget", "-qO-", "http://127.0.0.1:9428/-/healthy" ]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:9428/-/healthy"]
       start_period: "30s"
       start_interval: "1s"
     restart: always
@@ -105,7 +106,7 @@ services:
       - "./config/dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml:ro"
       - "./config/dashboards:/etc/dashboards:rw"
     healthcheck:
-      test: [ "CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/health" ]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/health"]
       start_period: "30s"
       start_interval: "1s"
     restart: always

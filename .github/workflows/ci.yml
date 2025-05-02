@@ -1,3 +1,4 @@
+---
 name: CI
 
 on:
@@ -139,8 +140,8 @@ jobs:
       - name: Unit test
         run: just unit
 
-      # TODO: report coverage to PR
-      # maybe gwatts/go-coverage-action?
+    # TODO: report coverage to PR
+    # maybe gwatts/go-coverage-action?
 
   scan:
     name: Scan
@@ -284,7 +285,7 @@ jobs:
       - tag
     runs-on: ubuntu-latest
     permissions:
-      contents: read  # for checkout
+      contents: read # for checkout
       packages: write # for container push
       id-token: write # for keyless image signing
     steps:

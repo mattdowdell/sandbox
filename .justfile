@@ -75,7 +75,7 @@ vendor-go:
     go mod vendor
 
 # Run all formatters.
-fmt: fmt-buf fmt-go fmt-just
+fmt: fmt-buf fmt-go fmt-just fmt-yaml
 
 # Run the Protobuf formatter.
 fmt-buf: install-buf
@@ -95,6 +95,10 @@ fmt-go: install-gofumpt install-gci
 # Run the Justfile formatter.
 fmt-just:
     just --unstable --fmt
+
+# Run the YAML formatter
+fmt-yaml: install-yamlfmt
+    {{ yamlfmt }} .
 
 # Run all code generators.
 gen: gen-buf gen-go gen-just
