@@ -1,3 +1,4 @@
+---
 name: Container Build
 
 inputs:
@@ -26,7 +27,7 @@ runs:
           org.opencontainers.image.revision=${{ github.sha }}
           org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
           org.opencontainers.image.version=${{ inputs.version }}
-        build-args:
+        build-args: |
           SERVICE=${{ inputs.service }}
         cache-from: type=gha
         cache-to: type=gha,mode=max

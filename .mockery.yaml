@@ -1,3 +1,4 @@
+---
 # https://vektra.github.io/mockery/latest/configuration/
 
 dir: 'mocks/{{ trimPrefix .PackagePath "github.com/mattdowdell/sandbox/internal/" | dir }}/mock{{ .PackagePath | base }}'
