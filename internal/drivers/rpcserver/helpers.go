@@ -7,8 +7,8 @@ import (
 )
 
 // SplitProcedure splits the RPC procedure into RPC service and RPC method components.
-func SplitProcedure(spec connect.Spec) (service, method string) {
-	name := strings.TrimLeft(spec.Procedure, "/")
+func SplitProcedure(procedure string) (service, method string) {
+	name := strings.TrimLeft(procedure, "/")
 
 	service, method, ok := strings.Cut(name, "/")
 	if !ok {
