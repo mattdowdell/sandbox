@@ -1,6 +1,22 @@
 Feature: Delete Resource
   Support delete operations for Resources.
 
+  Rule: Must have valid authentication
+
+    Scenario: Delete resource without authentication
+      Given no authentication
+      And a non-existent Resource ID
+      When I delete the Resource
+      Then I should fail with code=unauthenticated, msg=invalid or missing authorization
+
+    Scenario: Delete resource with invalid authentication
+      Given invalid authentication
+      And a non-existent Resource ID
+      When I delete the Resource
+      Then I should fail with code=unauthenticated, msg=invalid or missing authorization
+
+  Rule: Only existing resources can be deleted
+
     Scenario: Delete resource with a valid ID
       Given valid authentication
       And an existing Resource ID

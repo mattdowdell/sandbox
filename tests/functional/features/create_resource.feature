@@ -3,13 +3,13 @@ Feature: Create Resource
 
   Rule: Must have valid authentication
 
-    Scenario: Missing authentication
+    Scenario: Create resource without authentication
       Given a name of 10 printable ASCII characters
       And no authentication
       When I create a Resource
       Then I should fail with code=unauthenticated, msg=invalid or missing authorization
 
-    Scenario: Invalid authentication
+    Scenario: Create resource with invalid authentication
       Given a name of 10 printable ASCII characters
       And invalid authentication
       When I create a Resource

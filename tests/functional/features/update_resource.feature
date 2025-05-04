@@ -1,6 +1,22 @@
 Feature: Update Resource
   Support update operations for Resources.
 
+  Rule: Must have valid authentication
+
+    Scenario: Update resource without authentication
+      Given no authentication
+      And a non-existent Resource ID
+      And a name of 10 printable ASCII characters
+      When I update the Resource
+      Then I should fail with code=unauthenticated, msg=invalid or missing authorization
+
+    Scenario: Update resource with invalid authentication
+      Given invalid authentication
+      And a non-existent Resource ID
+      And a name of 10 printable ASCII characters
+      When I update the Resource
+      Then I should fail with code=unauthenticated, msg=invalid or missing authorization
+
   Rule: Names must be 3-100 printable ASCII characters
 
     Scenario: Update resource with short name
