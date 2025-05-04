@@ -4,53 +4,61 @@ Feature: Update Resource
   Rule: Names must be 3-100 printable ASCII characters
 
     Scenario: Update resource with short name
-      Given an existing Resource ID
+      Given valid authentication
+      And an existing Resource ID
       And a name of 3 printable ASCII characters
       When I update the Resource
       Then I should receive the Resource
 
     Scenario: Update resource with long name
-      Given an existing Resource ID
+      Given valid authentication
+      And an existing Resource ID
       And a name of 100 printable ASCII characters
       When I update the Resource
       Then I should receive the Resource
 
     Scenario: Update resource with invalid name
-      Given an existing Resource ID
+      Given valid authentication
+      And an existing Resource ID
       And a name of 10 printable non-ASCII characters
       When I update the Resource
       Then I should fail with code=invalid_argument, msg=validation error: - resource.name: value does not match regex pattern `^[ -~]+$` [string.pattern]
 
     Scenario: Update resource with a too short name
-      Given an existing Resource ID
+      Given valid authentication
+      And an existing Resource ID
       And a name of 2 printable ASCII characters
       When I update the Resource
       Then I should fail with code=invalid_argument, msg=validation error: - resource.name: value length must be at least 3 characters [string.min_len]
 
     Scenario: Update resource with a too long name
-      Given an existing Resource ID
+      Given valid authentication
+      And an existing Resource ID
       And a name of 101 printable ASCII characters
       When I update the Resource
       Then I should fail with code=invalid_argument, msg=validation error: - resource.name: value length must be at most 100 characters [string.max_len]
 
   Rule: Names must not be duplicated
 
-   Scenario: Update duplicate resource
-     Given an existing Resource ID
-     And an existing resource name
-     When I update the Resource
-     Then I should fail with code=already_exists, msg=resource name already in use
+    Scenario: Update duplicate resource
+      Given valid authentication
+      And an existing Resource ID
+      And an existing resource name
+      When I update the Resource
+      Then I should fail with code=already_exists, msg=resource name already in use
 
   Rule: Only existing resources can be updated
 
     Scenario: Update non-existent resource
-      Given a non-existent Resource ID
+      Given valid authentication
+      And a non-existent Resource ID
       And a name of 20 printable ASCII characters
       When I update the Resource
       Then I should fail with code=not_found, msg=resource does not exist
 
     Scenario: Update resource with invalid ID
-      Given an invalid Resource ID
+      Given valid authentication
+      And an invalid Resource ID
       And a name of 20 printable ASCII characters
       When I update the Resource
       Then I should fail with code=invalid_argument, msg=validation error: - resource.id: value must be a valid UUID [string.uuid]

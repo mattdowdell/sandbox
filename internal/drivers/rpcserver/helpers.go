@@ -2,8 +2,6 @@ package rpcserver
 
 import (
 	"strings"
-
-	"connectrpc.com/connect"
 )
 
 // SplitProcedure splits the RPC procedure into RPC service and RPC method components.
@@ -20,8 +18,8 @@ func SplitProcedure(procedure string) (service, method string) {
 
 // ProtocolToSystem converts the request protocol to the format used by the OpenTelemetry semantic
 // convention for RPC systems.
-func ProtocolToSystem(peer connect.Peer) string {
-	switch peer.Protocol {
+func ProtocolToSystem(protocol string) string {
+	switch protocol {
 	case "grpcweb":
 		return "grpc_web"
 
@@ -29,6 +27,6 @@ func ProtocolToSystem(peer connect.Peer) string {
 		return "connect_rpc"
 
 	default:
-		return peer.Protocol
+		return protocol
 	}
 }

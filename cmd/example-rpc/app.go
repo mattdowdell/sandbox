@@ -20,6 +20,7 @@ type AppConfig struct {
 
 // ...
 type App struct {
+	conf            Config
 	shutdownTimeout time.Duration
 	logger          *slog.Logger
 	server          *rpcserver.Server
@@ -28,15 +29,18 @@ type App struct {
 }
 
 // ...
+//
+//nolint:gocritic // config is large(ish), but this is called once
 func NewApp(
-	config AppConfig,
+	conf Config,
 	logger *slog.Logger,
 	server *rpcserver.Server,
 	tpShutdown otelx.TracerProviderShutdown,
 	mpShutdown otelx.MeterProviderShutdown,
 ) *App {
 	return &App{
-		shutdownTimeout: config.ShutdownTimeout,
+		conf:            conf,
+		shutdownTimeout: conf.App.ShutdownTimeout,
 		logger:          logger,
 		server:          server,
 		tpShutdown:      tpShutdown,
@@ -46,7 +50,7 @@ func NewApp(
 
 // ...
 func (a *App) Start(ctx context.Context, stop context.CancelFunc) {
-	a.logger.InfoContext(ctx, "starting")
+	a.logger.InfoContext(ctx, "starting", slogx.Config(a.conf))
 
 	if err := runtime.Start(); err != nil {
 		a.logger.ErrorContext(ctx, "failed to start runtime metrics", slogx.Err(err))

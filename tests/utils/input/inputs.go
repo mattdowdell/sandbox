@@ -11,6 +11,7 @@ const (
 	nameCtxKey ctxKey = iota + 1
 	idCtxKey
 	newNameCtxKey
+	authnCtxKey
 )
 
 // ...
@@ -53,4 +54,15 @@ func IDFromContext(ctx context.Context) (string, error) {
 	}
 
 	return "", errors.New("id not found in context")
+}
+
+// ...
+func AddAuthnToContext(ctx context.Context, value string) context.Context {
+	return context.WithValue(ctx, authnCtxKey, value)
+}
+
+// ...
+func AuthnFromContext(ctx context.Context) (string, bool) {
+	val, ok := ctx.Value(authnCtxKey).(string)
+	return val, ok
 }

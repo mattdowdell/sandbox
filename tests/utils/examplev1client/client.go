@@ -27,6 +27,7 @@ func New(baseURL string) *Client {
 		connect.WithInterceptors(
 			connect.UnaryInterceptorFunc(ValidateUnaryInterceptor),
 			connect.UnaryInterceptorFunc(ScenarioUnaryInterceptor),
+			connect.UnaryInterceptorFunc(AuthnUnaryInterceptor),
 		),
 	)
 

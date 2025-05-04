@@ -55,6 +55,9 @@ func InitializeScenario(sc *godog.ScenarioContext) {
 	sc.Given(`^a non-existent Resource ID$`, step.NilUUID)
 	sc.Given(`^an invalid Resource ID$`, step.InvalidUUID)
 	sc.Given(`^an existing Resource ID$`, step.ExistingID)
+	sc.Given(`^invalid authentication$`, step.InvalidAuthentication)
+	sc.Given(`^no authentication$`, step.NoAuthentication)
+	sc.Given(`^valid authentication$`, step.ValidAuthentication)
 
 	sc.When(`^I create a Resource$`, step.CreateResource)
 	sc.When(`^I get the Resource$`, step.GetResource)

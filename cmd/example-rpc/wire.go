@@ -22,6 +22,7 @@ import (
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
 	"github.com/mattdowdell/sandbox/internal/drivers/pgsql"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver"
+	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/authn"
 	logginginterceptor "github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/otelconnectx"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/validatex"
@@ -35,7 +36,7 @@ func ProvideApp(ctx context.Context) (*App, error) {
 		flagoptions.New,
 		config.New,
 		LoadConfig,
-		wire.FieldsOf(new(Config), "App", "Database", "Logging", "Meter", "OtelConnect", "RPCServer", "Tracer"),
+		wire.FieldsOf(new(Config), "Database", "Logging", "Meter", "OtelConnect", "RPCServer", "Tracer"),
 		// observability
 		loggerOptions,
 		logging.NewAsDefaultFromConfig,
@@ -74,6 +75,8 @@ func ProvideApp(ctx context.Context) (*App, error) {
 		validatex.New,
 		otelconnectx.NewFromConfig,
 		logginginterceptor.New,
+		authnOptions,
+		authn.New,
 		collectInterceptors,
 		rpcserver.NewRecoverer,
 		collectHandlerOptions,
