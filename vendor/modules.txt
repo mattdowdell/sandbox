@@ -1,12 +1,17 @@
 # buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.6-20250425153114-8976f5be98c1.1
 ## explicit; go 1.22
 buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate
-# buf.build/gen/go/grpc/grpc/connectrpc/go v1.18.1-20250327203416-d75db256c5a2.1
+# buf.build/gen/go/grpc/grpc/connectrpc/go v1.18.1-20250429200738-0ee95b84c2c7.1
 ## explicit; go 1.21
 buf.build/gen/go/grpc/grpc/connectrpc/go/grpc/health/v1/healthv1connect
-# buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.6-20250327203416-d75db256c5a2.1
+# buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.6-20250429200738-0ee95b84c2c7.1
 ## explicit; go 1.22
 buf.build/gen/go/grpc/grpc/protocolbuffers/go/grpc/health/v1
+# buf.build/go/protovalidate v0.11.0
+## explicit; go 1.23.0
+buf.build/go/protovalidate
+buf.build/go/protovalidate/cel
+buf.build/go/protovalidate/resolve
 # cel.dev/expr v0.23.1
 ## explicit; go 1.22.0
 cel.dev/expr
@@ -25,8 +30,8 @@ connectrpc.com/grpcreflect/internal/gen/go/connectext/grpc/reflection/v1
 # connectrpc.com/otelconnect v0.7.2
 ## explicit; go 1.21
 connectrpc.com/otelconnect
-# connectrpc.com/validate v0.2.0
-## explicit; go 1.21.1
+# connectrpc.com/validate v0.3.0
+## explicit; go 1.23.0
 connectrpc.com/validate
 # github.com/XSAM/otelsql v0.38.0
 ## explicit; go 1.23.0
@@ -136,16 +141,11 @@ github.com/aws/smithy-go/transport/http/internal/io
 # github.com/aymanbagabas/go-osc52/v2 v2.0.1
 ## explicit; go 1.16
 github.com/aymanbagabas/go-osc52/v2
-# github.com/bufbuild/protovalidate-go v0.10.0
-## explicit; go 1.23.0
-github.com/bufbuild/protovalidate-go
-github.com/bufbuild/protovalidate-go/cel
-github.com/bufbuild/protovalidate-go/resolve
 # github.com/cenkalti/backoff/v4 v4.3.0
 ## explicit; go 1.18
 github.com/cenkalti/backoff/v4
-# github.com/charmbracelet/bubbletea v1.3.4
-## explicit; go 1.18
+# github.com/charmbracelet/bubbletea v1.3.5
+## explicit; go 1.23.0
 github.com/charmbracelet/bubbletea
 # github.com/charmbracelet/colorprofile v0.2.3-0.20250311203215-f60798e515dc
 ## explicit; go 1.18

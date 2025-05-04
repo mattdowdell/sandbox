@@ -16,12 +16,13 @@ package protovalidate
 
 import (
 	"fmt"
+	"maps"
 	"sync"
 	"sync/atomic"
 
 	"buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
-	pvcel "github.com/bufbuild/protovalidate-go/cel"
-	"github.com/bufbuild/protovalidate-go/resolve"
+	pvcel "buf.build/go/protovalidate/cel"
+	"buf.build/go/protovalidate/resolve"
 	"github.com/google/cel-go/cel"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
@@ -175,7 +176,7 @@ func (bldr *builder) processOneofRules(
 	_ messageCache,
 ) {
 	oneofs := desc.Oneofs()
-	for i := 0; i < oneofs.Len(); i++ {
+	for i := range oneofs.Len() {
 		oneofDesc := oneofs.Get(i)
 		oneofRules := resolve.OneofRules(oneofDesc)
 		oneofEval := oneof{
@@ -193,7 +194,7 @@ func (bldr *builder) processFields(
 	cache messageCache,
 ) {
 	fields := desc.Fields()
-	for i := 0; i < fields.Len(); i++ {
+	for i := range fields.Len() {
 		fdesc := fields.Get(i)
 		fieldRules := resolve.FieldRules(fdesc)
 		fldEval, err := bldr.buildField(fdesc, fieldRules, cache)
@@ -532,9 +533,7 @@ func (c messageCache) Clone() messageCache {
 	return newCache
 }
 func (c messageCache) SyncTo(other messageCache) {
-	for k, v := range c {
-		other[k] = v
-	}
+	maps.Copy(other, c)
 }
 
 // isMessageField returns true if the field descriptor fdesc describes a field

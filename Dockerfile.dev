@@ -7,15 +7,15 @@
 # Dependencies
 # ------------
 
-FROM ghcr.io/gitleaks/gitleaks:v8.24.3@sha256:e1b35e12a8c6fa8901f060459cfb6b2fc4c484d3afbe3b029733a3bbfab07055 AS gitleaks
+FROM ghcr.io/gitleaks/gitleaks:v8.25.1@sha256:2d7f83a3059f0444130115ab17c71d174c9671352251b27e9d97290981c12a51 AS gitleaks
 FROM mirror.gcr.io/golangci/golangci-lint:v2.1.5@sha256:88a8cc6bd17bc81a0cc97f401d25427b47394d664f16e5ca15d4156563d32154 AS golangci-lint
-FROM ghcr.io/aquasecurity/trivy:0.61.1@sha256:91bcccab7cb503127b0d792db7c652c4e556c9ff30eeb0908b6ae1980d7727ad AS trivy
+FROM ghcr.io/aquasecurity/trivy:0.62.0@sha256:cb84170aa1fb6942c11b638969dce0845735c35f40d3bd48851c7f2d83a3c1ae AS trivy
 
 # -------------
 # Devenv target
 # -------------
 
-FROM mirror.gcr.io/golang:1.24-bookworm@sha256:00eccd446e023d3cd9566c25a6e6a02b90db3e1e0bbe26a48fc29cd96e800901 AS dev
+FROM mirror.gcr.io/golang:1.24-bookworm@sha256:79390b5e5af9ee6e7b1173ee3eac7fadf6751a545297672916b59bfa0ecf6f71 AS dev
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -23,7 +23,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get update; \
     apt-get install -y --no-install-recommends \
         postgresql-client \
-        python3-pip \
+        pipx \
     ;
 
 RUN set -eux; \
@@ -38,6 +38,7 @@ USER dev
 
 RUN set -eux; \
     echo "export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin" >> /home/dev/.bashrc; \
+    pipx ensurepath; \
     mkdir -p /home/dev/ws; \
     git config --global --add safe.directory /home/dev/ws;
 
@@ -48,7 +49,7 @@ COPY --from=trivy /usr/local/bin/trivy /usr/bin/trivy
 ARG ZIZMOR_VERSION=1.6.0
 # TODO: add cache mounts?
 RUN set -eux; \
-    pip3 install --user --break-system-packages zizmor==${ZIZMOR_VERSION};
+    pipx install zizmor==${ZIZMOR_VERSION};
 
 # TODO: add cache mounts
 RUN set -eux; \
