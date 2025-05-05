@@ -2,6 +2,8 @@ package main
 
 import (
 	"connectrpc.com/connect"
+	"connectrpc.com/grpchealth"
+	"connectrpc.com/grpcreflect"
 	"connectrpc.com/otelconnect"
 	"connectrpc.com/validate"
 
@@ -11,6 +13,7 @@ import (
 	"github.com/mattdowdell/sandbox/internal/drivers/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver"
+	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/authn"
 	logginginterceptor "github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/logging"
 )
 
@@ -55,11 +58,13 @@ func collectInterceptors(
 	otelconnec *otelconnect.Interceptor,
 	validat *validate.Interceptor,
 	loggin *logginginterceptor.Interceptor,
+	auth *authn.Interceptor,
 ) []connect.Interceptor {
 	return []connect.Interceptor{
 		otelconnec,
 		validat,
 		loggin,
+		auth,
 	}
 }
 
@@ -81,5 +86,15 @@ func collectHandlerOptions(
 	return []connect.HandlerOption{
 		connect.WithInterceptors(interceptors...),
 		connect.WithRecover(recoverer.Handle),
+	}
+}
+
+func authnOptions() []authn.Option {
+	return []authn.Option{
+		authn.WithIgnoreService(
+			grpchealth.HealthV1ServiceName,
+			grpcreflect.ReflectV1ServiceName,
+			grpcreflect.ReflectV1AlphaServiceName,
+		),
 	}
 }

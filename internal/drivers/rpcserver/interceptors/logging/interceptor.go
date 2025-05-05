@@ -30,8 +30,8 @@ func (*Interceptor) WrapUnary(next connect.UnaryFunc) connect.UnaryFunc {
 			return next(ctx, req)
 		}
 
-		system := rpcserver.ProtocolToSystem(req.Peer())
-		service, method := rpcserver.SplitProcedure(req.Spec())
+		system := rpcserver.ProtocolToSystem(req.Peer().Protocol)
+		service, method := rpcserver.SplitProcedure(req.Spec().Procedure)
 
 		logger := slogx.FromContext(ctx).With(
 			slogx.RPCSystem(system),
@@ -46,8 +46,8 @@ func (*Interceptor) WrapUnary(next connect.UnaryFunc) connect.UnaryFunc {
 // WrapStreamingHandler implements a server streaming request interceptor.
 func (*Interceptor) WrapStreamingHandler(next connect.StreamingHandlerFunc) connect.StreamingHandlerFunc {
 	return func(ctx context.Context, conn connect.StreamingHandlerConn) error {
-		system := rpcserver.ProtocolToSystem(conn.Peer())
-		service, method := rpcserver.SplitProcedure(conn.Spec())
+		system := rpcserver.ProtocolToSystem(conn.Peer().Protocol)
+		service, method := rpcserver.SplitProcedure(conn.Spec().Procedure)
 
 		logger := slogx.FromContext(ctx).With(
 			slogx.RPCSystem(system),

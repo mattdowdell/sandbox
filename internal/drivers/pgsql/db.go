@@ -21,7 +21,7 @@ type Config struct {
 	Hostname     string        `koanf:"hostname"`
 	Port         string        `koanf:"port" default:"5432"`
 	Username     string        `koanf:"username"`
-	Password     string        `koanf:"password"`
+	Password     string        `koanf:"password" json:"-"`
 	UseIAMAuth   bool          `koanf:"useiamauth"`
 	Name         string        `koanf:"name"`
 	SSLMode      string        `koanf:"sslmode" default:"verify-full"`
