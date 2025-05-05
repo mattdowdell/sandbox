@@ -20,20 +20,6 @@ import (
 // Config contains configuration for connecting to a PostgreSQL database. It is intended to be
 // populated by internal/drivers/config.Load.
 type Config struct {
-<<<<<<< Updated upstream
-	Hostname     string        `koanf:"hostname"`
-	Port         string        `koanf:"port" default:"5432"`
-	Username     string        `koanf:"username"`
-	Password     string        `koanf:"password"`
-	UseIAMAuth   bool          `koanf:"useiamauth"`
-	Name         string        `koanf:"name"`
-	SSLMode      string        `koanf:"sslmode" default:"verify-full"`
-	Region       string        `koanf:"region"`
-	MaxIdleTime  time.Duration `koanf:"maxidletime" default:"5m"`
-	MaxLifetime  time.Duration `koanf:"maxlifetime" default:"5m"`
-	MaxIdleConns int           `koanf:"maxidleconns"`
-	MaxOpenConns int           `koanf:"maxopenconns"`
-=======
 	// The hostname of the database server.
 	Hostname string `koanf:"hostname"`
 
@@ -49,14 +35,14 @@ type Config struct {
 	// Enables the use of IAM authentication. For use in AWS environments only.
 	UseIAMAuth bool `koanf:"useiamauth"`
 
+	// The AWS region of the database server. For use in AWS environments only.
+	Region string `koanf:"region"`
+
 	// The name of the database to connect to.
 	Name string `koanf:"name"`
 
 	// The SSL mode to connect with. Defaults to verify-full.
 	SSLMode string `koanf:"sslmode" default:"verify-full"`
-
-	// The AWS region of the database server. this should be omitted when UseIAMAuth is false.
-	Region string `koanf:"region"`
 
 	// The maximum time a database connection can be idle before being closed. Defaults to 5
 	// minutes. Set to 0 to disable.
@@ -73,7 +59,6 @@ type Config struct {
 	// It is strongly recommended to set this value when sharing a single database server across
 	// multiple clients to avoid accidentally starving other clients of connections.
 	MaxOpenConns int `koanf:"maxopenconns"`
->>>>>>> Stashed changes
 }
 
 func (c *Config) toOptions() []Option {
