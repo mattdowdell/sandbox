@@ -1,3 +1,4 @@
+// Package pgsql provides a PostgreSQL implementation of [sql.DB].
 package pgsql
 
 import (
@@ -16,8 +17,10 @@ import (
 	"go.opentelemetry.io/otel/semconv/v1.26.0"
 )
 
-// ...
+// Config contains configuration for connecting to a PostgreSQL database. It is intended to be
+// populated by internal/drivers/config.Load.
 type Config struct {
+<<<<<<< Updated upstream
 	Hostname     string        `koanf:"hostname"`
 	Port         string        `koanf:"port" default:"5432"`
 	Username     string        `koanf:"username"`
@@ -30,11 +33,56 @@ type Config struct {
 	MaxLifetime  time.Duration `koanf:"maxlifetime" default:"5m"`
 	MaxIdleConns int           `koanf:"maxidleconns"`
 	MaxOpenConns int           `koanf:"maxopenconns"`
+=======
+	// The hostname of the database server.
+	Hostname string `koanf:"hostname"`
+
+	// The port the database server is listening on. Defaults to 5432.
+	Port string `koanf:"port" default:"5432"`
+
+	// The username to authenticate with.
+	Username string `koanf:"username"`
+
+	// The password to authenticate with. This should be omitted when UseIAMAuth is set to true.
+	Password string `koanf:"password" json:"-"`
+
+	// Enables the use of IAM authentication. For use in AWS environments only.
+	UseIAMAuth bool `koanf:"useiamauth"`
+
+	// The name of the database to connect to.
+	Name string `koanf:"name"`
+
+	// The SSL mode to connect with. Defaults to verify-full.
+	SSLMode string `koanf:"sslmode" default:"verify-full"`
+
+	// The AWS region of the database server. this should be omitted when UseIAMAuth is false.
+	Region string `koanf:"region"`
+
+	// The maximum time a database connection can be idle before being closed. Defaults to 5
+	// minutes. Set to 0 to disable.
+	MaxIdleTime time.Duration `koanf:"maxidletime" default:"5m"`
+
+	// The maximum lifetime for a database connection. Defaults to 5 minutes. Set to 0 to disable.
+	MaxLifetime time.Duration `koanf:"maxlifetime" default:"5m"`
+
+	// The maximum number of idle connections in the database connection pool. Defaults to no limit.
+	MaxIdleConns int `koanf:"maxidleconns"`
+
+	// The maximum number of open connections in the database connection pool. Defaults to no limit.
+	//
+	// It is strongly recommended to set this value when sharing a single database server across
+	// multiple clients to avoid accidentally starving other clients of connections.
+	MaxOpenConns int `koanf:"maxopenconns"`
+>>>>>>> Stashed changes
 }
 
-// ...
 func (c *Config) toOptions() []Option {
-	var options []Option
+	options := []Option{
+		WithMaxIdleTime(c.MaxIdleTime),
+		WithMaxLifetime(c.MaxLifetime),
+		WithMaxIdleConns(c.MaxIdleConns),
+		WithMaxOpenConns(c.MaxOpenConns),
+	}
 
 	if c.Password != "" {
 		options = append(options, WithPassword(c.Password))
@@ -48,9 +96,9 @@ func (c *Config) toOptions() []Option {
 	return options
 }
 
-// ...
+// NewFromConfig creates a new [sql.DB] using the given configuration.
 //
-//nolint:gocritic // called once, little gain from passing by pointer
+//nolint:gocritic // called once, little gain from passing Config by pointer
 func NewFromConfig(ctx context.Context, conf Config) (*sql.DB, error) {
 	return New(
 		ctx,
@@ -63,7 +111,13 @@ func NewFromConfig(ctx context.Context, conf Config) (*sql.DB, error) {
 	)
 }
 
-// ...
+// New creates a new [sql.DB] for the given PostgreSQL database.
+//
+// The returned database connection pool has the following features:
+//
+//   - Built-in OpenTelemetry tracing and metrics.
+//   - Automatic closure of connections that observe a read-only transaction error to enable recovery
+//     when a primary server moves to standby.
 func New(
 	ctx context.Context,
 	host string,
@@ -96,9 +150,10 @@ func New(
 			return false
 		}
 
-		// this error is produced if a write is attempted in a readonly transaction
-		// it can mean that the database primary moved to standby and now only accepts reads
-		// closing to refreshes the ip address and so enables self-healing
+		// this error is produced if a write is attempted in a readonly transaction.
+		// it can mean that the database primary moved to standby and now only accepts reads.
+		// closing the connection allows the server ip address to be refreshed and enables faster
+		// self-healing that the configured max connection lifetime would allow.
 		if err.Code == pgerrcode.ReadOnlySQLTransaction {
 			return false
 		}
@@ -126,7 +181,6 @@ func New(
 	return db, nil
 }
 
-// ...
 func makeDSN(
 	host string,
 	port string,
