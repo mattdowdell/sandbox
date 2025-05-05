@@ -27,8 +27,13 @@ var _ connect.Interceptor = (*Interceptor)(nil)
 // is added external, such as by Istio's sidecar, using HTTP middleware may not result in a loss of
 // observability.
 //
+// See [connectrpc/otelconnect-go#164] for whether otelconnect could provide a middleware and so
+// provide observability for the authn module's middleware too.
+//
 // For the purposes of this service, which does not use Istio or an equivalent, and is not deployed
 // anywhere, publicly or otherwise, the risk of a malicious request body is acceptable.
+//
+// [connectrpc/otelconnect-go#164]: https://github.com/connectrpc/otelconnect-go/issues/164
 type Interceptor struct {
 	connect.Interceptor
 
@@ -74,7 +79,7 @@ func (i *Interceptor) WrapStreamingHandler(next connect.StreamingHandlerFunc) co
 	}
 }
 
-// ...
+// authenticate implements the common authentication logic for both unary and streaming handlers.
 func (i *Interceptor) authenticate(
 	ctx context.Context,
 	procedure string,
