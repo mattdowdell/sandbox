@@ -48,11 +48,11 @@ func (u *CreateResource) Execute(
 
 	if err := store.CreateResource(ctx, resource); err != nil {
 		if errors.Is(err, domain.ErrAlreadyExists) {
-			slog.InfoContext(ctx, "resource exists", slogx.Err(err))
+			logger.InfoContext(ctx, "resource exists", slogx.Err(err))
 			return nil, domain.ErrAlreadyExists
 		}
 
-		slog.ErrorContext(ctx, "failed to create resource", slogx.Err(err))
+		logger.ErrorContext(ctx, "failed to create resource", slogx.Err(err))
 		return nil, domain.ErrInternal
 	}
 

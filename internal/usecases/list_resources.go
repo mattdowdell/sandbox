@@ -28,7 +28,7 @@ func (u *ListResources) Execute(
 ) ([]*entities.Resource, error) {
 	resources, err := store.ListResources(ctx)
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to list resources", slogx.Err(err))
+		logger.ErrorContext(ctx, "failed to list resources", slogx.Err(err))
 		return nil, domain.ErrInternal
 	}
 

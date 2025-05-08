@@ -28,7 +28,7 @@ func (u *ListAuditEvents) Execute(
 ) ([]*entities.AuditEvent, error) {
 	events, err := store.ListAuditEvents(ctx)
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to list audit events", slogx.Err(err))
+		logger.ErrorContext(ctx, "failed to list audit events", slogx.Err(err))
 		return nil, domain.ErrInternal
 	}
 

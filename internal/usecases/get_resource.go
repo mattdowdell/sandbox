@@ -34,11 +34,11 @@ func (u *GetResource) Execute(
 	resource, err := store.GetResource(ctx, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			slog.InfoContext(ctx, "resource not found", slogx.Err(err))
+			logger.InfoContext(ctx, "resource not found", slogx.Err(err))
 			return nil, domain.ErrNotFound
 		}
 
-		slog.ErrorContext(ctx, "failed to get resource", slogx.Err(err))
+		logger.ErrorContext(ctx, "failed to get resource", slogx.Err(err))
 		return nil, domain.ErrInternal
 	}
 

@@ -32,11 +32,11 @@ func (u *DeleteResource) Execute(
 ) error {
 	if err := store.DeleteResource(ctx, id); err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			slog.InfoContext(ctx, "resource not found", slogx.Err(err))
+			logger.InfoContext(ctx, "resource not found", slogx.Err(err))
 			return domain.ErrNotFound
 		}
 
-		slog.ErrorContext(ctx, "failed to delete resource", slogx.Err(err))
+		logger.ErrorContext(ctx, "failed to delete resource", slogx.Err(err))
 		return domain.ErrInternal
 	}
 

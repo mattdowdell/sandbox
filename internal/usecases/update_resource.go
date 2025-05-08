@@ -41,15 +41,15 @@ func (u *UpdateResource) Execute(
 	if err != nil {
 		switch {
 		case errors.Is(err, domain.ErrNotFound):
-			slog.InfoContext(ctx, "resource not found", slogx.Err(err))
+			logger.InfoContext(ctx, "resource not found", slogx.Err(err))
 			return nil, domain.ErrNotFound
 
 		case errors.Is(err, domain.ErrAlreadyExists):
-			slog.InfoContext(ctx, "resource exists", slogx.Err(err))
+			logger.InfoContext(ctx, "resource exists", slogx.Err(err))
 			return nil, domain.ErrAlreadyExists
 
 		default:
-			slog.ErrorContext(ctx, "failed to update resource", slogx.Err(err))
+			logger.ErrorContext(ctx, "failed to update resource", slogx.Err(err))
 			return nil, domain.ErrInternal
 		}
 	}
