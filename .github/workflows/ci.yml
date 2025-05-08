@@ -39,10 +39,12 @@ jobs:
           echo size=${SIZE}
           echo includes=${INCLUDES}
           echo excludes=${EXCLUDES}
+          echo ignores=${IGNORES}
         env:
           SIZE: ${{ steps.size.outputs.size }}
           INCLUDES: ${{ steps.size.outputs.includes }}
           EXCLUDES: ${{ steps.size.outputs.excludes }}
+          IGNORES: ${{ steps.size.outputs.ignores }}
 
   checks:
     name: Checks
