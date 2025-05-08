@@ -31,6 +31,8 @@ jobs:
       - name: Size
         id: size
         uses: mattdowdell/pr-sizer@main # v0.2.0
+        with:
+          ignore-deleted-lines: true
 
       - name: Outputs
         run: |
