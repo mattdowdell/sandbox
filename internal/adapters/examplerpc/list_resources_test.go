@@ -7,6 +7,7 @@ import (
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/mattdowdell/sandbox/gen/example/v1"
@@ -23,7 +24,7 @@ func Test_Handler_ListResources_Success(t *testing.T) {
 	facade := mockexamplerpc.NewResourceFacade(t)
 	facade.
 		EXPECT().
-		List(t.Context()).
+		List(t.Context(), mock.AnythingOfType("*slog.Logger")).
 		Return(
 			[]*entities.Resource{
 				{

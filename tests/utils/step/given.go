@@ -89,6 +89,22 @@ func ExistingID(ctx context.Context) (context.Context, error) {
 	return ctx, err
 }
 
+// ...
+func InvalidAuthentication(ctx context.Context) context.Context {
+	return input.AddAuthnToContext(ctx, "Basic invalid")
+}
+
+// ...
+func NoAuthentication(ctx context.Context) context.Context {
+	return input.AddAuthnToContext(ctx, "")
+}
+
+// ...
+func ValidAuthentication(ctx context.Context) context.Context {
+	// TODO: get a real JWT
+	return input.AddAuthnToContext(ctx, "Bearer an.example.jwt")
+}
+
 // printableASCII returns a set of printable ASCII characters for use with RandomString.
 func printableASCII() string {
 	var output []rune

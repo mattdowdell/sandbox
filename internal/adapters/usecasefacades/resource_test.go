@@ -1,6 +1,7 @@
 package usecasefacades_test
 
 import (
+	"log/slog"
 	"testing"
 
 	"github.com/google/uuid"
@@ -14,6 +15,7 @@ import (
 
 func Test_Resource_Create(t *testing.T) {
 	// arrange
+	logger := slog.New(slog.DiscardHandler)
 	datastore := mockcommon.NewDatastore(t)
 
 	commit := mockcommon.NewCommitFn(t)
@@ -32,7 +34,7 @@ func Test_Resource_Create(t *testing.T) {
 	usecase := mockusecasefacades.NewResourceCreator(t)
 	usecase.
 		EXPECT().
-		Execute(t.Context(), datastore, &entities.Resource{}).
+		Execute(t.Context(), logger, datastore, &entities.Resource{}).
 		Return(&entities.Resource{}, nil).
 		Once()
 
@@ -46,7 +48,7 @@ func Test_Resource_Create(t *testing.T) {
 	)
 
 	// act
-	output, err := facade.Create(t.Context(), &entities.Resource{})
+	output, err := facade.Create(t.Context(), logger, &entities.Resource{})
 
 	// assert
 	assert.NotNil(t, output)
@@ -57,6 +59,7 @@ func Test_Resource_Get(t *testing.T) {
 	// arrange
 	id := uuid.New()
 
+	logger := slog.New(slog.DiscardHandler)
 	datastore := mockcommon.NewDatastore(t)
 
 	provider := mockcommon.NewProvider(t)
@@ -65,7 +68,7 @@ func Test_Resource_Get(t *testing.T) {
 	usecase := mockusecasefacades.NewResourceGetter(t)
 	usecase.
 		EXPECT().
-		Execute(t.Context(), datastore, id).
+		Execute(t.Context(), logger, datastore, id).
 		Return(&entities.Resource{}, nil).
 		Once()
 
@@ -79,7 +82,7 @@ func Test_Resource_Get(t *testing.T) {
 	)
 
 	// act
-	output, err := facade.Get(t.Context(), id)
+	output, err := facade.Get(t.Context(), logger, id)
 
 	// assert
 	assert.NotNil(t, output)
@@ -88,6 +91,7 @@ func Test_Resource_Get(t *testing.T) {
 
 func Test_Resource_List(t *testing.T) {
 	// arrange
+	logger := slog.New(slog.DiscardHandler)
 	datastore := mockcommon.NewDatastore(t)
 
 	provider := mockcommon.NewProvider(t)
@@ -96,7 +100,7 @@ func Test_Resource_List(t *testing.T) {
 	usecase := mockusecasefacades.NewResourceLister(t)
 	usecase.
 		EXPECT().
-		Execute(t.Context(), datastore).
+		Execute(t.Context(), logger, datastore).
 		Return(nil, nil).
 		Once()
 
@@ -110,7 +114,7 @@ func Test_Resource_List(t *testing.T) {
 	)
 
 	// act
-	output, err := facade.List(t.Context())
+	output, err := facade.List(t.Context(), logger)
 
 	// assert
 	assert.Empty(t, output)
@@ -119,6 +123,7 @@ func Test_Resource_List(t *testing.T) {
 
 func Test_Resource_Update(t *testing.T) {
 	// arrange
+	logger := slog.New(slog.DiscardHandler)
 	datastore := mockcommon.NewDatastore(t)
 
 	commit := mockcommon.NewCommitFn(t)
@@ -137,7 +142,7 @@ func Test_Resource_Update(t *testing.T) {
 	usecase := mockusecasefacades.NewResourceUpdater(t)
 	usecase.
 		EXPECT().
-		Execute(t.Context(), datastore, &entities.Resource{}).
+		Execute(t.Context(), logger, datastore, &entities.Resource{}).
 		Return(&entities.Resource{}, nil).
 		Once()
 
@@ -151,7 +156,7 @@ func Test_Resource_Update(t *testing.T) {
 	)
 
 	// act
-	output, err := facade.Update(t.Context(), &entities.Resource{})
+	output, err := facade.Update(t.Context(), logger, &entities.Resource{})
 
 	// assert
 	assert.NotNil(t, output)
@@ -162,6 +167,7 @@ func Test_Resource_Delete(t *testing.T) {
 	// arrange
 	id := uuid.New()
 
+	logger := slog.New(slog.DiscardHandler)
 	datastore := mockcommon.NewDatastore(t)
 
 	commit := mockcommon.NewCommitFn(t)
@@ -180,7 +186,7 @@ func Test_Resource_Delete(t *testing.T) {
 	usecase := mockusecasefacades.NewResourceDeleter(t)
 	usecase.
 		EXPECT().
-		Execute(t.Context(), datastore, id).
+		Execute(t.Context(), logger, datastore, id).
 		Return(nil).
 		Once()
 
@@ -194,7 +200,7 @@ func Test_Resource_Delete(t *testing.T) {
 	)
 
 	// act
-	err := facade.Delete(t.Context(), id)
+	err := facade.Delete(t.Context(), logger, id)
 
 	// assert
 	assert.NoError(t, err)

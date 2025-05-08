@@ -11,7 +11,7 @@ import (
 
 // ...
 type MeterProviderConfig struct {
-	// ...
+	// The URL of the OTLP HTTP endpoint to export metrics to.
 	Endpoint string `koanf:"endpoint"`
 }
 

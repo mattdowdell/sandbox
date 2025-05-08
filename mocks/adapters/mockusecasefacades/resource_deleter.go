@@ -8,6 +8,8 @@ import (
 	repositories "github.com/mattdowdell/sandbox/internal/domain/repositories"
 	mock "github.com/stretchr/testify/mock"
 
+	slog "log/slog"
+
 	uuid "github.com/google/uuid"
 )
 
@@ -24,17 +26,17 @@ func (_m *ResourceDeleter) EXPECT() *ResourceDeleter_Expecter {
 	return &ResourceDeleter_Expecter{mock: &_m.Mock}
 }
 
-// Execute provides a mock function with given fields: _a0, _a1, _a2
-func (_m *ResourceDeleter) Execute(_a0 context.Context, _a1 repositories.Resource, _a2 uuid.UUID) error {
-	ret := _m.Called(_a0, _a1, _a2)
+// Execute provides a mock function with given fields: _a0, _a1, _a2, _a3
+func (_m *ResourceDeleter) Execute(_a0 context.Context, _a1 *slog.Logger, _a2 repositories.Resource, _a3 uuid.UUID) error {
+	ret := _m.Called(_a0, _a1, _a2, _a3)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Execute")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, repositories.Resource, uuid.UUID) error); ok {
-		r0 = rf(_a0, _a1, _a2)
+	if rf, ok := ret.Get(0).(func(context.Context, *slog.Logger, repositories.Resource, uuid.UUID) error); ok {
+		r0 = rf(_a0, _a1, _a2, _a3)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -49,15 +51,16 @@ type ResourceDeleter_Execute_Call struct {
 
 // Execute is a helper method to define mock.On call
 //   - _a0 context.Context
-//   - _a1 repositories.Resource
-//   - _a2 uuid.UUID
-func (_e *ResourceDeleter_Expecter) Execute(_a0 interface{}, _a1 interface{}, _a2 interface{}) *ResourceDeleter_Execute_Call {
-	return &ResourceDeleter_Execute_Call{Call: _e.mock.On("Execute", _a0, _a1, _a2)}
+//   - _a1 *slog.Logger
+//   - _a2 repositories.Resource
+//   - _a3 uuid.UUID
+func (_e *ResourceDeleter_Expecter) Execute(_a0 interface{}, _a1 interface{}, _a2 interface{}, _a3 interface{}) *ResourceDeleter_Execute_Call {
+	return &ResourceDeleter_Execute_Call{Call: _e.mock.On("Execute", _a0, _a1, _a2, _a3)}
 }
 
-func (_c *ResourceDeleter_Execute_Call) Run(run func(_a0 context.Context, _a1 repositories.Resource, _a2 uuid.UUID)) *ResourceDeleter_Execute_Call {
+func (_c *ResourceDeleter_Execute_Call) Run(run func(_a0 context.Context, _a1 *slog.Logger, _a2 repositories.Resource, _a3 uuid.UUID)) *ResourceDeleter_Execute_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(repositories.Resource), args[2].(uuid.UUID))
+		run(args[0].(context.Context), args[1].(*slog.Logger), args[2].(repositories.Resource), args[3].(uuid.UUID))
 	})
 	return _c
 }
@@ -67,7 +70,7 @@ func (_c *ResourceDeleter_Execute_Call) Return(_a0 error) *ResourceDeleter_Execu
 	return _c
 }
 
-func (_c *ResourceDeleter_Execute_Call) RunAndReturn(run func(context.Context, repositories.Resource, uuid.UUID) error) *ResourceDeleter_Execute_Call {
+func (_c *ResourceDeleter_Execute_Call) RunAndReturn(run func(context.Context, *slog.Logger, repositories.Resource, uuid.UUID) error) *ResourceDeleter_Execute_Call {
 	_c.Call.Return(run)
 	return _c
 }

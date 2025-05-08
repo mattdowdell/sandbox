@@ -3,7 +3,6 @@ package examplerpc
 import (
 	"context"
 	"errors"
-	"log/slog"
 
 	"connectrpc.com/connect"
 
@@ -18,11 +17,13 @@ func (h *Handler) CreateResource(
 	ctx context.Context,
 	req *connect.Request[examplev1.CreateResourceRequest],
 ) (*connect.Response[examplev1.CreateResourceResponse], error) {
+	logger := slogx.FromContext(ctx)
+
 	input := models.ResourceCreateToDomain(req.Msg.GetResource())
 
-	output, err := h.resource.Create(ctx, input)
+	output, err := h.resource.Create(ctx, logger, input)
 	if err != nil {
-		slog.DebugContext(ctx, "failed to create resource", slogx.Err(err))
+		logger.DebugContext(ctx, "failed to create resource", slogx.Err(err))
 
 		if errors.Is(err, domain.ErrAlreadyExists) {
 			return nil, ErrResourceAlreadyExists

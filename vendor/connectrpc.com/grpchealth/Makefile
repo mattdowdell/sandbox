@@ -9,7 +9,7 @@ MAKEFLAGS += --no-print-directory
 BIN=$(abspath .tmp/bin)
 export PATH := $(BIN):$(PATH)
 export GOBIN := $(abspath $(BIN))
-COPYRIGHT_YEARS := 2022-2023
+COPYRIGHT_YEARS := 2022-2024
 LICENSE_IGNORE := --ignore /testdata/ --ignore internal/proto/connectext/
 
 .PHONY: help
@@ -39,11 +39,13 @@ lint: $(BIN)/golangci-lint $(BIN)/buf ## Lint Go and protobuf
 	test -z "$$($(BIN)/buf format -d . | tee /dev/stderr)"
 	go vet ./...
 	golangci-lint run
+	golangci-lint fmt --diff
 	buf lint
 
 .PHONY: lintfix
 lintfix: $(BIN)/golangci-lint $(BIN)/buf ## Automatically fix some lint errors
 	golangci-lint run --fix
+	golangci-lint fmt
 	buf format -w .
 
 .PHONY: generate
@@ -66,15 +68,15 @@ checkgenerate:
 
 $(BIN)/buf: Makefile
 	@mkdir -p $(@D)
-	go install github.com/bufbuild/buf/cmd/buf@v1.26.1
+	go install github.com/bufbuild/buf/cmd/buf@v1.51.0
 
 $(BIN)/license-header: Makefile
 	@mkdir -p $(@D)
-	go install github.com/bufbuild/buf/private/pkg/licenseheader/cmd/license-header@v1.26.1
+	go install github.com/bufbuild/buf/private/pkg/licenseheader/cmd/license-header@v1.51.0
 
 $(BIN)/golangci-lint: Makefile
 	@mkdir -p $(@D)
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.54.1
+	go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.0.2
 
 $(BIN)/protoc-gen-go: Makefile
 	@mkdir -p $(@D)

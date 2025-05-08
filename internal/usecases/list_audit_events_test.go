@@ -1,6 +1,7 @@
 package usecases_test
 
 import (
+	"log/slog"
 	"testing"
 	"time"
 
@@ -26,6 +27,7 @@ func Test_NewListAuditEvents(t *testing.T) {
 func Test_ListAuditEvents_Success(t *testing.T) {
 	// arrange
 	usecase := usecases.NewListAuditEvents()
+	logger := slog.New(slog.DiscardHandler)
 
 	expected := []*entities.AuditEvent{
 		{
@@ -42,7 +44,7 @@ func Test_ListAuditEvents_Success(t *testing.T) {
 	store.EXPECT().ListAuditEvents(t.Context()).Return(expected, nil).Once()
 
 	// act
-	events, err := usecase.Execute(t.Context(), store)
+	events, err := usecase.Execute(t.Context(), logger, store)
 
 	// assert
 	assert.Equal(t, expected, events)
@@ -52,12 +54,13 @@ func Test_ListAuditEvents_Success(t *testing.T) {
 func Test_ListAuditEvents_Error(t *testing.T) {
 	// arrange
 	usecase := usecases.NewListAuditEvents()
+	logger := slog.New(slog.DiscardHandler)
 
 	store := mockrepositories.NewAuditEvent(t)
 	store.EXPECT().ListAuditEvents(t.Context()).Return(nil, domain.ErrInternal).Once()
 
 	// act
-	events, err := usecase.Execute(t.Context(), store)
+	events, err := usecase.Execute(t.Context(), logger, store)
 
 	// assert
 	assert.Empty(t, events)

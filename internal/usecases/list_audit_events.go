@@ -23,12 +23,12 @@ func NewListAuditEvents() *ListAuditEvents {
 // Any failure will cause ErrInternal to be returned.
 func (u *ListAuditEvents) Execute(
 	ctx context.Context,
+	logger *slog.Logger,
 	store repositories.AuditEvent,
 ) ([]*entities.AuditEvent, error) {
 	events, err := store.ListAuditEvents(ctx)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to list audit events", slogx.Err(err))
-
 		return nil, domain.ErrInternal
 	}
 

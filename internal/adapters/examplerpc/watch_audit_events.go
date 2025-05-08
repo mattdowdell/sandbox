@@ -2,7 +2,6 @@ package examplerpc
 
 import (
 	"context"
-	"log/slog"
 
 	"connectrpc.com/connect"
 
@@ -17,19 +16,21 @@ func (h *Handler) WatchAuditEvents(
 	_ *connect.Request[examplev1.WatchAuditEventsRequest],
 	stream *connect.ServerStream[examplev1.WatchAuditEventsResponse],
 ) error {
-	ch := h.auditEvent.Watch(ctx)
+	logger := slogx.FromContext(ctx)
+
+	ch := h.auditEvent.Watch(ctx, logger)
 
 	for {
 		select {
 		case <-ctx.Done():
-			slog.DebugContext(ctx, "connection closed by client")
+			logger.DebugContext(ctx, "connection closed by client")
 			return nil
 
 		case event := <-ch:
 			if err := stream.Send(&examplev1.WatchAuditEventsResponse{
 				AuditEvent: models.AuditEventFromDomain(event),
 			}); err != nil {
-				slog.ErrorContext(ctx, "failed send", slogx.Err(err))
+				logger.ErrorContext(ctx, "failed send", slogx.Err(err))
 			}
 		}
 	}

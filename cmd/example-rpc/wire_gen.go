@@ -20,6 +20,8 @@ import (
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
 	"github.com/mattdowdell/sandbox/internal/drivers/pgsql"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver"
+	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/authn"
+	logging2 "github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/otelconnectx"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/validatex"
 	"github.com/mattdowdell/sandbox/internal/drivers/uuidgen"
@@ -35,7 +37,6 @@ func ProvideApp(ctx context.Context) (*App, error) {
 	if err != nil {
 		return nil, err
 	}
-	appConfig := mainConfig.App
 	loggingConfig := mainConfig.Logging
 	v := loggerOptions()
 	logger := logging.NewAsDefaultFromConfig(loggingConfig, v...)
@@ -61,22 +62,25 @@ func ProvideApp(ctx context.Context) (*App, error) {
 	reflectrpcHandler := reflectrpc.New()
 	healthrpcHandler := healthrpc.New()
 	v2 := collectHandlers(handler, reflectrpcHandler, healthrpcHandler)
-	interceptor, err := validatex.New()
-	if err != nil {
-		return nil, err
-	}
 	otelconnectxConfig := mainConfig.OtelConnect
-	otelconnectInterceptor, err := otelconnectx.NewFromConfig(otelconnectxConfig)
+	interceptor, err := otelconnectx.NewFromConfig(otelconnectxConfig)
 	if err != nil {
 		return nil, err
 	}
-	v3 := collectInterceptors(interceptor, otelconnectInterceptor)
+	validateInterceptor, err := validatex.New()
+	if err != nil {
+		return nil, err
+	}
+	loggingInterceptor := logging2.New()
+	v3 := authnOptions()
+	authnInterceptor := authn.New(v3...)
+	v4 := collectInterceptors(interceptor, validateInterceptor, loggingInterceptor, authnInterceptor)
 	recoverer, err := rpcserver.NewRecoverer()
 	if err != nil {
 		return nil, err
 	}
-	v4 := collectHandlerOptions(v3, recoverer)
-	server := rpcserver.NewFromConfig(rpcserverConfig, v2, v4)
+	v5 := collectHandlerOptions(v4, recoverer)
+	server := rpcserver.NewFromConfig(rpcserverConfig, v2, v5)
 	tracerProviderConfig := mainConfig.Tracer
 	tracerProviderShutdown, err := otelx.NewTracerProviderFromConfig(ctx, tracerProviderConfig)
 	if err != nil {
@@ -87,6 +91,6 @@ func ProvideApp(ctx context.Context) (*App, error) {
 	if err != nil {
 		return nil, err
 	}
-	app := NewApp(appConfig, logger, server, tracerProviderShutdown, meterProviderShutdown)
+	app := NewApp(mainConfig, logger, server, tracerProviderShutdown, meterProviderShutdown)
 	return app, nil
 }

@@ -56,3 +56,9 @@ wire := join(gopath, "bin", "wire-v0.6.0")
 install-wire:
     {{ if path_exists(wire) == "true" { "" } else { "bingo get wire" } }}
 
+yamlfmt := join(gopath, "bin", "yamlfmt-v0.16.0")
+
+[private]
+install-yamlfmt:
+    {{ if path_exists(yamlfmt) == "true" { "" } else { "bingo get yamlfmt" } }}
+

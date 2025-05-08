@@ -1,3 +1,4 @@
+---
 # https://docs.docker.com/reference/compose-file/
 
 services:
@@ -17,6 +18,7 @@ services:
       APP_DATABASE_PASSWORD: "secret"
       APP_DATABASE_NAME: "postgres"
       APP_DATABASE_SSLMODE: "disable"
+      APP_LOGGING_LEVEL: "debug"
       APP_RPCSERVER_HOST: "0.0.0.0"
       APP_METERPROVIDER_ENDPOINT: "http://victoria-metrics:8428/opentelemetry/v1/metrics"
       APP_TRACERPROVIDER_ENDPOINT: "http://jaeger:4318"
@@ -26,7 +28,7 @@ services:
     volumes:
       - "./.covdata:/covdata"
     healthcheck:
-      test: [ "CMD", "/example-health" ]
+      test: ["CMD", "/example-health"]
       start_period: "30s"
       start_interval: "1s"
     depends_on:
@@ -55,44 +57,41 @@ services:
       start_interval: "1s"
     restart: always
 
-
   jaeger:
-    image: "mirror.gcr.io/jaegertracing/jaeger:2.4.0"
+    image: "mirror.gcr.io/jaegertracing/jaeger:2.5.0"
     pull_policy: "always"
     ports:
       - "127.0.0.1:16686:16686"
     healthcheck:
-      test: [ "CMD", "wget", "-qO", "/dev/null", "http://localhost:16686/" ]
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:16686/"]
       start_period: "30s"
       start_interval: "1s"
     restart: always
 
-  # TODO: use plain prometheus?
-  #       avoids need for grafana plugin, but modifies meter provider to enable scraping
   victoria-metrics:
-    image: "mirror.gcr.io/victoriametrics/victoria-metrics:latest" # TODO: pick tag
+    image: "mirror.gcr.io/victoriametrics/victoria-metrics:v1.116.0"
     pull_policy: "always"
     ports:
       - "127.0.0.1:8428:8428"
     healthcheck:
-      test: [ "CMD", "wget", "-qO-", "http://127.0.0.1:8428/-/healthy" ]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8428/-/healthy"]
       start_period: "30s"
       start_interval: "1s"
     restart: always
 
   victoria-logs:
-    image: "mirror.gcr.io/victoriametrics/victoria-logs:latest" # TODO: pick tag
+    image: "mirror.gcr.io/victoriametrics/victoria-logs:v1.21.0-victorialogs"
     pull_policy: "always"
     ports:
       - "127.0.0.1:9428:9428"
     healthcheck:
-      test: [ "CMD", "wget", "-qO-", "http://127.0.0.1:9428/-/healthy" ]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:9428/-/healthy"]
       start_period: "30s"
       start_interval: "1s"
     restart: always
 
   grafana:
-    image: "mirror.gcr.io/grafana/grafana:latest" # TODO: pick tag
+    image: "mirror.gcr.io/grafana/grafana:11.6.1"
     pull_policy: "always"
     environment:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
@@ -108,7 +107,7 @@ services:
       - "./config/dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml:ro"
       - "./config/dashboards:/etc/dashboards:rw"
     healthcheck:
-      test: [ "CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/health" ]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/health"]
       start_period: "30s"
       start_interval: "1s"
     restart: always

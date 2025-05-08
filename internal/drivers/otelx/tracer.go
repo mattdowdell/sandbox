@@ -11,7 +11,7 @@ import (
 
 // ...
 type TracerProviderConfig struct {
-	// ...
+	// The URL of the OTLP HTTP endpoint to export traces to.
 	Endpoint string `koanf:"endpoint"`
 }
 

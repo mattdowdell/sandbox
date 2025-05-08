@@ -2,7 +2,6 @@ package examplerpc
 
 import (
 	"context"
-	"log/slog"
 
 	"connectrpc.com/connect"
 
@@ -16,9 +15,11 @@ func (h *Handler) ListResources(
 	ctx context.Context,
 	_ *connect.Request[examplev1.ListResourcesRequest],
 ) (*connect.Response[examplev1.ListResourcesResponse], error) {
-	output, err := h.resource.List(ctx)
+	logger := slogx.FromContext(ctx)
+
+	output, err := h.resource.List(ctx, logger)
 	if err != nil {
-		slog.DebugContext(ctx, "failed to list resources", slogx.Err(err))
+		logger.DebugContext(ctx, "failed to list resources", slogx.Err(err))
 		return nil, ErrInternal
 	}
 

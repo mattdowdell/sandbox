@@ -9,6 +9,13 @@ import (
 )
 
 // ...
+//
+// TODO: document how to redact secrets.
+func Config(conf any) slog.Attr {
+	return slog.Any("config", conf)
+}
+
+// ...
 func Err(err error) slog.Attr {
 	return slog.String("error", err.Error())
 }
@@ -31,6 +38,11 @@ func Stacktrace() slog.Attr {
 // ...
 func TraceID(span trace.Span) slog.Attr {
 	return slog.String("trace_id", span.SpanContext().TraceID().String())
+}
+
+// ...
+func RPCSystem(system string) slog.Attr {
+	return slog.String("rpc_system", system)
 }
 
 // ...

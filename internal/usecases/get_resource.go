@@ -27,6 +27,7 @@ func NewGetResource() *GetResource {
 // ErrInternal to be returned.
 func (u *GetResource) Execute(
 	ctx context.Context,
+	logger *slog.Logger,
 	store repositories.Resource,
 	id uuid.UUID,
 ) (*entities.Resource, error) {
@@ -34,12 +35,10 @@ func (u *GetResource) Execute(
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			slog.InfoContext(ctx, "resource not found", slogx.Err(err))
-
 			return nil, domain.ErrNotFound
 		}
 
 		slog.ErrorContext(ctx, "failed to get resource", slogx.Err(err))
-
 		return nil, domain.ErrInternal
 	}
 

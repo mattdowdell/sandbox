@@ -75,7 +75,7 @@ vendor-go:
     go mod vendor
 
 # Run all formatters.
-fmt: fmt-buf fmt-go fmt-just
+fmt: fmt-buf fmt-go fmt-just fmt-yaml
 
 # Run the Protobuf formatter.
 fmt-buf: install-buf
@@ -95,6 +95,10 @@ fmt-go: install-gofumpt install-gci
 # Run the Justfile formatter.
 fmt-just:
     just --unstable --fmt
+
+# Run the YAML formatter
+fmt-yaml: install-yamlfmt
+    {{ yamlfmt }} .
 
 # Run all code generators.
 gen: gen-buf gen-go gen-just
@@ -189,7 +193,18 @@ scan-trivy:
 
 # Scan actions and workflows using Zizmor.
 scan-zizmor:
-    zizmor --persona pedantic .github/actions/*/*.yml .github/workflows/*.yml
+    zizmor --persona pedantic .
+
+[private]
+scan-zizmor-ci:
+    docker buildx build --tag zizmor:local ./.github/actions/zizmor/
+    docker run \
+        --rm \
+        --workdir /github/workspace \
+        -e "INPUT_INPUTS=." \
+        -v ".":"/github/workspace" \
+        zizmor:local \
+        "--persona=pedantic"
 
 # Build all binaries.
 build:

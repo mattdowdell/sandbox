@@ -3,7 +3,6 @@ package examplerpc
 import (
 	"context"
 	"errors"
-	"log/slog"
 
 	"connectrpc.com/connect"
 
@@ -18,15 +17,17 @@ func (h *Handler) UpdateResource(
 	ctx context.Context,
 	req *connect.Request[examplev1.UpdateResourceRequest],
 ) (*connect.Response[examplev1.UpdateResourceResponse], error) {
+	logger := slogx.FromContext(ctx)
+
 	input, err := models.ResourceUpdateToDomain(req.Msg.GetResource())
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to parse id", slogx.Err(err))
+		logger.ErrorContext(ctx, "failed to parse id", slogx.Err(err))
 		return nil, ErrInternal
 	}
 
-	output, err := h.resource.Update(ctx, input)
+	output, err := h.resource.Update(ctx, logger, input)
 	if err != nil {
-		slog.DebugContext(ctx, "failed to update resource", slogx.Err(err))
+		logger.DebugContext(ctx, "failed to update resource", slogx.Err(err))
 
 		switch {
 		case errors.Is(err, domain.ErrNotFound):

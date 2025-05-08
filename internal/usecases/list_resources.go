@@ -23,12 +23,12 @@ func NewListResources() *ListResources {
 // Any failure will cause ErrInternal to be returned.
 func (u *ListResources) Execute(
 	ctx context.Context,
+	logger *slog.Logger,
 	store repositories.Resource,
 ) ([]*entities.Resource, error) {
 	resources, err := store.ListResources(ctx)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to list resources", slogx.Err(err))
-
 		return nil, domain.ErrInternal
 	}
 
