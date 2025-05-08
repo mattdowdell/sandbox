@@ -6,6 +6,18 @@
 // replacement with minimal changes to business logic, or even selection between multiple options at
 // runtime.
 //
+// # Resource-Oriented
+//
+// It is tempting to think of repositories as the interaction point of the application rather than
+// the interaction points of the business. However, the domain layer exists to model business
+// processes rather than how the application functions. Therefore, it is recommended to group
+// repository methods based on the entities they interact with rather than how they may be
+// implemented.
+//
+// For example, a database might store data across multiple tables, where each table corresponds to
+// a specific entity. Each entitiy should have a separate repository interface, even if the
+// interfaces are implemented by the same type.
+//
 // # Specificity
 //
 // A repository should aim to be a specific and targeted interface, rather than providing generic
