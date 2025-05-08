@@ -32,7 +32,7 @@ jobs:
         id: size
         uses: mattdowdell/pr-sizer@main # v0.2.0
         with:
-          # ignore-deleted-lines: true
+          ignore-deleted-lines: true
           ignore-deleted-files: true
 
       - name: Outputs
