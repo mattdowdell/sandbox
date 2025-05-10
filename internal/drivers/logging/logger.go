@@ -60,16 +60,16 @@ func New(level slog.Leveler, options ...Option) *slog.Logger {
 		option.apply(opts)
 	}
 
-	otelInner := otelslog.NewHandler("whatever", otelslog.WithSource(true))
-	jsonInner := slog.NewJSONHandler(opts.writer, &slog.HandlerOptions{
+	otelHandler := otelslog.NewHandler("", otelslog.WithSource(true))
+	jsonHandler := slog.NewJSONHandler(opts.writer, &slog.HandlerOptions{
 		AddSource:   true,
 		Level:       level,
 		ReplaceAttr: replaceAttr(opts),
 	})
 
 	handler := slogmulti.Fanout(
-		Wrap(otelInner, opts.extractors),
-		Wrap(jsonInner, opts.extractors),
+		Wrap(otelHandler, opts.extractors),
+		Wrap(jsonHandler, opts.extractors),
 	)
 
 	return slog.New(handler)

@@ -8,7 +8,7 @@ import (
 	sdklog "go.opentelemetry.io/otel/sdk/log"
 )
 
-// ...
+// LoggerProviderConfig contains configuration for configuring an OpenTelemetry logger provider.
 type LoggerProviderConfig struct {
 	// The URL of the OTLP HTTP endpoint to export logs to.
 	Endpoint string `koanf:"endpoint"`
@@ -53,16 +53,3 @@ func NewLoggerProvider(
 
 	return provider.Shutdown, nil
 }
-
-// // Meter wraps [otel.Meter] to provide a [metric.Meter] with the package name and version
-// // automatically set based on the direct caller. It is advised to cache the result when possible to
-// // avoid computing the caller's package details unnecessarily.
-// //
-// // [otel.Meter]: https://pkg.go.dev/go.opentelemetry.io/otel#Meter
-// // [metric.Meter]: https://pkg.go.dev/go.opentelemetry.io/otel/metric#Meter
-// func Meter() metric.Meter {
-// 	pkg := packageName(1 /*skip*/)
-// 	ver := packageVersion(pkg)
-
-// 	return otel.Meter(pkg, metric.WithInstrumentationVersion(ver))
-// }
