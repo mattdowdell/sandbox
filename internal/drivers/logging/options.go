@@ -23,7 +23,7 @@ func defaultOptions() *loggerOpts {
 	}
 }
 
-// WithWriter sets the output of a logger. Defaults to os.Stdout.
+// WithWriter sets the output of a JSON logger. Defaults to os.Stdout.
 func WithWriter(w io.Writer) Option {
 	return &writerOpt{
 		w: w,

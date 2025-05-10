@@ -22,6 +22,7 @@ services:
       APP_RPCSERVER_HOST: "0.0.0.0"
       APP_METERPROVIDER_ENDPOINT: "http://victoria-metrics:8428/opentelemetry/v1/metrics"
       APP_TRACERPROVIDER_ENDPOINT: "http://jaeger:4318"
+      APP_LOGGERPROVIDER_ENDPOINT: "http://victoria-logs:9428/insert/opentelemetry/v1/logs"
       OTEL_GO_X_DEPRECATED_RUNTIME_METRICS: "false"
     ports:
       - "127.0.0.1:5000:5000"
