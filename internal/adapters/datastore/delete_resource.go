@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/postgres/public/table"
-	"github.com/mattdowdell/sandbox/internal/domain/apperrors"
+	"github.com/mattdowdell/sandbox/internal/domain"
 )
 
 // ...
@@ -24,17 +24,17 @@ func (d *Datastore) DeleteResource(ctx context.Context, id uuid.UUID) error {
 
 	count, err := result.RowsAffected()
 	if err != nil {
-		return fmt.Errorf("%w: %w", apperrors.ErrInternal, err)
+		return fmt.Errorf("%w: %w", domain.ErrInternal, err)
 	}
 
 	switch count {
 	case 0:
-		return fmt.Errorf("%w: %s", apperrors.ErrNotFound, id)
+		return fmt.Errorf("%w: %s", domain.ErrNotFound, id)
 
 	case 1:
 		return nil
 
 	default:
-		return fmt.Errorf("%w: too many deletes: %d", apperrors.ErrInternal, count)
+		return fmt.Errorf("%w: too many deletes: %d", domain.ErrInternal, count)
 	}
 }

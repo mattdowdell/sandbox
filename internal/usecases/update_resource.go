@@ -5,7 +5,7 @@ import (
 	"errors"
 	"log/slog"
 
-	"github.com/mattdowdell/sandbox/internal/domain/apperrors"
+	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 	"github.com/mattdowdell/sandbox/internal/domain/repositories"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
@@ -40,17 +40,17 @@ func (u *UpdateResource) Execute(
 	resource, err := store.UpdateResource(ctx, changes)
 	if err != nil {
 		switch {
-		case errors.Is(err, apperrors.ErrNotFound):
+		case errors.Is(err, domain.ErrNotFound):
 			logger.InfoContext(ctx, "resource not found", slogx.Err(err))
-			return nil, apperrors.ErrNotFound
+			return nil, domain.ErrNotFound
 
-		case errors.Is(err, apperrors.ErrAlreadyExists):
+		case errors.Is(err, domain.ErrAlreadyExists):
 			logger.InfoContext(ctx, "resource exists", slogx.Err(err))
-			return nil, apperrors.ErrAlreadyExists
+			return nil, domain.ErrAlreadyExists
 
 		default:
 			logger.ErrorContext(ctx, "failed to update resource", slogx.Err(err))
-			return nil, apperrors.ErrInternal
+			return nil, domain.ErrInternal
 		}
 	}
 

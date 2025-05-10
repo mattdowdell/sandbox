@@ -10,7 +10,7 @@ import (
 
 	"github.com/mattdowdell/sandbox/gen/example/v1"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
-	"github.com/mattdowdell/sandbox/internal/domain/apperrors"
+	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/mocks/adapters/mockexamplerpc"
 )
 
@@ -71,7 +71,7 @@ func Test_Handler_DeleteResource_NotFound(t *testing.T) {
 	facade.
 		EXPECT().
 		Delete(t.Context(), mock.AnythingOfType("*slog.Logger"), id).
-		Return(apperrors.ErrNotFound).
+		Return(domain.ErrNotFound).
 		Once()
 
 	handler := examplerpc.New(
@@ -99,7 +99,7 @@ func Test_Handler_DeleteResource_Internal(t *testing.T) {
 	facade.
 		EXPECT().
 		Delete(t.Context(), mock.AnythingOfType("*slog.Logger"), id).
-		Return(apperrors.ErrInternal).
+		Return(domain.ErrInternal).
 		Once()
 
 	handler := examplerpc.New(
