@@ -30,17 +30,19 @@ jobs:
 
       - name: Size
         id: size
-        uses: mattdowdell/pr-sizer@e2dc7d60097f6b6d6d6f895a1ef31248096f282c # v0.2.0
+        uses: mattdowdell/pr-sizer@e523aba6b9ee5306cd9c69cb08fd59a893e399ca # v0.3.0
 
       - name: Outputs
         run: |
           echo size=${SIZE}
           echo includes=${INCLUDES}
           echo excludes=${EXCLUDES}
+          echo ignores=${IGNORES}
         env:
           SIZE: ${{ steps.size.outputs.size }}
           INCLUDES: ${{ steps.size.outputs.includes }}
           EXCLUDES: ${{ steps.size.outputs.excludes }}
+          IGNORES: ${{ steps.size.outputs.ignores }}
 
   checks:
     name: Checks
