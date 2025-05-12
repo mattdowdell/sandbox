@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mattdowdell/sandbox/internal/domain/apperrors"
+	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 	"github.com/mattdowdell/sandbox/internal/usecases"
 	"github.com/mattdowdell/sandbox/mocks/domain/mockrepositories"
@@ -87,7 +87,7 @@ func Test_CreateResource_IDFailed(t *testing.T) {
 
 	// assert
 	assert.Nil(t, output)
-	assert.ErrorIs(t, err, apperrors.ErrInternal)
+	assert.ErrorIs(t, err, domain.ErrInternal)
 }
 
 func Test_CreateResource_CreateFailed(t *testing.T) {
@@ -97,11 +97,11 @@ func Test_CreateResource_CreateFailed(t *testing.T) {
 	}{
 		{
 			name: "already exists",
-			err:  apperrors.ErrAlreadyExists,
+			err:  domain.ErrAlreadyExists,
 		},
 		{
 			name: "internal",
-			err:  apperrors.ErrInternal,
+			err:  domain.ErrInternal,
 		},
 	}
 

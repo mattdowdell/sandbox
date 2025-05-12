@@ -8,7 +8,7 @@ import (
 
 	"github.com/mattdowdell/sandbox/gen/example/v1"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc/models"
-	"github.com/mattdowdell/sandbox/internal/domain/apperrors"
+	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
@@ -25,7 +25,7 @@ func (h *Handler) CreateResource(
 	if err != nil {
 		logger.DebugContext(ctx, "failed to create resource", slogx.Err(err))
 
-		if errors.Is(err, apperrors.ErrAlreadyExists) {
+		if errors.Is(err, domain.ErrAlreadyExists) {
 			return nil, ErrResourceAlreadyExists
 		}
 

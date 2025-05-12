@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mattdowdell/sandbox/internal/domain/apperrors"
+	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 	"github.com/mattdowdell/sandbox/internal/usecases"
 	"github.com/mattdowdell/sandbox/mocks/domain/mockrepositories"
@@ -65,15 +65,15 @@ func Test_UpdateResource_Error(t *testing.T) {
 	}{
 		{
 			name: "not found",
-			err:  apperrors.ErrNotFound,
+			err:  domain.ErrNotFound,
 		},
 		{
 			name: "already exists",
-			err:  apperrors.ErrAlreadyExists,
+			err:  domain.ErrAlreadyExists,
 		},
 		{
 			name: "internal",
-			err:  apperrors.ErrInternal,
+			err:  domain.ErrInternal,
 		},
 	}
 

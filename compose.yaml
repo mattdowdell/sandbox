@@ -22,6 +22,7 @@ services:
       APP_RPCSERVER_HOST: "0.0.0.0"
       APP_METERPROVIDER_ENDPOINT: "http://victoria-metrics:8428/opentelemetry/v1/metrics"
       APP_TRACERPROVIDER_ENDPOINT: "http://jaeger:4318"
+      APP_LOGGERPROVIDER_ENDPOINT: "http://victoria-logs:9428/insert/opentelemetry/v1/logs"
       OTEL_GO_X_DEPRECATED_RUNTIME_METRICS: "false"
     ports:
       - "127.0.0.1:5000:5000"
@@ -80,7 +81,7 @@ services:
     restart: always
 
   victoria-logs:
-    image: "mirror.gcr.io/victoriametrics/victoria-logs:v1.21.0-victorialogs"
+    image: "mirror.gcr.io/victoriametrics/victoria-logs:v1.22.2-victorialogs"
     pull_policy: "always"
     ports:
       - "127.0.0.1:9428:9428"
@@ -91,7 +92,7 @@ services:
     restart: always
 
   grafana:
-    image: "mirror.gcr.io/grafana/grafana:11.6.1"
+    image: "mirror.gcr.io/grafana/grafana:12.0.0"
     pull_policy: "always"
     environment:
       GF_AUTH_ANONYMOUS_ENABLED: "true"

@@ -26,6 +26,7 @@ type App struct {
 	server          *rpcserver.Server
 	tpShutdown      otelx.TracerProviderShutdown
 	mpShutdown      otelx.MeterProviderShutdown
+	lpShutdown      otelx.LoggerProviderShutdown
 }
 
 // ...
@@ -37,6 +38,7 @@ func NewApp(
 	server *rpcserver.Server,
 	tpShutdown otelx.TracerProviderShutdown,
 	mpShutdown otelx.MeterProviderShutdown,
+	lpShutdown otelx.LoggerProviderShutdown,
 ) *App {
 	return &App{
 		conf:            conf,
@@ -45,6 +47,7 @@ func NewApp(
 		server:          server,
 		tpShutdown:      tpShutdown,
 		mpShutdown:      mpShutdown,
+		lpShutdown:      lpShutdown,
 	}
 }
 
@@ -82,5 +85,9 @@ func (a *App) Shutdown(ctx context.Context) {
 
 	if err := a.mpShutdown(ctx); err != nil {
 		a.logger.WarnContext(ctx, "failed to shutdown meter provider", slogx.Err(err))
+	}
+
+	if err := a.lpShutdown(ctx); err != nil {
+		a.logger.WarnContext(ctx, "failed to shutdown logger provider", slogx.Err(err))
 	}
 }
