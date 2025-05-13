@@ -39,6 +39,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The P99 latency for success responses, averaged across the current time range.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -50,8 +51,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -83,7 +83,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.5.0",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "editorMode": "code",
@@ -101,6 +101,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The P99 latency for error responses, averaged across the current time range.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -112,8 +113,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -145,7 +145,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.5.0",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "editorMode": "code",
@@ -163,6 +163,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The P90 latency for success responses, averaged across the current time range.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -174,8 +175,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -207,7 +207,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.5.0",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "datasource": {
@@ -230,6 +230,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The P90 latency for error responses, averaged across the current time range.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -241,8 +242,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -274,7 +274,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.5.0",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "datasource": {
@@ -297,6 +297,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The P50 latency for success responses, averaged across the current time range.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -308,8 +309,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -341,7 +341,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.5.0",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "datasource": {
@@ -364,6 +364,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The P50 latency for error database responses, averaged across the current time range.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -375,8 +376,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -408,7 +408,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.5.0",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "datasource": {
@@ -431,6 +431,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "Latency for all responses over time.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -474,8 +475,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -507,7 +507,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.5.0",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "editorMode": "code",
@@ -549,6 +549,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "Latency for success responses over time.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -592,8 +593,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -625,7 +625,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.5.0",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "editorMode": "code",
@@ -667,6 +667,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "Latency for error responses over time.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -710,8 +711,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -743,7 +743,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.5.0",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "editorMode": "code",
@@ -798,6 +798,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "Total count of each method and status combination across the current time range.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -826,12 +827,15 @@
         "legend": {
           "displayMode": "list",
           "placement": "right",
-          "showLegend": true
+          "showLegend": true,
+          "values": [
+            "percent"
+          ]
         },
         "pieType": "donut",
         "reduceOptions": {
           "calcs": [
-            "mean"
+            "sum"
           ],
           "fields": "",
           "values": false
@@ -842,7 +846,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.5.0",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "editorMode": "code",
@@ -852,7 +856,7 @@
           "refId": "A"
         }
       ],
-      "title": "Average",
+      "title": "Total",
       "type": "piechart"
     },
     {
@@ -860,6 +864,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "Number of each method and status combination over time.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -903,8 +908,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -935,7 +939,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.5.0",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "editorMode": "code",
@@ -966,6 +970,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The current number of open connections.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -976,8 +981,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           }
@@ -1008,7 +1012,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.5.0",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "datasource": {
@@ -1046,6 +1050,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The current number of connections being waited for.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1056,8 +1061,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1092,7 +1096,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.5.0",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "editorMode": "code",
@@ -1110,6 +1114,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The current number of closed connections.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1120,8 +1125,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           }
@@ -1152,7 +1156,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.5.0",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "editorMode": "code",
@@ -1194,6 +1198,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The number of open connections over time.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1237,8 +1242,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1269,7 +1273,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.5.0",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "datasource": {
@@ -1307,6 +1311,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The number of connections being waited for over time.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1350,8 +1355,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1382,7 +1386,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.5.0",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "editorMode": "code",
@@ -1400,6 +1404,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The number of closed connections over time.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1443,8 +1448,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1475,7 +1479,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.5.0",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "editorMode": "code",
@@ -1515,7 +1519,7 @@
   ],
   "preload": false,
   "refresh": "1m",
-  "schemaVersion": 40,
+  "schemaVersion": 41,
   "tags": [],
   "templating": {
     "list": [
@@ -1526,6 +1530,7 @@
           "value": "$__all"
         },
         "definition": "label_values(db.sql.connection.max_open,service.name)",
+        "description": "Filter all panels by service.",
         "includeAll": true,
         "label": "Service Name",
         "name": "service_name",
@@ -1547,6 +1552,7 @@
           "value": "$__all"
         },
         "definition": "label_values(db.sql.latency_bucket{service.name=\"$service_name\"},method)",
+        "description": "Filter latency and traffic panels by method.",
         "includeAll": true,
         "label": "Method",
         "name": "method",
@@ -1568,6 +1574,7 @@
           "value": "$__all"
         },
         "definition": "label_values(db.sql.latency_bucket{service.name=\"$service_name\"},status)",
+        "description": "Filter traffic panels by status.",
         "includeAll": true,
         "label": "Status",
         "name": "status",
@@ -1592,6 +1599,5 @@
   "timezone": "browser",
   "title": "Database",
   "uid": "eef5wem86i874c",
-  "version": 1,
-  "weekStart": ""
+  "version": 1
 }
