@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 3,
   "links": [],
   "panels": [
     {
@@ -26,6 +26,7 @@
         "type": "victoriametrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The goroutines used and processors available, averaged across all instances of a service.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -70,8 +71,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -97,11 +97,12 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "datasource": {
@@ -135,6 +136,7 @@
         "type": "victoriametrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The memory allocated, averaged across all instances of a service.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -178,8 +180,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -206,11 +207,12 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "editorMode": "code",
@@ -250,7 +252,7 @@
     }
   ],
   "preload": false,
-  "schemaVersion": 40,
+  "schemaVersion": 41,
   "tags": [],
   "templating": {
     "list": [
@@ -284,6 +286,5 @@
   "timezone": "browser",
   "title": "Go Runtime",
   "uid": "ae9uxps6dea68b",
-  "version": 1,
-  "weekStart": ""
+  "version": 1
 }
