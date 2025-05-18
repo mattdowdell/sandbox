@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 4,
+  "id": 3,
   "links": [],
   "panels": [
     {
@@ -55,7 +55,7 @@
         "content": "This dashboard provides visualisations for 3 of the 4 golden signals: Errors,\nLatency and Traffic.\n\nIt aims to track compliance with the following [SLOs][1]:\n\n* 99% of requests must be served within 100ms.\n* 99% of requests must result in a success response.\n\nThe following [status codes][2] are considered to be error responses.\n\n- Unknown (2)\n- DeadlineExceeded (4)\n- Unimplemented (12)\n- Internal (13)\n- Unavailable (14)\n- Data Loss (15)\n\n[1]: https://sre.google/sre-book/service-level-objectives/\n[2]: https://grpc.io/docs/guides/status-codes/",
         "mode": "markdown"
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.0.0",
       "title": "",
       "type": "text"
     },
@@ -77,6 +77,7 @@
         "type": "victoriametrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The percentage of requests that exceeded the latency threshold across the current time range.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -127,7 +128,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "datasource": {
@@ -150,6 +151,7 @@
         "type": "victoriametrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The percentage of requests that resulted in error responses across the current time range.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -200,7 +202,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "editorMode": "code",
@@ -339,6 +341,7 @@
         "type": "victoriametrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The percentage of requests that exceeded the latency threshold.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -413,7 +416,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "datasource": {
@@ -436,6 +439,7 @@
         "type": "victoriametrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The percentage of requests that resulted in error responses.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -514,7 +518,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "editorMode": "code",
@@ -666,12 +670,14 @@
         "type": "victoriametrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The P99 latency for success responses across the current time range.",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "thresholds"
           },
           "mappings": [],
+          "min": 0,
           "noValue": "N/A",
           "thresholds": {
             "mode": "absolute",
@@ -695,7 +701,7 @@
         "x": 0,
         "y": 21
       },
-      "id": 5,
+      "id": 10,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
@@ -713,12 +719,12 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.5, sum(increase(rpc.server.duration_bucket{rpc.system=\"grpc\",service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.grpc.status_code!~\"2|4|12|13|14|15\"}[$__rate_interval])) by (le))",
+          "expr": "histogram_quantile(0.99, sum(increase(rpc.server.duration_bucket{rpc.system=\"grpc\",service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.grpc.status_code!~\"2|4|12|13|14|15\"}[$__rate_interval])) by (le))",
           "format": "time_series",
           "instant": false,
           "legendFormat": "p50",
@@ -726,7 +732,7 @@
           "refId": "A"
         }
       ],
-      "title": "P50 Average (Success)",
+      "title": "P99 Average (Success)",
       "type": "stat"
     },
     {
@@ -734,6 +740,7 @@
         "type": "victoriametrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The P99 latency for error responses across the current time range.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -764,7 +771,7 @@
         "x": 4,
         "y": 21
       },
-      "id": 6,
+      "id": 9,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
@@ -782,12 +789,12 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.5, sum(increase(rpc.server.duration_bucket{rpc.system=\"grpc\",service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.grpc.status_code=~\"2|4|12|13|14|15\"}[$__rate_interval])) by (le))",
+          "expr": "histogram_quantile(0.99, sum(increase(rpc.server.duration_bucket{rpc.system=\"grpc\",service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.grpc.status_code=~\"2|4|12|13|14|15\"}[$__rate_interval])) by (le))",
           "format": "time_series",
           "instant": false,
           "legendFormat": "p50",
@@ -795,7 +802,7 @@
           "refId": "A"
         }
       ],
-      "title": "P50 Average (Error)",
+      "title": "P99 Average (Error)",
       "type": "stat"
     },
     {
@@ -803,6 +810,7 @@
         "type": "victoriametrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The P90 latency for success responses across the current time range.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -851,7 +859,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "editorMode": "code",
@@ -872,6 +880,7 @@
         "type": "victoriametrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The P90 latency for error responses across the current time range.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -920,7 +929,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "editorMode": "code",
@@ -941,13 +950,13 @@
         "type": "victoriametrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The P50 latency for success responses across the current time range.",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "thresholds"
           },
           "mappings": [],
-          "min": 0,
           "noValue": "N/A",
           "thresholds": {
             "mode": "absolute",
@@ -971,7 +980,7 @@
         "x": 16,
         "y": 21
       },
-      "id": 10,
+      "id": 5,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
@@ -989,12 +998,12 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.99, sum(increase(rpc.server.duration_bucket{rpc.system=\"grpc\",service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.grpc.status_code!~\"2|4|12|13|14|15\"}[$__rate_interval])) by (le))",
+          "expr": "histogram_quantile(0.5, sum(increase(rpc.server.duration_bucket{rpc.system=\"grpc\",service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.grpc.status_code!~\"2|4|12|13|14|15\"}[$__rate_interval])) by (le))",
           "format": "time_series",
           "instant": false,
           "legendFormat": "p50",
@@ -1002,7 +1011,7 @@
           "refId": "A"
         }
       ],
-      "title": "P99 Average (Success)",
+      "title": "P50 Average (Success)",
       "type": "stat"
     },
     {
@@ -1010,6 +1019,7 @@
         "type": "victoriametrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The P50 latency for error responses across the current time range.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1040,7 +1050,7 @@
         "x": 20,
         "y": 21
       },
-      "id": 9,
+      "id": 6,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
@@ -1058,12 +1068,12 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.99, sum(increase(rpc.server.duration_bucket{rpc.system=\"grpc\",service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.grpc.status_code=~\"2|4|12|13|14|15\"}[$__rate_interval])) by (le))",
+          "expr": "histogram_quantile(0.5, sum(increase(rpc.server.duration_bucket{rpc.system=\"grpc\",service.name=~\"$service_name\",rpc.service=~\"$rpc_service\",rpc.method=~\"$rpc_method\",rpc.grpc.status_code=~\"2|4|12|13|14|15\"}[$__rate_interval])) by (le))",
           "format": "time_series",
           "instant": false,
           "legendFormat": "p50",
@@ -1071,7 +1081,7 @@
           "refId": "A"
         }
       ],
-      "title": "P99 Average (Error)",
+      "title": "P50 Average (Error)",
       "type": "stat"
     },
     {
@@ -1079,6 +1089,7 @@
         "type": "victoriametrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The latency for all responses.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1155,7 +1166,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "datasource": {
@@ -1201,6 +1212,7 @@
         "type": "victoriametrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The latency for success responses.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1277,7 +1289,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "datasource": {
@@ -1323,6 +1335,7 @@
         "type": "victoriametrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The latency for error responses.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1399,7 +1412,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "datasource": {
@@ -1458,6 +1471,7 @@
         "type": "victoriametrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "Total responses by status code for the current time range.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1503,7 +1517,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "editorMode": "code",
@@ -1642,6 +1656,7 @@
         "type": "victoriametrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The number of responses.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1712,7 +1727,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "editorMode": "code",
@@ -1730,6 +1745,7 @@
         "type": "victoriametrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The number of responses by error code.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1804,7 +1820,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "editorMode": "code",
@@ -1952,6 +1968,7 @@
           "value": "$__all"
         },
         "definition": "label_values(rpc.server.duration_bucket{rpc.system=\"grpc\"},service.name)",
+        "description": "Filter panels by service name.",
         "includeAll": true,
         "label": "Service Name",
         "name": "service_name",
@@ -1972,6 +1989,7 @@
           "value": "$__all"
         },
         "definition": "label_values(rpc.server.duration_bucket{rpc.system=\"grpc\",service.name=~\"$service_name\"},rpc.service)",
+        "description": "Filter panels by RPC service.",
         "includeAll": true,
         "label": "RPC Service",
         "name": "rpc_service",
@@ -1992,6 +2010,7 @@
           "value": "$__all"
         },
         "definition": "label_values(rpc.server.duration_bucket{rpc.system=\"grpc\",service.name=~\"$service_name\", rpc.service=~\"$rpc_service\"},rpc.method)",
+        "description": "Filter panels by RPC method.",
         "includeAll": true,
         "label": "RPC Method",
         "name": "rpc_method",
