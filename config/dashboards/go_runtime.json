@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 3,
   "links": [],
   "panels": [
     {
@@ -26,6 +26,7 @@
         "type": "victoriametrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The goroutines used and processors available, averaged across all instances of a service.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -70,8 +71,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -97,11 +97,12 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
           "datasource": {
@@ -109,8 +110,8 @@
             "uid": "victoriametrics"
           },
           "editorMode": "code",
-          "expr": "avg by(service.name) (go.goroutine.count{service.name=~\"$service_name\"})",
-          "legendFormat": "{{service.name}} (goroutines)",
+          "expr": "avg by(service.name,service.instance.id) (go.goroutine.count{service.name=~\"$service_name\",service.instance.id=~\"$service_instance_id\"})",
+          "legendFormat": "{{service.name}} goroutines ({{service.instance.id}}",
           "range": true,
           "refId": "A"
         },
@@ -120,9 +121,9 @@
             "uid": "victoriametrics"
           },
           "editorMode": "code",
-          "expr": "avg by(service.name) (go.processor.limit{service.name=~\"$service_name\"})",
+          "expr": "avg by(service.name,service.instance.id) (go.processor.limit{service.name=~\"$service_name\",service.instance.id=~\"$service_instance_id\"})",
           "hide": false,
-          "legendFormat": "{{service.name}} (processor limit)",
+          "legendFormat": "{{service.name}} processor limit ({{service.instance.id}})",
           "range": true,
           "refId": "B"
         }
@@ -135,6 +136,7 @@
         "type": "victoriametrics-datasource",
         "uid": "victoriametrics"
       },
+      "description": "The memory used, averaged across all instances of a service.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -178,8 +180,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -206,61 +207,44 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.0.0",
       "targets": [
         {
-          "editorMode": "code",
-          "expr": "avg by (service.name) (go.memory.allocated{service.name=~\"$service_name\"})",
-          "hide": false,
-          "legendFormat": "{{service.name}} (allocated)",
-          "range": true,
-          "refId": "A"
-        },
-        {
           "datasource": {
             "type": "victoriametrics-datasource",
             "uid": "victoriametrics"
           },
           "editorMode": "code",
-          "expr": "avg by(service.name) (go.memory.used{service.name=~\"$service_name\",go.memory.type=\"stack\"})",
+          "expr": "avg by(service.name,service.instance.id,go.memory.type) (go.memory.used{service.name=~\"$service_name\",service.instance.id=~\"$service_instance_id\"})",
           "hide": false,
-          "legendFormat": "{{service.name}} (stack)",
+          "legendFormat": "{{service.name}} {{go.memory.type}} ({{service.instance.id}})",
           "range": true,
           "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "victoriametrics-datasource",
-            "uid": "victoriametrics"
-          },
-          "editorMode": "code",
-          "expr": "avg by(service.name) (go.memory.used{service.name=~\"$service_name\",go.memory.type=\"other\"})",
-          "hide": false,
-          "legendFormat": "{{service.name}} (other)",
-          "range": true,
-          "refId": "C"
         }
       ],
-      "title": "Memory",
+      "title": "Memory Usage",
       "type": "timeseries"
     }
   ],
   "preload": false,
-  "schemaVersion": 40,
+  "schemaVersion": 41,
   "tags": [],
   "templating": {
     "list": [
       {
-        "allValue": ".*",
+        "allValue": "",
+        "allowCustomValue": false,
         "current": {
           "text": "All",
           "value": "$__all"
         },
         "definition": "label_values(go.goroutine.count,service.name)",
+        "description": "Filter by service name",
         "includeAll": true,
         "label": "Service Name",
         "name": "service_name",
@@ -273,6 +257,28 @@
         "refresh": 1,
         "regex": "",
         "type": "query"
+      },
+      {
+        "allowCustomValue": false,
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "definition": "label_values(go.goroutine.count{service.name=\"$service_name\"},service.instance.id)",
+        "description": "Filter by service instance",
+        "includeAll": true,
+        "label": "Service Instance",
+        "name": "service_instance_id",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(go.goroutine.count{service.name=\"$service_name\"},service.instance.id)",
+          "refId": "VariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
       }
     ]
   },
@@ -284,6 +290,5 @@
   "timezone": "browser",
   "title": "Go Runtime",
   "uid": "ae9uxps6dea68b",
-  "version": 1,
-  "weekStart": ""
+  "version": 1
 }

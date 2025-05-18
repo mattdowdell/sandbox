@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net"
 	"net/http"
+	"net/http/pprof"
 	"strconv"
 	"time"
 
@@ -19,8 +20,9 @@ const (
 
 // Config contains the configuration for creating a Server instance.
 type Config struct {
-	Host string `koanf:"host" default:"localhost"`
-	Port uint16 `koanf:"port" default:"5000"`
+	Host        string `koanf:"host" default:"localhost"`
+	Port        uint16 `koanf:"port" default:"5000"`
+	EnablePprof bool   `koanf:"enablepprof"`
 }
 
 // Handler implementations can register themselves to be hosted by the server.
@@ -35,15 +37,29 @@ type Server struct {
 
 // New creates a new Server instance from the given configuration.
 func NewFromConfig(config Config, handlers []Handler, opts []connect.HandlerOption) *Server {
-	return New(config.Host, config.Port, handlers, opts)
+	return New(config.Host, config.Port, config.EnablePprof, handlers, opts)
 }
 
 // New creates a new Server instance.
-func New(host string, port uint16, handlers []Handler, opts []connect.HandlerOption) *Server {
+func New(
+	host string,
+	port uint16,
+	enablePprof bool,
+	handlers []Handler,
+	opts []connect.HandlerOption,
+) *Server {
 	mux := http.NewServeMux()
 
 	for _, h := range handlers {
 		h.Register(mux, opts)
+	}
+
+	if enablePprof {
+		mux.HandleFunc("GET /debug/pprof/", pprof.Index)
+		mux.HandleFunc("GET /debug/pprof/cmdline", pprof.Cmdline)
+		mux.HandleFunc("GET /debug/pprof/profile", pprof.Profile)
+		mux.HandleFunc("GET /debug/pprof/symbol", pprof.Symbol)
+		mux.HandleFunc("GET /debug/pprof/trace", pprof.Trace)
 	}
 
 	return &Server{
