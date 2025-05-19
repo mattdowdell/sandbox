@@ -7,7 +7,7 @@
 # Dependencies
 # ------------
 
-FROM ghcr.io/gitleaks/gitleaks:v8.25.1@sha256:2d7f83a3059f0444130115ab17c71d174c9671352251b27e9d97290981c12a51 AS gitleaks
+FROM ghcr.io/gitleaks/gitleaks:v8.26.0@sha256:a6d5fa4bde3316d4ea9b969ebd3bd36a6529a31efdc5248f5779e6471196b85f AS gitleaks
 FROM mirror.gcr.io/golangci/golangci-lint:v2.1.6@sha256:568ee1c1c53493575fa9494e280e579ac9ca865787bafe4df3023ae59ecf299b AS golangci-lint
 FROM ghcr.io/aquasecurity/trivy:0.62.1@sha256:fc10faf341a1d8fa8256c5ff1a6662ef74dd38b65034c8ce42346cf958a02d5d AS trivy
 
