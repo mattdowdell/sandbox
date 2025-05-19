@@ -75,6 +75,9 @@ linters:
     godot:
       exclude:
         - "^\\s*\\[.+?\\]:\\s+" # ignore markdown ref links
+    mnd:
+      ignored-functions:
+        - '^os\.OpenFile$'
     sloglint:
       attr-only: true
       context: all

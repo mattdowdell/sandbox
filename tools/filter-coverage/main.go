@@ -6,13 +6,13 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"log/slog"
-	"strings"
-	"os"
-	"go/token"
 	"go/ast"
 	"go/parser"
+	"go/token"
+	"log/slog"
+	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
@@ -103,7 +103,8 @@ func run(ctx context.Context) int {
 	return exitSuccess
 }
 
-func extractModPath(path string) (string, error) {
+func extractModPath(_ string) (string, error) {
+	// TODO: implement this properly
 	return "github.com/mattdowdell/sandbox/", nil
 }
 
