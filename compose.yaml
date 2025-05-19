@@ -60,7 +60,7 @@ services:
     restart: always
 
   jaeger:
-    image: "mirror.gcr.io/jaegertracing/jaeger:2.5.0"
+    image: "mirror.gcr.io/jaegertracing/jaeger:2.6.0"
     pull_policy: "always"
     ports:
       - "127.0.0.1:16686:16686"
