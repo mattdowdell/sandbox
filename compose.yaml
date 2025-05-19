@@ -71,7 +71,7 @@ services:
     restart: always
 
   victoria-metrics:
-    image: "mirror.gcr.io/victoriametrics/victoria-metrics:v1.116.0"
+    image: "mirror.gcr.io/victoriametrics/victoria-metrics:v1.117.1"
     pull_policy: "always"
     ports:
       - "127.0.0.1:8428:8428"
