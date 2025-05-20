@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"context"
 	"flag"
 	"fmt"
 	"go/ast"
@@ -13,6 +12,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"golang.org/x/mod/modfile"
 )
 
 const (
@@ -21,15 +22,15 @@ const (
 )
 
 var (
-	module = flag.String("mod", "go.mod", "The path of the go.mod file for the module under test")
+	modfilePath = flag.String("modfile", "go.mod", "The path of the go.mod file for the module under test")
 	output = flag.String("output", "filtered.out", "The path to output to")
 )
 
 func main() {
-	os.Exit(run(context.Background()))
+	os.Exit(run())
 }
 
-func run(ctx context.Context) int {
+func run() int {
 	flag.Usage = func() {
 		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s <coverprofile>\n", filepath.Base(os.Args[0]))
 		flag.PrintDefaults()
@@ -38,7 +39,7 @@ func run(ctx context.Context) int {
 	flag.Parse()
 
 	if flag.NArg() < 1 {
-		slog.ErrorContext(ctx, "missing argument")
+		slog.Error("missing argument")
 		return exitFailure
 	}
 
@@ -49,13 +50,13 @@ func run(ctx context.Context) int {
 	}
 	defer profile.Close()
 
-	modPath, err := extractModPath(*module)
+	prefix, err := extractModulePrefix(*modfilePath)
 	if err != nil {
 		slog.Error("failed to extract module path", slog.Any("err", err))
 		return exitFailure
 	}
 
-	filtered, err := filterFile(profile, modPath)
+	filtered, err := filterFile(profile, prefix)
 	if err != nil {
 		slog.Error("failed to filter file", slog.Any("err", err))
 		return exitFailure
@@ -114,9 +115,17 @@ func filterFile(profile *os.File, modPath string) (string, error) {
 	return buffer.String(), nil
 }
 
-func extractModPath(_ string) (string, error) {
-	// TODO: implement this properly
-	return "github.com/mattdowdell/sandbox/", nil
+func extractModulePrefix(path string) (string, error) {
+	contents, err := os.ReadFile(path)
+	if err != nil {
+		return "", nil
+	}
+
+	if name := modfile.ModulePath(contents); name != "" {
+		return name + "/", nil
+	}
+
+	return "", fmt.Errorf("failed to extract module name from: %s", path)
 }
 
 func extractFilename(line, prefix string) (string, bool) {
