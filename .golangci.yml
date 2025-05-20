@@ -102,6 +102,12 @@ linters:
       - builtin$
       - examples$
 
+    rules:
+      - path: tools/
+        linters:
+          # allow less strict logging for tools
+          - sloglint
+
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0

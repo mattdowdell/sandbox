@@ -13,8 +13,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
 const (
@@ -46,17 +44,39 @@ func run(ctx context.Context) int {
 
 	profile, err := os.Open(flag.Arg(0))
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to open coverprofile", slogx.Err(err))
+		slog.Error("failed to open coverprofile", slog.Any("err", err))
 		return exitFailure
 	}
 	defer profile.Close()
 
 	modPath, err := extractModPath(*module)
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to extract module path", slogx.Err(err))
+		slog.Error("failed to extract module path", slog.Any("err", err))
 		return exitFailure
 	}
 
+	filtered, err := filterFile(profile, modPath)
+	if err != nil {
+		slog.Error("failed to filter file", slog.Any("err", err))
+		return exitFailure
+	}
+
+	out, err := os.OpenFile(*output, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o644)
+	if err != nil {
+		slog.Error("failed to open output file", slog.Any("err", err))
+		return exitFailure
+	}
+	defer out.Close()
+
+	if _, err := out.WriteString(filtered); err != nil {
+		slog.Error("failed to write to output file", slog.Any("err", err))
+		return exitFailure
+	}
+
+	return exitSuccess
+}
+
+func filterFile(profile *os.File, modPath string) (string, error) {
 	scanner := bufio.NewScanner(profile)
 	processed := map[string]bool{}
 	fset := token.NewFileSet()
@@ -76,6 +96,10 @@ func run(ctx context.Context) int {
 		if !ok {
 			generated = isGenerated(fset, filename)
 			processed[filename] = generated
+
+			if generated {
+				slog.Info("skipping generated file", slog.String("filename", filename))
+			}
 		}
 
 		if !generated {
@@ -84,23 +108,10 @@ func run(ctx context.Context) int {
 	}
 
 	if err := scanner.Err(); err != nil {
-		slog.ErrorContext(ctx, "failed to read file", slogx.Err(err))
-		return exitFailure
+		return "", err
 	}
 
-	out, err := os.OpenFile(*output, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o644)
-	if err != nil {
-		slog.ErrorContext(ctx, "failed to open output file", slogx.Err(err))
-		return exitFailure
-	}
-	defer out.Close()
-
-	if _, err := out.WriteString(buffer.String()); err != nil {
-		slog.ErrorContext(ctx, "failed to write to output file", slogx.Err(err))
-		return exitFailure
-	}
-
-	return exitSuccess
+	return buffer.String(), nil
 }
 
 func extractModPath(_ string) (string, error) {
