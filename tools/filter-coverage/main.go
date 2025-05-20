@@ -23,7 +23,7 @@ const (
 
 var (
 	modfilePath = flag.String("modfile", "go.mod", "The path of the go.mod file for the module under test")
-	output = flag.String("output", "filtered.out", "The path to output to")
+	output      = flag.String("output", "filtered.out", "The path to output to")
 )
 
 func main() {
