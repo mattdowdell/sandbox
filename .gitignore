@@ -28,7 +28,6 @@ go.work.sum
 dist/
 
 # Coverage outputs
-cover.html
+*.html
 .covdata/**
 !.covdata/.gitkeep
-functional.html

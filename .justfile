@@ -160,8 +160,9 @@ lint-fix-go:
 # Run the Go unit tests.
 unit timeout="30s":
     go test -timeout={{ timeout }} -count=1 -cover -coverprofile=cover.out ./internal/... ./pkg/...
-    @echo "Total coverage: `go tool cover -func=cover.out | tail -n 1 | awk '{print $3}'`"
-    go tool cover -html cover.out -o cover.html
+    @go run ./tools/filter-coverage/ -output=unit.out cover.out
+    @echo "Total coverage: `go tool cover -func=unit.out | tail -n 1 | awk '{print $3}'`"
+    go tool cover -html unit.out -o unit.html
 
 # Run the functional tests.
 functional:
@@ -172,9 +173,11 @@ functional:
 
 # Summarise functional test coverage.
 functional-cover:
-    go tool covdata textfmt -i=.covdata -o functional.out
-    @echo "Total coverage: `go tool cover -func=cover.out | tail -n 1 | awk '{print $3}'`"
-    go tool cover -html functional.out -o functional.html
+    go tool covdata percent -i=.covdata
+    @go tool covdata textfmt -i=.covdata -o functional.out
+    @go run ./tools/filter-coverage/ -output=functional2.out functional.out
+    @echo "Total coverage: `go tool cover -func=functional2.out | tail -n 1 | awk '{print $3}'`"
+    go tool cover -html functional2.out -o functional.html
 
 # Delete functional test coverage artifacts.
 functional-cover-clean:
