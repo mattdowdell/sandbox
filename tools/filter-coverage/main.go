@@ -118,7 +118,7 @@ func filterFile(profile *os.File, modPath string) (string, error) {
 func extractModulePrefix(path string) (string, error) {
 	contents, err := os.ReadFile(path)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
 	if name := modfile.ModulePath(contents); name != "" {
