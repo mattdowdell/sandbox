@@ -6,6 +6,9 @@ import (
 	"net/http"
 
 	"connectrpc.com/connect"
+	"connectrpc.com/otelconnect"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 
 	"github.com/mattdowdell/sandbox/gen/example/v1"
 	"github.com/mattdowdell/sandbox/gen/example/v1/examplev1connect"
@@ -20,7 +23,16 @@ type Client struct {
 }
 
 // ...
-func New(baseURL string) *Client {
+func New(baseURL string) (*Client, error) {
+	otelInterceptor, err := otelconnect.NewInterceptor()
+	if err != nil {
+		return nil, err
+	}
+
+	otel.SetTextMapPropagator(
+		propagation.NewCompositeTextMapPropagator(propagation.Baggage{}),
+	)
+
 	inner := examplev1connect.NewExampleServiceClient(
 		http.DefaultClient,
 		baseURL,
@@ -28,12 +40,13 @@ func New(baseURL string) *Client {
 			connect.UnaryInterceptorFunc(ValidateUnaryInterceptor),
 			connect.UnaryInterceptorFunc(ScenarioUnaryInterceptor),
 			connect.UnaryInterceptorFunc(AuthnUnaryInterceptor),
+			otelInterceptor,
 		),
 	)
 
 	return &Client{
 		inner: inner,
-	}
+	}, nil
 }
 
 // ...

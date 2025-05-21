@@ -3,6 +3,7 @@ package otelx
 import (
 	"context"
 
+	"go.opentelemetry.io/contrib/processors/baggagecopy"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp"
 	"go.opentelemetry.io/otel/log/global"
 	sdklog "go.opentelemetry.io/otel/sdk/log"
@@ -17,23 +18,25 @@ type LoggerProviderConfig struct {
 // LoggerProviderShutdown provides a dedicated type for the logger provider shutdown function.
 type LoggerProviderShutdown func(context.Context) error
 
-// NewLoggerProviderFromConfig calls NewLoggerProvider with the given configuration.
-func NewLoggerProviderFromConfig(
+// SetupLoggerProviderFromConfig calls NewLoggerProvider with the given configuration.
+func SetupLoggerProviderFromConfig(
 	ctx context.Context,
 	conf LoggerProviderConfig,
+	filter baggagecopy.Filter,
 ) (LoggerProviderShutdown, error) {
-	return NewLoggerProvider(ctx, conf.Endpoint)
+	return SetupLoggerProvider(ctx, conf.Endpoint, filter)
 }
 
-// NewLoggerProvider creates a new [log.LoggerProvider] and sets it as the default using
+// SetupLoggerProvider creates a new [log.LoggerProvider] and sets it as the default using
 // [global.SetLoggerProvider]. The returned function should be called when the process exits to
 // export any lingering logs.
 //
 // [log.LoggerProvider]: https://pkg.go.dev/go.opentelemetry.io/otel/log#LoggerProvider
 // [global.SetLoggerProvider]: https://pkg.go.dev/go.opentelemetry.io/otel/log/global#SetLoggerProvider
-func NewLoggerProvider(
+func SetupLoggerProvider(
 	ctx context.Context,
 	endpoint string,
+	filter baggagecopy.Filter,
 ) (LoggerProviderShutdown, error) {
 	exporter, err := otlploghttp.New(ctx, otlploghttp.WithEndpointURL(endpoint))
 	if err != nil {
@@ -46,6 +49,7 @@ func NewLoggerProvider(
 	}
 
 	provider := sdklog.NewLoggerProvider(
+		sdklog.WithProcessor(baggagecopy.NewLogProcessor(filter)),
 		sdklog.WithProcessor(sdklog.NewBatchProcessor(exporter)),
 		sdklog.WithResource(res),
 	)

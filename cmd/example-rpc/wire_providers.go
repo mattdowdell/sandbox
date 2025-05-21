@@ -6,6 +6,7 @@ import (
 	"connectrpc.com/grpcreflect"
 	"connectrpc.com/otelconnect"
 	"connectrpc.com/validate"
+	"go.opentelemetry.io/contrib/processors/baggagecopy"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/healthrpc"
@@ -16,6 +17,11 @@ import (
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/authn"
 	logginginterceptor "github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/logging"
 )
+
+// ...
+func baggageFilter() baggagecopy.Filter {
+	return baggagecopy.AllowAllMembers
+}
 
 // loggerOptions provides logger configuration options.
 func loggerOptions() []logging.Option {
@@ -89,6 +95,7 @@ func collectHandlerOptions(
 	}
 }
 
+// ...
 func authnOptions() []authn.Option {
 	return []authn.Option{
 		authn.WithIgnoreService(

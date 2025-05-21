@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"flag"
-	"fmt"
 	"testing"
 
 	"github.com/cucumber/godog"
@@ -21,7 +20,10 @@ func init() {
 }
 
 func Test_ExampleService(t *testing.T) {
-	client := examplev1client.New("http://localhost:5000")
+	client, err := examplev1client.New("http://localhost:5000")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	o := opts
 	o.TestingT = t
@@ -45,8 +47,7 @@ func Test_ExampleService(t *testing.T) {
 
 func InitializeScenario(sc *godog.ScenarioContext) {
 	sc.Before(func(ctx context.Context, scen *godog.Scenario) (context.Context, error) {
-		fmt.Println("name:", scen.Name)
-		return ctx, nil
+		return examplev1client.AddScenarioToContext(ctx, scen), nil
 	})
 
 	sc.Given(`^a name of (\d+) printable ASCII characters$`, step.PrintableASCIIChars)
