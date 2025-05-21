@@ -47,9 +47,10 @@ func ProvideApp(ctx context.Context) (*App, error) {
 			"TracerProvider",
 		),
 		// observability
-		otelx.NewTracerProviderFromConfig,
-		otelx.NewMeterProviderFromConfig,
-		otelx.NewLoggerProviderFromConfig,
+		baggageFilter,
+		otelx.SetupTracerProviderFromConfig,
+		otelx.SetupMeterProviderFromConfig,
+		otelx.SetupLoggerProviderFromConfig,
 		loggerOptions,
 		logging.NewAsDefaultFromConfig,
 		// providers

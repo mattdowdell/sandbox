@@ -391,6 +391,9 @@ go.opentelemetry.io/contrib/bridges/otelslog
 go.opentelemetry.io/contrib/instrumentation/runtime
 go.opentelemetry.io/contrib/instrumentation/runtime/internal/deprecatedruntime
 go.opentelemetry.io/contrib/instrumentation/runtime/internal/x
+# go.opentelemetry.io/contrib/processors/baggagecopy v0.8.0
+## explicit; go 1.22.0
+go.opentelemetry.io/contrib/processors/baggagecopy
 # go.opentelemetry.io/otel v1.35.0
 ## explicit; go 1.22.0
 go.opentelemetry.io/otel
