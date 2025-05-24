@@ -24,7 +24,7 @@ func (d *Datastore) ListAuditEvents(ctx context.Context) ([]*entities.AuditEvent
 
 	var events []*model.AuditEvents
 	if err := stmt.QueryContext(ctx, d.db, &events); err != nil {
-		return nil, err
+		return nil, err // TODO: wrap
 	}
 
 	return modelhelpers.AuditEventsToDomain(events), nil

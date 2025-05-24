@@ -24,7 +24,7 @@ func (d *Datastore) CreateAuditEvent(ctx context.Context, event *entities.AuditE
 		MODEL(m)
 
 	if _, err := stmt.ExecContext(ctx, d.db); err != nil {
-		return err
+		return err // TODO: wrap
 	}
 
 	return nil
