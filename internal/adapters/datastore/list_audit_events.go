@@ -22,7 +22,7 @@ func (d *Datastore) ListAuditEvents(ctx context.Context) ([]*entities.AuditEvent
 		).
 		ORDER_BY(table.Resources.ID.ASC())
 
-	var events []model.AuditEvents
+	var events []*model.AuditEvents
 	if err := stmt.QueryContext(ctx, d.db, &events); err != nil {
 		return nil, err
 	}

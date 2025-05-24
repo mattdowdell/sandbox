@@ -19,7 +19,7 @@ func (d *Datastore) DeleteResource(ctx context.Context, id uuid.UUID) error {
 
 	result, err := stmt.ExecContext(ctx, d.db)
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: %w", domain.ErrInternal, err)
 	}
 
 	count, err := result.RowsAffected()

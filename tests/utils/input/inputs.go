@@ -15,7 +15,7 @@ const (
 )
 
 // ...
-func AddNameToContext(ctx context.Context, name string) context.Context {
+func NameIntoContext(ctx context.Context, name string) context.Context {
 	return context.WithValue(ctx, nameCtxKey, name)
 }
 
@@ -29,7 +29,7 @@ func NameFromContext(ctx context.Context) (string, error) {
 }
 
 // ...
-func AddNewNameToContext(ctx context.Context, name string) context.Context {
+func NewNameIntoContext(ctx context.Context, name string) context.Context {
 	return context.WithValue(ctx, newNameCtxKey, name)
 }
 
@@ -43,7 +43,7 @@ func NewNameFromContext(ctx context.Context) (string, error) {
 }
 
 // ...
-func AddIDToContext(ctx context.Context, id string) context.Context {
+func IDIntoContext(ctx context.Context, id string) context.Context {
 	return context.WithValue(ctx, idCtxKey, id)
 }
 
@@ -57,7 +57,7 @@ func IDFromContext(ctx context.Context) (string, error) {
 }
 
 // ...
-func AddAuthnToContext(ctx context.Context, value string) context.Context {
+func AuthnIntoContext(ctx context.Context, value string) context.Context {
 	return context.WithValue(ctx, authnCtxKey, value)
 }
 

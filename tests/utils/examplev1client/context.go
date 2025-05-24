@@ -15,8 +15,8 @@ const (
 	scenarioCtxKey
 )
 
-// AddToContext returns a child context with the Client within.
-func AddToContext(ctx context.Context, client *Client) context.Context {
+// IntoContext returns a child context with the Client within.
+func IntoContext(ctx context.Context, client *Client) context.Context {
 	return context.WithValue(ctx, clientCtxKey, client)
 }
 
@@ -59,7 +59,7 @@ func RunCleanups(ctx context.Context) error {
 }
 
 // ...
-func AddScenarioToContext(ctx context.Context, scen *godog.Scenario) context.Context {
+func ScenarioIntoContext(ctx context.Context, scen *godog.Scenario) context.Context {
 	return context.WithValue(ctx, scenarioCtxKey, scen.Name)
 }
 

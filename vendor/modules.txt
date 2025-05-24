@@ -33,6 +33,9 @@ connectrpc.com/otelconnect
 # connectrpc.com/validate v0.3.0
 ## explicit; go 1.23.0
 connectrpc.com/validate
+# github.com/DATA-DOG/go-sqlmock v1.5.2
+## explicit; go 1.15
+github.com/DATA-DOG/go-sqlmock
 # github.com/XSAM/otelsql v0.38.0
 ## explicit; go 1.23.0
 github.com/XSAM/otelsql
