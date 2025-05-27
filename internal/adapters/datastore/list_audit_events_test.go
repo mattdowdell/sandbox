@@ -14,25 +14,23 @@ import (
 )
 
 const (
-	listAuditEventsSQL = `SELECT audit_events.id AS "audit_events.id", `+
-		`audit_events.operation AS "audit_events.operation", `+
-		`audit_events.created_at AS "audit_events.created_at", `+
-		`audit_events.summary AS "audit_events.summary", `+
-		`audit_events.resource_id AS "audit_events.resource_id", `+
-		`audit_events.resource_type AS "audit_events.resource_type" FROM public.audit_events `+
+	listAuditEventsSQL = `SELECT audit_events.id AS "audit_events.id", ` +
+		`audit_events.operation AS "audit_events.operation", ` +
+		`audit_events.created_at AS "audit_events.created_at", ` +
+		`audit_events.summary AS "audit_events.summary", ` +
+		`audit_events.resource_id AS "audit_events.resource_id", ` +
+		`audit_events.resource_type AS "audit_events.resource_type" FROM public.audit_events ` +
 		`ORDER BY resources.id ASC;`
 )
 
-var (
-	listAuditEventsColumns = []string{
-		"audit_events.id",
-		"audit_events.operation",
-		"audit_events.created_at",
-		"audit_events.summary",
-		"audit_events.resource_id",
-		"audit_events.resource_type",
-	}
-)
+var listAuditEventsColumns = []string{
+	"audit_events.id",
+	"audit_events.operation",
+	"audit_events.created_at",
+	"audit_events.summary",
+	"audit_events.resource_id",
+	"audit_events.resource_type",
+}
 
 func Test_Datastore_ListAuditEvents_Success(t *testing.T) {
 	// arrange
@@ -64,11 +62,11 @@ func Test_Datastore_ListAuditEvents_Success(t *testing.T) {
 	// assert
 	want := []*entities.AuditEvent{
 		{
-			ID: id,
-			Operation: entities.OperationCreated,
-			CreatedAt: now,
-			Summary: "summary",
-			ResourceID: resourceID,
+			ID:           id,
+			Operation:    entities.OperationCreated,
+			CreatedAt:    now,
+			Summary:      "summary",
+			ResourceID:   resourceID,
 			ResourceType: entities.ResourceTypeResource,
 		},
 	}

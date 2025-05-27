@@ -16,20 +16,18 @@ import (
 )
 
 const (
-	updateResourceSQL = `UPDATE public.resources SET (name, updated_at) = ($1, $2) `+
-		`WHERE resources.id = $3 RETURNING resources.id AS "resources.id", `+
-		`resources.name AS "resources.name", resources.created_at AS "resources.created_at", `+
+	updateResourceSQL = `UPDATE public.resources SET (name, updated_at) = ($1, $2) ` +
+		`WHERE resources.id = $3 RETURNING resources.id AS "resources.id", ` +
+		`resources.name AS "resources.name", resources.created_at AS "resources.created_at", ` +
 		`resources.updated_at AS "resources.updated_at";`
 )
 
-var (
-	updateResourceColumns = []string{
-		"resources.id",
-		"resources.name",
-		"resources.created_at",
-		"resources.updated_at",
-	}
-)
+var updateResourceColumns = []string{
+	"resources.id",
+	"resources.name",
+	"resources.created_at",
+	"resources.updated_at",
+}
 
 func Test_Datastore_UpdateResource_Success(t *testing.T) {
 	// arrange
@@ -54,8 +52,8 @@ func Test_Datastore_UpdateResource_Success(t *testing.T) {
 	store := datastore.NewDatastore(db)
 
 	have := &entities.Resource{
-		ID: id,
-		Name: testResourceName,
+		ID:        id,
+		Name:      testResourceName,
 		UpdatedAt: now.Add(time.Hour),
 	}
 
@@ -64,8 +62,8 @@ func Test_Datastore_UpdateResource_Success(t *testing.T) {
 
 	// assert
 	want := &entities.Resource{
-		ID: id,
-		Name: testResourceName,
+		ID:        id,
+		Name:      testResourceName,
 		CreatedAt: now,
 		UpdatedAt: now.Add(time.Hour),
 	}
@@ -89,8 +87,8 @@ func Test_Datastore_UpdateResource_NotFound(t *testing.T) {
 	store := datastore.NewDatastore(db)
 
 	have := &entities.Resource{
-		ID: id,
-		Name: testResourceName,
+		ID:        id,
+		Name:      testResourceName,
 		UpdatedAt: now.Add(time.Hour),
 	}
 
@@ -141,8 +139,8 @@ func Test_Datastore_UpdateResource_QueryError(t *testing.T) {
 			store := datastore.NewDatastore(db)
 
 			have := &entities.Resource{
-				ID: id,
-				Name: testResourceName,
+				ID:        id,
+				Name:      testResourceName,
 				UpdatedAt: now.Add(time.Hour),
 			}
 

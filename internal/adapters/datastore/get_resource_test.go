@@ -14,20 +14,18 @@ import (
 )
 
 const (
-	getResourceSQL = `SELECT resources.id AS "resources.id", resources.name AS "resources.name", `+
-		`resources.created_at AS "resources.created_at", `+
-		`resources.updated_at AS "resources.updated_at" FROM public.resources `+
+	getResourceSQL = `SELECT resources.id AS "resources.id", resources.name AS "resources.name", ` +
+		`resources.created_at AS "resources.created_at", ` +
+		`resources.updated_at AS "resources.updated_at" FROM public.resources ` +
 		`WHERE resources.id = $1;`
 )
 
-var (
-	getResourceColumns = []string{
-		"resources.id",
-		"resources.name",
-		"resources.created_at",
-		"resources.updated_at",
-	}
-)
+var getResourceColumns = []string{
+	"resources.id",
+	"resources.name",
+	"resources.created_at",
+	"resources.updated_at",
+}
 
 func Test_Datastore_GetResource_Success(t *testing.T) {
 	// arrange
@@ -56,8 +54,8 @@ func Test_Datastore_GetResource_Success(t *testing.T) {
 
 	// assert
 	want := &entities.Resource{
-		ID: id,
-		Name: testResourceName,
+		ID:        id,
+		Name:      testResourceName,
 		CreatedAt: now,
 		UpdatedAt: now.Add(time.Hour),
 	}

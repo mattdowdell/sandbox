@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	createAuditEventSQL = `INSERT INTO public.audit_events `+
-		`(id, operation, created_at, summary, resource_id, resource_type) `+
+	createAuditEventSQL = `INSERT INTO public.audit_events ` +
+		`(id, operation, created_at, summary, resource_id, resource_type) ` +
 		`VALUES ($1, $2, $3, $4, $5, $6);`
 )
 
@@ -35,11 +35,11 @@ func Test_Datastore_CreateAuditEvent_Success(t *testing.T) {
 	store := datastore.NewDatastore(db)
 
 	event := &entities.AuditEvent{
-		ID:        id,
-		Operation: entities.OperationCreated,
-		CreatedAt: now,
-		Summary: "summary",
-		ResourceID: resourceID,
+		ID:           id,
+		Operation:    entities.OperationCreated,
+		CreatedAt:    now,
+		Summary:      "summary",
+		ResourceID:   resourceID,
 		ResourceType: entities.ResourceTypeResource,
 	}
 
@@ -66,11 +66,11 @@ func Test_Datastore_CreateAuditEvent_Error(t *testing.T) {
 	store := datastore.NewDatastore(db)
 
 	event := &entities.AuditEvent{
-		ID:        id,
-		Operation: entities.OperationCreated,
-		CreatedAt: now,
-		Summary: "summary",
-		ResourceID: resourceID,
+		ID:           id,
+		Operation:    entities.OperationCreated,
+		CreatedAt:    now,
+		Summary:      "summary",
+		ResourceID:   resourceID,
 		ResourceType: entities.ResourceTypeResource,
 	}
 
