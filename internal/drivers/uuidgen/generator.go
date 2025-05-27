@@ -18,6 +18,6 @@ func New() *Generator {
 }
 
 // ...
-func (g *Generator) NewV7() (uuid.UUID, error) {
+func (*Generator) NewV7() (uuid.UUID, error) {
 	return uuid.NewV7()
 }
