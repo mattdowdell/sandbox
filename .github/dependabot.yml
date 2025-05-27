@@ -14,6 +14,7 @@ updates:
       interval: "weekly"
       day: "monday"
       time: "08:00"
+      timezone: "Europe/London"
 
   - package-ecosystem: "gomod"
     directory: "/"
@@ -21,6 +22,7 @@ updates:
       interval: "weekly"
       day: "monday"
       time: "08:00"
+      timezone: "Europe/London"
     # lots of go dependencies, increase limit accordingly
     open-pull-requests-limit: 20
 
@@ -32,6 +34,7 @@ updates:
       interval: "weekly"
       day: "monday"
       time: "08:00"
+      timezone: "Europe/London"
 
   - package-ecosystem: "docker-compose"
     directory: "/"
@@ -39,3 +42,4 @@ updates:
       interval: "weekly"
       day: "monday"
       time: "08:00"
+      timezone: "Europe/London"
