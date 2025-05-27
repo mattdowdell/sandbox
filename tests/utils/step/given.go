@@ -18,7 +18,7 @@ func PrintableASCIIChars(ctx context.Context, length int) (context.Context, erro
 		return ctx, err
 	}
 
-	return input.AddNameToContext(ctx, name), nil
+	return input.NameIntoContext(ctx, name), nil
 }
 
 // ...
@@ -28,7 +28,7 @@ func PrintableNonASCIIChars(ctx context.Context, length int) (context.Context, e
 		return ctx, err
 	}
 
-	return input.AddNameToContext(ctx, name), nil
+	return input.NameIntoContext(ctx, name), nil
 }
 
 func ExistingResourceName(ctx context.Context) (context.Context, error) {
@@ -49,19 +49,19 @@ func ExistingResourceName(ctx context.Context) (context.Context, error) {
 	}
 
 	ctx = examplev1client.AppendCleanup(ctx, cleanup)
-	ctx = input.AddNameToContext(ctx, name)
+	ctx = input.NameIntoContext(ctx, name)
 
 	return ctx, nil
 }
 
 // ...
 func NilUUID(ctx context.Context) context.Context {
-	return input.AddIDToContext(ctx, uuid.Nil.String())
+	return input.IDIntoContext(ctx, uuid.Nil.String())
 }
 
 // ...
 func InvalidUUID(ctx context.Context) context.Context {
-	return input.AddIDToContext(ctx, "invalid")
+	return input.IDIntoContext(ctx, "invalid")
 }
 
 // ...
@@ -83,26 +83,26 @@ func ExistingID(ctx context.Context) (context.Context, error) {
 	}
 
 	ctx = examplev1client.AppendCleanup(ctx, cleanup)
-	ctx = input.AddIDToContext(ctx, resource.GetId())
-	ctx = input.AddNameToContext(ctx, name)
+	ctx = input.IDIntoContext(ctx, resource.GetId())
+	ctx = input.NameIntoContext(ctx, name)
 
 	return ctx, err
 }
 
 // ...
 func InvalidAuthentication(ctx context.Context) context.Context {
-	return input.AddAuthnToContext(ctx, "Basic invalid")
+	return input.AuthnIntoContext(ctx, "Basic invalid")
 }
 
 // ...
 func NoAuthentication(ctx context.Context) context.Context {
-	return input.AddAuthnToContext(ctx, "")
+	return input.AuthnIntoContext(ctx, "")
 }
 
 // ...
 func ValidAuthentication(ctx context.Context) context.Context {
 	// TODO: get a real JWT
-	return input.AddAuthnToContext(ctx, "Bearer an.example.jwt")
+	return input.AuthnIntoContext(ctx, "Bearer an.example.jwt")
 }
 
 // printableASCII returns a set of printable ASCII characters for use with RandomString.

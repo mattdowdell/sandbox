@@ -28,14 +28,14 @@ func Test_FromContext(t *testing.T) {
 		{
 			name: "nil",
 			have: func(ctx context.Context) context.Context {
-				return slogx.AddToContext(ctx, nil /*logger*/)
+				return slogx.IntoContext(ctx, nil /*logger*/)
 			},
 			want: slog.Default(),
 		},
 		{
 			name: "present",
 			have: func(ctx context.Context) context.Context {
-				return slogx.AddToContext(ctx, toAdd)
+				return slogx.IntoContext(ctx, toAdd)
 			},
 			want: toAdd,
 		},

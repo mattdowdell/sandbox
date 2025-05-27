@@ -2,9 +2,11 @@ package datastore
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/modelhelpers"
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/postgres/public/table"
+	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 )
 
@@ -24,7 +26,7 @@ func (d *Datastore) CreateAuditEvent(ctx context.Context, event *entities.AuditE
 		MODEL(m)
 
 	if _, err := stmt.ExecContext(ctx, d.db); err != nil {
-		return err
+		return fmt.Errorf("%w: %w", domain.ErrInternal, err)
 	}
 
 	return nil

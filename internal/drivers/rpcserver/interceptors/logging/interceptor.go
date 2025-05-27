@@ -39,7 +39,7 @@ func (*Interceptor) WrapUnary(next connect.UnaryFunc) connect.UnaryFunc {
 			slogx.RPCMethod(method),
 		)
 
-		return next(slogx.AddToContext(ctx, logger), req)
+		return next(slogx.IntoContext(ctx, logger), req)
 	}
 }
 
@@ -55,6 +55,6 @@ func (*Interceptor) WrapStreamingHandler(next connect.StreamingHandlerFunc) conn
 			slogx.RPCMethod(method),
 		)
 
-		return next(slogx.AddToContext(ctx, logger), conn)
+		return next(slogx.IntoContext(ctx, logger), conn)
 	}
 }

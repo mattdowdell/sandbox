@@ -16,7 +16,7 @@ func FromContext(ctx context.Context) *slog.Logger {
 	return slog.Default()
 }
 
-// AddToContext adds the given logger to the context, returning the new context.
-func AddToContext(ctx context.Context, logger *slog.Logger) context.Context {
+// IntoContext adds the given logger to the context, returning the new context.
+func IntoContext(ctx context.Context, logger *slog.Logger) context.Context {
 	return context.WithValue(ctx, ctxKey{}, logger)
 }

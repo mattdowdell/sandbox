@@ -27,7 +27,7 @@ func Test_ExampleService(t *testing.T) {
 
 	o := opts
 	o.TestingT = t
-	o.DefaultContext = examplev1client.AddToContext(t.Context(), client)
+	o.DefaultContext = examplev1client.IntoContext(t.Context(), client)
 
 	suite := godog.TestSuite{
 		Name:                "example_service",
@@ -47,7 +47,7 @@ func Test_ExampleService(t *testing.T) {
 
 func InitializeScenario(sc *godog.ScenarioContext) {
 	sc.Before(func(ctx context.Context, scen *godog.Scenario) (context.Context, error) {
-		return examplev1client.AddScenarioToContext(ctx, scen), nil
+		return examplev1client.ScenarioIntoContext(ctx, scen), nil
 	})
 
 	sc.Given(`^a name of (\d+) printable ASCII characters$`, step.PrintableASCIIChars)
