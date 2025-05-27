@@ -15,7 +15,7 @@ FROM ghcr.io/aquasecurity/trivy:0.62.1@sha256:fc10faf341a1d8fa8256c5ff1a6662ef74
 # Devenv target
 # -------------
 
-FROM mirror.gcr.io/golang:1.24-bookworm@sha256:89a04cc2e2fbafef82d4a45523d4d4ae4ecaf11a197689036df35fef3bde444a AS dev
+FROM mirror.gcr.io/golang:1.24-bookworm@sha256:29d97266c1d341b7424e2f5085440b74654ae0b61ecdba206bc12d6264844e21 AS dev
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
