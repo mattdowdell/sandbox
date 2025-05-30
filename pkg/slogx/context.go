@@ -13,7 +13,9 @@ func FromContext(ctx context.Context) *slog.Logger {
 		return logger
 	}
 
-	return slog.Default()
+	d := slog.Default()
+	d.InfoContext(ctx, "from context")
+	return d
 }
 
 // IntoContext adds the given logger to the context, returning the new context.

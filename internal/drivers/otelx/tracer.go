@@ -12,8 +12,14 @@ import (
 
 // TracerProviderConfig contains configuration for configuring an OpenTelemetry tracer provider.
 type TracerProviderConfig struct {
-	// The URL of the OTLP HTTP endpoint to export traces to.
+	// Use HTTP instead of HTTPS for the trace exporter's HTTP connection.
+	Insecure bool `koanf:"insecure"`
+
+	// The host and optional port for the trace exporter to connect to.
 	Endpoint string `koanf:"endpoint"`
+
+	// The URL path the trace exporter should send requests to.
+	Path string `koanf:"path" default:"/v1/traces"`
 }
 
 // TracerProviderShutdown provides a dedicated type for the tracer provider shutdown function.
@@ -25,7 +31,7 @@ func SetupTracerProviderFromConfig(
 	conf TracerProviderConfig,
 	filter baggagecopy.Filter,
 ) (TracerProviderShutdown, error) {
-	return SetupTracerProvider(ctx, conf.Endpoint, filter)
+	return SetupTracerProvider(ctx, conf.Insecure, conf.Endpoint, conf.Path, filter)
 }
 
 // SetupTracerProvider creates a new [trace.TracerProvider] and sets it as the default using
@@ -39,10 +45,20 @@ func SetupTracerProviderFromConfig(
 // [otel.SetTracerProvider]: https://pkg.go.dev/go.opentelemetry.io/otel#SetTracerProvider
 func SetupTracerProvider(
 	ctx context.Context,
+	insecure bool,
 	endpoint string,
+	path string,
 	filter baggagecopy.Filter,
 ) (TracerProviderShutdown, error) {
-	exporter, err := otlptracehttp.New(ctx, otlptracehttp.WithEndpointURL(endpoint))
+	opts := []otlptracehttp.Option{
+		otlptracehttp.WithEndpoint(endpoint),
+		otlptracehttp.WithURLPath(path),
+	}
+	if insecure {
+		opts = append(opts, otlptracehttp.WithInsecure())
+	}
+
+	exporter, err := otlptracehttp.New(ctx, opts...)
 	if err != nil {
 		return nil, err
 	}
