@@ -43,7 +43,7 @@ func (e *Extractor) Extract(ctx context.Context) []slog.Attr {
 	}
 
 	if e.withSpanID {
-		attrs = append(attrs, slog.String("span_id", spanCtx.TraceID().String()))
+		attrs = append(attrs, slog.String("span_id", spanCtx.SpanID().String()))
 	}
 
 	if e.withSampled {

@@ -1,9 +1,14 @@
 package otelx
 
 import (
+	"path"
 	"runtime"
 	"runtime/debug"
 	"strings"
+)
+
+const (
+	unknownVersion = "(unknown)"
 )
 
 // packageName returns the package name of the caller, using skip to ignore 0 or more stack frames
@@ -31,9 +36,17 @@ func packageName(skip int) string {
 func packageVersion(pkg string) string {
 	info, ok := debug.ReadBuildInfo()
 	if !ok {
-		return "(unknown)"
+		return unknownVersion
 	}
 
+	return extractVersion(pkg, info)
+}
+
+// extractVersion returns the version of the given package using the given build info, or
+// "(unknown)" if no version could be identified.
+//
+// Build info is passed via an argument to support unit testing with runtime/debug.ParseBuildInfo.
+func extractVersion(pkg string, info *debug.BuildInfo) string {
 	mods := map[string]string{}
 
 	if isParent(info.Main.Path, pkg) {
@@ -52,12 +65,13 @@ func packageVersion(pkg string) string {
 		}
 	}
 
-	if version, ok := mods[pkg]; ok {
-		return version
+	for ; pkg != "."; pkg = path.Dir(pkg) {
+		if version, ok := mods[pkg]; ok {
+			return version
+		}
 	}
 
-	// TODO: filter modules to closest parent
-	return "unimplemented"
+	return unknownVersion
 }
 
 func isParent(mod, pkg string) bool {

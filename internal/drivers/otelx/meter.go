@@ -11,8 +11,14 @@ import (
 
 // MeterProviderConfig contains configuration for configuring an OpenTelemetry meter provider.
 type MeterProviderConfig struct {
-	// The URL of the OTLP HTTP endpoint to export metrics to.
+	// Use HTTP instead of HTTPS for the metric exporter's HTTP connection.
+	Insecure bool `koanf:"insecure"`
+
+	// The host and optional port for the metric exporter to connect to.
 	Endpoint string `koanf:"endpoint"`
+
+	// The URL path the metric exporter should send requests to.
+	Path string `koanf:"path" default:"/v1/metrics"`
 }
 
 // MeterProviderShutdown provides a dedicated type for the meter provider shutdown function.
@@ -23,7 +29,7 @@ func SetupMeterProviderFromConfig(
 	ctx context.Context,
 	conf MeterProviderConfig,
 ) (MeterProviderShutdown, error) {
-	return SetupMeterProvider(ctx, conf.Endpoint)
+	return SetupMeterProvider(ctx, conf.Insecure, conf.Endpoint, conf.Path)
 }
 
 // SetupMeterProvider creates a new [metric.MeterProvider] and sets it as the default using
@@ -34,9 +40,19 @@ func SetupMeterProviderFromConfig(
 // [otel.SetMeterProvider]: https://pkg.go.dev/go.opentelemetry.io/otel#SetMeterProvider
 func SetupMeterProvider(
 	ctx context.Context,
+	insecure bool,
 	endpoint string,
+	path string,
 ) (MeterProviderShutdown, error) {
-	exporter, err := otlpmetrichttp.New(ctx, otlpmetrichttp.WithEndpointURL(endpoint))
+	opts := []otlpmetrichttp.Option{
+		otlpmetrichttp.WithEndpoint(endpoint),
+		otlpmetrichttp.WithURLPath(path),
+	}
+	if insecure {
+		opts = append(opts, otlpmetrichttp.WithInsecure())
+	}
+
+	exporter, err := otlpmetrichttp.New(ctx, opts...)
 	if err != nil {
 		return nil, err
 	}

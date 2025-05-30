@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"golang.org/x/mod/modfile"
 )
@@ -24,19 +25,42 @@ const (
 var (
 	modfilePath = flag.String("modfile", "go.mod", "The path of the go.mod file for the module under test")
 	output      = flag.String("output", "filtered.out", "The path to output to")
+	debug       = flag.Bool("debug", false, "Enable debug logging")
 )
+
+var level slog.LevelVar
 
 func main() {
 	os.Exit(run())
 }
 
 func run() int {
+	logger := slog.New(slog.NewTextHandler(flag.CommandLine.Output(), &slog.HandlerOptions{
+		Level: &level,
+		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+			if len(groups) > 0 {
+				return a
+			}
+
+			if a.Key == slog.TimeKey && a.Value.Kind() == slog.KindTime {
+				return slog.String(slog.TimeKey, a.Value.Time().Format(time.Kitchen))
+			}
+
+			return a
+		},
+	}))
+	slog.SetDefault(logger)
+
 	flag.Usage = func() {
 		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s <coverprofile>\n", filepath.Base(os.Args[0]))
 		flag.PrintDefaults()
 	}
 
 	flag.Parse()
+
+	if *debug {
+		level.Set(slog.LevelDebug)
+	}
 
 	if flag.NArg() < 1 {
 		slog.Error("missing argument")
@@ -99,7 +123,7 @@ func filterFile(profile *os.File, modPath string) (string, error) {
 			processed[filename] = generated
 
 			if generated {
-				slog.Info("skipping generated file", slog.String("filename", filename))
+				slog.Debug("skipping generated file", slog.String("filename", filename))
 			}
 		}
 
