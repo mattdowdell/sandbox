@@ -26,7 +26,6 @@ services:
       APP_METERPROVIDER_PATH: "/opentelemetry/v1/metrics"
       APP_TRACERPROVIDER_INSECURE: "true"
       APP_TRACERPROVIDER_ENDPOINT: "jaeger:4318"
-      # TODO: need to suppress path?
       APP_LOGGERPROVIDER_INSECURE: "true"
       APP_LOGGERPROVIDER_ENDPOINT: "victoria-logs:9428"
       APP_LOGGERPROVIDER_PATH: "/insert/opentelemetry/v1/logs"
