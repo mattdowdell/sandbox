@@ -13,6 +13,11 @@ import (
 //
 // The use of tabs as delimiters is required by the parser. Furthermore, each line cannot be
 // prefixed with whitespace or it will be ignored by the parser.
+//
+// At time of writing, "go test ./path" does not compile in dependencies. As a result,
+// runtime/debug.ReadBuildInfo is insufficient for unit testing package version extraction. As a
+// workaround, the below is a hardcoded output. Happily, this also means the versions are fully
+// deterministic instead of changing with dependency updates.
 const buildInfoData = `go	go1.24.0
 path	github.com/mattdowdell/sandbox/cmd/example-health
 mod	github.com/mattdowdell/sandbox	v0.0.120
