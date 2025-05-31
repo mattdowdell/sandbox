@@ -46,7 +46,7 @@ func Test_Recoverer_Handle(t *testing.T) {
 	err = recoverer.Handle(t.Context(), spec, http.Header{}, "example")
 
 	// assert
-	assert.EqualError(t, err, "internal: internal error")
+	require.EqualError(t, err, "internal: internal error")
 
 	want := metricdata.ScopeMetrics{
 		Scope: instrumentation.Scope{

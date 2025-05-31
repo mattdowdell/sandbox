@@ -49,5 +49,5 @@ func Tracer(options ...TracerOption) trace.Tracer {
 	pkg := packageName(1 /*skip*/)
 	ver := packageVersion(pkg)
 
-	return otel.Tracer(pkg, trace.WithInstrumentationVersion(ver))
+	return provider.Tracer(pkg, trace.WithInstrumentationVersion(ver))
 }
