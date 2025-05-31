@@ -48,3 +48,20 @@ func Test_MustSpan_Error(t *testing.T) {
 		})
 	}
 }
+
+func Test_TestMeterProvider(t *testing.T) {
+	// arrange
+
+	// act
+	provider, collect := otelx.TestMeterProvider()
+
+	// assert
+	assert.NotNil(t, provider)
+
+	if assert.NotNil(t, collect) {
+		metrics, err := collect(t.Context())
+
+		assert.Empty(t, metrics.ScopeMetrics)
+		assert.NoError(t, err)
+	}
+}
