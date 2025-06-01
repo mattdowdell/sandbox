@@ -39,7 +39,7 @@ func Test_Recoverer_Handle(t *testing.T) {
 	require.NoError(t, err)
 
 	spec := connect.Spec{
-		Procedure: "acme.foo.v1.FooService/Bar",
+		Procedure: "/acme.foo.v1.FooService/Bar",
 	}
 
 	// act
