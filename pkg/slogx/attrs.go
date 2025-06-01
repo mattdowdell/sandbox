@@ -8,49 +8,73 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+const (
+	ConfigKey       = "config"
+	ErrorKey        = "error"
+	HealthStatusKey = "health_status"
+	PanicKey        = "panic"
+	StacktraceKey   = "stacktrace"
+	TraceIDKey      = "trace_id"
+	SpanIDKey       = "span_id"
+	SampledKey      = "sampled"
+	RPCSystemKey    = "rpc_system"
+	RPCServiceKey   = "rpc_service"
+	RPCMethodKey    = "rpc_method"
+)
+
 // ...
 //
 // TODO: document how to redact secrets.
 func Config(conf any) slog.Attr {
-	return slog.Any("config", conf)
+	return slog.Any(ConfigKey, conf)
 }
 
 // ...
 func Err(err error) slog.Attr {
-	return slog.String("error", err.Error())
+	return slog.String(ErrorKey, err.Error())
 }
 
 // ...
 func HealthStatus(status fmt.Stringer) slog.Attr {
-	return slog.String("health_status", status.String())
+	return slog.String(HealthStatusKey, status.String())
 }
 
 // ...
 func Panic(val any) slog.Attr {
-	return slog.Any("panic", val)
+	return slog.Any(PanicKey, val)
 }
 
 // ...
 func Stacktrace() slog.Attr {
-	return slog.String("stacktrace", string(debug.Stack()))
+	return slog.String(StacktraceKey, string(debug.Stack()))
 }
 
 // ...
 func TraceID(span trace.Span) slog.Attr {
-	return slog.String("trace_id", span.SpanContext().TraceID().String())
+	return slog.String(TraceIDKey, span.SpanContext().TraceID().String())
+}
+
+// ...
+func SpanID(span trace.Span) slog.Attr {
+	return slog.String(SpanIDKey, span.SpanContext().SpanID().String())
+}
+
+// ...
+func Sampled(span trace.Span) slog.Attr {
+	return slog.Bool(SampledKey, span.SpanContext().IsSampled())
 }
 
 // ...
 func RPCSystem(system string) slog.Attr {
-	return slog.String("rpc_system", system)
+	return slog.String(RPCSystemKey, system)
 }
 
 // ...
 func RPCService(service string) slog.Attr {
-	return slog.String("rpc_service", service)
+	return slog.String(RPCServiceKey, service)
 }
 
 // ...
 func RPCMethod(method string) slog.Attr {
-	return slog.String("rpc_method", method)
+	return slog.String(RPCMethodKey, method)
 }
