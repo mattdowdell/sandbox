@@ -46,7 +46,7 @@ func Meter(options ...MeterOption) metric.Meter {
 		provider = otel.GetMeterProvider()
 	}
 
-	pkg := packageName(1)
+	pkg := packageName(1 /*skip*/)
 	ver := packageVersion(pkg)
 
 	return provider.Meter(pkg, metric.WithInstrumentationVersion(ver))
