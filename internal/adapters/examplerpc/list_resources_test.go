@@ -12,6 +12,7 @@ import (
 
 	"github.com/mattdowdell/sandbox/gen/example/v1"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
+	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 	"github.com/mattdowdell/sandbox/mocks/adapters/mockexamplerpc"
 )
@@ -62,4 +63,28 @@ func Test_Handler_ListResources_Success(t *testing.T) {
 
 	assert.Equal(t, expected, resp)
 	assert.NoError(t, err)
+}
+
+func Test_Handler_ListResources_Error(t *testing.T) {
+	// arrange
+	facade := mockexamplerpc.NewResourceFacade(t)
+	facade.
+		EXPECT().
+		List(t.Context(), mock.AnythingOfType("*slog.Logger")).
+		Return(nil, domain.ErrInternal).
+		Once()
+
+	handler := examplerpc.New(
+		facade,
+		mockexamplerpc.NewAuditEventFacade(t),
+	)
+
+	req := connect.NewRequest(&examplev1.ListResourcesRequest{})
+
+	// act
+	resp, err := handler.ListResources(t.Context(), req)
+
+	// assert
+	assert.Nil(t, resp)
+	assert.EqualError(t, err, "internal: internal error")
 }

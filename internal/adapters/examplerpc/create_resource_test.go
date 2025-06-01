@@ -79,65 +79,54 @@ func Test_Handler_CreateResource_Success(t *testing.T) {
 }
 
 func Test_Handler_CreateResource_AlreadyExists(t *testing.T) {
-	// arrange
-	facade := mockexamplerpc.NewResourceFacade(t)
-	facade.
-		EXPECT().
-		Create(
-			t.Context(),
-			mock.AnythingOfType("*slog.Logger"),
-			mock.AnythingOfType("*entities.Resource"),
-		).
-		Return(nil, domain.ErrAlreadyExists).
-		Once()
-
-	handler := examplerpc.New(
-		facade,
-		mockexamplerpc.NewAuditEventFacade(t),
-	)
-
-	req := connect.NewRequest(&examplev1.CreateResourceRequest{
-		Resource: &examplev1.ResourceCreate{
-			Name: testResourceName,
+	testCases := []struct {
+		name string
+		have error
+		want string
+	}{
+		{
+			name: "already exists",
+			have: domain.ErrAlreadyExists,
+			want: "already_exists: resource name already in use",
 		},
-	})
-
-	// act
-	resp, err := handler.CreateResource(t.Context(), req)
-
-	// assert
-	assert.Nil(t, resp)
-	assert.EqualError(t, err, "already_exists: resource name already in use")
-}
-
-func Test_Handler_CreateResource_Internal(t *testing.T) {
-	// arrange
-	facade := mockexamplerpc.NewResourceFacade(t)
-	facade.
-		EXPECT().
-		Create(
-			t.Context(),
-			mock.AnythingOfType("*slog.Logger"),
-			mock.AnythingOfType("*entities.Resource"),
-		).
-		Return(nil, domain.ErrInternal).
-		Once()
-
-	handler := examplerpc.New(
-		facade,
-		mockexamplerpc.NewAuditEventFacade(t),
-	)
-
-	req := connect.NewRequest(&examplev1.CreateResourceRequest{
-		Resource: &examplev1.ResourceCreate{
-			Name: testResourceName,
+		{
+			name: "internal",
+			have: domain.ErrInternal,
+			want: "internal: internal error",
 		},
-	})
+	}
 
-	// act
-	resp, err := handler.CreateResource(t.Context(), req)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// arrange
+			facade := mockexamplerpc.NewResourceFacade(t)
+			facade.
+				EXPECT().
+				Create(
+					t.Context(),
+					mock.AnythingOfType("*slog.Logger"),
+					mock.AnythingOfType("*entities.Resource"),
+				).
+				Return(nil, tc.have).
+				Once()
 
-	// assert
-	assert.Nil(t, resp)
-	assert.EqualError(t, err, "internal: internal error")
+			handler := examplerpc.New(
+				facade,
+				mockexamplerpc.NewAuditEventFacade(t),
+			)
+
+			req := connect.NewRequest(&examplev1.CreateResourceRequest{
+				Resource: &examplev1.ResourceCreate{
+					Name: testResourceName,
+				},
+			})
+
+			// act
+			resp, err := handler.CreateResource(t.Context(), req)
+
+			// assert
+			assert.Nil(t, resp)
+			assert.EqualError(t, err, tc.want)
+		})
+	}
 }

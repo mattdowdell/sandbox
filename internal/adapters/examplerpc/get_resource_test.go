@@ -14,6 +14,7 @@ import (
 
 	"github.com/mattdowdell/sandbox/gen/example/v1"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
+	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 	"github.com/mattdowdell/sandbox/mocks/adapters/mockexamplerpc"
 )
@@ -65,4 +66,72 @@ func Test_Handler_GetResource_Success(t *testing.T) {
 
 	assert.Equal(t, expected, resp)
 	assert.NoError(t, err)
+}
+
+func Test_Handler_GetResource_InvalidID(t *testing.T) {
+	// arrange
+	handler := examplerpc.New(
+		mockexamplerpc.NewResourceFacade(t),
+		mockexamplerpc.NewAuditEventFacade(t),
+	)
+
+	req := connect.NewRequest(&examplev1.GetResourceRequest{
+		Id: "invalid",
+	})
+
+	// act
+	resp, err := handler.GetResource(t.Context(), req)
+
+	// assert
+	assert.Nil(t, resp)
+	assert.EqualError(t, err, "internal: internal error")
+}
+
+func Test_Handler_GetResource_UsecaseError(t *testing.T) {
+	testCases := []struct {
+		name string
+		have error
+		want string
+	}{
+		{
+			name: "not found",
+			have: domain.ErrNotFound,
+			want: "not_found: resource does not exist",
+		},
+		{
+			name: "internal",
+			have: domain.ErrInternal,
+			want: "internal: internal error",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// arrange
+			id := uuid.New()
+
+			facade := mockexamplerpc.NewResourceFacade(t)
+			facade.
+				EXPECT().
+				Get(t.Context(), mock.AnythingOfType("*slog.Logger"), id).
+				Return(nil, tc.have).
+				Once()
+
+			handler := examplerpc.New(
+				facade,
+				mockexamplerpc.NewAuditEventFacade(t),
+			)
+
+			req := connect.NewRequest(&examplev1.GetResourceRequest{
+				Id: id.String(),
+			})
+
+			// act
+			resp, err := handler.GetResource(t.Context(), req)
+
+			// assert
+			assert.Nil(t, resp)
+			assert.EqualError(t, err, tc.want)
+		})
+	}
 }
