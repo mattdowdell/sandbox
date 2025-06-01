@@ -6,6 +6,7 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
+	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -15,10 +16,13 @@ import (
 	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 	"github.com/mattdowdell/sandbox/mocks/adapters/mockexamplerpc"
+	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
 func Test_Handler_ListAuditEvents_Success(t *testing.T) {
 	// arrange
+	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
+
 	id := uuid.New()
 	now := time.Now()
 	resourceID := uuid.New()
@@ -26,7 +30,7 @@ func Test_Handler_ListAuditEvents_Success(t *testing.T) {
 	facade := mockexamplerpc.NewAuditEventFacade(t)
 	facade.
 		EXPECT().
-		List(t.Context(), mock.AnythingOfType("*slog.Logger")).
+		List(ctx, mock.AnythingOfType("*slog.Logger")).
 		Return(
 			[]*entities.AuditEvent{
 				{
@@ -50,7 +54,7 @@ func Test_Handler_ListAuditEvents_Success(t *testing.T) {
 	req := connect.NewRequest(&examplev1.ListAuditEventsRequest{})
 
 	// act
-	resp, err := handler.ListAuditEvents(t.Context(), req)
+	resp, err := handler.ListAuditEvents(ctx, req)
 
 	// assert
 	expected := connect.NewResponse(&examplev1.ListAuditEventsResponse{
@@ -72,10 +76,12 @@ func Test_Handler_ListAuditEvents_Success(t *testing.T) {
 
 func Test_Handler_ListAuditEvents_Error(t *testing.T) {
 	// arrange
+	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
+
 	facade := mockexamplerpc.NewAuditEventFacade(t)
 	facade.
 		EXPECT().
-		List(t.Context(), mock.AnythingOfType("*slog.Logger")).
+		List(ctx, mock.AnythingOfType("*slog.Logger")).
 		Return(nil, domain.ErrInternal).
 		Once()
 
@@ -87,7 +93,7 @@ func Test_Handler_ListAuditEvents_Error(t *testing.T) {
 	req := connect.NewRequest(&examplev1.ListAuditEventsRequest{})
 
 	// act
-	resp, err := handler.ListAuditEvents(t.Context(), req)
+	resp, err := handler.ListAuditEvents(ctx, req)
 
 	// assert
 	assert.Nil(t, resp)

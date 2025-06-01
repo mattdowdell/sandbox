@@ -8,6 +8,7 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
+	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -17,6 +18,7 @@ import (
 	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 	"github.com/mattdowdell/sandbox/mocks/adapters/mockexamplerpc"
+	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
 const (
@@ -25,6 +27,8 @@ const (
 
 func Test_Handler_CreateResource_Success(t *testing.T) {
 	// arrange
+	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
+
 	id := uuid.New()
 	now := time.Now()
 
@@ -32,7 +36,7 @@ func Test_Handler_CreateResource_Success(t *testing.T) {
 	facade.
 		EXPECT().
 		Create(
-			t.Context(),
+			ctx,
 			mock.AnythingOfType("*slog.Logger"),
 			mock.AnythingOfType("*entities.Resource"),
 		).
@@ -62,7 +66,7 @@ func Test_Handler_CreateResource_Success(t *testing.T) {
 	})
 
 	// act
-	resp, err := handler.CreateResource(t.Context(), req)
+	resp, err := handler.CreateResource(ctx, req)
 
 	// assert
 	expected := connect.NewResponse(&examplev1.CreateResourceResponse{
@@ -99,11 +103,13 @@ func Test_Handler_CreateResource_AlreadyExists(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// arrange
+			ctx := slogx.IntoContext(t.Context(), slogt.New(t))
+
 			facade := mockexamplerpc.NewResourceFacade(t)
 			facade.
 				EXPECT().
 				Create(
-					t.Context(),
+					ctx,
 					mock.AnythingOfType("*slog.Logger"),
 					mock.AnythingOfType("*entities.Resource"),
 				).
@@ -122,7 +128,7 @@ func Test_Handler_CreateResource_AlreadyExists(t *testing.T) {
 			})
 
 			// act
-			resp, err := handler.CreateResource(t.Context(), req)
+			resp, err := handler.CreateResource(ctx, req)
 
 			// assert
 			assert.Nil(t, resp)

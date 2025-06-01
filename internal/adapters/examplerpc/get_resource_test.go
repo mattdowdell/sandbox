@@ -8,6 +8,7 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
+	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -17,17 +18,20 @@ import (
 	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 	"github.com/mattdowdell/sandbox/mocks/adapters/mockexamplerpc"
+	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
 func Test_Handler_GetResource_Success(t *testing.T) {
 	// arrange
+	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
+
 	id := uuid.New()
 	now := time.Now()
 
 	facade := mockexamplerpc.NewResourceFacade(t)
 	facade.
 		EXPECT().
-		Get(t.Context(), mock.AnythingOfType("*slog.Logger"), id).
+		Get(ctx, mock.AnythingOfType("*slog.Logger"), id).
 		RunAndReturn(func(
 			_ context.Context,
 			_ *slog.Logger,
@@ -52,7 +56,7 @@ func Test_Handler_GetResource_Success(t *testing.T) {
 	})
 
 	// act
-	resp, err := handler.GetResource(t.Context(), req)
+	resp, err := handler.GetResource(ctx, req)
 
 	// assert
 	expected := connect.NewResponse(&examplev1.GetResourceResponse{
@@ -70,6 +74,8 @@ func Test_Handler_GetResource_Success(t *testing.T) {
 
 func Test_Handler_GetResource_InvalidID(t *testing.T) {
 	// arrange
+	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
+
 	handler := examplerpc.New(
 		mockexamplerpc.NewResourceFacade(t),
 		mockexamplerpc.NewAuditEventFacade(t),
@@ -80,7 +86,7 @@ func Test_Handler_GetResource_InvalidID(t *testing.T) {
 	})
 
 	// act
-	resp, err := handler.GetResource(t.Context(), req)
+	resp, err := handler.GetResource(ctx, req)
 
 	// assert
 	assert.Nil(t, resp)
@@ -108,12 +114,13 @@ func Test_Handler_GetResource_UsecaseError(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// arrange
+			ctx := slogx.IntoContext(t.Context(), slogt.New(t))
 			id := uuid.New()
 
 			facade := mockexamplerpc.NewResourceFacade(t)
 			facade.
 				EXPECT().
-				Get(t.Context(), mock.AnythingOfType("*slog.Logger"), id).
+				Get(ctx, mock.AnythingOfType("*slog.Logger"), id).
 				Return(nil, tc.have).
 				Once()
 
@@ -127,7 +134,7 @@ func Test_Handler_GetResource_UsecaseError(t *testing.T) {
 			})
 
 			// act
-			resp, err := handler.GetResource(t.Context(), req)
+			resp, err := handler.GetResource(ctx, req)
 
 			// assert
 			assert.Nil(t, resp)

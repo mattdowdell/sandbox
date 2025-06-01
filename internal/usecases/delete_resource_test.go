@@ -1,10 +1,10 @@
 package usecases_test
 
 import (
-	"log/slog"
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/domain"
@@ -27,7 +27,7 @@ func Test_DeleteResource_Success(t *testing.T) {
 	id := uuid.New()
 
 	usecase := usecases.NewDeleteResource()
-	logger := slog.New(slog.DiscardHandler)
+	logger := slogt.New(t)
 
 	store := mockrepositories.NewResource(t)
 	store.EXPECT().DeleteResource(t.Context(), id).Return(nil).Once()
@@ -60,7 +60,7 @@ func Test_DeleteResource_Error(t *testing.T) {
 			id := uuid.New()
 
 			usecase := usecases.NewDeleteResource()
-			logger := slog.New(slog.DiscardHandler)
+			logger := slogt.New(t)
 
 			store := mockrepositories.NewResource(t)
 			store.EXPECT().DeleteResource(t.Context(), id).Return(tc.err).Once()

@@ -5,6 +5,7 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
+	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
@@ -12,16 +13,18 @@ import (
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
 	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/mocks/adapters/mockexamplerpc"
+	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
 func Test_Handler_DeleteResource_Success(t *testing.T) {
 	// arrange
+	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
 	id := uuid.New()
 
 	facade := mockexamplerpc.NewResourceFacade(t)
 	facade.
 		EXPECT().
-		Delete(t.Context(), mock.AnythingOfType("*slog.Logger"), id).
+		Delete(ctx, mock.AnythingOfType("*slog.Logger"), id).
 		Return(nil).
 		Once()
 
@@ -35,7 +38,7 @@ func Test_Handler_DeleteResource_Success(t *testing.T) {
 	})
 
 	// act
-	resp, err := handler.DeleteResource(t.Context(), req)
+	resp, err := handler.DeleteResource(ctx, req)
 
 	// assert
 	expected := connect.NewResponse(&examplev1.DeleteResourceResponse{})
@@ -46,6 +49,8 @@ func Test_Handler_DeleteResource_Success(t *testing.T) {
 
 func Test_Handler_DeleteResource_InvalidID(t *testing.T) {
 	// arrange
+	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
+
 	handler := examplerpc.New(
 		mockexamplerpc.NewResourceFacade(t),
 		mockexamplerpc.NewAuditEventFacade(t),
@@ -56,7 +61,7 @@ func Test_Handler_DeleteResource_InvalidID(t *testing.T) {
 	})
 
 	// act
-	resp, err := handler.DeleteResource(t.Context(), req)
+	resp, err := handler.DeleteResource(ctx, req)
 
 	// assert
 	assert.Nil(t, resp)
@@ -84,12 +89,13 @@ func Test_Handler_DeleteResource_UsecaseError(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// arrange
+			ctx := slogx.IntoContext(t.Context(), slogt.New(t))
 			id := uuid.New()
 
 			facade := mockexamplerpc.NewResourceFacade(t)
 			facade.
 				EXPECT().
-				Delete(t.Context(), mock.AnythingOfType("*slog.Logger"), id).
+				Delete(ctx, mock.AnythingOfType("*slog.Logger"), id).
 				Return(tc.have).
 				Once()
 
@@ -103,7 +109,7 @@ func Test_Handler_DeleteResource_UsecaseError(t *testing.T) {
 			})
 
 			// act
-			resp, err := handler.DeleteResource(t.Context(), req)
+			resp, err := handler.DeleteResource(ctx, req)
 
 			// assert
 			assert.Nil(t, resp)

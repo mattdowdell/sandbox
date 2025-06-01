@@ -1,11 +1,11 @@
 package usecases_test
 
 import (
-	"log/slog"
 	"testing"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/domain"
@@ -30,7 +30,7 @@ func Test_GetResource_Success(t *testing.T) {
 	now := time.Now()
 
 	usecase := usecases.NewGetResource()
-	logger := slog.New(slog.DiscardHandler)
+	logger := slogt.New(t)
 
 	expected := &entities.Resource{
 		ID:        id,
@@ -71,7 +71,7 @@ func Test_GetResource_Error(t *testing.T) {
 			id := uuid.New()
 
 			usecase := usecases.NewGetResource()
-			logger := slog.New(slog.DiscardHandler)
+			logger := slogt.New(t)
 
 			store := mockrepositories.NewResource(t)
 			store.EXPECT().GetResource(t.Context(), id).Return(nil, tc.err).Once()

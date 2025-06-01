@@ -89,6 +89,7 @@ func ProvideApp(ctx context.Context) (*App, error) {
 		authnOptions,
 		authn.New,
 		collectInterceptors,
+		recovererOptions,
 		rpcserver.NewRecoverer,
 		collectHandlerOptions,
 		// handlers

@@ -1,11 +1,11 @@
 package usecases_test
 
 import (
-	"log/slog"
 	"testing"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/domain"
@@ -30,7 +30,7 @@ func Test_ListResources_Success(t *testing.T) {
 	now := time.Now()
 
 	usecase := usecases.NewListResources()
-	logger := slog.New(slog.DiscardHandler)
+	logger := slogt.New(t)
 
 	expected := []*entities.Resource{
 		{
@@ -55,7 +55,7 @@ func Test_ListResources_Success(t *testing.T) {
 func Test_ListResources_Error(t *testing.T) {
 	// arrange
 	usecase := usecases.NewListResources()
-	logger := slog.New(slog.DiscardHandler)
+	logger := slogt.New(t)
 
 	store := mockrepositories.NewResource(t)
 	store.EXPECT().ListResources(t.Context()).Return(nil, domain.ErrInternal).Once()

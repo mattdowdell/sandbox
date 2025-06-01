@@ -36,9 +36,14 @@ func Test_Handler_Register(t *testing.T) {
 	handler.Register(mux, nil /*opts*/)
 
 	// assert
-	req, err := http.NewRequestWithContext(t.Context(), http.MethodPost, "/example.v1.ExampleService/", http.NoBody)
+	req, err := http.NewRequestWithContext(
+		t.Context(),
+		http.MethodPost,
+		"/example.v1.ExampleService/",
+		http.NoBody,
+	)
 	require.NoError(t, err)
 
 	_, pattern := mux.Handler(req)
-	assert.Equal(t, "/example.v1.ExampleService/", pattern)
+	assert.Equal(t, "/example.v1.ExampleService/", pattern, "pattern not handled")
 }

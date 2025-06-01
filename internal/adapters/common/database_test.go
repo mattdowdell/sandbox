@@ -2,9 +2,9 @@ package common_test
 
 import (
 	"errors"
-	"log/slog"
 	"testing"
 
+	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/common"
@@ -13,7 +13,7 @@ import (
 
 func Test_TxFunc(t *testing.T) {
 	// arrange
-	logger := slog.New(slog.DiscardHandler)
+	logger := slogt.New(t)
 	datastore := mockcommon.NewDatastore(t)
 
 	commit := mockcommon.NewCommitFn(t)
@@ -40,7 +40,7 @@ func Test_TxFunc(t *testing.T) {
 
 func Test_TxValue(t *testing.T) {
 	// arrange
-	logger := slog.New(slog.DiscardHandler)
+	logger := slogt.New(t)
 	datastore := mockcommon.NewDatastore(t)
 
 	commit := mockcommon.NewCommitFn(t)
@@ -84,7 +84,7 @@ func Test_TxValues_Success(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// arrange
-			logger := slog.New(slog.DiscardHandler)
+			logger := slogt.New(t)
 			datastore := mockcommon.NewDatastore(t)
 
 			commit := mockcommon.NewCommitFn(t)
@@ -199,7 +199,7 @@ func Test_TxValues_Error(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// arrange
-			logger := slog.New(slog.DiscardHandler)
+			logger := slogt.New(t)
 			provider := tc.provider(t)
 
 			// act

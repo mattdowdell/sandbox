@@ -75,12 +75,13 @@ func ProvideApp(ctx context.Context) (*App, error) {
 	v3 := authnOptions()
 	authnInterceptor := authn.New(v3...)
 	v4 := collectInterceptors(interceptor, validateInterceptor, loggingInterceptor, authnInterceptor)
-	recoverer, err := rpcserver.NewRecoverer()
+	v5 := recovererOptions()
+	recoverer, err := rpcserver.NewRecoverer(v5...)
 	if err != nil {
 		return nil, err
 	}
-	v5 := collectHandlerOptions(v4, recoverer)
-	server := rpcserver.NewFromConfig(rpcserverConfig, v2, v5)
+	v6 := collectHandlerOptions(v4, recoverer)
+	server := rpcserver.NewFromConfig(rpcserverConfig, v2, v6)
 	tracerProviderConfig := mainConfig.TracerProvider
 	filter := baggageFilter()
 	tracerProviderShutdown, err := otelx.SetupTracerProviderFromConfig(ctx, tracerProviderConfig, filter)

@@ -6,6 +6,7 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
+	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -15,17 +16,20 @@ import (
 	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 	"github.com/mattdowdell/sandbox/mocks/adapters/mockexamplerpc"
+	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
 func Test_Handler_ListResources_Success(t *testing.T) {
 	// arrange
+	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
+
 	id := uuid.New()
 	now := time.Now()
 
 	facade := mockexamplerpc.NewResourceFacade(t)
 	facade.
 		EXPECT().
-		List(t.Context(), mock.AnythingOfType("*slog.Logger")).
+		List(ctx, mock.AnythingOfType("*slog.Logger")).
 		Return(
 			[]*entities.Resource{
 				{
@@ -47,7 +51,7 @@ func Test_Handler_ListResources_Success(t *testing.T) {
 	req := connect.NewRequest(&examplev1.ListResourcesRequest{})
 
 	// act
-	resp, err := handler.ListResources(t.Context(), req)
+	resp, err := handler.ListResources(ctx, req)
 
 	// assert
 	expected := connect.NewResponse(&examplev1.ListResourcesResponse{
@@ -67,10 +71,12 @@ func Test_Handler_ListResources_Success(t *testing.T) {
 
 func Test_Handler_ListResources_Error(t *testing.T) {
 	// arrange
+	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
+
 	facade := mockexamplerpc.NewResourceFacade(t)
 	facade.
 		EXPECT().
-		List(t.Context(), mock.AnythingOfType("*slog.Logger")).
+		List(ctx, mock.AnythingOfType("*slog.Logger")).
 		Return(nil, domain.ErrInternal).
 		Once()
 
@@ -82,7 +88,7 @@ func Test_Handler_ListResources_Error(t *testing.T) {
 	req := connect.NewRequest(&examplev1.ListResourcesRequest{})
 
 	// act
-	resp, err := handler.ListResources(t.Context(), req)
+	resp, err := handler.ListResources(ctx, req)
 
 	// assert
 	assert.Nil(t, resp)
