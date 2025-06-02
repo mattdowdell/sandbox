@@ -33,6 +33,8 @@ type Handler interface {
 // Server provides a HTTP/2 server for one or more HTTP handlers.
 type Server struct {
 	server *http.Server
+	url    string
+	ch     chan struct{}
 }
 
 // New creates a new Server instance from the given configuration.
@@ -68,17 +70,25 @@ func New(
 			Handler:           h2c.NewHandler(mux, &http2.Server{}),
 			ReadHeaderTimeout: readHeaderTimeout,
 		},
+		ch: make(chan struct{}),
 	}
 }
 
-// Start starts the server. This blocks until the server stops.
+// Start starts the server and blocks until the server stops.
 func (s *Server) Start() error {
-	err := s.server.ListenAndServe()
-	if errors.Is(err, http.ErrServerClosed) {
-		return nil
+	listener, err := net.Listen("tcp", s.server.Addr)
+	if err != nil {
+		return err
 	}
 
-	return err
+	s.url = listener.Addr().String()
+	close(s.ch)
+
+	if err := s.server.Serve(listener); !errors.Is(err, http.ErrServerClosed) {
+		return err
+	}
+
+	return nil
 }
 
 // Shutdown gracefully stops the server.

@@ -96,6 +96,11 @@ func collectHandlerOptions(
 }
 
 // ...
+func recovererOptions() []rpcserver.RecovererOption {
+	return nil
+}
+
+// ...
 func authnOptions() []authn.Option {
 	return []authn.Option{
 		authn.WithIgnoreService(

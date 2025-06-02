@@ -1,94 +1,53 @@
 package otelx
 
 import (
-	"context"
-
-	"go.opentelemetry.io/contrib/processors/baggagecopy"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
 )
 
-// TracerProviderConfig contains configuration for configuring an OpenTelemetry tracer provider.
-type TracerProviderConfig struct {
-	// Use HTTP instead of HTTPS for the trace exporter's HTTP connection.
-	Insecure bool `koanf:"insecure"`
-
-	// The host and optional port for the trace exporter to connect to.
-	Endpoint string `koanf:"endpoint"`
-
-	// The URL path the trace exporter should send requests to.
-	Path string `koanf:"path" default:"/v1/traces"`
+// TracerOption implementations customise the behaviour of Tracer.
+type TracerOption interface {
+	apply(*tracerOpts)
 }
 
-// TracerProviderShutdown provides a dedicated type for the tracer provider shutdown function.
-type TracerProviderShutdown func(context.Context) error
-
-// SetupTracerProviderFromConfig calls SetupTracerProvider with the given configuration.
-func SetupTracerProviderFromConfig(
-	ctx context.Context,
-	conf TracerProviderConfig,
-	filter baggagecopy.Filter,
-) (TracerProviderShutdown, error) {
-	return SetupTracerProvider(ctx, conf.Insecure, conf.Endpoint, conf.Path, filter)
+type tracerOpts struct {
+	provider trace.TracerProvider
 }
 
-// SetupTracerProvider creates a new [trace.TracerProvider] and sets it as the default using
-// [otel.SetTracerProvider]. The returned function should be called when the process exits to
-// publish any lingering spans.
-//
-// Propagation of W3C trace contexts and W3C baggage is also configured for both incoming requests
-// and outgoing requests when supported.
-//
-// [trace.TracerProvider]: https://pkg.go.dev/go.opentelemetry.io/otel/trace#TracerProvider
-// [otel.SetTracerProvider]: https://pkg.go.dev/go.opentelemetry.io/otel#SetTracerProvider
-func SetupTracerProvider(
-	ctx context.Context,
-	insecure bool,
-	endpoint string,
-	path string,
-	filter baggagecopy.Filter,
-) (TracerProviderShutdown, error) {
-	opts := []otlptracehttp.Option{
-		otlptracehttp.WithEndpoint(endpoint),
-		otlptracehttp.WithURLPath(path),
-	}
-	if insecure {
-		opts = append(opts, otlptracehttp.WithInsecure())
-	}
-
-	exporter, err := otlptracehttp.New(ctx, opts...)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := newResource()
-	if err != nil {
-		return nil, err
-	}
-
-	setupPropagator()
-
-	provider := sdktrace.NewTracerProvider(
-		sdktrace.WithBatcher(exporter),
-		sdktrace.WithResource(res),
-		sdktrace.WithSpanProcessor(baggagecopy.NewSpanProcessor(filter)),
-	)
-	otel.SetTracerProvider(provider)
-
-	return provider.Shutdown, nil
+type tracerProviderOpt struct {
+	provider trace.TracerProvider
 }
 
-// Tracer wraps [otel.Tracer] to provide a [trace.Tracer] with the package name and version
-// automatically set based on the direct caller. It is advised to cache the result when possible to
-// avoid computing the caller's package details unnecessarily.
+// WithTracerProvider overrides the global TracerProvider. This can be useful for testing the result
+// of recording metrics.
+func WithTracerProvider(provider trace.TracerProvider) TracerOption {
+	return &tracerProviderOpt{
+		provider: provider,
+	}
+}
+
+func (o *tracerProviderOpt) apply(options *tracerOpts) {
+	options.provider = o.provider
+}
+
+// Tracer provides a [trace.Tracer] with the package name and version automatically set based on the
+// direct caller. It is advised to cache the result when possible to avoid computing the caller's
+// package details unnecessarily.
 //
-// [otel.Tracer]: https://pkg.go.dev/go.opentelemetry.io/otel#Tracer
 // [trace.Tracer]: https://pkg.go.dev/go.opentelemetry.io/otel/trace#Tracer
-func Tracer() trace.Tracer {
+func Tracer(options ...TracerOption) trace.Tracer {
+	opts := &tracerOpts{}
+	for _, option := range options {
+		option.apply(opts)
+	}
+
+	provider := opts.provider
+	if provider == nil {
+		provider = otel.GetTracerProvider()
+	}
+
 	pkg := packageName(1 /*skip*/)
 	ver := packageVersion(pkg)
 
-	return otel.Tracer(pkg, trace.WithInstrumentationVersion(ver))
+	return provider.Tracer(pkg, trace.WithInstrumentationVersion(ver))
 }

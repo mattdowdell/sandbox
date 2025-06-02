@@ -16,6 +16,32 @@ import (
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
+var errInternal = connect.NewError(connect.CodeInternal, errors.New("internal error"))
+
+// ...
+type RecovererOption interface {
+	apply(*recovererOpts)
+}
+
+type recovererOpts struct {
+	meterOpts []otelx.MeterOption
+}
+
+type providerOpt struct {
+	provider metric.MeterProvider
+}
+
+// ...
+func WithMeterProvider(provider metric.MeterProvider) RecovererOption {
+	return &providerOpt{
+		provider: provider,
+	}
+}
+
+func (o *providerOpt) apply(options *recovererOpts) {
+	options.meterOpts = append(options.meterOpts, otelx.WithMeterProvider(o.provider))
+}
+
 // Recoverer handles the recovery from panics and should be used with [connect.WithRecover].
 //
 // When a panic occurs, the following are performed:
@@ -32,8 +58,13 @@ type Recoverer struct {
 }
 
 // NewRecoverer creates a Recoverer.
-func NewRecoverer() (*Recoverer, error) {
-	panics, err := otelx.Meter().Int64Counter(
+func NewRecoverer(options ...RecovererOption) (*Recoverer, error) {
+	opts := &recovererOpts{}
+	for _, option := range options {
+		option.apply(opts)
+	}
+
+	panics, err := otelx.Meter(opts.meterOpts...).Int64Counter(
 		"rpc.server.panics",
 		metric.WithDescription("Measures the number of panics per RPC."),
 	)
@@ -69,5 +100,5 @@ func (r *Recoverer) Handle(ctx context.Context, spec connect.Spec, _ http.Header
 		semconv.RPCMethod(method),
 	))
 
-	return connect.NewError(connect.CodeInternal, errors.New("internal"))
+	return errInternal
 }

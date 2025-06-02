@@ -1,11 +1,11 @@
 package usecases_test
 
 import (
-	"log/slog"
 	"testing"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/domain"
@@ -27,7 +27,7 @@ func Test_NewListAuditEvents(t *testing.T) {
 func Test_ListAuditEvents_Success(t *testing.T) {
 	// arrange
 	usecase := usecases.NewListAuditEvents()
-	logger := slog.New(slog.DiscardHandler)
+	logger := slogt.New(t)
 
 	expected := []*entities.AuditEvent{
 		{
@@ -54,7 +54,7 @@ func Test_ListAuditEvents_Success(t *testing.T) {
 func Test_ListAuditEvents_Error(t *testing.T) {
 	// arrange
 	usecase := usecases.NewListAuditEvents()
-	logger := slog.New(slog.DiscardHandler)
+	logger := slogt.New(t)
 
 	store := mockrepositories.NewAuditEvent(t)
 	store.EXPECT().ListAuditEvents(t.Context()).Return(nil, domain.ErrInternal).Once()
