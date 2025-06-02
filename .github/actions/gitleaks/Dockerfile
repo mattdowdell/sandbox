@@ -1,3 +1,3 @@
 # https://docs.docker.com/reference/dockerfile/
 
-FROM ghcr.io/gitleaks/gitleaks:v8.26.0@sha256:a6d5fa4bde3316d4ea9b969ebd3bd36a6529a31efdc5248f5779e6471196b85f
+FROM ghcr.io/gitleaks/gitleaks:v8.27.0@sha256:090a2715530bd6592342e6a66c3f35eafcaaf2a3227a312482504f9c854997e3
