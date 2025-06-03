@@ -20,6 +20,7 @@ require (
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/creasty/defaults v1.8.0
 	github.com/cucumber/godog v0.15.0
+	github.com/fsnotify/fsnotify v1.9.0
 	github.com/go-jet/jet/v2 v2.13.0
 	github.com/google/uuid v1.6.0
 	github.com/google/wire v0.6.0
@@ -79,7 +80,6 @@ require (
 	github.com/cucumber/messages/go/v21 v21.0.1 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f // indirect
-	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
