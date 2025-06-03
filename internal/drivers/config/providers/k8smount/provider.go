@@ -6,10 +6,19 @@ import (
 	"io"
 	"io/fs"
 	"os"
+	"path/filepath"
 	"strings"
+	"sync/atomic"
+	"time"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/knadh/koanf/maps"
 	"github.com/knadh/koanf/v2"
+)
+
+var (
+	ErrUnexpectedEvent = errors.New("unexpected event")
+	ErrAlreadyWatched  = errors.New("mount is already being watched")
 )
 
 // Non-allocating compile-time check for interface implementation.
@@ -17,8 +26,10 @@ var _ koanf.Provider = (*K8SMount)(nil)
 
 // K8SMount implements a Kubernetes pod mount provider.
 type K8SMount struct {
-	mount string
-	delim string
+	mount    string
+	delim    string
+	watching atomic.Bool
+	watcher  *fsnotify.Watcher
 }
 
 // Provider creates a new K8SMount provider capable of reading in mounted secrets and configmaps in
@@ -30,7 +41,7 @@ type K8SMount struct {
 // being read as configuration.
 func Provider(mount, delim string) *K8SMount {
 	return &K8SMount{
-		mount: mount,
+		mount: filepath.Clean(mount),
 		delim: delim,
 	}
 }
@@ -79,4 +90,86 @@ func (k *K8SMount) Read() (map[string]any, error) {
 	}
 
 	return maps.Unflatten(values, k.delim), nil
+}
+
+// Watch starts a watcher in a goroutine for the files under the mount point and calls the given
+// function when changes occur.
+//
+// Only one watcher may be started at a time.
+//
+// If an error occurs, the function is called with the error before the watch is stopped. If the
+// function is called with a nil error value, a change was detected successfully and watching will
+// continue.
+func (k *K8SMount) Watch(fn func(err error)) error {
+	if k.watching.Swap(true) {
+		return ErrAlreadyWatched
+	}
+
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		return err
+	}
+
+	k.watcher = watcher
+	go k.watchDir(fn)
+
+	return watcher.Add(k.mount)
+}
+
+//nolint:gocognit // short enough that the complaxity is acceptable
+func (k *K8SMount) watchDir(fn func(err error)) {
+	defer k.watching.Store(false)
+
+	var (
+		lastEvent     string
+		lastEventTime time.Time
+	)
+
+	for {
+		select {
+		case event, ok := <-k.watcher.Events:
+			if !ok {
+				return
+			}
+
+			// Use a simple timer to buffer events as certain events fire
+			// multiple times on some platforms.
+			if event.String() == lastEvent && time.Since(lastEventTime) < time.Millisecond*5 {
+				continue
+			}
+
+			lastEvent = event.String()
+			lastEventTime = time.Now()
+
+			fmt.Println(event.String())
+
+			// mounts are only meant to be updated for the lifetime of the pod
+			if !event.Has(fsnotify.Write | fsnotify.Chmod) {
+				fn(fmt.Errorf("%w: %s", ErrUnexpectedEvent, event.String()))
+				return
+			}
+
+			// ignore chmod
+			if !event.Has(fsnotify.Chmod) {
+				fn(nil)
+			}
+
+		case err, ok := <-k.watcher.Errors:
+			if !ok {
+				return
+			}
+
+			fn(err)
+			return
+		}
+	}
+}
+
+// Unwatch stops a previously started Watch.
+func (k *K8SMount) Unwatch() error {
+	if k.watcher != nil {
+		return k.watcher.Close()
+	}
+
+	return nil
 }

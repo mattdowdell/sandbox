@@ -14,6 +14,11 @@ import (
 // - -config.envprefix is the prefix for environment variables to read configuration from.
 // - -config.files is a comma delimited list of files to read configuration from.
 // - -config.mounts is a comma delimited list of kubernetes pod mounts to read configuration from.
+//
+// Internally, a new [flag.FlagSet] instance is created with just the above flags allowed.
+// Unrecognised flags will cause the process to exit. This is usually acceptable for a binary, but
+// may cause problems if relying on flags defined in other modules/packages. In these cases, use
+// NewWithFlagSet to either set the global FlagSet instance or another instance.
 func New() *config.Options {
 	// copied from flag, apparently execl can cause os.Args to be empty
 	var name string
