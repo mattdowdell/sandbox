@@ -31,7 +31,7 @@ func Test_New(t *testing.T) {
 	}{
 		{
 			name: "defaults",
-			args: []string{"example"},
+			args: []string{t.Name()},
 			want: &config.Options{
 				EnvPrefix: "APP_",
 				Files:     []string{},
@@ -41,7 +41,7 @@ func Test_New(t *testing.T) {
 		{
 			name: "arguments",
 			args: []string{
-				"example",
+				t.Name(),
 				"-config.envprefix=ARG_",
 				"-config.files=/etc/arg1,/etc/arg2",
 				"-config.mounts=/etc/arg3,/etc/arg4",
@@ -68,7 +68,7 @@ func Test_New(t *testing.T) {
 		{
 			name: "both",
 			args: []string{
-				"example",
+				t.Name(),
 				"-config.envprefix=ARG_",
 				"-config.files=/etc/arg1,/etc/arg2",
 				"-config.mounts=/etc/arg3,/etc/arg4",
@@ -108,7 +108,7 @@ func Test_NewWithFlagSet_Success(t *testing.T) {
 	// arrange
 	flagset := flag.NewFlagSet(t.Name(), flag.ContinueOnError)
 
-	setArgs(t, "example")
+	setArgs(t, t.Name())
 
 	// act
 	got, err := flagoptions.NewWithFlagSet(flagset)
@@ -128,7 +128,7 @@ func Test_NewWithFlagSet_Error(t *testing.T) {
 	// arrange
 	flagset := flag.NewFlagSet(t.Name(), flag.ContinueOnError)
 
-	setArgs(t, "example", "-invalid=invalid")
+	setArgs(t, t.Name(), "-invalid=invalid")
 
 	// act
 	got, err := flagoptions.NewWithFlagSet(flagset)
