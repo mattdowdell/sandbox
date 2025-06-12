@@ -50,8 +50,8 @@ func Register(driverName string, options ...Option) (string, error) {
 	// Since we might want to register multiple OTel drivers to have different
 	// configurations, but potentially the same underlying database driver, we
 	// cycle through to find available driver names.
-	driverName = driverName + "-otelsql-"
-	for i := 0; i < maxDriverSlot; i++ {
+	driverName += "-otelsql-"
+	for i := range maxDriverSlot {
 		var (
 			found   = false
 			regName = driverName + strconv.FormatInt(int64(i), 10)
@@ -150,6 +150,7 @@ func recordDBStatsMetrics(
 		metric.WithAttributes(cfg.Attributes...),
 	)
 
+	// TODO: optimize slice allocation.
 	observer.ObserveInt64(instruments.connectionOpen,
 		int64(dbStats.InUse),
 		metric.WithAttributes(append(cfg.Attributes, connectionStatusKey.String("inuse"))...),

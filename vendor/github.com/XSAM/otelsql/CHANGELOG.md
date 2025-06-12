@@ -8,6 +8,40 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [0.39.0] - 2025-06-05
+
+> [!WARNING]
+> The new introduced `OTEL_SEMCONV_STABILITY_OPT_IN` environment variable will be supported for at least six months from this release. After this period, support for legacy metrics and Semantic Conventions `v1.24.0` may be removed in the next release.
+>
+> You can start the migration to the new Semantic Conventions `v1.30.0` by setting the `OTEL_SEMCONV_STABILITY_OPT_IN=database/dup` or `OTEL_SEMCONV_STABILITY_OPT_IN=database` environment variable in your application.
+>
+> See also the [Semantic conventions for database client metrics](https://opentelemetry.io/docs/specs/semconv/database/database-metrics/).
+
+### Added
+
+- Support to emit query related attributes for the v1.24.0 and v1.30.0 semantic conventions based on the value of the `OTEL_SEMCONV_STABILITY_OPT_IN` environment variable. (#478)
+
+  - `database/dup`: Emit both `db.statement` and `db.query.text` attributes.
+  - `database`: Emit `db.query.text` attribute.
+  - by default: Emit `db.statement` attribute.
+
+- New `db.client.operation.duration` metric following OpenTelemetry semantic conventions. (#480)
+- Support for configuring metrics behavior based on `OTEL_SEMCONV_STABILITY_OPT_IN` setting. (#480)
+
+  - `database/dup`: Emit both legacy latency and new duration `db.client.operation.duration` metrics.
+  - `database`: Emit new duration `db.client.operation.duration` metric.
+  - by default: Emit only the legacy latency metric.
+
+### Changed
+
+- Upgrade semantic conventions to `semconv/v1.30.0`. (#478)
+- Improve memory usage when recording metrics or creating spans. (#497)
+- Upgrade OTel to `v1.36.0/v0.58.0`. (#495)
+
+### Fixed
+
+- Data race issues when recording metrics or creating spans. (#497)
+
 ## [0.38.0] - 2025-03-26
 
 ### Added
@@ -424,7 +458,8 @@ It contains instrumentation for trace and depends on OTel `v0.18.0`.
 - Example code for a basic usage.
 - Apache-2.0 license.
 
-[Unreleased]: https://github.com/XSAM/otelsql/compare/v0.38.0...HEAD
+[Unreleased]: https://github.com/XSAM/otelsql/compare/v0.39.0...HEAD
+[0.39.0]: https://github.com/XSAM/otelsql/releases/tag/v0.39.0
 [0.38.0]: https://github.com/XSAM/otelsql/releases/tag/v0.38.0
 [0.37.0]: https://github.com/XSAM/otelsql/releases/tag/v0.37.0
 [0.36.0]: https://github.com/XSAM/otelsql/releases/tag/v0.36.0
