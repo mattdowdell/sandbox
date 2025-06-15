@@ -2,13 +2,28 @@ package flagoptions_test
 
 import (
 	"flag"
+	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/drivers/config"
 	"github.com/mattdowdell/sandbox/internal/drivers/config/flagoptions"
+)
+
+var (
+	testArgPath1 = filepath.Join("etc", "arg1")
+	testArgPath2 = filepath.Join("etc", "arg2")
+	testArgPath3 = filepath.Join("etc", "arg3")
+	testArgPath4 = filepath.Join("etc", "arg4")
+
+	testEnvPath1 = filepath.Join("etc", "env1")
+	testEnvPath2 = filepath.Join("etc", "env2")
+	testEnvPath3 = filepath.Join("etc", "env3")
+	testEnvPath4 = filepath.Join("etc", "env4")
 )
 
 func setArgs(t *testing.T, args ...string) {
@@ -22,7 +37,17 @@ func setArgs(t *testing.T, args ...string) {
 	})
 }
 
+func joinPathList(paths []string) string {
+	return strings.Join(paths, string(os.PathListSeparator))
+}
+
 func Test_New(t *testing.T) {
+	argFiles := []string{testArgPath1, testArgPath2}
+	argMounts := []string{testArgPath3, testArgPath4}
+
+	envFiles := []string{}
+	envMounts := []string{}
+
 	testCases := []struct {
 		name string
 		args []string
@@ -43,26 +68,26 @@ func Test_New(t *testing.T) {
 			args: []string{
 				t.Name(),
 				"-config.envprefix=ARG_",
-				"-config.files=/etc/arg1,/etc/arg2",
-				"-config.mounts=/etc/arg3,/etc/arg4",
+				"-config.files=" + joinPathList(argFiles),
+				"-config.mounts=" + joinPathList(argMounts),
 			},
 			want: &config.Options{
 				EnvPrefix: "ARG_",
-				Files:     []string{"/etc/arg1", "/etc/arg2"},
-				Mounts:    []string{"/etc/arg3", "/etc/arg4"},
+				Files:     argFiles,
+				Mounts:    argMounts,
 			},
 		},
 		{
 			name: "environment",
 			env: map[string]string{
 				"CONFIG_ENVPREFIX": "ENV_",
-				"CONFIG_FILES":     "/etc/env1,/etc/env2",
-				"CONFIG_MOUNTS":    "/etc/env3,/etc/env4",
+				"CONFIG_FILES":     joinPathList(envFiles),
+				"CONFIG_MOUNTS":    joinPathList(envMounts),
 			},
 			want: &config.Options{
 				EnvPrefix: "ENV_",
-				Files:     []string{"/etc/env1", "/etc/env2"},
-				Mounts:    []string{"/etc/env3", "/etc/env4"},
+				Files:     envFiles,
+				Mounts:    envMounts,
 			},
 		},
 		{
@@ -70,18 +95,18 @@ func Test_New(t *testing.T) {
 			args: []string{
 				t.Name(),
 				"-config.envprefix=ARG_",
-				"-config.files=/etc/arg1,/etc/arg2",
-				"-config.mounts=/etc/arg3,/etc/arg4",
+				"-config.files=" + joinPathList(argFiles),
+				"-config.mounts=" + joinPathList(argMounts),
 			},
 			env: map[string]string{
 				"CONFIG_ENVPREFIX": "ENV_",
-				"CONFIG_FILES":     "/etc/env1,/etc/env2",
-				"CONFIG_MOUNTS":    "/etc/env3,/etc/env4",
+				"CONFIG_FILES":     joinPathList(envFiles),
+				"CONFIG_MOUNTS":    joinPathList(envMounts),
 			},
 			want: &config.Options{
 				EnvPrefix: "ARG_",
-				Files:     []string{"/etc/arg1", "/etc/arg2"},
-				Mounts:    []string{"/etc/arg3", "/etc/arg4"},
+				Files:     argFiles,
+				Mounts:    argMounts,
 			},
 		},
 	}

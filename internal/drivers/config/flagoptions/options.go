@@ -3,17 +3,17 @@ package flagoptions
 import (
 	"flag"
 	"os"
+	"path/filepath"
 	"slices"
-	"strings"
 
 	"github.com/mattdowdell/sandbox/internal/drivers/config"
 )
 
 // New creates a new Options instance populated with values from CLI flags.
 //
-// - -config.envprefix is the prefix for environment variables to read configuration from.
-// - -config.files is a comma delimited list of files to read configuration from.
-// - -config.mounts is a comma delimited list of kubernetes pod mounts to read configuration from.
+//   - -config.envprefix is the prefix for environment variables to read configuration from.
+//   - -config.files is a list of file paths to read configuration from.
+//   - -config.mounts is a list of kubernetes pod mount paths to read configuration from.
 //
 // Internally, a new [flag.FlagSet] instance is created with just the above flags allowed.
 // Unrecognised flags will cause the process to exit. This is usually acceptable for a binary, but
@@ -35,9 +35,9 @@ func New() *config.Options {
 
 // NewWithFlagSet creates a new Options instance populated with values from CLI flags.
 //
-// - -config.envprefix is the prefix for environment variables to read configuration from.
-// - -config.files is a comma delimited list of files to read configuration from.
-// - -config.mounts is a comma delimited list of kubernetes pod mounts to read configuration from.
+//   - -config.envprefix is the prefix for environment variables to read configuration from.
+//   - -config.files is a list of file paths to read configuration from.
+//   - -config.mounts is a list of kubernetes pod mount paths to read configuration from.
 //
 // New creates a separate [flag.FlagSet] instance which is appropriate for normal binaries. However,
 // this separation means that flags defined with [flag.String], etc. in other packages will result
@@ -93,7 +93,7 @@ func envOrDefault(name, fallback string) string {
 
 // splitPaths converts a comma delimited list of paths into a slice, discarding any empty elements.
 func splitPaths(input string) []string {
-	parts := strings.Split(input, ",")
+	parts := filepath.SplitList(input)
 
 	return slices.DeleteFunc(parts, func(p string) bool {
 		return p == ""
