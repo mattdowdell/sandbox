@@ -91,7 +91,7 @@ func envOrDefault(name, fallback string) string {
 	return fallback
 }
 
-// splitPaths converts a comma delimited list of paths into a slice, discarding any empty elements.
+// splitPaths converts a list of paths into a slice, discarding any empty elements.
 func splitPaths(input string) []string {
 	parts := filepath.SplitList(input)
 
