@@ -3,7 +3,6 @@ package k8smount
 import (
 	"errors"
 	"fmt"
-	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -53,10 +52,15 @@ func (*K8SMount) ReadBytes() ([]byte, error) {
 
 // Read collects the contents of all files under the mount point and returns them as a map.
 func (k *K8SMount) Read() (map[string]any, error) {
-	values := map[string]any{}
-	dirFs := os.DirFS(k.mount)
+	root, err := os.OpenRoot(k.mount)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open mount: %w", err)
+	}
 
-	if err := fs.WalkDir(dirFs, ".", func(path string, d fs.DirEntry, err error) error {
+	values := map[string]any{}
+	mountFS := root.FS()
+
+	if err := fs.WalkDir(mountFS, ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -70,13 +74,7 @@ func (k *K8SMount) Read() (map[string]any, error) {
 			return fs.SkipDir
 		}
 
-		file, err := dirFs.Open(path)
-		if err != nil {
-			return err
-		}
-		defer file.Close()
-
-		content, err := io.ReadAll(file)
+		content, err := fs.ReadFile(mountFS, path)
 		if err != nil {
 			return err
 		}
@@ -140,8 +138,6 @@ func (k *K8SMount) watchDir(fn func(err error)) {
 
 			lastEvent = event.String()
 			lastEventTime = time.Now()
-
-			fmt.Println(event.String())
 
 			// mounts are only meant to be updated for the lifetime of the pod
 			if !event.Has(fsnotify.Write | fsnotify.Chmod) {

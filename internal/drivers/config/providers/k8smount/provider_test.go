@@ -3,6 +3,7 @@ package k8smount_test
 import (
 	"os"
 	"path/filepath"
+	"sync/atomic"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -106,7 +107,7 @@ func Test_K8SMount_Read_MissingDir(t *testing.T) {
 	assert.EqualError(
 		t,
 		err,
-		`failed to read configuration from mount: "/does/not/exist": stat .: no such file or directory`,
+		`failed to open mount: open /does/not/exist: no such file or directory`,
 	)
 }
 
@@ -121,18 +122,19 @@ func Test_K8SMount_Watch_Success(t *testing.T) {
 	_, err := provider.Read()
 	require.NoError(t, err)
 
-	watched := make(chan struct{})
+	var watched atomic.Bool
 
 	// act
 	require.NoError(t, provider.Watch(func(err error) {
 		assert.NoError(t, err)
-		close(watched)
+		watched.Store(true)
 	}))
 
-	writeFile(t, dir, "a", "b")
+	for !watched.Load() {
+		writeFile(t, dir, "a", "b")
+	}
 
 	// assert
-	<-watched
 	require.NoError(t, provider.Unwatch())
 
 	got, err := provider.Read()
@@ -177,18 +179,18 @@ func Test_K8SMount_Watch_UnexpectedEvent(t *testing.T) {
 	_, err := provider.Read()
 	require.NoError(t, err)
 
-	watched := make(chan struct{})
+	var watched atomic.Bool
 
 	// act
 	require.NoError(t, provider.Watch(func(err error) {
 		assert.ErrorIs(t, err, k8smount.ErrUnexpectedEvent)
-		close(watched)
+		watched.Store(true)
 	}))
 
 	os.Remove(filepath.Join(dir, "a"))
 
 	// assert
-	<-watched
+	for !watched.Load() {}
 	require.NoError(t, provider.Unwatch())
 }
 

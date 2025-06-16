@@ -2,7 +2,6 @@ package flagoptions_test
 
 import (
 	"flag"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -45,8 +44,8 @@ func Test_New(t *testing.T) {
 	argFiles := []string{testArgPath1, testArgPath2}
 	argMounts := []string{testArgPath3, testArgPath4}
 
-	envFiles := []string{}
-	envMounts := []string{}
+	envFiles := []string{testEnvPath1, testEnvPath2}
+	envMounts := []string{testEnvPath3, testEnvPath4}
 
 	testCases := []struct {
 		name string
