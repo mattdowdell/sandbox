@@ -179,18 +179,18 @@ func Test_K8SMount_Watch_UnexpectedEvent(t *testing.T) {
 	_, err := provider.Read()
 	require.NoError(t, err)
 
-	var watched atomic.Bool
+	watched := make(chan struct{})
 
 	// act
 	require.NoError(t, provider.Watch(func(err error) {
 		assert.ErrorIs(t, err, k8smount.ErrUnexpectedEvent)
-		watched.Store(true)
+		close(watched)
 	}))
 
 	os.Remove(filepath.Join(dir, "a"))
 
 	// assert
-	for !watched.Load() {}
+	<-watched
 	require.NoError(t, provider.Unwatch())
 }
 
