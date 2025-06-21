@@ -8,6 +8,7 @@ package main
 
 import (
 	"context"
+	"github.com/gofrs/uuid/v5"
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/healthrpc"
@@ -24,7 +25,6 @@ import (
 	logging2 "github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/otelconnectx"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/validatex"
-	"github.com/mattdowdell/sandbox/internal/drivers/uuidgen"
 	"github.com/mattdowdell/sandbox/internal/usecases"
 )
 
@@ -48,8 +48,8 @@ func ProvideApp(ctx context.Context) (*App, error) {
 	}
 	provider := datastore.NewProvider(db)
 	clockClock := clock.New()
-	generator := uuidgen.New()
-	createResource := usecases.NewCreateResource(clockClock, generator)
+	gen := uuid.NewGen()
+	createResource := usecases.NewCreateResource(clockClock, gen)
 	getResource := usecases.NewGetResource()
 	listResources := usecases.NewListResources()
 	updateResource := usecases.NewUpdateResource(clockClock)

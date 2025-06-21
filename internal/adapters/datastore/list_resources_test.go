@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore"
@@ -29,7 +29,7 @@ var listResourcesColumns = []string{
 
 func Test_Datastore_ListResources_Success(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 	now := time.Now()
 
 	db, mock := newMockDB(t)
