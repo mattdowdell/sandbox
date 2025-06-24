@@ -6,8 +6,8 @@ package main
 import (
 	"context"
 
-	"github.com/google/wire"
 	"github.com/gofrs/uuid/v5"
+	"github.com/google/wire"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/common"
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore"
