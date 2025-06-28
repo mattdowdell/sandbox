@@ -65,13 +65,9 @@ func (k *K8SMount) Read() (map[string]any, error) {
 			return err
 		}
 
-		info, err := d.Info()
-		if err != nil {
-			return err
-		}
-
 		// skip sub-directories as path separators are invalid in keys
-		if info.IsDir() {
+		// FIXME: data can be mounted at paths depending on how the pod volume is configured
+		if d.IsDir() {
 			if path == "." {
 				return nil
 			}
