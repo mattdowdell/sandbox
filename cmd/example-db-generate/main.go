@@ -24,9 +24,9 @@ const (
 var defaultOutput = filepath.Join("internal", "adapters", "datastore", "schema")
 
 var (
-	output   = flag.String("output", defaultOutput, "TODO")
+	output   = flag.String("output", defaultOutput, "The directory to output to")
 	host     = flag.String("host", defaultHost, "The hostname of the database server")
-	port     = flag.Int("port", defaultPort, "the port the database server is lietening on")
+	port     = flag.Int("port", defaultPort, "The port the database server is lietening on")
 	username = flag.String("username", "", "The username to authenticate with")
 	password = flag.String("password", "", "The password to authenticate with")
 	name     = flag.String("name", defaultName, "The name of the database")
