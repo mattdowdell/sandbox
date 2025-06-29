@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/modelhelpers"
-	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/public/table"
+	"github.com/mattdowdell/sandbox/internal/adapters/datastore/schema/table"
 	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 )
