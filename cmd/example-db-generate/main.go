@@ -3,14 +3,16 @@ package main
 import (
 	"context"
 	"flag"
-	"log"
+	"log/slog"
 	"os"
 	"path/filepath"
 
 	"github.com/go-jet/jet/v2/generator/postgres"
 
 	"github.com/mattdowdell/sandbox/internal/drivers/exit"
+	"github.com/mattdowdell/sandbox/internal/drivers/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/pgsql"
+	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
 const (
@@ -41,6 +43,8 @@ func main() {
 func run(ctx context.Context) int {
 	flag.Parse()
 
+	logger := logging.New(slog.LevelInfo)
+
 	db, err := pgsql.NewFromConfig(ctx, pgsql.Config{
 		Hostname: *host,
 		Port:     *port,
@@ -50,12 +54,12 @@ func run(ctx context.Context) int {
 		SSLMode:  *sslmode,
 	})
 	if err != nil {
-		log.Print(err)
+		logger.ErrorContext(ctx, "failed to create db connection pool", slogx.Err(err))
 		return exit.Failure
 	}
 
 	if err := postgres.GenerateDB(db, *schema, *output, updateTemplate()); err != nil {
-		log.Print(err)
+		logger.ErrorContext(ctx, "failed to generate database models", slogx.Err(err))
 		return exit.Failure
 	}
 
