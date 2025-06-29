@@ -4,7 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 	"github.com/mattdowdell/sandbox/internal/domain/repositories"

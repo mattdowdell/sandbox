@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/modelhelpers"
@@ -18,17 +18,17 @@ const (
 
 func Test_AuditEventsToDomain(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 	now := time.Now()
-	resourceID := uuid.New()
+	resourceID := uuid.Must(uuid.NewV7())
 
 	have := []*model.AuditEvents{
 		{
-			ID:           id,
+			ID:           modelhelpers.ToGoogleUUID(id),
 			Operation:    "created",
 			CreatedAt:    now,
 			Summary:      testSummary,
-			ResourceID:   resourceID,
+			ResourceID:   modelhelpers.ToGoogleUUID(resourceID),
 			ResourceType: "resource",
 		},
 	}
@@ -53,16 +53,16 @@ func Test_AuditEventsToDomain(t *testing.T) {
 
 func Test_AuditEventToDomain(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 	now := time.Now()
-	resourceID := uuid.New()
+	resourceID := uuid.Must(uuid.NewV7())
 
 	have := &model.AuditEvents{
-		ID:           id,
+		ID:           modelhelpers.ToGoogleUUID(id),
 		Operation:    "created",
 		CreatedAt:    now,
 		Summary:      testSummary,
-		ResourceID:   resourceID,
+		ResourceID:   modelhelpers.ToGoogleUUID(resourceID),
 		ResourceType: "resource",
 	}
 
@@ -84,9 +84,9 @@ func Test_AuditEventToDomain(t *testing.T) {
 
 func Test_AuditEventFromDomain(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 	now := time.Now()
-	resourceID := uuid.New()
+	resourceID := uuid.Must(uuid.NewV7())
 
 	have := &entities.AuditEvent{
 		ID:           id,
@@ -102,11 +102,11 @@ func Test_AuditEventFromDomain(t *testing.T) {
 
 	// assert
 	want := &model.AuditEvents{
-		ID:           id,
+		ID:           modelhelpers.ToGoogleUUID(id),
 		Operation:    "created",
 		CreatedAt:    now,
 		Summary:      testSummary,
-		ResourceID:   resourceID,
+		ResourceID:   modelhelpers.ToGoogleUUID(resourceID),
 		ResourceType: "resource",
 	}
 

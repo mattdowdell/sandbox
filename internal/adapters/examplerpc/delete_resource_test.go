@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"connectrpc.com/connect"
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -19,7 +19,7 @@ import (
 func Test_Handler_DeleteResource_Success(t *testing.T) {
 	// arrange
 	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 
 	facade := mockexamplerpc.NewResourceFacade(t)
 	facade.
@@ -90,7 +90,7 @@ func Test_Handler_DeleteResource_UsecaseError(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// arrange
 			ctx := slogx.IntoContext(t.Context(), slogt.New(t))
-			id := uuid.New()
+			id := uuid.Must(uuid.NewV7())
 
 			facade := mockexamplerpc.NewResourceFacade(t)
 			facade.

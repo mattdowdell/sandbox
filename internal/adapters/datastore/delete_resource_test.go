@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore"
@@ -18,7 +18,7 @@ const (
 
 func Test_Datastore_DeleteResource_Success(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 
 	db, mock := newMockDB(t)
 
@@ -38,7 +38,7 @@ func Test_Datastore_DeleteResource_Success(t *testing.T) {
 
 func Test_Datastore_DeleteResource_ExecError(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 
 	db, mock := newMockDB(t)
 
@@ -58,7 +58,7 @@ func Test_Datastore_DeleteResource_ExecError(t *testing.T) {
 
 func Test_Datastore_DeleteResource_RowsAffectedError(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 
 	db, mock := newMockDB(t)
 
@@ -77,7 +77,7 @@ func Test_Datastore_DeleteResource_RowsAffectedError(t *testing.T) {
 }
 
 func Test_Datastore_DeleteResource_RowsAffectedInvalid(t *testing.T) {
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 
 	testCases := []struct {
 		name string

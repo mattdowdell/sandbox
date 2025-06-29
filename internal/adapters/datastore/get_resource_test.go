@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore"
@@ -29,7 +29,7 @@ var getResourceColumns = []string{
 
 func Test_Datastore_GetResource_Success(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 	now := time.Now()
 
 	db, mock := newMockDB(t)
@@ -66,7 +66,7 @@ func Test_Datastore_GetResource_Success(t *testing.T) {
 
 func Test_Datastore_GetResource_NotFound(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 
 	db, mock := newMockDB(t)
 
@@ -87,7 +87,7 @@ func Test_Datastore_GetResource_NotFound(t *testing.T) {
 
 func Test_Datastore_GetResource_Error(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 
 	db, mock := newMockDB(t)
 

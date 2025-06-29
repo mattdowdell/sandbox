@@ -3,7 +3,7 @@ package repositories
 import (
 	"context"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 )

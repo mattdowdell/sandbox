@@ -3,7 +3,7 @@ package usecases_test
 import (
 	"testing"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 
@@ -24,7 +24,7 @@ func Test_NewDeleteResource(t *testing.T) {
 
 func Test_DeleteResource_Success(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 
 	usecase := usecases.NewDeleteResource()
 	logger := slogt.New(t)
@@ -57,7 +57,7 @@ func Test_DeleteResource_Error(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// arrange
-			id := uuid.New()
+			id := uuid.Must(uuid.NewV7())
 
 			usecase := usecases.NewDeleteResource()
 			logger := slogt.New(t)
