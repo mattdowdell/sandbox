@@ -10,8 +10,8 @@ import (
 	"github.com/jackc/pgerrcode"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/modelhelpers"
-	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/postgres/public/model"
-	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/postgres/public/table"
+	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/public/model"
+	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/public/table"
 	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 )

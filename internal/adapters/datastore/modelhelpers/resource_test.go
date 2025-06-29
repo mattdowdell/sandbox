@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/modelhelpers"
-	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/postgres/public/model"
+	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/public/model"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 )
 

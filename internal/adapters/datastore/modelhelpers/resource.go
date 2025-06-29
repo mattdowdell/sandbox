@@ -1,7 +1,7 @@
 package modelhelpers
 
 import (
-	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/postgres/public/model"
+	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/public/model"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 )
 
