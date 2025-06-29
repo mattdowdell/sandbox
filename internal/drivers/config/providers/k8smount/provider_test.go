@@ -12,21 +12,6 @@ import (
 	"github.com/mattdowdell/sandbox/internal/drivers/config/providers/k8smount"
 )
 
-func writeFile(t *testing.T, root, path, content string) {
-	t.Helper()
-
-	absPath := filepath.Join(root, path)
-	absDirPath := filepath.Dir(absPath)
-
-	if err := os.MkdirAll(absDirPath, 0o755); err != nil {
-		t.Fatalf("failed to create directory: %s", err)
-	}
-
-	if err := os.WriteFile(absPath, []byte(content), 0o600); err != nil {
-		t.Fatalf("failed to create file: %s", err)
-	}
-}
-
 func Test_New(t *testing.T) {
 	// arrange
 	dir := t.TempDir()
@@ -68,10 +53,10 @@ func Test_K8SMount_Read_WithFiles(t *testing.T) {
 	// arrange
 	dir := t.TempDir()
 
-	writeFile(t, dir, "a", "a")
-	writeFile(t, dir, "b.c", "c")
-	writeFile(t, dir, "d.e.f", "f")
-	writeFile(t, dir, "dir/file", "a") // should be ignored
+	require.NoError(t, writeFile(filepath.Join(dir, "a"), "a"))
+	require.NoError(t, writeFile(filepath.Join(dir, "b.c"), "c"))
+	require.NoError(t, writeFile(filepath.Join(dir, "d.e.f"), "f"))
+	require.NoError(t, writeFile(filepath.Join(dir, "dir", "file"), "a")) // should be ignored
 
 	provider := k8smount.Provider(dir, "." /*delim*/)
 
@@ -88,6 +73,36 @@ func Test_K8SMount_Read_WithFiles(t *testing.T) {
 			"e": map[string]any{
 				"f": "f",
 			},
+		},
+	}
+
+	assert.Equal(t, want, got)
+	assert.NoError(t, err)
+}
+
+func Test_K8SMount_Read_WithVolumeMount(t *testing.T) {
+	// arrange
+	dir := t.TempDir()
+
+	require.NoError(t, writeVolumeMount(dir, map[string]string{
+		"a.foo": "foo-value",
+		"b.bar": "bar-value",
+		"b.baz": "baz-value",
+	}))
+
+	provider := k8smount.Provider(dir, "." /*delim*/)
+
+	// act
+	got, err := provider.Read()
+
+	// assert
+	want := map[string]any{
+		"a": map[string]any{
+			"foo": "foo-value",
+		},
+		"b": map[string]any{
+			"bar": "bar-value",
+			"baz": "baz-value",
 		},
 	}
 
@@ -115,7 +130,7 @@ func Test_K8SMount_Watch_Success(t *testing.T) {
 	// arrange
 	dir := t.TempDir()
 
-	writeFile(t, dir, "a", "a")
+	require.NoError(t, writeFile(filepath.Join(dir, "a"), "a"))
 
 	provider := k8smount.Provider(dir, "." /*delim*/)
 
@@ -131,7 +146,7 @@ func Test_K8SMount_Watch_Success(t *testing.T) {
 	}))
 
 	for !watched.Load() {
-		writeFile(t, dir, "a", "b")
+		require.NoError(t, writeFile(filepath.Join(dir, "a"), "b"))
 	}
 
 	// assert
@@ -172,7 +187,7 @@ func Test_K8SMount_Watch_UnexpectedEvent(t *testing.T) {
 	// arrange
 	dir := t.TempDir()
 
-	writeFile(t, dir, "a", "a")
+	require.NoError(t, writeFile(filepath.Join(dir, "a"), "a"))
 
 	provider := k8smount.Provider(dir, "." /*delim*/)
 
