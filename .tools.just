@@ -26,12 +26,6 @@ gofumpt := join(gopath, "bin", "gofumpt-v0.7.0")
 install-gofumpt:
     {{ if path_exists(gofumpt) == "true" { "" } else { "bingo get gofumpt" } }}
 
-jet := join(gopath, "bin", "jet-v2.13.0")
-
-[private]
-install-jet:
-    {{ if path_exists(jet) == "true" { "" } else { "bingo get jet" } }}
-
 mockery := join(gopath, "bin", "mockery-v2.53.3")
 
 [private]
