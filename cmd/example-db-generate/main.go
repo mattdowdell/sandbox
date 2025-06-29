@@ -25,13 +25,13 @@ var defaultOutput = filepath.Join("internal", "adapters", "datastore", "schema")
 
 var (
 	output   = flag.String("output", defaultOutput, "TODO")
-	host     = flag.String("host", defaultHost, "TODO")
-	port     = flag.Int("port", defaultPort, "TODO")
-	username = flag.String("username", "", "TODO")
-	password = flag.String("password", "", "TODO")
-	name     = flag.String("name", defaultName, "TODO")
-	schema   = flag.String("schema", defaultSchema, "TODO")
-	sslmode  = flag.String("sslmode", defaultSSLMode, "TODO")
+	host     = flag.String("host", defaultHost, "The hostname of the database server")
+	port     = flag.Int("port", defaultPort, "the port the database server is lietening on")
+	username = flag.String("username", "", "The username to authenticate with")
+	password = flag.String("password", "", "The password to authenticate with")
+	name     = flag.String("name", defaultName, "The name of the database")
+	schema   = flag.String("schema", defaultSchema, "The database schema to use")
+	sslmode  = flag.String("sslmode", defaultSSLMode, "The SSL mode to connect with")
 )
 
 func main() {
