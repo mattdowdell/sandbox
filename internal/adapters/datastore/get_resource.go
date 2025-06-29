@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/modelhelpers"
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/postgres/public/model"

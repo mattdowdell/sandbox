@@ -6,6 +6,7 @@ package main
 import (
 	"context"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/google/wire"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/common"
@@ -26,7 +27,6 @@ import (
 	logginginterceptor "github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/otelconnectx"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/validatex"
-	"github.com/mattdowdell/sandbox/internal/drivers/uuidgen"
 	"github.com/mattdowdell/sandbox/internal/usecases"
 )
 
@@ -60,8 +60,8 @@ func ProvideApp(ctx context.Context) (*App, error) {
 		// repositories
 		clock.New,
 		wire.Bind(new(repositories.Clock), new(*clock.Clock)),
-		uuidgen.New,
-		wire.Bind(new(repositories.UUIDGenerator), new(*uuidgen.Generator)),
+		uuid.NewGen,
+		wire.Bind(new(repositories.UUIDGenerator), new(*uuid.Gen)),
 		// usecases
 		usecases.NewCreateResource,
 		wire.Bind(new(usecasefacades.ResourceCreator), new(*usecases.CreateResource)),

@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 
@@ -26,7 +26,7 @@ func Test_NewListResources(t *testing.T) {
 
 func Test_ListResources_Success(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 	now := time.Now()
 
 	usecase := usecases.NewListResources()

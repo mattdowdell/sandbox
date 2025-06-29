@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 )
 
 // Errors that can be returned from ParseID.
@@ -14,7 +14,7 @@ var (
 
 // ParseID parses the "Id" field from a Protobuf message into a UUID.
 func ParseID(msg interface{ GetId() string }) (uuid.UUID, error) {
-	id, err := uuid.Parse(msg.GetId())
+	id, err := uuid.FromString(msg.GetId())
 	if err != nil {
 		return uuid.Nil, fmt.Errorf("%w %q: %w", ErrParseID, msg.GetId(), err)
 	}

@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"testing"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/usecasefacades"
@@ -57,7 +57,7 @@ func Test_Resource_Create(t *testing.T) {
 
 func Test_Resource_Get(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 
 	logger := slog.New(slog.DiscardHandler)
 	datastore := mockcommon.NewDatastore(t)
@@ -165,7 +165,7 @@ func Test_Resource_Update(t *testing.T) {
 
 func Test_Resource_Delete(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 
 	logger := slog.New(slog.DiscardHandler)
 	datastore := mockcommon.NewDatastore(t)
