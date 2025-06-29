@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/modelhelpers"
-	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/postgres/public/model"
+	"github.com/mattdowdell/sandbox/internal/adapters/datastore/schema/model"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 )
 
@@ -23,7 +23,7 @@ func Test_ResourcesToDomain(t *testing.T) {
 
 	have := []*model.Resources{
 		{
-			ID:        modelhelpers.ToGoogleUUID(id),
+			ID:        id,
 			Name:      testResourceName,
 			CreatedAt: now,
 			UpdatedAt: now.Add(time.Hour),
@@ -52,7 +52,7 @@ func Test_ResourceToDomain(t *testing.T) {
 	now := time.Now()
 
 	have := &model.Resources{
-		ID:        modelhelpers.ToGoogleUUID(id),
+		ID:        id,
 		Name:      testResourceName,
 		CreatedAt: now,
 		UpdatedAt: now.Add(time.Hour),
@@ -89,7 +89,7 @@ func Test_ResourceFromDomain(t *testing.T) {
 
 	// assert
 	want := &model.Resources{
-		ID:        modelhelpers.ToGoogleUUID(id),
+		ID:        id,
 		Name:      testResourceName,
 		CreatedAt: now,
 		UpdatedAt: now.Add(time.Hour),

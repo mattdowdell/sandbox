@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/modelhelpers"
-	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/postgres/public/model"
+	"github.com/mattdowdell/sandbox/internal/adapters/datastore/schema/model"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 )
 
@@ -24,11 +24,11 @@ func Test_AuditEventsToDomain(t *testing.T) {
 
 	have := []*model.AuditEvents{
 		{
-			ID:           modelhelpers.ToGoogleUUID(id),
+			ID:           id,
 			Operation:    "created",
 			CreatedAt:    now,
 			Summary:      testSummary,
-			ResourceID:   modelhelpers.ToGoogleUUID(resourceID),
+			ResourceID:   resourceID,
 			ResourceType: "resource",
 		},
 	}
@@ -58,11 +58,11 @@ func Test_AuditEventToDomain(t *testing.T) {
 	resourceID := uuid.Must(uuid.NewV7())
 
 	have := &model.AuditEvents{
-		ID:           modelhelpers.ToGoogleUUID(id),
+		ID:           id,
 		Operation:    "created",
 		CreatedAt:    now,
 		Summary:      testSummary,
-		ResourceID:   modelhelpers.ToGoogleUUID(resourceID),
+		ResourceID:   resourceID,
 		ResourceType: "resource",
 	}
 
@@ -102,11 +102,11 @@ func Test_AuditEventFromDomain(t *testing.T) {
 
 	// assert
 	want := &model.AuditEvents{
-		ID:           modelhelpers.ToGoogleUUID(id),
+		ID:           id,
 		Operation:    "created",
 		CreatedAt:    now,
 		Summary:      testSummary,
-		ResourceID:   modelhelpers.ToGoogleUUID(resourceID),
+		ResourceID:   resourceID,
 		ResourceType: "resource",
 	}
 

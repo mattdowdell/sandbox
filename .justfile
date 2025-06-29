@@ -130,15 +130,13 @@ gen-go: gen-go-jet gen-go-mockery gen-go-wire
 
 # Run the Go jet generator
 [group('generators')]
-gen-go-jet: install-jet
-    {{ jet }} \
-        -source=postgres \
+gen-go-jet:
+    go run ./cmd/example-db-generate \
         -host={{ db_host }} \
         -port={{ db_port }} \
-        -user={{ db_user }} \
+        -username={{ db_user }} \
         -password={{ db_pass }} \
-        -dbname=postgres \
-        -path ./internal/adapters/datastore/models/
+        -name=postgres
 
 # Run the Go mockery generator.
 [group('generators')]
