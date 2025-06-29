@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 
@@ -31,11 +31,11 @@ func Test_ListAuditEvents_Success(t *testing.T) {
 
 	expected := []*entities.AuditEvent{
 		{
-			ID:           uuid.New(),
+			ID:           uuid.Must(uuid.NewV7()),
 			Operation:    entities.OperationCreated,
 			CreatedAt:    time.Now(),
 			Summary:      "example",
-			ResourceID:   uuid.New(),
+			ResourceID:   uuid.Must(uuid.NewV7()),
 			ResourceType: entities.ResourceTypeResource,
 		},
 	}

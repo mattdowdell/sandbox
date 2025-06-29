@@ -20,7 +20,7 @@ func ResourcesToDomain(inputs []*model.Resources) []*entities.Resource {
 // ResourceToDomain converts a database resource model to the equivalent domain representation.
 func ResourceToDomain(input *model.Resources) *entities.Resource {
 	return &entities.Resource{
-		ID:        input.ID,
+		ID:        toGofrsUUID(input.ID),
 		Name:      input.Name,
 		CreatedAt: input.CreatedAt,
 		UpdatedAt: input.UpdatedAt,
@@ -30,7 +30,7 @@ func ResourceToDomain(input *model.Resources) *entities.Resource {
 // ResourceToDomain converts a domain resource model to the equivalent database representation.
 func ResourceFromDomain(input *entities.Resource) *model.Resources {
 	return &model.Resources{
-		ID:        input.ID,
+		ID:        toGoogleUUID(input.ID),
 		Name:      input.Name,
 		CreatedAt: input.CreatedAt,
 		UpdatedAt: input.UpdatedAt,

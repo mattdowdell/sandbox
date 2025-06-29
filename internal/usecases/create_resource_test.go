@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 
@@ -34,7 +34,7 @@ func Test_NewCreateResource(t *testing.T) {
 func Test_CreateResource_Success(t *testing.T) {
 	// arrange
 	now := time.Now().UTC().Round(time.Second)
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 
 	clock := mockrepositories.NewClock(t)
 	clock.EXPECT().Now().Return(now).Once()
@@ -109,7 +109,7 @@ func Test_CreateResource_CreateFailed(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// arrange
 			now := time.Now().UTC().Round(time.Second)
-			id := uuid.New()
+			id := uuid.Must(uuid.NewV7())
 
 			clock := mockrepositories.NewClock(t)
 			clock.EXPECT().Now().Return(now).Once()
