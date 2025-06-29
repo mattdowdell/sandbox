@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/go-jet/jet/v2/generator/metadata"
 	"github.com/go-jet/jet/v2/generator/template"
-	postgres "github.com/go-jet/jet/v2/postgres"
+	"github.com/go-jet/jet/v2/postgres"
 	"github.com/gofrs/uuid/v5"
 )
 
