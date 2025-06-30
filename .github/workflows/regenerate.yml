@@ -76,7 +76,9 @@ jobs:
           compose-file: compose.yaml
           up-flags: --build --wait
           down-flags: --volumes --remove-orphans
-          services: postgres
+          services: |
+            postgres
+            migrate
 
       - name: Regenerate
         run: |
