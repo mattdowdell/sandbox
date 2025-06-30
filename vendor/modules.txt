@@ -329,7 +329,7 @@ github.com/knadh/koanf/parsers/json
 # github.com/knadh/koanf/parsers/toml v0.1.0
 ## explicit; go 1.18
 github.com/knadh/koanf/parsers/toml
-# github.com/knadh/koanf/parsers/yaml v1.0.0
+# github.com/knadh/koanf/parsers/yaml v1.1.0
 ## explicit; go 1.23.0
 github.com/knadh/koanf/parsers/yaml
 # github.com/knadh/koanf/providers/env v1.1.0
@@ -512,6 +512,9 @@ go.opentelemetry.io/proto/otlp/logs/v1
 go.opentelemetry.io/proto/otlp/metrics/v1
 go.opentelemetry.io/proto/otlp/resource/v1
 go.opentelemetry.io/proto/otlp/trace/v1
+# go.yaml.in/yaml/v3 v3.0.3
+## explicit; go 1.22
+go.yaml.in/yaml/v3
 # golang.org/x/crypto v0.39.0
 ## explicit; go 1.23.0
 golang.org/x/crypto/pbkdf2
