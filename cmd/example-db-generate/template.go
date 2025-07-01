@@ -19,7 +19,14 @@ func updateSchema(schema metadata.Schema) template.Schema {
 	return template.DefaultSchema(schema).UseModel(model).UsePath("")
 }
 
+// updateTable skips the "goose_db_version" table, used for tracking database migrations.
 func updateTable(table metadata.Table) template.TableModel {
+	if table.Name == "goose_db_version" {
+		return template.TableModel{
+			Skip: true,
+		}
+	}
+
 	return template.DefaultTableModel(table).UseField(updateColumnType)
 }
 
