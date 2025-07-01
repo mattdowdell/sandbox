@@ -29,7 +29,6 @@ services:
       APP_LOGGERPROVIDER_INSECURE: "true"
       APP_LOGGERPROVIDER_ENDPOINT: "victoria-logs:9428"
       APP_LOGGERPROVIDER_PATH: "/insert/opentelemetry/v1/logs"
-      OTEL_GO_X_DEPRECATED_RUNTIME_METRICS: "false"
     ports:
       - "127.0.0.1:5000:5000"
     volumes:
