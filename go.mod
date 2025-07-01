@@ -3,7 +3,7 @@ module github.com/mattdowdell/sandbox
 go 1.24
 
 require (
-	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.6-20250613105001-9f2d3c737feb.1
+	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.6-20250625184727-c923a0c2a132.1
 	buf.build/gen/go/grpc/grpc/connectrpc/go v1.18.1-20250429200738-0ee95b84c2c7.1
 	buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.6-20250429200738-0ee95b84c2c7.1
 	buf.build/go/protovalidate v0.13.1
@@ -30,13 +30,13 @@ require (
 	github.com/knadh/koanf/maps v0.1.2
 	github.com/knadh/koanf/parsers/json v1.0.0
 	github.com/knadh/koanf/parsers/toml v0.1.0
-	github.com/knadh/koanf/parsers/yaml v1.0.0
+	github.com/knadh/koanf/parsers/yaml v1.1.0
 	github.com/knadh/koanf/providers/env v1.1.0
 	github.com/knadh/koanf/providers/file v1.2.0
 	github.com/knadh/koanf/v2 v2.2.1
 	github.com/neilotoole/slogt v1.1.0
 	github.com/pressly/goose/v3 v3.24.3
-	github.com/samber/slog-multi v1.4.0
+	github.com/samber/slog-multi v1.4.1
 	github.com/stretchr/testify v1.10.0
 	go.opentelemetry.io/contrib/bridges/otelslog v0.11.0
 	go.opentelemetry.io/contrib/instrumentation/runtime v0.61.0
@@ -112,7 +112,8 @@ require (
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
-	github.com/samber/lo v1.49.1 // indirect
+	github.com/samber/lo v1.51.0 // indirect
+	github.com/samber/slog-common v0.19.0 // indirect
 	github.com/sethvargo/go-retry v0.3.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stoewer/go-strcase v1.3.0 // indirect
@@ -123,6 +124,7 @@ require (
 	go.opentelemetry.io/otel/sdk/log/logtest v0.0.0-20250527062454-e33675716b21 // indirect
 	go.opentelemetry.io/proto/otlp v1.6.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
+	go.yaml.in/yaml/v3 v3.0.3 // indirect
 	golang.org/x/crypto v0.39.0 // indirect
 	golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6 // indirect
 	golang.org/x/sync v0.15.0 // indirect
