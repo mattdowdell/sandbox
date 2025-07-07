@@ -6,13 +6,13 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 
-	"github.com/mattdowdell/sandbox/internal/adapters/common"
+	"github.com/mattdowdell/sandbox/internal/adapters/txn"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 )
 
 // ...
 type Resource struct {
-	provider common.Provider
+	provider txn.Provider
 	creator  ResourceCreator
 	getter   ResourceGetter
 	lister   ResourceLister
@@ -22,7 +22,7 @@ type Resource struct {
 
 // ...
 func NewResource(
-	provider common.Provider,
+	provider txn.Provider,
 	creator ResourceCreator,
 	getter ResourceGetter,
 	lister ResourceLister,
@@ -45,7 +45,7 @@ func (r *Resource) Create(
 	logger *slog.Logger,
 	input *entities.Resource,
 ) (*entities.Resource, error) {
-	return common.TxValue(ctx, logger, r.provider, func(ds common.Datastore) (*entities.Resource, error) {
+	return txn.Value(ctx, logger, r.provider, func(ds txn.Datastore) (*entities.Resource, error) {
 		return r.creator.Execute(ctx, logger, ds, input)
 	})
 }
@@ -73,7 +73,7 @@ func (r *Resource) Update(
 	logger *slog.Logger,
 	input *entities.Resource,
 ) (*entities.Resource, error) {
-	return common.TxValue(ctx, logger, r.provider, func(ds common.Datastore) (*entities.Resource, error) {
+	return txn.Value(ctx, logger, r.provider, func(ds txn.Datastore) (*entities.Resource, error) {
 		return r.updater.Execute(ctx, logger, ds, input)
 	})
 }
@@ -84,7 +84,7 @@ func (r *Resource) Delete(
 	logger *slog.Logger,
 	input uuid.UUID,
 ) error {
-	return common.TxFunc(ctx, logger, r.provider, func(ds common.Datastore) error {
+	return txn.Func(ctx, logger, r.provider, func(ds txn.Datastore) error {
 		return r.deleter.Execute(ctx, logger, ds, input)
 	})
 }
