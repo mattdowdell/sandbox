@@ -4,20 +4,20 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/mattdowdell/sandbox/internal/adapters/common"
+	"github.com/mattdowdell/sandbox/internal/adapters/txn"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 )
 
 // ...
 type AuditEvent struct {
-	provider common.Provider
+	provider txn.Provider
 	lister   AuditEventLister
 	watcher  AuditEventWatcher
 }
 
 // ...
 func NewAuditEvent(
-	provider common.Provider,
+	provider txn.Provider,
 	lister AuditEventLister,
 	watcher AuditEventWatcher,
 ) *AuditEvent {

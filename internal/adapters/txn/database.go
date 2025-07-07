@@ -1,4 +1,4 @@
-package common
+package txn
 
 import (
 	"context"
@@ -27,30 +27,30 @@ type Provider interface {
 	BeginTx(context.Context) (Datastore, CommitFn, RollbackFn, error)
 }
 
-// TxFunc executes the given function within a transaction, automatically committing or rolling back
+// Func executes the given function within a transaction, automatically committing or rolling back
 // the transaction as necessary.
-func TxFunc(
+func Func(
 	ctx context.Context,
 	logger *slog.Logger,
 	provider Provider,
 	fn func(Datastore) error,
 ) error {
-	_, _, err := TxValues(ctx, logger, provider, func(ds Datastore) (struct{}, struct{}, error) {
+	_, _, err := Values(ctx, logger, provider, func(ds Datastore) (struct{}, struct{}, error) {
 		return struct{}{}, struct{}{}, fn(ds)
 	})
 
 	return err
 }
 
-// TxValue executes the given function within a transaction, automatically committing or rolling
+// Value executes the given function within a transaction, automatically committing or rolling
 // back the transaction as necessary. It returns the non-error value returned by fn on success.
-func TxValue[T any](
+func Value[T any](
 	ctx context.Context,
 	logger *slog.Logger,
 	provider Provider,
 	fn func(Datastore) (T, error),
 ) (T, error) {
-	val, _, err := TxValues(ctx, logger, provider, func(ds Datastore) (T, struct{}, error) {
+	val, _, err := Values(ctx, logger, provider, func(ds Datastore) (T, struct{}, error) {
 		val, err := fn(ds)
 		return val, struct{}{}, err
 	})
@@ -58,11 +58,11 @@ func TxValue[T any](
 	return val, err
 }
 
-// TxValues executes the given function within a transaction, automatically committing or rolling
+// Values executes the given function within a transaction, automatically committing or rolling
 // back the transaction as necessary. It returns the non-error values returned by fn on success.
 //
 //nolint:gocritic // nothing gained by naming generic return values
-func TxValues[T1, T2 any](
+func Values[T1, T2 any](
 	ctx context.Context,
 	logger *slog.Logger,
 	provider Provider,

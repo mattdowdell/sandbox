@@ -1,4 +1,4 @@
-package common_test
+package txn_test
 
 import (
 	"errors"
@@ -7,22 +7,22 @@ import (
 	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mattdowdell/sandbox/internal/adapters/common"
-	"github.com/mattdowdell/sandbox/mocks/adapters/mockcommon"
+	"github.com/mattdowdell/sandbox/internal/adapters/txn"
+	"github.com/mattdowdell/sandbox/mocks/adapters/mocktxn"
 )
 
-func Test_TxFunc(t *testing.T) {
+func Test_Func(t *testing.T) {
 	// arrange
 	logger := slogt.New(t)
-	datastore := mockcommon.NewDatastore(t)
+	datastore := mocktxn.NewDatastore(t)
 
-	commit := mockcommon.NewCommitFn(t)
+	commit := mocktxn.NewCommitFn(t)
 	commit.EXPECT().Execute().Return(nil).Once()
 
-	rollback := mockcommon.NewRollbackFn(t)
+	rollback := mocktxn.NewRollbackFn(t)
 	rollback.EXPECT().Execute().Return(nil).Once()
 
-	provider := mockcommon.NewProvider(t)
+	provider := mocktxn.NewProvider(t)
 	provider.
 		EXPECT().
 		BeginTx(t.Context()).
@@ -30,7 +30,7 @@ func Test_TxFunc(t *testing.T) {
 		Once()
 
 	// act
-	err := common.TxFunc(t.Context(), logger, provider, func(_ common.Datastore) error {
+	err := txn.Func(t.Context(), logger, provider, func(_ txn.Datastore) error {
 		return nil
 	})
 
@@ -38,18 +38,18 @@ func Test_TxFunc(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func Test_TxValue(t *testing.T) {
+func Test_Value(t *testing.T) {
 	// arrange
 	logger := slogt.New(t)
-	datastore := mockcommon.NewDatastore(t)
+	datastore := mocktxn.NewDatastore(t)
 
-	commit := mockcommon.NewCommitFn(t)
+	commit := mocktxn.NewCommitFn(t)
 	commit.EXPECT().Execute().Return(nil).Once()
 
-	rollback := mockcommon.NewRollbackFn(t)
+	rollback := mocktxn.NewRollbackFn(t)
 	rollback.EXPECT().Execute().Return(nil).Once()
 
-	provider := mockcommon.NewProvider(t)
+	provider := mocktxn.NewProvider(t)
 	provider.
 		EXPECT().
 		BeginTx(t.Context()).
@@ -57,7 +57,7 @@ func Test_TxValue(t *testing.T) {
 		Once()
 
 	// act
-	val, err := common.TxValue(t.Context(), logger, provider, func(_ common.Datastore) (bool, error) {
+	val, err := txn.Value(t.Context(), logger, provider, func(_ txn.Datastore) (bool, error) {
 		return true, nil
 	})
 
@@ -66,7 +66,7 @@ func Test_TxValue(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func Test_TxValues_Success(t *testing.T) {
+func Test_Values_Success(t *testing.T) {
 	testCases := []struct {
 		name        string
 		rollbackErr error
@@ -85,15 +85,15 @@ func Test_TxValues_Success(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// arrange
 			logger := slogt.New(t)
-			datastore := mockcommon.NewDatastore(t)
+			datastore := mocktxn.NewDatastore(t)
 
-			commit := mockcommon.NewCommitFn(t)
+			commit := mocktxn.NewCommitFn(t)
 			commit.EXPECT().Execute().Return(nil).Once()
 
-			rollback := mockcommon.NewRollbackFn(t)
+			rollback := mocktxn.NewRollbackFn(t)
 			rollback.EXPECT().Execute().Return(tc.rollbackErr).Once()
 
-			provider := mockcommon.NewProvider(t)
+			provider := mocktxn.NewProvider(t)
 			provider.
 				EXPECT().
 				BeginTx(t.Context()).
@@ -101,11 +101,11 @@ func Test_TxValues_Success(t *testing.T) {
 				Once()
 
 			// act
-			val1, val2, err := common.TxValues(
+			val1, val2, err := txn.Values(
 				t.Context(),
 				logger,
 				provider,
-				func(_ common.Datastore) (bool, bool, error) {
+				func(_ txn.Datastore) (bool, bool, error) {
 					return true, true, nil
 				},
 			)
@@ -118,19 +118,19 @@ func Test_TxValues_Success(t *testing.T) {
 	}
 }
 
-func Test_TxValues_Error(t *testing.T) {
+func Test_Values_Error(t *testing.T) {
 	testCases := []struct {
 		name     string
-		provider func(*testing.T) common.Provider
-		fn       func(common.Datastore) (bool, bool, error)
+		provider func(*testing.T) txn.Provider
+		fn       func(txn.Datastore) (bool, bool, error)
 		want     string
 	}{
 		{
 			name: "begin error",
-			provider: func(t *testing.T) common.Provider {
+			provider: func(t *testing.T) txn.Provider {
 				t.Helper()
 
-				p := mockcommon.NewProvider(t)
+				p := mocktxn.NewProvider(t)
 				p.
 					EXPECT().
 					BeginTx(t.Context()).
@@ -144,16 +144,16 @@ func Test_TxValues_Error(t *testing.T) {
 		},
 		{
 			name: "fn error",
-			provider: func(t *testing.T) common.Provider {
+			provider: func(t *testing.T) txn.Provider {
 				t.Helper()
 
-				datastore := mockcommon.NewDatastore(t)
-				commit := mockcommon.NewCommitFn(t)
+				datastore := mocktxn.NewDatastore(t)
+				commit := mocktxn.NewCommitFn(t)
 
-				rollback := mockcommon.NewRollbackFn(t)
+				rollback := mocktxn.NewRollbackFn(t)
 				rollback.EXPECT().Execute().Return(nil).Once()
 
-				p := mockcommon.NewProvider(t)
+				p := mocktxn.NewProvider(t)
 				p.
 					EXPECT().
 					BeginTx(t.Context()).
@@ -162,25 +162,25 @@ func Test_TxValues_Error(t *testing.T) {
 
 				return p
 			},
-			fn: func(_ common.Datastore) (bool, bool, error) {
+			fn: func(_ txn.Datastore) (bool, bool, error) {
 				return false, false, errors.New("example")
 			},
 			want: "example",
 		},
 		{
 			name: "commit error",
-			provider: func(t *testing.T) common.Provider {
+			provider: func(t *testing.T) txn.Provider {
 				t.Helper()
 
-				datastore := mockcommon.NewDatastore(t)
+				datastore := mocktxn.NewDatastore(t)
 
-				commit := mockcommon.NewCommitFn(t)
+				commit := mocktxn.NewCommitFn(t)
 				commit.EXPECT().Execute().Return(errors.New("example")).Once()
 
-				rollback := mockcommon.NewRollbackFn(t)
+				rollback := mocktxn.NewRollbackFn(t)
 				rollback.EXPECT().Execute().Return(nil).Once()
 
-				p := mockcommon.NewProvider(t)
+				p := mocktxn.NewProvider(t)
 				p.
 					EXPECT().
 					BeginTx(t.Context()).
@@ -189,7 +189,7 @@ func Test_TxValues_Error(t *testing.T) {
 
 				return p
 			},
-			fn: func(_ common.Datastore) (bool, bool, error) {
+			fn: func(_ txn.Datastore) (bool, bool, error) {
 				return true, true, nil
 			},
 			want: "failed to commit transaction: example",
@@ -203,7 +203,7 @@ func Test_TxValues_Error(t *testing.T) {
 			provider := tc.provider(t)
 
 			// act
-			val1, val2, err := common.TxValues(t.Context(), logger, provider, tc.fn)
+			val1, val2, err := txn.Values(t.Context(), logger, provider, tc.fn)
 
 			// assert
 			assert.False(t, val1)

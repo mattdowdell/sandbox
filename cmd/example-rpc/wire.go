@@ -9,11 +9,11 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/google/wire"
 
-	"github.com/mattdowdell/sandbox/internal/adapters/common"
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/healthrpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/reflectrpc"
+	"github.com/mattdowdell/sandbox/internal/adapters/txn"
 	"github.com/mattdowdell/sandbox/internal/adapters/usecasefacades"
 	"github.com/mattdowdell/sandbox/internal/domain/repositories"
 	"github.com/mattdowdell/sandbox/internal/drivers/clock"
@@ -56,7 +56,7 @@ func ProvideApp(ctx context.Context) (*App, error) {
 		// providers
 		pgsql.NewFromConfig,
 		datastore.NewProvider,
-		wire.Bind(new(common.Provider), new(*datastore.Provider)),
+		wire.Bind(new(txn.Provider), new(*datastore.Provider)),
 		// repositories
 		clock.New,
 		wire.Bind(new(repositories.Clock), new(*clock.Clock)),

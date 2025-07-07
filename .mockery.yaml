@@ -11,22 +11,23 @@ resolve-type-alias: false
 with-expecter: true
 
 packages:
-  github.com/mattdowdell/sandbox/internal/adapters/common:
-    config:
-      all: true
   github.com/mattdowdell/sandbox/internal/adapters/examplerpc:
     config:
       all: true
+  github.com/mattdowdell/sandbox/internal/adapters/txn:
+    config:
+      all: true
   github.com/mattdowdell/sandbox/internal/adapters/usecasefacades:
+    config:
+      all: true
+  github.com/mattdowdell/sandbox/internal/domain/repositories:
     config:
       all: true
   github.com/mattdowdell/sandbox/internal/drivers/rpcserver:
     config:
       include-regex: "^.+$"
       exclude-regex: "^RecovererOption$"
-  github.com/mattdowdell/sandbox/internal/domain/repositories:
-    config:
-      all: true
+  # external dependencies
   connectrpc.com/connect:
     config:
       dir: 'mocks/external/{{ dir .PackagePath }}/mock{{ .PackagePath | base }}'
