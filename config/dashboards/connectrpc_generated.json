@@ -1,0 +1,235 @@
+{
+  "uid": "my-connect-rpc",
+  "title": "ConnectRPC (generated)",
+  "timezone": "browser",
+  "editable": true,
+  "graphTooltip": 0,
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "fiscalYearStartMonth": 0,
+  "refresh": "1m",
+  "schemaVersion": 41,
+  "panels": [
+    {
+      "type": "row",
+      "collapsed": false,
+      "title": "Errors",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 0,
+      "panels": []
+    },
+    {
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "(\n\tsum(increase(\n\t\trpc.server.duration_bucket{\n\t\t\trpc.system=\"connect_rpc\",\n\t\t\tservice.name=~\"$service_name\",\n\t\t\trpc.service=~\"$rpc_service\",\n\t\t\trpc.method=~\"$rpc_method\",\n\t\t\tle=\"250\"\n\t\t}[$__rate_interval]\n\t)) - sum(increase(\n\t\trpc.server.duration_bucket{\n\t\t\trpc.system=\"connect_rpc\",\n\t\t\tservice.name=~\"$service_name\",\n\t\t\trpc.service=~\"$rpc_service\",\n\t\t\trpc.method=~\"$rpc_method\",\n\t\t\tle=\"100\"\n\t\t}[$__rate_interval]\n\t))\n) / sum(increase(\n\trpc.server.duration_count{\n\t\trpc.system=\"connect_rpc\",\n\t\tservice.name=~\"$service_name\",\n\t\trpc.service=~\"$rpc_service\",\n\t\trpc.method=~\"$rpc_method\"\n\t}[$__rate_interval]\n))",
+          "legendFormat": "Requests",
+          "refId": ""
+        }
+      ],
+      "title": "Above Latency Threshold",
+      "description": "The percentage of requests that exceeded the latency threshold across the current time range.",
+      "transparent": false,
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 0,
+        "y": 1
+      },
+      "options": {
+        "graphMode": "area",
+        "colorMode": "value",
+        "justifyMode": "auto",
+        "textMode": "auto",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ]
+        },
+        "percentChangeColorMode": "standard",
+        "orientation": ""
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 2,
+          "min": 0,
+          "max": 1,
+          "thresholds": {
+            "mode": "",
+            "steps": [
+              {
+                "value": null,
+                "color": "green"
+              },
+              {
+                "value": 0.01,
+                "color": "red"
+              }
+            ]
+          },
+          "noValue": "N/A"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "sum(increase(\n\trpc.server.duration_count{\n\t\trpc.system=\"connect_rpc\",\n\t\tservice.name=~\"$service_name\",\n\t\trpc.service=~\"$rpc_service\",\n\t\trpc.method=~\"$rpc_method\",\n\t\trpc.connect_rpc.error_code=~\"unknown|deadline_exceeded|unimplemented|internal|unavailable|data_loss\"\n\t}[$__rate_interval]\n)) / sum(increase(\n\trpc.server.duration_count{\n\t\trpc.system=\"connect_rpc\",\n\t\tservice.name=~\"$service_name\",\n\t\trpc.service=~\"$rpc_service\",\n\t\trpc.method=~\"$rpc_method\"\n\t}[$__rate_interval]\n))",
+          "legendFormat": "Requests",
+          "refId": ""
+        }
+      ],
+      "title": "Error Responses",
+      "description": "The percentage of requests that resulted in error responses across the current time range.",
+      "transparent": false,
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 4,
+        "y": 1
+      },
+      "options": {
+        "graphMode": "area",
+        "colorMode": "value",
+        "justifyMode": "auto",
+        "textMode": "auto",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ]
+        },
+        "percentChangeColorMode": "standard",
+        "orientation": ""
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 2,
+          "min": 0,
+          "max": 1,
+          "thresholds": {
+            "mode": "",
+            "steps": [
+              {
+                "value": null,
+                "color": "green"
+              },
+              {
+                "value": 0.01,
+                "color": "red"
+              }
+            ]
+          },
+          "noValue": "N/A"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "(\n\tsum by(service.name,rpc.service,rpc.method) (increase(\n\t\trpc.server.duration_bucket{\n\t\t\trpc.system=\"connect_rpc\",\n\t\t\tservice.name=~\"$service_name\",\n\t\t\trpc.service=~\"$rpc_service\",\n\t\t\trpc.method=~\"$rpc_method\",\n\t\t\tle=\"250\"\n\t\t}[$__rate_interval]\n\t)) - sum by(service.name,rpc.service,rpc.method) (increase(\n\t\trpc.server.duration_bucket{\n\t\t\trpc.system=\"connect_rpc\",\n\t\t\tservice.name=~\"$service_name\",\n\t\t\trpc.service=~\"$rpc_service\",\n\t\t\trpc.method=~\"$rpc_method\",\n\t\t\tle=\"100\"\n\t\t}[$__rate_interval]\n\t))\n) / sum by(service.name,rpc.service,rpc.method) (increase(\n\trpc.server.duration_count{\n\t\trpc.system=\"connect_rpc\",\n\t\tservice.name=~\"$service_name\",\n\t\trpc.service=~\"$rpc_service\",\n\t\trpc.method=~\"$rpc_method\"\n\t}[$__rate_interval]\n))",
+          "legendFormat": "Requests",
+          "refId": ""
+        }
+      ],
+      "title": "Above Latency Threshold",
+      "description": "The percentage of requests that exceeded the latency threshold.",
+      "transparent": false,
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 1
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1,
+          "custom": {
+            "axisSoftMax": 0.1
+          }
+        },
+        "overrides": []
+      }
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "type": "query",
+        "name": "service_name",
+        "label": "Service Name",
+        "skipUrlSync": false,
+        "description": "Filter panels by service name.",
+        "query": "label_values(rpc.server.duration_bucket{rpc.system=\"connect_rpc\"},service.name)",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "multi": false,
+        "allowCustomValue": false,
+        "sort": 1,
+        "includeAll": true,
+        "auto": false,
+        "auto_min": "10s",
+        "auto_count": 30
+      },
+      {
+        "type": "query",
+        "name": "rpc_service",
+        "label": "RPC Service",
+        "skipUrlSync": false,
+        "description": "Filter panels by RPC service.",
+        "query": "label_values(rpc.server.duration_bucket{rpc.system=\"connect_rpc\",service.name=~\"$service_name\"},rpc.service)",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "multi": false,
+        "allowCustomValue": false,
+        "sort": 1,
+        "includeAll": true,
+        "auto": false,
+        "auto_min": "10s",
+        "auto_count": 30
+      },
+      {
+        "type": "query",
+        "name": "rpc_method",
+        "label": "RPC Method",
+        "skipUrlSync": false,
+        "description": "Filter panels by RPC method.",
+        "query": "label_values(rpc.server.duration_bucket{rpc.system=\"connect_rpc\",service.name=~\"$service_name\",rpc.service=~\"$rpc_service\"},rpc.method)",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "multi": false,
+        "allowCustomValue": false,
+        "sort": 1,
+        "includeAll": true,
+        "auto": false,
+        "auto_min": "10s",
+        "auto_count": 30
+      }
+    ]
+  },
+  "annotations": {}
+}

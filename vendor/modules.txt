@@ -263,6 +263,16 @@ github.com/google/uuid
 # github.com/google/wire v0.6.0
 ## explicit; go 1.12
 github.com/google/wire
+# github.com/grafana/grafana-foundation-sdk/go v0.0.0-20250613155137-bade83b30287
+## explicit; go 1.21
+github.com/grafana/grafana-foundation-sdk/go/cog
+github.com/grafana/grafana-foundation-sdk/go/cog/variants
+github.com/grafana/grafana-foundation-sdk/go/common
+github.com/grafana/grafana-foundation-sdk/go/dashboard
+github.com/grafana/grafana-foundation-sdk/go/prometheus
+github.com/grafana/grafana-foundation-sdk/go/stat
+github.com/grafana/grafana-foundation-sdk/go/timeseries
+github.com/grafana/grafana-foundation-sdk/go/units
 # github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.1
 ## explicit; go 1.23.0
 github.com/grpc-ecosystem/grpc-gateway/v2/internal/httprule
