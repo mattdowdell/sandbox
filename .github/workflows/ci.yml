@@ -60,7 +60,7 @@ jobs:
         uses: ./.github/actions/setup-checks
 
       - name: Start database
-        uses: hoverkraft-tech/compose-action@8be2d741e891ac9b8ac20825e6f3904149599925 # v2.2.0
+        uses: hoverkraft-tech/compose-action@40041ff1b97dbf152cd2361138c2b03fa29139df # v2.3.0
         with:
           compose-file: compose.yaml
           up-flags: --build --wait
@@ -241,7 +241,7 @@ jobs:
             echo "Total coverage: `go tool cover -func=functional.out | tail -n 1 | awk '{print $3}'`"
 
       - name: Start
-        uses: hoverkraft-tech/compose-action@8be2d741e891ac9b8ac20825e6f3904149599925 # v2.2.0
+        uses: hoverkraft-tech/compose-action@40041ff1b97dbf152cd2361138c2b03fa29139df # v2.3.0
         with:
           compose-file: compose.yaml
           up-flags: --build --wait
