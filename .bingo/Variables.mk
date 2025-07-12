@@ -35,11 +35,11 @@ $(GODOG): $(BINGO_DIR)/godog.mod
 	@echo "(re)installing $(GOBIN)/godog-v0.15.0"
 	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=godog.mod -o=$(GOBIN)/godog-v0.15.0 "github.com/cucumber/godog/cmd/godog"
 
-GOFUMPT := $(GOBIN)/gofumpt-v0.7.0
+GOFUMPT := $(GOBIN)/gofumpt-v0.8.0
 $(GOFUMPT): $(BINGO_DIR)/gofumpt.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/gofumpt-v0.7.0"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=gofumpt.mod -o=$(GOBIN)/gofumpt-v0.7.0 "mvdan.cc/gofumpt"
+	@echo "(re)installing $(GOBIN)/gofumpt-v0.8.0"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=gofumpt.mod -o=$(GOBIN)/gofumpt-v0.8.0 "mvdan.cc/gofumpt"
 
 MOCKERY := $(GOBIN)/mockery-v2.53.3
 $(MOCKERY): $(BINGO_DIR)/mockery.mod
