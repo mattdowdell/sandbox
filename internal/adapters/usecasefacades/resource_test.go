@@ -18,10 +18,10 @@ func Test_Resource_Create(t *testing.T) {
 	logger := slog.New(slog.DiscardHandler)
 	datastore := mocktxn.NewDatastore(t)
 
-	commit := mocktxn.NewCommitFn(t)
+	commit := NewCommitFn(t)
 	commit.EXPECT().Execute().Return(nil).Once()
 
-	rollback := mocktxn.NewRollbackFn(t)
+	rollback := NewRollbackFn(t)
 	rollback.EXPECT().Execute().Return(nil).Once()
 
 	provider := mocktxn.NewProvider(t)
@@ -126,10 +126,10 @@ func Test_Resource_Update(t *testing.T) {
 	logger := slog.New(slog.DiscardHandler)
 	datastore := mocktxn.NewDatastore(t)
 
-	commit := mocktxn.NewCommitFn(t)
+	commit := NewCommitFn(t)
 	commit.EXPECT().Execute().Return(nil).Once()
 
-	rollback := mocktxn.NewRollbackFn(t)
+	rollback := NewRollbackFn(t)
 	rollback.EXPECT().Execute().Return(nil).Once()
 
 	provider := mocktxn.NewProvider(t)
@@ -170,10 +170,10 @@ func Test_Resource_Delete(t *testing.T) {
 	logger := slog.New(slog.DiscardHandler)
 	datastore := mocktxn.NewDatastore(t)
 
-	commit := mocktxn.NewCommitFn(t)
+	commit := NewCommitFn(t)
 	commit.EXPECT().Execute().Return(nil).Once()
 
-	rollback := mocktxn.NewRollbackFn(t)
+	rollback := NewRollbackFn(t)
 	rollback.EXPECT().Execute().Return(nil).Once()
 
 	provider := mocktxn.NewProvider(t)
