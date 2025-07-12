@@ -41,11 +41,11 @@ $(GOFUMPT): $(BINGO_DIR)/gofumpt.mod
 	@echo "(re)installing $(GOBIN)/gofumpt-v0.7.0"
 	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=gofumpt.mod -o=$(GOBIN)/gofumpt-v0.7.0 "mvdan.cc/gofumpt"
 
-MOCKERY := $(GOBIN)/mockery-v2.53.3
+MOCKERY := $(GOBIN)/mockery-v2.53.4
 $(MOCKERY): $(BINGO_DIR)/mockery.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/mockery-v2.53.3"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=mockery.mod -o=$(GOBIN)/mockery-v2.53.3 "github.com/vektra/mockery/v2"
+	@echo "(re)installing $(GOBIN)/mockery-v2.53.4"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=mockery.mod -o=$(GOBIN)/mockery-v2.53.4 "github.com/vektra/mockery/v2"
 
 PROTOC_GEN_CONNECT_GO := $(GOBIN)/protoc-gen-connect-go-v1.18.1
 $(PROTOC_GEN_CONNECT_GO): $(BINGO_DIR)/protoc-gen-connect-go.mod
