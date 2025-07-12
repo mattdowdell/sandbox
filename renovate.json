@@ -11,5 +11,6 @@
       "matchPackageNames": ["go.opentelemetry.io/*"],
       "groupName": "OpenTelemetry"
     }
-  ]
+  ],
+  "postUpdateOptions": ["gomodTidy", "goModVendor"]
 }
