@@ -16,10 +16,10 @@ func Test_Func(t *testing.T) {
 	logger := slogt.New(t)
 	datastore := mocktxn.NewDatastore(t)
 
-	commit := mocktxn.NewCommitFn(t)
+	commit := NewCommitFn(t)
 	commit.EXPECT().Execute().Return(nil).Once()
 
-	rollback := mocktxn.NewRollbackFn(t)
+	rollback := NewRollbackFn(t)
 	rollback.EXPECT().Execute().Return(nil).Once()
 
 	provider := mocktxn.NewProvider(t)
@@ -43,10 +43,10 @@ func Test_Value(t *testing.T) {
 	logger := slogt.New(t)
 	datastore := mocktxn.NewDatastore(t)
 
-	commit := mocktxn.NewCommitFn(t)
+	commit := NewCommitFn(t)
 	commit.EXPECT().Execute().Return(nil).Once()
 
-	rollback := mocktxn.NewRollbackFn(t)
+	rollback := NewRollbackFn(t)
 	rollback.EXPECT().Execute().Return(nil).Once()
 
 	provider := mocktxn.NewProvider(t)
@@ -87,10 +87,10 @@ func Test_Values_Success(t *testing.T) {
 			logger := slogt.New(t)
 			datastore := mocktxn.NewDatastore(t)
 
-			commit := mocktxn.NewCommitFn(t)
+			commit := NewCommitFn(t)
 			commit.EXPECT().Execute().Return(nil).Once()
 
-			rollback := mocktxn.NewRollbackFn(t)
+			rollback := NewRollbackFn(t)
 			rollback.EXPECT().Execute().Return(tc.rollbackErr).Once()
 
 			provider := mocktxn.NewProvider(t)
@@ -148,9 +148,9 @@ func Test_Values_Error(t *testing.T) {
 				t.Helper()
 
 				datastore := mocktxn.NewDatastore(t)
-				commit := mocktxn.NewCommitFn(t)
+				commit := NewCommitFn(t)
 
-				rollback := mocktxn.NewRollbackFn(t)
+				rollback := NewRollbackFn(t)
 				rollback.EXPECT().Execute().Return(nil).Once()
 
 				p := mocktxn.NewProvider(t)
@@ -174,10 +174,10 @@ func Test_Values_Error(t *testing.T) {
 
 				datastore := mocktxn.NewDatastore(t)
 
-				commit := mocktxn.NewCommitFn(t)
+				commit := NewCommitFn(t)
 				commit.EXPECT().Execute().Return(errors.New("example")).Once()
 
-				rollback := mocktxn.NewRollbackFn(t)
+				rollback := NewRollbackFn(t)
 				rollback.EXPECT().Execute().Return(nil).Once()
 
 				p := mocktxn.NewProvider(t)

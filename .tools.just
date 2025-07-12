@@ -26,7 +26,7 @@ gofumpt := join(gopath, "bin", "gofumpt-v0.8.0")
 install-gofumpt:
     {{ if path_exists(gofumpt) == "true" { "" } else { "bingo get gofumpt" } }}
 
-mockery := join(gopath, "bin", "mockery-v2.53.4")
+mockery := join(gopath, "bin", "mockery-v3.5.0")
 
 [private]
 install-mockery:

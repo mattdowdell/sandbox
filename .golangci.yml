@@ -101,6 +101,7 @@ linters:
       - third_party$
       - builtin$
       - examples$
+      - .*/mocks_test\.go$
 
     rules:
       - path: tools/
