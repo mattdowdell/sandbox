@@ -9,7 +9,7 @@
 
 FROM ghcr.io/gitleaks/gitleaks:v8.27.2@sha256:ebfeb6fd4f2c37fa371d3731ebfa662fdf80f93cd37d3b4771bb82263edff8d0 AS gitleaks
 FROM mirror.gcr.io/golangci/golangci-lint:v2.2.1@sha256:2085f63aee644093ae9a2572af6ab517021514525cfb264ff2ecdf8f23c847ff AS golangci-lint
-FROM ghcr.io/aquasecurity/trivy:0.63.0@sha256:6fb0646988fcd2fdf7bf123f7174945ebc2c9c72d1fa1567c8d7daeeb70f8037 AS trivy
+FROM ghcr.io/aquasecurity/trivy:0.64.1@sha256:a8ca29078522f30393bdb34225e4c0994d38f37083be81a42da3a2a7e1488e9e AS trivy
 
 # -------------
 # Devenv target
