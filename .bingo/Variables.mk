@@ -23,23 +23,17 @@ $(BUF): $(BINGO_DIR)/buf.mod
 	@echo "(re)installing $(GOBIN)/buf-v1.55.1"
 	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=buf.mod -o=$(GOBIN)/buf-v1.55.1 "github.com/bufbuild/buf/cmd/buf"
 
-GCI := $(GOBIN)/gci-v0.13.6
-$(GCI): $(BINGO_DIR)/gci.mod
-	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/gci-v0.13.6"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=gci.mod -o=$(GOBIN)/gci-v0.13.6 "github.com/daixiang0/gci"
-
 GODOG := $(GOBIN)/godog-v0.15.0
 $(GODOG): $(BINGO_DIR)/godog.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
 	@echo "(re)installing $(GOBIN)/godog-v0.15.0"
 	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=godog.mod -o=$(GOBIN)/godog-v0.15.0 "github.com/cucumber/godog/cmd/godog"
 
-GOFUMPT := $(GOBIN)/gofumpt-v0.8.0
-$(GOFUMPT): $(BINGO_DIR)/gofumpt.mod
+GOLANGCI_LINT := $(GOBIN)/golangci-lint-v2.2.2
+$(GOLANGCI_LINT): $(BINGO_DIR)/golangci-lint.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/gofumpt-v0.8.0"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=gofumpt.mod -o=$(GOBIN)/gofumpt-v0.8.0 "mvdan.cc/gofumpt"
+	@echo "(re)installing $(GOBIN)/golangci-lint-v2.2.2"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=golangci-lint.mod -o=$(GOBIN)/golangci-lint-v2.2.2 "github.com/golangci/golangci-lint/v2/cmd/golangci-lint"
 
 MOCKERY := $(GOBIN)/mockery-v2.53.4
 $(MOCKERY): $(BINGO_DIR)/mockery.mod

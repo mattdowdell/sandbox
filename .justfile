@@ -95,15 +95,8 @@ fmt-buf: install-buf
 
 # Run the Go formatter.
 [group('formatters')]
-fmt-go: install-gofumpt install-gci
-    {{ gofumpt }} -l -w .
-    {{ gci }} write \
-        --skip-vendor \
-        --skip-generated \
-        -s standard \
-        -s default \
-        -s localmodule \
-        .
+fmt-go: install-golangci-lint
+    {{ golangci-lint }} fmt
 
 # Run the Justfile formatter.
 [group('formatters')]
@@ -170,8 +163,8 @@ lint-buf: install-buf
 
 # Run the Go linter.
 [group('linters')]
-lint-go:
-    golangci-lint run
+lint-go: install-golangci-lint
+    {{ golangci-lint }} run
 
 # Run all linter fixers.
 [group('linters')]
@@ -179,8 +172,8 @@ lint-fix:
 
 # Run the Go linter fixer.
 [group('linters')]
-lint-fix-go:
-    golangci-lint run --fix
+lint-fix-go: install-golangci-lint
+    {{ golangci-lint }} run --fix
 
 # Run the Go unit tests.
 [group('tests')]
