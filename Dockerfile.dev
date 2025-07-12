@@ -8,7 +8,6 @@
 # ------------
 
 FROM ghcr.io/gitleaks/gitleaks:v8.27.2@sha256:ebfeb6fd4f2c37fa371d3731ebfa662fdf80f93cd37d3b4771bb82263edff8d0 AS gitleaks
-FROM mirror.gcr.io/golangci/golangci-lint:v2.2.2@sha256:0f0e3fad35aa127e2823e79809727709bceb6b899ad17362b92a6148ba40c862 AS golangci-lint
 FROM ghcr.io/aquasecurity/trivy:0.64.1@sha256:a8ca29078522f30393bdb34225e4c0994d38f37083be81a42da3a2a7e1488e9e AS trivy
 
 # -------------
