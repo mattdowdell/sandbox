@@ -12,5 +12,5 @@
       "groupName": "OpenTelemetry"
     }
   ],
-  "postUpdateOptions": ["gomodTidy", "goModVendor"]
+  "postUpdateOptions": ["gomodTidy", "goModVendor", "gomodUpdateImportPaths"]
 }
