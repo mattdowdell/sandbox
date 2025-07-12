@@ -8,8 +8,12 @@
   },
   "packageRules": [
     {
-      "matchPackageNames": ["go.opentelemetry.io/*"],
+      "matchPackageNames": ["go.opentelemetry.io/**"],
       "groupName": "OpenTelemetry"
+    },
+    {
+      "matchPackageNames": ["golang.org/x/**"],
+      "groupName": "X-Repositories"
     }
   ],
   "postUpdateOptions": ["gomodTidy", "goModVendor", "gomodUpdateImportPaths"]
