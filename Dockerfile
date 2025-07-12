@@ -17,7 +17,7 @@ ARG GO_BUILD_ARGS=
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=bind,target=. \
     set -eux; \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH \
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GOTOOLCHAIN=local \
     go build ${GO_BUILD_ARGS} -trimpath -ldflags="-buildid= -s -w" -o /go/bin/ ./cmd/...; \
     touch --date=@${SOURCE_DATE_EPOCH} /go/bin/*;
 
