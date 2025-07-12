@@ -20,7 +20,7 @@ godog := join(gopath, "bin", "godog-v0.15.0")
 install-godog:
     {{ if path_exists(godog) == "true" { "" } else { "bingo get godog" } }}
 
-gofumpt := join(gopath, "bin", "gofumpt-v0.7.0")
+gofumpt := join(gopath, "bin", "gofumpt-v0.8.0")
 
 [private]
 install-gofumpt:
