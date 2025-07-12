@@ -82,15 +82,8 @@ jobs:
 
       - name: Regenerate
         run: |
-          if ! just checks; then
-            if ! git diff HEAD --quiet .tools.just; then
-              echo "regenerate updated .tools.just, retrying"
-              just checks
-            else
-              echo "unexpected failure"
-              exit 1
-            fi
-          fi
+          # look for tool updates first as it can cause other commands to fail
+          just gen-just checks
 
       - name: Commit diff
         run: |
