@@ -1,11 +1,11 @@
-buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.6-20250625184727-c923a0c2a132.1 h1:6tCo3lsKNLqUjRPhyc8JuYWYUiQkulufxSDOfG1zgWQ=
-buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.6-20250625184727-c923a0c2a132.1/go.mod h1:avRlCjnFzl98VPaeCtJ24RrV/wwHFzB8sWXhj26+n/U=
+buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.6-20250717165733-d22d418d82d8.1 h1:VahIvw/JagkamVOb0q87Az0zu2tmrzlqvO2IKIGOwnI=
+buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.6-20250717165733-d22d418d82d8.1/go.mod h1:avRlCjnFzl98VPaeCtJ24RrV/wwHFzB8sWXhj26+n/U=
 buf.build/gen/go/grpc/grpc/connectrpc/go v1.18.1-20250429200738-0ee95b84c2c7.1 h1:Q6tD47IPqva0yvN+iSS/gwCbxxN++XBnvWc08+VSHrc=
 buf.build/gen/go/grpc/grpc/connectrpc/go v1.18.1-20250429200738-0ee95b84c2c7.1/go.mod h1:seJW/W3UQNTWqCpw186jxTahF/2V4Kan61o+kdYfWMk=
 buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.6-20250429200738-0ee95b84c2c7.1 h1:qw2TwuCJYRis7YbbG1bGu5nhZC2x0yF0pWD3Tn5jkHk=
 buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.6-20250429200738-0ee95b84c2c7.1/go.mod h1:St+K/OBg/lOgktE7jF9IKP5o5lVB2nGREsrBf6k8oHs=
-buf.build/go/protovalidate v0.13.1 h1:6loHDTWdY/1qmqmt1MijBIKeN4T9Eajrqb9isT1W1s8=
-buf.build/go/protovalidate v0.13.1/go.mod h1:C/QcOn/CjXRn5udUwYBiLs8y1TGy7RS+GOSKqjS77aU=
+buf.build/go/protovalidate v0.14.0 h1:kr/rC/no+DtRyYX+8KXLDxNnI1rINz0imk5K44ZpZ3A=
+buf.build/go/protovalidate v0.14.0/go.mod h1:+F/oISho9MO7gJQNYC2VWLzcO1fTPmaTA08SDYJZncA=
 cel.dev/expr v0.23.1 h1:K4KOtPCJQjVggkARsjG9RWXP6O4R73aHeJMa/dmCQQg=
 cel.dev/expr v0.23.1/go.mod h1:hLPLo1W4QUmuYdA72RBX06QTs6MXw941piREPl3Yfiw=
 connectrpc.com/connect v1.18.1 h1:PAg7CjSAGvscaf6YZKUefjoih5Z/qYkyaTrBW8xvYPw=
