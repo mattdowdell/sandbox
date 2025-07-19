@@ -35,11 +35,11 @@ $(GOLANGCI_LINT): $(BINGO_DIR)/golangci-lint.mod
 	@echo "(re)installing $(GOBIN)/golangci-lint-v2.2.2"
 	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=golangci-lint.mod -o=$(GOBIN)/golangci-lint-v2.2.2 "github.com/golangci/golangci-lint/v2/cmd/golangci-lint"
 
-MOCKERY := $(GOBIN)/mockery-v3.5.0
+MOCKERY := $(GOBIN)/mockery-v3.5.1
 $(MOCKERY): $(BINGO_DIR)/mockery.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/mockery-v3.5.0"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=mockery.mod -o=$(GOBIN)/mockery-v3.5.0 "github.com/vektra/mockery/v3"
+	@echo "(re)installing $(GOBIN)/mockery-v3.5.1"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=mockery.mod -o=$(GOBIN)/mockery-v3.5.1 "github.com/vektra/mockery/v3"
 
 PROTOC_GEN_CONNECT_GO := $(GOBIN)/protoc-gen-connect-go-v1.18.1
 $(PROTOC_GEN_CONNECT_GO): $(BINGO_DIR)/protoc-gen-connect-go.mod
