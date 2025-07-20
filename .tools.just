@@ -8,7 +8,7 @@ buf := join(gopath, "bin", "buf-v1.55.1")
 install-buf:
     {{ if path_exists(buf) == "true" { "" } else { "bingo get buf" } }}
 
-godog := join(gopath, "bin", "godog-v0.15.0")
+godog := join(gopath, "bin", "godog-v0.15.1")
 
 [private]
 install-godog:
