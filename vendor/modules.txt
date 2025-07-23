@@ -11,7 +11,7 @@ buf.build/gen/go/grpc/grpc/protocolbuffers/go/grpc/health/v1
 ## explicit; go 1.23.0
 buf.build/go/protovalidate
 buf.build/go/protovalidate/cel
-# cel.dev/expr v0.23.1
+# cel.dev/expr v0.24.0
 ## explicit; go 1.22.0
 cel.dev/expr
 # connectrpc.com/connect v1.18.1
@@ -601,7 +601,7 @@ google.golang.org/genproto/googleapis/api/httpbody
 # google.golang.org/genproto/googleapis/rpc v0.0.0-20250603155806-513f23925822
 ## explicit; go 1.23.0
 google.golang.org/genproto/googleapis/rpc/status
-# google.golang.org/grpc v1.73.0
+# google.golang.org/grpc v1.74.2
 ## explicit; go 1.23.0
 google.golang.org/grpc
 google.golang.org/grpc/attributes
