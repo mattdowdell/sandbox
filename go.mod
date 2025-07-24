@@ -53,12 +53,12 @@ require (
 	go.opentelemetry.io/otel/trace v1.37.0
 	golang.org/x/mod v0.26.0
 	golang.org/x/net v0.42.0
-	google.golang.org/grpc v1.73.0
+	google.golang.org/grpc v1.74.2
 	google.golang.org/protobuf v1.36.6
 )
 
 require (
-	cel.dev/expr v0.23.1 // indirect
+	cel.dev/expr v0.24.0 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.36.6 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.71 // indirect
