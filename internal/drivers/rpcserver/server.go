@@ -75,8 +75,9 @@ func New(
 }
 
 // Start starts the server and blocks until the server stops.
-func (s *Server) Start() error {
-	listener, err := net.Listen("tcp", s.server.Addr)
+func (s *Server) Start(ctx context.Context) error {
+	var lc net.ListenConfig
+	listener, err := lc.Listen(ctx, "tcp", s.server.Addr)
 	if err != nil {
 		return err
 	}
