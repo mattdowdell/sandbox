@@ -29,6 +29,7 @@ services:
       APP_LOGGERPROVIDER_INSECURE: "true"
       APP_LOGGERPROVIDER_ENDPOINT: "victoria-logs:9428"
       APP_LOGGERPROVIDER_PATH: "/insert/opentelemetry/v1/logs"
+      OTEL_SEMCONV_STABILITY_OPT_IN: "database"
     ports:
       - "127.0.0.1:5000:5000"
     volumes:

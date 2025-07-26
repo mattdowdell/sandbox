@@ -42,7 +42,6 @@ RUN set -eux; \
     git config --global --add safe.directory /home/dev/ws;
 
 COPY --from=gitleaks /usr/bin/gitleaks /usr/bin/gitleaks
-COPY --from=golangci-lint /usr/bin/golangci-lint /usr/bin/golangci-lint
 COPY --from=trivy /usr/local/bin/trivy /usr/bin/trivy
 
 ARG ZIZMOR_VERSION=1.6.0
