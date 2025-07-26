@@ -6,13 +6,14 @@ package main
 import (
 	"context"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/google/wire"
 
-	"github.com/mattdowdell/sandbox/internal/adapters/common"
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/healthrpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/reflectrpc"
+	"github.com/mattdowdell/sandbox/internal/adapters/txn"
 	"github.com/mattdowdell/sandbox/internal/adapters/usecasefacades"
 	"github.com/mattdowdell/sandbox/internal/domain/repositories"
 	"github.com/mattdowdell/sandbox/internal/drivers/clock"
@@ -26,7 +27,6 @@ import (
 	logginginterceptor "github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/otelconnectx"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/validatex"
-	"github.com/mattdowdell/sandbox/internal/drivers/uuidgen"
 	"github.com/mattdowdell/sandbox/internal/usecases"
 )
 
@@ -47,20 +47,21 @@ func ProvideApp(ctx context.Context) (*App, error) {
 			"TracerProvider",
 		),
 		// observability
-		otelx.NewTracerProviderFromConfig,
-		otelx.NewMeterProviderFromConfig,
-		otelx.NewLoggerProviderFromConfig,
+		baggageFilter,
+		otelx.SetupTracerProviderFromConfig,
+		otelx.SetupMeterProviderFromConfig,
+		otelx.SetupLoggerProviderFromConfig,
 		loggerOptions,
 		logging.NewAsDefaultFromConfig,
 		// providers
 		pgsql.NewFromConfig,
 		datastore.NewProvider,
-		wire.Bind(new(common.Provider), new(*datastore.Provider)),
+		wire.Bind(new(txn.Provider), new(*datastore.Provider)),
 		// repositories
 		clock.New,
 		wire.Bind(new(repositories.Clock), new(*clock.Clock)),
-		uuidgen.New,
-		wire.Bind(new(repositories.UUIDGenerator), new(*uuidgen.Generator)),
+		uuid.NewGen,
+		wire.Bind(new(repositories.UUIDGenerator), new(*uuid.Gen)),
 		// usecases
 		usecases.NewCreateResource,
 		wire.Bind(new(usecasefacades.ResourceCreator), new(*usecases.CreateResource)),
@@ -88,6 +89,7 @@ func ProvideApp(ctx context.Context) (*App, error) {
 		authnOptions,
 		authn.New,
 		collectInterceptors,
+		recovererOptions,
 		rpcserver.NewRecoverer,
 		collectHandlerOptions,
 		// handlers

@@ -11,9 +11,15 @@ echo
 
 for tool in $tools
 do
-	filename=`bingo list | grep "\b$tool\b" | awk '{print $2}'`
+	if [[ "$tool" == protoc-gen-* ]]
+	then
+		filename=`bingo list | grep "\b$tool\b" | awk '{print $1}'`
+		echo "${tool} := join(gopath, \"bin\", \"$filename\")"
+	else
+		filename=`bingo list | grep "\b$tool\b" | awk '{print $2}'`
+		echo "${tool} := join(gopath, \"bin\", \"$filename\")"
+	fi
 
-	echo "${tool} := join(gopath, \"bin\", \"$filename\")"
 	echo
 	echo "[private]"
 	echo "install-${tool}:"

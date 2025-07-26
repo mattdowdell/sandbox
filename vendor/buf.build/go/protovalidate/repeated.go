@@ -1,4 +1,4 @@
-// Copyright 2023-2024 Buf Technologies, Inc.
+// Copyright 2023-2025 Buf Technologies, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -55,11 +55,11 @@ func (r listItems) Evaluate(msg protoreflect.Message, val protoreflect.Value, cf
 		itemErr := r.ItemRules.EvaluateField(msg, list.Get(i), cfg, true)
 		if itemErr != nil {
 			updateViolationPaths(itemErr, &validate.FieldPathElement{
-				FieldNumber: proto.Int32(r.base.FieldPathElement.GetFieldNumber()),
+				FieldNumber: proto.Int32(r.FieldPathElement.GetFieldNumber()),
 				FieldType:   r.base.FieldPathElement.GetFieldType().Enum(),
-				FieldName:   proto.String(r.base.FieldPathElement.GetFieldName()),
+				FieldName:   proto.String(r.FieldPathElement.GetFieldName()),
 				Subscript:   &validate.FieldPathElement_Index{Index: uint64(i)}, //nolint:gosec // indices are guaranteed to be non-negative
-			}, r.base.RulePrefix.GetElements())
+			}, r.RulePrefix.GetElements())
 		}
 		if ok, err = mergeViolations(err, itemErr, cfg); !ok {
 			return err

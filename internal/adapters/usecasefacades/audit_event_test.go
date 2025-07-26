@@ -8,16 +8,16 @@ import (
 
 	"github.com/mattdowdell/sandbox/internal/adapters/usecasefacades"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
-	"github.com/mattdowdell/sandbox/mocks/adapters/mockcommon"
+	"github.com/mattdowdell/sandbox/mocks/adapters/mocktxn"
 	"github.com/mattdowdell/sandbox/mocks/adapters/mockusecasefacades"
 )
 
 func Test_AuditEvent_List(t *testing.T) {
 	// arrange
 	logger := slog.New(slog.DiscardHandler)
-	datastore := mockcommon.NewDatastore(t)
+	datastore := mocktxn.NewDatastore(t)
 
-	provider := mockcommon.NewProvider(t)
+	provider := mocktxn.NewProvider(t)
 	provider.EXPECT().Datastore().Return(datastore).Once()
 
 	usecase := mockusecasefacades.NewAuditEventLister(t)
@@ -44,9 +44,9 @@ func Test_AuditEvent_List(t *testing.T) {
 func Test_AuditEvent_Watch(t *testing.T) {
 	// arrange
 	logger := slog.New(slog.DiscardHandler)
-	datastore := mockcommon.NewDatastore(t)
+	datastore := mocktxn.NewDatastore(t)
 
-	provider := mockcommon.NewProvider(t)
+	provider := mocktxn.NewProvider(t)
 	provider.EXPECT().Datastore().Return(datastore).Once()
 
 	ch := make(chan *entities.AuditEvent)

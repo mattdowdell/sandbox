@@ -47,7 +47,7 @@ func Test_Interceptor_WrapUnary_Client(t *testing.T) {
 
 	expected := connect.NewResponse(&healthv1.HealthCheckResponse{})
 
-	next := mockconnect.NewUnaryFunc(t)
+	next := NewUnaryFunc(t)
 	next.EXPECT().Execute(t.Context(), req).Return(expected, nil).Once()
 
 	fn := interceptor.WrapUnary(next.Execute)
@@ -117,7 +117,7 @@ func Test_Interceptor_WrapUnary_Success(t *testing.T) {
 
 			expected := connect.NewResponse(&healthv1.HealthCheckResponse{})
 
-			next := mockconnect.NewUnaryFunc(t)
+			next := NewUnaryFunc(t)
 			next.EXPECT().Execute(t.Context(), req).Return(expected, nil).Once()
 
 			fn := interceptor.WrapUnary(next.Execute)
@@ -154,7 +154,7 @@ func Test_Interceptor_WrapUnary_Error(t *testing.T) {
 			req := connect.NewRequest(&healthv1.HealthCheckRequest{})
 			req.Header().Set("Authorization", tc.have)
 
-			next := mockconnect.NewUnaryFunc(t)
+			next := NewUnaryFunc(t)
 			fn := interceptor.WrapUnary(next.Execute)
 
 			// act
@@ -178,7 +178,7 @@ func Test_Interceptor_WrapStreamingHandler_Success(t *testing.T) {
 	conn.EXPECT().Spec().Return(connect.Spec{}).Once()
 	conn.EXPECT().RequestHeader().Return(headers).Once()
 
-	next := mockconnect.NewStreamingHandlerFunc(t)
+	next := NewStreamingHandlerFunc(t)
 	next.EXPECT().Execute(t.Context(), conn).Return(nil).Once()
 
 	fn := interceptor.WrapStreamingHandler(next.Execute)
@@ -198,7 +198,7 @@ func Test_Interceptor_WrapStreamingHandler_Error(t *testing.T) {
 	conn.EXPECT().Spec().Return(connect.Spec{}).Once()
 	conn.EXPECT().RequestHeader().Return(http.Header{}).Once()
 
-	next := mockconnect.NewStreamingHandlerFunc(t)
+	next := NewStreamingHandlerFunc(t)
 	fn := interceptor.WrapStreamingHandler(next.Execute)
 
 	// act

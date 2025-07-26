@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 )
 
 // UUIDGenerator implementations generate new UUIDs.

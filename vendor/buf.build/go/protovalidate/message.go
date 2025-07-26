@@ -1,4 +1,4 @@
-// Copyright 2023-2024 Buf Technologies, Inc.
+// Copyright 2023-2025 Buf Technologies, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -109,7 +109,7 @@ type embeddedMessage struct {
 
 func (m *embeddedMessage) Evaluate(_ protoreflect.Message, val protoreflect.Value, cfg *validationConfig) error {
 	err := m.message.EvaluateMessage(val.Message(), cfg)
-	updateViolationPaths(err, m.base.FieldPathElement, nil)
+	updateViolationPaths(err, m.FieldPathElement, nil)
 	return err
 }
 

@@ -2,11 +2,11 @@ package usecases_test
 
 import (
 	"errors"
-	"log/slog"
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
+	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/domain"
@@ -34,7 +34,7 @@ func Test_NewCreateResource(t *testing.T) {
 func Test_CreateResource_Success(t *testing.T) {
 	// arrange
 	now := time.Now().UTC().Round(time.Second)
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 
 	clock := mockrepositories.NewClock(t)
 	clock.EXPECT().Now().Return(now).Once()
@@ -43,7 +43,7 @@ func Test_CreateResource_Success(t *testing.T) {
 	uuidgen.EXPECT().NewV7().Return(id, nil).Once()
 
 	usecase := usecases.NewCreateResource(clock, uuidgen)
-	logger := slog.New(slog.DiscardHandler)
+	logger := slogt.New(t)
 
 	expected := &entities.Resource{
 		ID:        id,
@@ -75,7 +75,7 @@ func Test_CreateResource_IDFailed(t *testing.T) {
 	uuidgen.EXPECT().NewV7().Return(uuid.Nil, errors.New("example")).Once()
 
 	usecase := usecases.NewCreateResource(clock, uuidgen)
-	logger := slog.New(slog.DiscardHandler)
+	logger := slogt.New(t)
 	store := mockrepositories.NewResource(t)
 
 	input := &entities.Resource{
@@ -109,7 +109,7 @@ func Test_CreateResource_CreateFailed(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// arrange
 			now := time.Now().UTC().Round(time.Second)
-			id := uuid.New()
+			id := uuid.Must(uuid.NewV7())
 
 			clock := mockrepositories.NewClock(t)
 			clock.EXPECT().Now().Return(now).Once()
@@ -118,7 +118,7 @@ func Test_CreateResource_CreateFailed(t *testing.T) {
 			uuidgen.EXPECT().NewV7().Return(id, nil).Once()
 
 			usecase := usecases.NewCreateResource(clock, uuidgen)
-			logger := slog.New(slog.DiscardHandler)
+			logger := slogt.New(t)
 
 			expected := &entities.Resource{
 				ID:        id,

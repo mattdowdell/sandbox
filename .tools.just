@@ -2,49 +2,37 @@
 
 gopath := shell("go env GOPATH")
 
-buf := join(gopath, "bin", "buf-v1.51.0")
+buf := join(gopath, "bin", "buf-v1.55.1")
 
 [private]
 install-buf:
     {{ if path_exists(buf) == "true" { "" } else { "bingo get buf" } }}
 
-gci := join(gopath, "bin", "gci-v0.13.6")
-
-[private]
-install-gci:
-    {{ if path_exists(gci) == "true" { "" } else { "bingo get gci" } }}
-
-godog := join(gopath, "bin", "godog-v0.15.0")
+godog := join(gopath, "bin", "godog-v0.15.1")
 
 [private]
 install-godog:
     {{ if path_exists(godog) == "true" { "" } else { "bingo get godog" } }}
 
-gofumpt := join(gopath, "bin", "gofumpt-v0.7.0")
+golangci-lint := join(gopath, "bin", "golangci-lint-v2.3.0")
 
 [private]
-install-gofumpt:
-    {{ if path_exists(gofumpt) == "true" { "" } else { "bingo get gofumpt" } }}
+install-golangci-lint:
+    {{ if path_exists(golangci-lint) == "true" { "" } else { "bingo get golangci-lint" } }}
 
-jet := join(gopath, "bin", "jet-v2.13.0")
-
-[private]
-install-jet:
-    {{ if path_exists(jet) == "true" { "" } else { "bingo get jet" } }}
-
-mockery := join(gopath, "bin", "mockery-v2.53.3")
+mockery := join(gopath, "bin", "mockery-v3.5.1")
 
 [private]
 install-mockery:
     {{ if path_exists(mockery) == "true" { "" } else { "bingo get mockery" } }}
 
-protoc-gen-connect-go := join(gopath, "bin", "protoc-gen-connect-go-v1.18.1")
+protoc-gen-connect-go := join(gopath, "bin", "protoc-gen-connect-go")
 
 [private]
 install-protoc-gen-connect-go:
     {{ if path_exists(protoc-gen-connect-go) == "true" { "" } else { "bingo get protoc-gen-connect-go -l" } }}
 
-protoc-gen-go := join(gopath, "bin", "protoc-gen-go-v1.36.6")
+protoc-gen-go := join(gopath, "bin", "protoc-gen-go")
 
 [private]
 install-protoc-gen-go:
@@ -56,7 +44,7 @@ wire := join(gopath, "bin", "wire-v0.6.0")
 install-wire:
     {{ if path_exists(wire) == "true" { "" } else { "bingo get wire" } }}
 
-yamlfmt := join(gopath, "bin", "yamlfmt-v0.16.0")
+yamlfmt := join(gopath, "bin", "yamlfmt-v0.17.2")
 
 [private]
 install-yamlfmt:

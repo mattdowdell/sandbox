@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net"
+	"strconv"
 	"strings"
 	"time"
 
@@ -24,7 +25,7 @@ type Config struct {
 	Hostname string `koanf:"hostname"`
 
 	// The port the database server is listening on. Defaults to 5432.
-	Port string `koanf:"port" default:"5432"`
+	Port int `koanf:"port" default:"5432"`
 
 	// The username to authenticate with.
 	Username string `koanf:"username"`
@@ -74,7 +75,7 @@ func (c *Config) toOptions() []Option {
 	}
 
 	if c.UseIAMAuth {
-		endpoint := net.JoinHostPort(c.Hostname, c.Port)
+		endpoint := net.JoinHostPort(c.Hostname, strconv.Itoa(c.Port))
 		options = append(options, WithIAMAuth(endpoint, c.Region, c.Username))
 	}
 
@@ -106,7 +107,7 @@ func NewFromConfig(ctx context.Context, conf Config) (*sql.DB, error) {
 func New(
 	ctx context.Context,
 	host string,
-	port string,
+	port int,
 	user string,
 	name string,
 	sslmode string,
@@ -168,14 +169,14 @@ func New(
 
 func makeDSN(
 	host string,
-	port string,
+	port int,
 	user string,
 	password string,
 	name string,
 	sslmode string,
 ) string {
 	return fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		"host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
 		host,
 		port,
 		user,

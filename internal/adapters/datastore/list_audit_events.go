@@ -2,10 +2,12 @@ package datastore
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/modelhelpers"
-	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/postgres/public/model"
-	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/postgres/public/table"
+	"github.com/mattdowdell/sandbox/internal/adapters/datastore/schema/model"
+	"github.com/mattdowdell/sandbox/internal/adapters/datastore/schema/table"
+	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 )
 
@@ -22,9 +24,9 @@ func (d *Datastore) ListAuditEvents(ctx context.Context) ([]*entities.AuditEvent
 		).
 		ORDER_BY(table.Resources.ID.ASC())
 
-	var events []model.AuditEvents
+	var events []*model.AuditEvents
 	if err := stmt.QueryContext(ctx, d.db, &events); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: %w", domain.ErrInternal, err)
 	}
 
 	return modelhelpers.AuditEventsToDomain(events), nil

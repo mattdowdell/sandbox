@@ -75,6 +75,9 @@ linters:
     godot:
       exclude:
         - "^\\s*\\[.+?\\]:\\s+" # ignore markdown ref links
+    mnd:
+      ignored-functions:
+        - '^os\.OpenFile$'
     sloglint:
       attr-only: true
       context: all
@@ -98,6 +101,17 @@ linters:
       - third_party$
       - builtin$
       - examples$
+      - .*/mocks_test\.go$
+
+    rules:
+      - path: tools/
+        linters:
+          # allow less strict logging for tools
+          - sloglint
+      # use sloglint for context checks in log/slog.
+      - text: '(slog|log)\.\w+'
+        linters:
+          - noctx
 
 issues:
   max-issues-per-linter: 0

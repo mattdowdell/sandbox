@@ -16,7 +16,7 @@ const (
 )
 
 // ...
-func AddEmptyToContext(ctx context.Context) context.Context {
+func EmptyIntoContext(ctx context.Context) context.Context {
 	return context.WithValue(ctx, emptyCtxKey, 0)
 }
 
@@ -30,7 +30,7 @@ func EmptyFromContext(ctx context.Context) error {
 }
 
 // ...
-func AddResourceToContext(ctx context.Context, r *examplev1.Resource) context.Context {
+func ResourceIntoContext(ctx context.Context, r *examplev1.Resource) context.Context {
 	return context.WithValue(ctx, resourceCtxKey, r)
 }
 
@@ -44,7 +44,7 @@ func ResourceFromContext(ctx context.Context) (*examplev1.Resource, error) {
 }
 
 // ...
-func AddErrToContext(ctx context.Context, err error) context.Context {
+func ErrIntoContext(ctx context.Context, err error) context.Context {
 	return context.WithValue(ctx, errCtxKey, err)
 }
 

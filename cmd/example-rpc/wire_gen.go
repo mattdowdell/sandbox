@@ -8,6 +8,7 @@ package main
 
 import (
 	"context"
+	"github.com/gofrs/uuid/v5"
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/healthrpc"
@@ -24,7 +25,6 @@ import (
 	logging2 "github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/otelconnectx"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/validatex"
-	"github.com/mattdowdell/sandbox/internal/drivers/uuidgen"
 	"github.com/mattdowdell/sandbox/internal/usecases"
 )
 
@@ -48,8 +48,8 @@ func ProvideApp(ctx context.Context) (*App, error) {
 	}
 	provider := datastore.NewProvider(db)
 	clockClock := clock.New()
-	generator := uuidgen.New()
-	createResource := usecases.NewCreateResource(clockClock, generator)
+	gen := uuid.NewGen()
+	createResource := usecases.NewCreateResource(clockClock, gen)
 	getResource := usecases.NewGetResource()
 	listResources := usecases.NewListResources()
 	updateResource := usecases.NewUpdateResource(clockClock)
@@ -75,24 +75,26 @@ func ProvideApp(ctx context.Context) (*App, error) {
 	v3 := authnOptions()
 	authnInterceptor := authn.New(v3...)
 	v4 := collectInterceptors(interceptor, validateInterceptor, loggingInterceptor, authnInterceptor)
-	recoverer, err := rpcserver.NewRecoverer()
+	v5 := recovererOptions()
+	recoverer, err := rpcserver.NewRecoverer(v5...)
 	if err != nil {
 		return nil, err
 	}
-	v5 := collectHandlerOptions(v4, recoverer)
-	server := rpcserver.NewFromConfig(rpcserverConfig, v2, v5)
+	v6 := collectHandlerOptions(v4, recoverer)
+	server := rpcserver.NewFromConfig(rpcserverConfig, v2, v6)
 	tracerProviderConfig := mainConfig.TracerProvider
-	tracerProviderShutdown, err := otelx.NewTracerProviderFromConfig(ctx, tracerProviderConfig)
+	filter := baggageFilter()
+	tracerProviderShutdown, err := otelx.SetupTracerProviderFromConfig(ctx, tracerProviderConfig, filter)
 	if err != nil {
 		return nil, err
 	}
 	meterProviderConfig := mainConfig.MeterProvider
-	meterProviderShutdown, err := otelx.NewMeterProviderFromConfig(ctx, meterProviderConfig)
+	meterProviderShutdown, err := otelx.SetupMeterProviderFromConfig(ctx, meterProviderConfig)
 	if err != nil {
 		return nil, err
 	}
 	loggerProviderConfig := mainConfig.LoggerProvider
-	loggerProviderShutdown, err := otelx.NewLoggerProviderFromConfig(ctx, loggerProviderConfig)
+	loggerProviderShutdown, err := otelx.SetupLoggerProviderFromConfig(ctx, loggerProviderConfig, filter)
 	if err != nil {
 		return nil, err
 	}

@@ -42,12 +42,14 @@ func (h *handler) Handle(ctx context.Context, record slog.Record) error {
 
 func (h *handler) WithAttrs(attrs []slog.Attr) slog.Handler {
 	return &handler{
-		inner: h.inner.WithAttrs(attrs),
+		inner:      h.inner.WithAttrs(attrs),
+		extractors: h.extractors,
 	}
 }
 
 func (h *handler) WithGroup(name string) slog.Handler {
 	return &handler{
-		inner: h.inner.WithGroup(name),
+		inner:      h.inner.WithGroup(name),
+		extractors: h.extractors,
 	}
 }

@@ -1,69 +1,53 @@
 package otelx
 
 import (
-	"context"
-
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp"
 	"go.opentelemetry.io/otel/metric"
-	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 )
 
-// MeterProviderConfig contains configuration for configuring an OpenTelemetry meter provider.
-type MeterProviderConfig struct {
-	// The URL of the OTLP HTTP endpoint to export metrics to.
-	Endpoint string `koanf:"endpoint"`
+// MeterOption implementations customise the behaviour of Meter.
+type MeterOption interface {
+	apply(*meterOpts)
 }
 
-// MeterProviderShutdown provides a dedicated type for the meter provider shutdown function.
-type MeterProviderShutdown func(context.Context) error
-
-// NewMeterProviderFromConfig calls NewMeterProvider with the given configuration.
-func NewMeterProviderFromConfig(
-	ctx context.Context,
-	conf MeterProviderConfig,
-) (MeterProviderShutdown, error) {
-	return NewMeterProvider(ctx, conf.Endpoint)
+type meterOpts struct {
+	provider metric.MeterProvider
 }
 
-// NewMeterProvider creates a new [metric.MeterProvider] and sets it as the default using
-// [otel.SetMeterProvider]. The returned function should be called when the process exits to publish
-// any lingering metrics.
-//
-// [metric.MeterProvider]: https://pkg.go.dev/go.opentelemetry.io/otel/metric#MeterProvider
-// [otel.SetMeterProvider]: https://pkg.go.dev/go.opentelemetry.io/otel#SetMeterProvider
-func NewMeterProvider(
-	ctx context.Context,
-	endpoint string,
-) (MeterProviderShutdown, error) {
-	exporter, err := otlpmetrichttp.New(ctx, otlpmetrichttp.WithEndpointURL(endpoint))
-	if err != nil {
-		return nil, err
+type meterProviderOpt struct {
+	provider metric.MeterProvider
+}
+
+// WithMeterProvider overrides the global MeterProvider. This can be useful for testing the result
+// of recording metrics.
+func WithMeterProvider(provider metric.MeterProvider) MeterOption {
+	return &meterProviderOpt{
+		provider: provider,
 	}
-
-	res, err := newResource()
-	if err != nil {
-		return nil, err
-	}
-
-	provider := sdkmetric.NewMeterProvider(
-		sdkmetric.WithReader(sdkmetric.NewPeriodicReader(exporter)),
-		sdkmetric.WithResource(res),
-	)
-	otel.SetMeterProvider(provider)
-
-	return provider.Shutdown, nil
 }
 
-// Meter wraps [otel.Meter] to provide a [metric.Meter] with the package name and version
-// automatically set based on the direct caller. It is advised to cache the result when possible to
-// avoid computing the caller's package details unnecessarily.
+func (o *meterProviderOpt) apply(options *meterOpts) {
+	options.provider = o.provider
+}
+
+// Meter provides a [metric.Meter] with the package name and version automatically set based on the
+// direct caller. It is advised to cache the result when possible to avoid computing the caller's
+// package details unnecessarily.
 //
-// [otel.Meter]: https://pkg.go.dev/go.opentelemetry.io/otel#Meter
 // [metric.Meter]: https://pkg.go.dev/go.opentelemetry.io/otel/metric#Meter
-func Meter() metric.Meter {
+func Meter(options ...MeterOption) metric.Meter {
+	opts := &meterOpts{}
+	for _, option := range options {
+		option.apply(opts)
+	}
+
+	provider := opts.provider
+	if provider == nil {
+		provider = otel.GetMeterProvider()
+	}
+
 	pkg := packageName(1 /*skip*/)
 	ver := packageVersion(pkg)
 
-	return otel.Meter(pkg, metric.WithInstrumentationVersion(ver))
+	return provider.Meter(pkg, metric.WithInstrumentationVersion(ver))
 }

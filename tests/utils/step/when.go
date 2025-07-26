@@ -22,11 +22,11 @@ func CreateResource(ctx context.Context) (context.Context, error) {
 
 	resource, cleanup, err := client.CreateResource(ctx, name)
 	if err != nil {
-		return output.AddErrToContext(ctx, err), nil
+		return output.ErrIntoContext(ctx, err), nil
 	}
 
 	ctx = examplev1client.AppendCleanup(ctx, cleanup)
-	ctx = output.AddResourceToContext(ctx, resource)
+	ctx = output.ResourceIntoContext(ctx, resource)
 
 	return ctx, nil
 }
@@ -45,10 +45,10 @@ func GetResource(ctx context.Context) (context.Context, error) {
 
 	resource, err := client.GetResource(ctx, id)
 	if err != nil {
-		return output.AddErrToContext(ctx, err), nil
+		return output.ErrIntoContext(ctx, err), nil
 	}
 
-	return output.AddResourceToContext(ctx, resource), nil
+	return output.ResourceIntoContext(ctx, resource), nil
 }
 
 // ...
@@ -70,10 +70,10 @@ func UpdateResource(ctx context.Context) (context.Context, error) {
 
 	resource, err := client.UpdateResource(ctx, id, name)
 	if err != nil {
-		return output.AddErrToContext(ctx, err), nil
+		return output.ErrIntoContext(ctx, err), nil
 	}
 
-	return output.AddResourceToContext(ctx, resource), nil
+	return output.ResourceIntoContext(ctx, resource), nil
 }
 
 // ...
@@ -89,8 +89,8 @@ func DeleteResource(ctx context.Context) (context.Context, error) {
 	}
 
 	if err := client.DeleteResource(ctx, id); err != nil {
-		return output.AddErrToContext(ctx, err), nil
+		return output.ErrIntoContext(ctx, err), nil
 	}
 
-	return output.AddEmptyToContext(ctx), nil
+	return output.EmptyIntoContext(ctx), nil
 }

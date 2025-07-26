@@ -20,11 +20,23 @@ import (
 	"errors"
 	"time"
 
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/metric"
-	semconv "go.opentelemetry.io/otel/semconv/v1.24.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.30.0"
 	"go.opentelemetry.io/otel/trace"
+
+	internalsemconv "github.com/XSAM/otelsql/internal/semconv"
 )
+
+// estimatedAttributesOfGettersCount is the estimated number of attributes from getter methods.
+// This value 5 is borrowed from slog which
+// performed a quantitative survey of log library use and found this value to
+// cover 95% of all use-cases (https://go.dev/blog/slog#performance).
+// This may not be accurate for metrics or traces, but it's a good starting point.
+const estimatedAttributesOfGettersCount = 5
+
+var timeNow = time.Now
 
 func recordSpanErrorDeferred(span trace.Span, opts SpanOptions, err *error) {
 	recordSpanError(span, opts, *err)
@@ -38,10 +50,10 @@ func recordSpanError(span trace.Span, opts SpanOptions, err error) {
 		return
 	}
 
-	switch err {
-	case nil:
+	switch {
+	case err == nil:
 		return
-	case driver.ErrSkip:
+	case errors.Is(err, driver.ErrSkip):
 		if !opts.DisableErrSkip {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, "")
@@ -52,6 +64,56 @@ func recordSpanError(span trace.Span, opts SpanOptions, err error) {
 	}
 }
 
+func recordLegacyLatency(
+	ctx context.Context,
+	instruments *instruments,
+	cfg config,
+	duration time.Duration,
+	attributes []attribute.KeyValue,
+	method Method,
+	err error,
+) {
+	attributes = append(attributes, queryMethodKey.String(string(method)))
+
+	if err != nil {
+		if cfg.DisableSkipErrMeasurement && errors.Is(err, driver.ErrSkip) {
+			attributes = append(attributes, queryStatusKey.String("ok"))
+		} else {
+			attributes = append(attributes, queryStatusKey.String("error"))
+		}
+	} else {
+		attributes = append(attributes, queryStatusKey.String("ok"))
+	}
+
+	instruments.legacyLatency.Record(
+		ctx,
+		float64(duration.Nanoseconds())/1e6,
+		metric.WithAttributes(attributes...),
+	)
+}
+
+func recordDuration(
+	ctx context.Context,
+	instruments *instruments,
+	cfg config,
+	duration time.Duration,
+	attributes []attribute.KeyValue,
+	method Method,
+	err error,
+) {
+	attributes = append(attributes, semconv.DBOperationName(string(method)))
+	if err != nil && (!cfg.DisableSkipErrMeasurement || !errors.Is(err, driver.ErrSkip)) {
+		attributes = append(attributes, internalsemconv.ErrorTypeAttributes(err)...)
+	}
+
+	instruments.duration.Record(
+		ctx,
+		duration.Seconds(),
+		metric.WithAttributes(attributes...),
+	)
+}
+
+// TODO: remove instruments from arguments.
 func recordMetric(
 	ctx context.Context,
 	instruments *instruments,
@@ -60,12 +122,20 @@ func recordMetric(
 	query string,
 	args []driver.NamedValue,
 ) func(error) {
-	startTime := time.Now()
+	startTime := timeNow()
 
 	return func(err error) {
-		duration := float64(time.Since(startTime).Nanoseconds()) / 1e6
+		duration := timeNow().Sub(startTime)
 
-		attributes := cfg.Attributes
+		// number of attributes + estimated 5 from InstrumentAttributesGetter and
+		// InstrumentErrorAttributesGetter + estimated 2 from recordDuration.
+		attributes := make(
+			[]attribute.KeyValue,
+			len(cfg.Attributes),
+			len(cfg.Attributes)+estimatedAttributesOfGettersCount+2,
+		)
+		copy(attributes, cfg.Attributes)
+
 		if cfg.InstrumentAttributesGetter != nil {
 			attributes = append(attributes, cfg.InstrumentAttributesGetter(ctx, method, query, args)...)
 		}
@@ -73,23 +143,18 @@ func recordMetric(
 			if cfg.InstrumentErrorAttributesGetter != nil {
 				attributes = append(attributes, cfg.InstrumentErrorAttributesGetter(err)...)
 			}
-
-			if cfg.DisableSkipErrMeasurement && err == driver.ErrSkip {
-				attributes = append(attributes, queryStatusKey.String("ok"))
-			} else {
-				attributes = append(attributes, queryStatusKey.String("error"))
-			}
-		} else {
-			attributes = append(attributes, queryStatusKey.String("ok"))
 		}
 
-		attributes = append(attributes, queryMethodKey.String(string(method)))
-
-		instruments.latency.Record(
-			ctx,
-			duration,
-			metric.WithAttributes(attributes...),
-		)
+		switch cfg.SemConvStabilityOptIn {
+		case internalsemconv.OTelSemConvStabilityOptInStable:
+			recordDuration(ctx, instruments, cfg, duration, attributes, method, err)
+		case internalsemconv.OTelSemConvStabilityOptInDup:
+			// Intentionally emit both legacy and new metrics for backward compatibility.
+			recordLegacyLatency(ctx, instruments, cfg, duration, attributes, method, err)
+			recordDuration(ctx, instruments, cfg, duration, attributes, method, err)
+		case internalsemconv.OTelSemConvStabilityOptInNone:
+			recordLegacyLatency(ctx, instruments, cfg, duration, attributes, method, err)
+		}
 	}
 }
 
@@ -101,17 +166,24 @@ func createSpan(
 	query string,
 	args []driver.NamedValue,
 ) (context.Context, trace.Span) {
-	attrs := cfg.Attributes
+	// number of attributes + estimated 5 from AttributesGetter + estimated 2 from DBQueryTextAttributes.
+	attributes := make(
+		[]attribute.KeyValue,
+		len(cfg.Attributes),
+		len(cfg.Attributes)+estimatedAttributesOfGettersCount+2,
+	)
+	copy(attributes, cfg.Attributes)
+
 	if enableDBStatement && !cfg.SpanOptions.DisableQuery {
-		attrs = append(attrs, semconv.DBStatementKey.String(query))
+		attributes = append(attributes, cfg.DBQueryTextAttributes(query)...)
 	}
 	if cfg.AttributesGetter != nil {
-		attrs = append(attrs, cfg.AttributesGetter(ctx, method, query, args)...)
+		attributes = append(attributes, cfg.AttributesGetter(ctx, method, query, args)...)
 	}
 
 	return cfg.Tracer.Start(ctx, cfg.SpanNameFormatter(ctx, method, query),
 		trace.WithSpanKind(trace.SpanKindClient),
-		trace.WithAttributes(attrs...),
+		trace.WithAttributes(attributes...),
 	)
 }
 

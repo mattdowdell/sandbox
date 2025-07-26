@@ -1,0 +1,20 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "gomod": {
+    "managerFilePatterns": [".bingo/*.mod"]
+  },
+  "packageRules": [
+    {
+      "matchPackageNames": ["go.opentelemetry.io/**"],
+      "groupName": "OpenTelemetry"
+    },
+    {
+      "matchPackageNames": ["golang.org/x/**"],
+      "groupName": "X-Repositories"
+    }
+  ],
+  "postUpdateOptions": ["gomodTidy", "goModVendor", "gomodUpdateImportPaths"]
+}

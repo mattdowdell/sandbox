@@ -17,41 +17,29 @@ GO     ?= $(shell which go)
 #	@echo "Running buf"
 #	@$(BUF) <flags/args..>
 #
-BUF := $(GOBIN)/buf-v1.51.0
+BUF := $(GOBIN)/buf-v1.55.1
 $(BUF): $(BINGO_DIR)/buf.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/buf-v1.51.0"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=buf.mod -o=$(GOBIN)/buf-v1.51.0 "github.com/bufbuild/buf/cmd/buf"
+	@echo "(re)installing $(GOBIN)/buf-v1.55.1"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=buf.mod -o=$(GOBIN)/buf-v1.55.1 "github.com/bufbuild/buf/cmd/buf"
 
-GCI := $(GOBIN)/gci-v0.13.6
-$(GCI): $(BINGO_DIR)/gci.mod
-	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/gci-v0.13.6"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=gci.mod -o=$(GOBIN)/gci-v0.13.6 "github.com/daixiang0/gci"
-
-GODOG := $(GOBIN)/godog-v0.15.0
+GODOG := $(GOBIN)/godog-v0.15.1
 $(GODOG): $(BINGO_DIR)/godog.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/godog-v0.15.0"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=godog.mod -o=$(GOBIN)/godog-v0.15.0 "github.com/cucumber/godog/cmd/godog"
+	@echo "(re)installing $(GOBIN)/godog-v0.15.1"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=godog.mod -o=$(GOBIN)/godog-v0.15.1 "github.com/cucumber/godog/cmd/godog"
 
-GOFUMPT := $(GOBIN)/gofumpt-v0.7.0
-$(GOFUMPT): $(BINGO_DIR)/gofumpt.mod
+GOLANGCI_LINT := $(GOBIN)/golangci-lint-v2.3.0
+$(GOLANGCI_LINT): $(BINGO_DIR)/golangci-lint.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/gofumpt-v0.7.0"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=gofumpt.mod -o=$(GOBIN)/gofumpt-v0.7.0 "mvdan.cc/gofumpt"
+	@echo "(re)installing $(GOBIN)/golangci-lint-v2.3.0"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=golangci-lint.mod -o=$(GOBIN)/golangci-lint-v2.3.0 "github.com/golangci/golangci-lint/v2/cmd/golangci-lint"
 
-JET := $(GOBIN)/jet-v2.13.0
-$(JET): $(BINGO_DIR)/jet.mod
-	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/jet-v2.13.0"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=jet.mod -o=$(GOBIN)/jet-v2.13.0 "github.com/go-jet/jet/v2/cmd/jet"
-
-MOCKERY := $(GOBIN)/mockery-v2.53.3
+MOCKERY := $(GOBIN)/mockery-v3.5.1
 $(MOCKERY): $(BINGO_DIR)/mockery.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/mockery-v2.53.3"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=mockery.mod -o=$(GOBIN)/mockery-v2.53.3 "github.com/vektra/mockery/v2"
+	@echo "(re)installing $(GOBIN)/mockery-v3.5.1"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=mockery.mod -o=$(GOBIN)/mockery-v3.5.1 "github.com/vektra/mockery/v3"
 
 PROTOC_GEN_CONNECT_GO := $(GOBIN)/protoc-gen-connect-go-v1.18.1
 $(PROTOC_GEN_CONNECT_GO): $(BINGO_DIR)/protoc-gen-connect-go.mod
@@ -71,9 +59,9 @@ $(WIRE): $(BINGO_DIR)/wire.mod
 	@echo "(re)installing $(GOBIN)/wire-v0.6.0"
 	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=wire.mod -o=$(GOBIN)/wire-v0.6.0 "github.com/google/wire/cmd/wire"
 
-YAMLFMT := $(GOBIN)/yamlfmt-v0.16.0
+YAMLFMT := $(GOBIN)/yamlfmt-v0.17.2
 $(YAMLFMT): $(BINGO_DIR)/yamlfmt.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/yamlfmt-v0.16.0"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=yamlfmt.mod -o=$(GOBIN)/yamlfmt-v0.16.0 "github.com/google/yamlfmt/cmd/yamlfmt"
+	@echo "(re)installing $(GOBIN)/yamlfmt-v0.17.2"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=yamlfmt.mod -o=$(GOBIN)/yamlfmt-v0.17.2 "github.com/google/yamlfmt/cmd/yamlfmt"
 

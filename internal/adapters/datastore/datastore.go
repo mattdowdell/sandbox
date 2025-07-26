@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-jet/jet/v2/qrm"
 
-	"github.com/mattdowdell/sandbox/internal/adapters/common"
+	"github.com/mattdowdell/sandbox/internal/adapters/txn"
 )
 
 // Provider is used to create a Datastore with an optional transaction.
@@ -28,7 +28,7 @@ func NewProvider(db *sql.DB) *Provider {
 // BeginTx creates a Datastore within a transaction.
 func (p *Provider) BeginTx(
 	ctx context.Context,
-) (common.Datastore, common.CommitFn, common.RollbackFn, error) {
+) (txn.Datastore, txn.CommitFn, txn.RollbackFn, error) {
 	tx, err := p.db.BeginTx(ctx, nil /*opts*/)
 	if err != nil {
 		return nil, nil, nil, err
@@ -40,7 +40,7 @@ func (p *Provider) BeginTx(
 }
 
 // Datastore creates a Datastore without a transaction.
-func (p *Provider) Datastore() common.Datastore {
+func (p *Provider) Datastore() txn.Datastore {
 	return NewDatastore(p.db)
 }
 
@@ -58,7 +58,7 @@ func NewDatastore(db qrm.DB) *Datastore {
 
 // wrapRollback suppresses the error from a transaction rollback failure if it is caused by the
 // transaction already being committed. Otherwise the error is returned as is.
-func wrapRollback(fn common.RollbackFn) common.RollbackFn {
+func wrapRollback(fn txn.RollbackFn) txn.RollbackFn {
 	return func() error {
 		if err := fn(); err != nil && !errors.Is(err, sql.ErrTxDone) {
 			return err

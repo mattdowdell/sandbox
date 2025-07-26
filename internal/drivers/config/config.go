@@ -7,9 +7,9 @@ import (
 
 	"github.com/creasty/defaults"
 	"github.com/knadh/koanf/parsers/json"
-	"github.com/knadh/koanf/parsers/toml"
+	"github.com/knadh/koanf/parsers/toml/v2"
 	"github.com/knadh/koanf/parsers/yaml"
-	"github.com/knadh/koanf/providers/env"
+	"github.com/knadh/koanf/providers/env/v2"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
 
@@ -155,12 +155,11 @@ func (c *Config) loadMounts() error {
 }
 
 func envProvider(prefix string) *env.Env {
-	return env.Provider(prefix, delimiter, func(s string) string {
-		return strings.ReplaceAll(
-			strings.ToLower(strings.TrimPrefix(s, prefix)),
-			"_",
-			delimiter,
-		)
+	return env.Provider(delimiter, env.Opt{
+		Prefix: prefix,
+		TransformFunc: func(k, v string) (string, any) {
+			return transformKey(k, prefix), v
+		},
 	})
 }
 
@@ -178,4 +177,12 @@ func fileParser(path string) (koanf.Parser, error) {
 	default:
 		return nil, fmt.Errorf("supported file extension for path: %q", path)
 	}
+}
+
+func transformKey(key, prefix string) string {
+	return strings.ReplaceAll(
+		strings.ToLower(strings.TrimPrefix(key, prefix)),
+		"_",
+		delimiter,
+	)
 }

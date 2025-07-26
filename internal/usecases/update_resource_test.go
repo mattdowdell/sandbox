@@ -1,11 +1,11 @@
 package usecases_test
 
 import (
-	"log/slog"
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
+	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/domain"
@@ -27,14 +27,14 @@ func Test_NewUpdateResource(t *testing.T) {
 
 func Test_UpdateResource_Success(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 	now := time.Now().UTC().Round(time.Second)
 
 	clock := mockrepositories.NewClock(t)
 	clock.EXPECT().Now().Return(now).Once()
 
 	usecase := usecases.NewUpdateResource(clock)
-	logger := slog.New(slog.DiscardHandler)
+	logger := slogt.New(t)
 
 	expected := &entities.Resource{
 		ID:        id,
@@ -80,14 +80,14 @@ func Test_UpdateResource_Error(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// arrange
-			id := uuid.New()
+			id := uuid.Must(uuid.NewV7())
 			now := time.Now().UTC().Round(time.Second)
 
 			clock := mockrepositories.NewClock(t)
 			clock.EXPECT().Now().Return(now).Once()
 
 			usecase := usecases.NewUpdateResource(clock)
-			logger := slog.New(slog.DiscardHandler)
+			logger := slogt.New(t)
 
 			expected := &entities.Resource{
 				ID:        id,

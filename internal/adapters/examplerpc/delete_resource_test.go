@@ -4,7 +4,8 @@ import (
 	"testing"
 
 	"connectrpc.com/connect"
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
+	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
@@ -12,16 +13,18 @@ import (
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
 	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/mocks/adapters/mockexamplerpc"
+	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
 func Test_Handler_DeleteResource_Success(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
+	id := uuid.Must(uuid.NewV7())
 
 	facade := mockexamplerpc.NewResourceFacade(t)
 	facade.
 		EXPECT().
-		Delete(t.Context(), mock.AnythingOfType("*slog.Logger"), id).
+		Delete(ctx, mock.AnythingOfType("*slog.Logger"), id).
 		Return(nil).
 		Once()
 
@@ -35,7 +38,7 @@ func Test_Handler_DeleteResource_Success(t *testing.T) {
 	})
 
 	// act
-	resp, err := handler.DeleteResource(t.Context(), req)
+	resp, err := handler.DeleteResource(ctx, req)
 
 	// assert
 	expected := connect.NewResponse(&examplev1.DeleteResourceResponse{})
@@ -46,6 +49,8 @@ func Test_Handler_DeleteResource_Success(t *testing.T) {
 
 func Test_Handler_DeleteResource_InvalidID(t *testing.T) {
 	// arrange
+	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
+
 	handler := examplerpc.New(
 		mockexamplerpc.NewResourceFacade(t),
 		mockexamplerpc.NewAuditEventFacade(t),
@@ -56,65 +61,59 @@ func Test_Handler_DeleteResource_InvalidID(t *testing.T) {
 	})
 
 	// act
-	resp, err := handler.DeleteResource(t.Context(), req)
+	resp, err := handler.DeleteResource(ctx, req)
 
 	// assert
 	assert.Nil(t, resp)
 	assert.EqualError(t, err, "internal: internal error")
 }
 
-func Test_Handler_DeleteResource_NotFound(t *testing.T) {
-	// arrange
-	id := uuid.New()
+func Test_Handler_DeleteResource_UsecaseError(t *testing.T) {
+	testCases := []struct {
+		name string
+		have error
+		want string
+	}{
+		{
+			name: "not found",
+			have: domain.ErrNotFound,
+			want: "not_found: resource does not exist",
+		},
+		{
+			name: "internal",
+			have: domain.ErrInternal,
+			want: "internal: internal error",
+		},
+	}
 
-	facade := mockexamplerpc.NewResourceFacade(t)
-	facade.
-		EXPECT().
-		Delete(t.Context(), mock.AnythingOfType("*slog.Logger"), id).
-		Return(domain.ErrNotFound).
-		Once()
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// arrange
+			ctx := slogx.IntoContext(t.Context(), slogt.New(t))
+			id := uuid.Must(uuid.NewV7())
 
-	handler := examplerpc.New(
-		facade,
-		mockexamplerpc.NewAuditEventFacade(t),
-	)
+			facade := mockexamplerpc.NewResourceFacade(t)
+			facade.
+				EXPECT().
+				Delete(ctx, mock.AnythingOfType("*slog.Logger"), id).
+				Return(tc.have).
+				Once()
 
-	req := connect.NewRequest(&examplev1.DeleteResourceRequest{
-		Id: id.String(),
-	})
+			handler := examplerpc.New(
+				facade,
+				mockexamplerpc.NewAuditEventFacade(t),
+			)
 
-	// act
-	resp, err := handler.DeleteResource(t.Context(), req)
+			req := connect.NewRequest(&examplev1.DeleteResourceRequest{
+				Id: id.String(),
+			})
 
-	// assert
-	assert.Nil(t, resp)
-	assert.EqualError(t, err, "not_found: resource does not exist")
-}
+			// act
+			resp, err := handler.DeleteResource(ctx, req)
 
-func Test_Handler_DeleteResource_Internal(t *testing.T) {
-	// arrange
-	id := uuid.New()
-
-	facade := mockexamplerpc.NewResourceFacade(t)
-	facade.
-		EXPECT().
-		Delete(t.Context(), mock.AnythingOfType("*slog.Logger"), id).
-		Return(domain.ErrInternal).
-		Once()
-
-	handler := examplerpc.New(
-		facade,
-		mockexamplerpc.NewAuditEventFacade(t),
-	)
-
-	req := connect.NewRequest(&examplev1.DeleteResourceRequest{
-		Id: id.String(),
-	})
-
-	// act
-	resp, err := handler.DeleteResource(t.Context(), req)
-
-	// assert
-	assert.Nil(t, resp)
-	assert.EqualError(t, err, "internal: internal error")
+			// assert
+			assert.Nil(t, resp)
+			assert.EqualError(t, err, tc.want)
+		})
+	}
 }

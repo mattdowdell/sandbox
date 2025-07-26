@@ -10,7 +10,7 @@ runs:
         go-version-file: "go.mod"
 
     - name: Install Buf
-      uses: bufbuild/buf-action@5150a1eef5c10b6a5cf8a69fc872f24a09473195 # v1.1.1
+      uses: bufbuild/buf-action@c231a1aa9281e5db706c970f468f0744a37561fd # v1.2.0
       with:
         setup_only: true
 

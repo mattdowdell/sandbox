@@ -5,6 +5,8 @@ import (
 	"log/slog"
 
 	"go.opentelemetry.io/otel/trace"
+
+	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
 // ExtractOption implementations modify the behaviour of Extractor.Extract.
@@ -32,22 +34,21 @@ func NewExtractor(options ...ExtractOption) *Extractor {
 // Extract extracts span metadata from the given context to create log attributes.
 func (e *Extractor) Extract(ctx context.Context) []slog.Attr {
 	span := trace.SpanFromContext(ctx)
-	spanCtx := span.SpanContext()
 
-	if !spanCtx.IsValid() {
+	if !span.SpanContext().IsValid() {
 		return nil
 	}
 
 	attrs := []slog.Attr{
-		slog.String("trace_id", spanCtx.TraceID().String()),
+		slogx.TraceID(span),
 	}
 
 	if e.withSpanID {
-		attrs = append(attrs, slog.String("span_id", spanCtx.TraceID().String()))
+		attrs = append(attrs, slogx.SpanID(span))
 	}
 
 	if e.withSampled {
-		attrs = append(attrs, slog.Bool("sampled", spanCtx.IsSampled()))
+		attrs = append(attrs, slogx.Sampled(span))
 	}
 
 	return attrs

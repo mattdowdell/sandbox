@@ -1,5 +1,7 @@
 -- TODO: document
 
+-- +goose Up
+
 -- For storing resource data.
 CREATE TABLE resources (
 	id UUID PRIMARY KEY,

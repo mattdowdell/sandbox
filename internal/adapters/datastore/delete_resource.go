@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	"github.com/go-jet/jet/v2/postgres"
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 
-	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/postgres/public/table"
+	"github.com/mattdowdell/sandbox/internal/adapters/datastore/schema/table"
 	"github.com/mattdowdell/sandbox/internal/domain"
 )
 
@@ -19,7 +19,7 @@ func (d *Datastore) DeleteResource(ctx context.Context, id uuid.UUID) error {
 
 	result, err := stmt.ExecContext(ctx, d.db)
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: %w", domain.ErrInternal, err)
 	}
 
 	count, err := result.RowsAffected()
