@@ -1,37 +1,35 @@
 ---
 # https://vektra.github.io/mockery/latest/configuration/
 
-dir: 'mocks/{{ trimPrefix .PackagePath "github.com/mattdowdell/sandbox/internal/" | dir }}/mock{{ .PackagePath | base }}'
-disable-version-string: true
-filename: "{{ .InterfaceName | snakecase }}.go"
-issue-845-fix: true
-mockname: "{{ .InterfaceName }}"
-outpkg: "mock{{ .PackageName }}"
-resolve-type-alias: false
-with-expecter: true
+dir: 'mocks/{{ trimPrefix "github.com/mattdowdell/sandbox/internal/" .SrcPackagePath | dir }}/mock{{ .SrcPackagePath | base }}'
+filename: "mocks.go"
+structname: "{{ .InterfaceName }}"
+pkgname: "mock{{ .SrcPackageName }}"
+template: "testify"
+template-data:
+  unroll-variadic: true
 
 packages:
-  github.com/mattdowdell/sandbox/internal/adapters/common:
+  github.com/mattdowdell/sandbox/internal/adapters/examplerpc:
     config:
       all: true
-  github.com/mattdowdell/sandbox/internal/adapters/examplerpc:
+  github.com/mattdowdell/sandbox/internal/adapters/txn:
     config:
       all: true
   github.com/mattdowdell/sandbox/internal/adapters/usecasefacades:
     config:
       all: true
-  github.com/mattdowdell/sandbox/internal/drivers/rpcserver:
-    config:
-      include-regex: "^.+$"
-      exclude-regex: "^RecovererOption$"
   github.com/mattdowdell/sandbox/internal/domain/repositories:
     config:
       all: true
+  github.com/mattdowdell/sandbox/internal/drivers/rpcserver:
+    config:
+      exclude-interface-regex: "^RecovererOption$"
+      include-interface-regex: "^.+$"
+  # external dependencies
   connectrpc.com/connect:
     config:
-      dir: 'mocks/external/{{ dir .PackagePath }}/mock{{ .PackagePath | base }}'
+      dir: "mocks/external/{{ dir .SrcPackagePath }}/mock{{ .SrcPackagePath | base }}"
     interfaces:
-      AnyRequest:
-      StreamingHandlerConn:
-      StreamingHandlerFunc:
-      UnaryFunc:
+      AnyRequest: {}
+      StreamingHandlerConn: {}

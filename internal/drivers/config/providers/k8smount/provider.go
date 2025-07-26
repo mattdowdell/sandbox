@@ -3,7 +3,6 @@ package k8smount
 import (
 	"errors"
 	"fmt"
-	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -37,7 +36,7 @@ type K8SMount struct {
 //
 // The given path should be the mount point of the configmap or secret. The delimiter is used to
 // create a hierarchy of keys based on the mounted filename. For example, a configmap mounted at
-// "/my/config/" with a key of "log.level" set to "INFO" would result in {"log":{"level":"INFO"}}
+// "/mnt/config/" with a key of "log.level" set to "INFO" would result in {"log":{"level":"INFO"}}
 // being read as configuration.
 func Provider(mount, delim string) *K8SMount {
 	return &K8SMount{
@@ -53,15 +52,21 @@ func (*K8SMount) ReadBytes() ([]byte, error) {
 
 // Read collects the contents of all files under the mount point and returns them as a map.
 func (k *K8SMount) Read() (map[string]any, error) {
-	values := map[string]any{}
-	dirFs := os.DirFS(k.mount)
+	root, err := os.OpenRoot(k.mount)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open mount: %w", err)
+	}
 
-	if err := fs.WalkDir(dirFs, ".", func(path string, d fs.DirEntry, err error) error {
+	data := map[string]any{}
+	mountFS := root.FS()
+
+	if err := fs.WalkDir(mountFS, ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
 
-		// skip sub-directories as k8s resources can't use path separators in keys
+		// skip sub-directories as path separators are invalid in keys
+		// FIXME: data can be mounted at paths depending on how the pod volume is configured
 		if d.IsDir() {
 			if path == "." {
 				return nil
@@ -70,26 +75,26 @@ func (k *K8SMount) Read() (map[string]any, error) {
 			return fs.SkipDir
 		}
 
-		file, err := dirFs.Open(path)
-		if err != nil {
-			return err
+		// paths with a ".." prefix are reserved for the actual data files to be stored under
+		// instead of reading those, use symlinks in the root of the mount instead
+		if strings.HasPrefix(path, "..") {
+			return nil
 		}
-		defer file.Close()
 
-		content, err := io.ReadAll(file)
+		content, err := fs.ReadFile(mountFS, path)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to read file: %w", err)
 		}
 
 		key := strings.TrimPrefix(path, k.mount)
-		values[key] = string(content)
+		data[key] = string(content)
 
 		return nil
 	}); err != nil {
 		return nil, fmt.Errorf("failed to read configuration from mount: %q: %w", k.mount, err)
 	}
 
-	return maps.Unflatten(values, k.delim), nil
+	return maps.Unflatten(data, k.delim), nil
 }
 
 // Watch starts a watcher in a goroutine for the files under the mount point and calls the given
@@ -140,8 +145,6 @@ func (k *K8SMount) watchDir(fn func(err error)) {
 
 			lastEvent = event.String()
 			lastEventTime = time.Now()
-
-			fmt.Println(event.String())
 
 			// mounts are only meant to be updated for the lifetime of the pod
 			if !event.Has(fsnotify.Write | fsnotify.Chmod) {

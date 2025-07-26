@@ -4,27 +4,27 @@ import (
 	"log/slog"
 	"testing"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/usecasefacades"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
-	"github.com/mattdowdell/sandbox/mocks/adapters/mockcommon"
+	"github.com/mattdowdell/sandbox/mocks/adapters/mocktxn"
 	"github.com/mattdowdell/sandbox/mocks/adapters/mockusecasefacades"
 )
 
 func Test_Resource_Create(t *testing.T) {
 	// arrange
 	logger := slog.New(slog.DiscardHandler)
-	datastore := mockcommon.NewDatastore(t)
+	datastore := mocktxn.NewDatastore(t)
 
-	commit := mockcommon.NewCommitFn(t)
+	commit := NewCommitFn(t)
 	commit.EXPECT().Execute().Return(nil).Once()
 
-	rollback := mockcommon.NewRollbackFn(t)
+	rollback := NewRollbackFn(t)
 	rollback.EXPECT().Execute().Return(nil).Once()
 
-	provider := mockcommon.NewProvider(t)
+	provider := mocktxn.NewProvider(t)
 	provider.
 		EXPECT().
 		BeginTx(t.Context()).
@@ -57,12 +57,12 @@ func Test_Resource_Create(t *testing.T) {
 
 func Test_Resource_Get(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 
 	logger := slog.New(slog.DiscardHandler)
-	datastore := mockcommon.NewDatastore(t)
+	datastore := mocktxn.NewDatastore(t)
 
-	provider := mockcommon.NewProvider(t)
+	provider := mocktxn.NewProvider(t)
 	provider.EXPECT().Datastore().Return(datastore).Once()
 
 	usecase := mockusecasefacades.NewResourceGetter(t)
@@ -92,9 +92,9 @@ func Test_Resource_Get(t *testing.T) {
 func Test_Resource_List(t *testing.T) {
 	// arrange
 	logger := slog.New(slog.DiscardHandler)
-	datastore := mockcommon.NewDatastore(t)
+	datastore := mocktxn.NewDatastore(t)
 
-	provider := mockcommon.NewProvider(t)
+	provider := mocktxn.NewProvider(t)
 	provider.EXPECT().Datastore().Return(datastore).Once()
 
 	usecase := mockusecasefacades.NewResourceLister(t)
@@ -124,15 +124,15 @@ func Test_Resource_List(t *testing.T) {
 func Test_Resource_Update(t *testing.T) {
 	// arrange
 	logger := slog.New(slog.DiscardHandler)
-	datastore := mockcommon.NewDatastore(t)
+	datastore := mocktxn.NewDatastore(t)
 
-	commit := mockcommon.NewCommitFn(t)
+	commit := NewCommitFn(t)
 	commit.EXPECT().Execute().Return(nil).Once()
 
-	rollback := mockcommon.NewRollbackFn(t)
+	rollback := NewRollbackFn(t)
 	rollback.EXPECT().Execute().Return(nil).Once()
 
-	provider := mockcommon.NewProvider(t)
+	provider := mocktxn.NewProvider(t)
 	provider.
 		EXPECT().
 		BeginTx(t.Context()).
@@ -165,18 +165,18 @@ func Test_Resource_Update(t *testing.T) {
 
 func Test_Resource_Delete(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 
 	logger := slog.New(slog.DiscardHandler)
-	datastore := mockcommon.NewDatastore(t)
+	datastore := mocktxn.NewDatastore(t)
 
-	commit := mockcommon.NewCommitFn(t)
+	commit := NewCommitFn(t)
 	commit.EXPECT().Execute().Return(nil).Once()
 
-	rollback := mockcommon.NewRollbackFn(t)
+	rollback := NewRollbackFn(t)
 	rollback.EXPECT().Execute().Return(nil).Once()
 
-	provider := mockcommon.NewProvider(t)
+	provider := mocktxn.NewProvider(t)
 	provider.
 		EXPECT().
 		BeginTx(t.Context()).

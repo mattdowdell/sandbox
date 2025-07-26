@@ -4,11 +4,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/modelhelpers"
-	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/postgres/public/model"
+	"github.com/mattdowdell/sandbox/internal/adapters/datastore/schema/model"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 )
 
@@ -18,7 +18,7 @@ const (
 
 func Test_ResourcesToDomain(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 	now := time.Now()
 
 	have := []*model.Resources{
@@ -48,7 +48,7 @@ func Test_ResourcesToDomain(t *testing.T) {
 
 func Test_ResourceToDomain(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 	now := time.Now()
 
 	have := &model.Resources{
@@ -74,7 +74,7 @@ func Test_ResourceToDomain(t *testing.T) {
 
 func Test_ResourceFromDomain(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 	now := time.Now()
 
 	have := &entities.Resource{

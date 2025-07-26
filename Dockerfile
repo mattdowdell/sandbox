@@ -7,7 +7,7 @@
 # Build target
 # ------------
 
-FROM --platform=$BUILDPLATFORM mirror.gcr.io/golang:1.24-bookworm@sha256:c83619bb18b0207412fffdaf310f57ee3dd02f586ac7a5b44b9c36a29a9d5122 AS build
+FROM --platform=$BUILDPLATFORM mirror.gcr.io/golang:1.24-bookworm@sha256:ef8c5c733079ac219c77edab604c425d748c740d8699530ea6aced9de79aea40 AS build
 
 WORKDIR /go/src
 
@@ -17,7 +17,7 @@ ARG GO_BUILD_ARGS=
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=bind,target=. \
     set -eux; \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH \
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GOTOOLCHAIN=local \
     go build ${GO_BUILD_ARGS} -trimpath -ldflags="-buildid= -s -w" -o /go/bin/ ./cmd/...; \
     touch --date=@${SOURCE_DATE_EPOCH} /go/bin/*;
 
@@ -25,7 +25,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 # Runtime target
 # --------------
 
-FROM gcr.io/distroless/static-debian12:nonroot@sha256:188ddfb9e497f861177352057cb21913d840ecae6c843d39e00d44fa64daa51c AS runtime
+FROM gcr.io/distroless/static-debian12:nonroot@sha256:627d6c5a23ad24e6bdff827f16c7b60e0289029b0c79e9f7ccd54ae3279fb45f AS runtime
 
 ARG SERVICE
 COPY --from=build /go/bin/${SERVICE} /${SERVICE}

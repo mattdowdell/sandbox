@@ -95,15 +95,8 @@ fmt-buf: install-buf
 
 # Run the Go formatter.
 [group('formatters')]
-fmt-go: install-gofumpt install-gci
-    {{ gofumpt }} -l -w .
-    {{ gci }} write \
-        --skip-vendor \
-        --skip-generated \
-        -s standard \
-        -s default \
-        -s localmodule \
-        .
+fmt-go: install-golangci-lint
+    {{ golangci-lint }} fmt
 
 # Run the Justfile formatter.
 [group('formatters')]
@@ -130,15 +123,13 @@ gen-go: gen-go-jet gen-go-mockery gen-go-wire
 
 # Run the Go jet generator
 [group('generators')]
-gen-go-jet: install-jet
-    {{ jet }} \
-        -source=postgres \
+gen-go-jet:
+    go run ./cmd/example-db-generate \
         -host={{ db_host }} \
         -port={{ db_port }} \
-        -user={{ db_user }} \
+        -username={{ db_user }} \
         -password={{ db_pass }} \
-        -dbname=postgres \
-        -path ./internal/adapters/datastore/models/
+        -name=postgres
 
 # Run the Go mockery generator.
 [group('generators')]
@@ -172,8 +163,8 @@ lint-buf: install-buf
 
 # Run the Go linter.
 [group('linters')]
-lint-go:
-    golangci-lint run
+lint-go: install-golangci-lint
+    {{ golangci-lint }} run
 
 # Run all linter fixers.
 [group('linters')]
@@ -181,8 +172,8 @@ lint-fix:
 
 # Run the Go linter fixer.
 [group('linters')]
-lint-fix-go:
-    golangci-lint run --fix
+lint-fix-go: install-golangci-lint
+    {{ golangci-lint }} run --fix
 
 # Run the Go unit tests.
 [group('tests')]

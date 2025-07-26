@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -19,8 +19,8 @@ const (
 
 func Test_AuditEventsFromDomain(t *testing.T) {
 	// arrange
-	eventID := uuid.New()
-	resourceID := uuid.New()
+	eventID := uuid.Must(uuid.NewV7())
+	resourceID := uuid.Must(uuid.NewV7())
 	now := time.Now()
 
 	input := []*entities.AuditEvent{
@@ -54,8 +54,8 @@ func Test_AuditEventsFromDomain(t *testing.T) {
 
 // ...
 func Test_AuditEventFromDomain(t *testing.T) {
-	eventID := uuid.New()
-	resourceID := uuid.New()
+	eventID := uuid.Must(uuid.NewV7())
+	resourceID := uuid.Must(uuid.NewV7())
 	now := time.Now()
 
 	testCases := []struct {

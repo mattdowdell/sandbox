@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -36,7 +36,7 @@ func Test_ResourceCreateToDomain(t *testing.T) {
 
 func Test_ResourceUpdateToDomain_Success(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 
 	input := &examplev1.ResourceUpdate{
 		Id:   id.String(),
@@ -68,12 +68,16 @@ func Test_ResourceUpdateToDomain_Error(t *testing.T) {
 
 	// assert
 	assert.Nil(t, output)
-	assert.EqualError(t, err, `failed to parse id "invalid": invalid UUID length: 7`)
+	assert.EqualError(
+		t,
+		err,
+		`failed to parse id "invalid": uuid: incorrect UUID length 7 in string "invalid"`,
+	)
 }
 
 func Test_ResourcesFromDomain(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 	now := time.Now()
 
 	input := []*entities.Resource{
@@ -103,7 +107,7 @@ func Test_ResourcesFromDomain(t *testing.T) {
 
 func Test_ResourceFromDomain(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 	now := time.Now()
 
 	input := &entities.Resource{

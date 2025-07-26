@@ -63,7 +63,7 @@ func (a *App) Start(ctx context.Context, stop context.CancelFunc) {
 	}
 
 	go func() {
-		if err := a.server.Start(); err != nil {
+		if err := a.server.Start(ctx); err != nil {
 			a.logger.ErrorContext(ctx, "failed to start server", slogx.Err(err))
 		}
 

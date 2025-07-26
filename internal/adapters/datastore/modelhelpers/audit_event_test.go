@@ -4,11 +4,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore/modelhelpers"
-	"github.com/mattdowdell/sandbox/internal/adapters/datastore/models/postgres/public/model"
+	"github.com/mattdowdell/sandbox/internal/adapters/datastore/schema/model"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 )
 
@@ -18,9 +18,9 @@ const (
 
 func Test_AuditEventsToDomain(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 	now := time.Now()
-	resourceID := uuid.New()
+	resourceID := uuid.Must(uuid.NewV7())
 
 	have := []*model.AuditEvents{
 		{
@@ -53,9 +53,9 @@ func Test_AuditEventsToDomain(t *testing.T) {
 
 func Test_AuditEventToDomain(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 	now := time.Now()
-	resourceID := uuid.New()
+	resourceID := uuid.Must(uuid.NewV7())
 
 	have := &model.AuditEvents{
 		ID:           id,
@@ -84,9 +84,9 @@ func Test_AuditEventToDomain(t *testing.T) {
 
 func Test_AuditEventFromDomain(t *testing.T) {
 	// arrange
-	id := uuid.New()
+	id := uuid.Must(uuid.NewV7())
 	now := time.Now()
-	resourceID := uuid.New()
+	resourceID := uuid.Must(uuid.NewV7())
 
 	have := &entities.AuditEvent{
 		ID:           id,

@@ -79,7 +79,7 @@ func Test_Server_Start(t *testing.T) {
 
 	// act
 	go func() {
-		assert.NoError(t, server.Start())
+		assert.NoError(t, server.Start(t.Context()))
 	}()
 
 	defer func() {
