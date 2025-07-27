@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	flagCurrent  = flag.String("current", "", "TODO")
-	flagPrevious = flag.String("previous", "", "TODO")
+	flagCurrent  = flag.String("current", "", "The current coverage results file.")
+	flagPrevious = flag.String("previous", "", "The previous coverage results file, if available.")
 )
 
 func main() {
@@ -22,13 +22,13 @@ func main() {
 func run() int {
 	flag.Parse()
 
-	current, err := GatherCoverageFromFile(*flagCurrent)
+	current, err := PackageCoverageFromFile(*flagCurrent)
 	if err != nil {
 		slog.Error("failed to parse current profiles", slogx.Err(err))
 		return exit.Failure
 	}
 
-	previous, err := GatherCoverageFromFile(*flagPrevious)
+	previous, err := PackageCoverageFromFile(*flagPrevious)
 	if err != nil {
 		slog.Error("failed to parse previous profiles", slogx.Err(err))
 		return exit.Failure
@@ -43,8 +43,8 @@ func run() int {
 		fmt.Printf(
 			"| %s | %s | %s | %s |\n",
 			change.Name,
-			change.GetBefore(),
-			change.GetAfter(),
+			change.GetPrevious(),
+			change.GetCurrent(),
 			change.Diff(),
 		)
 	}
