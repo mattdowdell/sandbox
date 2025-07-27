@@ -25,6 +25,7 @@ require (
 	github.com/gofrs/uuid/v5 v5.3.2
 	github.com/google/uuid v1.6.0
 	github.com/google/wire v0.6.0
+	github.com/grafana/grafana-foundation-sdk/go v0.0.0-20250613155137-bade83b30287
 	github.com/jackc/pgerrcode v0.0.0-20240316143900-6e2875d9b438
 	github.com/jackc/pgx/v5 v5.7.5
 	github.com/knadh/koanf/maps v0.1.2
