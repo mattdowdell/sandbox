@@ -44,7 +44,7 @@ func (u *CreateResource) Execute(
 		return nil, domain.ErrInternal
 	}
 
-	resource.Init(id, u.clock.Now())
+	resource.Init(id, u.clock.UTCNow())
 
 	if err := store.CreateResource(ctx, resource); err != nil {
 		if errors.Is(err, domain.ErrAlreadyExists) {

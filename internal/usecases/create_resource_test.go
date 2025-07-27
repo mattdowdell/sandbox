@@ -37,7 +37,7 @@ func Test_CreateResource_Success(t *testing.T) {
 	id := uuid.Must(uuid.NewV7())
 
 	clock := mockrepositories.NewClock(t)
-	clock.EXPECT().Now().Return(now).Once()
+	clock.EXPECT().UTCNow().Return(now).Once()
 
 	uuidgen := mockrepositories.NewUUIDGenerator(t)
 	uuidgen.EXPECT().NewV7().Return(id, nil).Once()
@@ -112,7 +112,7 @@ func Test_CreateResource_CreateFailed(t *testing.T) {
 			id := uuid.Must(uuid.NewV7())
 
 			clock := mockrepositories.NewClock(t)
-			clock.EXPECT().Now().Return(now).Once()
+			clock.EXPECT().UTCNow().Return(now).Once()
 
 			uuidgen := mockrepositories.NewUUIDGenerator(t)
 			uuidgen.EXPECT().NewV7().Return(id, nil).Once()

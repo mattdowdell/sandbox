@@ -31,7 +31,7 @@ func Test_UpdateResource_Success(t *testing.T) {
 	now := time.Now().UTC().Round(time.Second)
 
 	clock := mockrepositories.NewClock(t)
-	clock.EXPECT().Now().Return(now).Once()
+	clock.EXPECT().UTCNow().Return(now).Once()
 
 	usecase := usecases.NewUpdateResource(clock)
 	logger := slogt.New(t)
@@ -84,7 +84,7 @@ func Test_UpdateResource_Error(t *testing.T) {
 			now := time.Now().UTC().Round(time.Second)
 
 			clock := mockrepositories.NewClock(t)
-			clock.EXPECT().Now().Return(now).Once()
+			clock.EXPECT().UTCNow().Return(now).Once()
 
 			usecase := usecases.NewUpdateResource(clock)
 			logger := slogt.New(t)
