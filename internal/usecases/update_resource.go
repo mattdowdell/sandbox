@@ -35,7 +35,7 @@ func (u *UpdateResource) Execute(
 	store repositories.Resource,
 	changes *entities.Resource,
 ) (*entities.Resource, error) {
-	changes.Update(u.clock.Now())
+	changes.Update(u.clock.UTCNow())
 
 	resource, err := store.UpdateResource(ctx, changes)
 	if err != nil {

@@ -16,12 +16,12 @@ func assertWithinRange(t *testing.T, expected, actual, delta time.Duration) {
 	assert.LessOrEqual(t, expected-delta, actual)
 }
 
-func Test_Clock_Now(t *testing.T) {
+func Test_Clock_UTCNow(t *testing.T) {
 	// arrange
 	c := clock.New()
 
 	// act
-	now := c.Now()
+	now := c.UTCNow()
 
 	// assert
 	assert.WithinDuration(t, time.Now(), now, time.Second)
@@ -30,6 +30,17 @@ func Test_Clock_Now(t *testing.T) {
 
 	assert.Equal(t, "UTC", zone)
 	assert.Equal(t, 0, offset)
+}
+
+func Test_Clock_LocalNow(t *testing.T) {
+	// arrange
+	c := clock.New()
+
+	// act
+	now := c.LocalNow()
+
+	// assert
+	assert.WithinDuration(t, time.Now(), now, time.Second)
 }
 
 func Test_Clock_Since(t *testing.T) {

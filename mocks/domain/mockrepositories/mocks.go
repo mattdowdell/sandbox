@@ -243,12 +243,12 @@ func (_m *Clock) EXPECT() *Clock_Expecter {
 	return &Clock_Expecter{mock: &_m.Mock}
 }
 
-// Now provides a mock function for the type Clock
-func (_mock *Clock) Now() time.Time {
+// LocalNow provides a mock function for the type Clock
+func (_mock *Clock) LocalNow() time.Time {
 	ret := _mock.Called()
 
 	if len(ret) == 0 {
-		panic("no return value specified for Now")
+		panic("no return value specified for LocalNow")
 	}
 
 	var r0 time.Time
@@ -260,29 +260,29 @@ func (_mock *Clock) Now() time.Time {
 	return r0
 }
 
-// Clock_Now_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Now'
-type Clock_Now_Call struct {
+// Clock_LocalNow_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'LocalNow'
+type Clock_LocalNow_Call struct {
 	*mock.Call
 }
 
-// Now is a helper method to define mock.On call
-func (_e *Clock_Expecter) Now() *Clock_Now_Call {
-	return &Clock_Now_Call{Call: _e.mock.On("Now")}
+// LocalNow is a helper method to define mock.On call
+func (_e *Clock_Expecter) LocalNow() *Clock_LocalNow_Call {
+	return &Clock_LocalNow_Call{Call: _e.mock.On("LocalNow")}
 }
 
-func (_c *Clock_Now_Call) Run(run func()) *Clock_Now_Call {
+func (_c *Clock_LocalNow_Call) Run(run func()) *Clock_LocalNow_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run()
 	})
 	return _c
 }
 
-func (_c *Clock_Now_Call) Return(time1 time.Time) *Clock_Now_Call {
+func (_c *Clock_LocalNow_Call) Return(time1 time.Time) *Clock_LocalNow_Call {
 	_c.Call.Return(time1)
 	return _c
 }
 
-func (_c *Clock_Now_Call) RunAndReturn(run func() time.Time) *Clock_Now_Call {
+func (_c *Clock_LocalNow_Call) RunAndReturn(run func() time.Time) *Clock_LocalNow_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -334,6 +334,50 @@ func (_c *Clock_Since_Call) Return(duration time.Duration) *Clock_Since_Call {
 }
 
 func (_c *Clock_Since_Call) RunAndReturn(run func(t time.Time) time.Duration) *Clock_Since_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UTCNow provides a mock function for the type Clock
+func (_mock *Clock) UTCNow() time.Time {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for UTCNow")
+	}
+
+	var r0 time.Time
+	if returnFunc, ok := ret.Get(0).(func() time.Time); ok {
+		r0 = returnFunc()
+	} else {
+		r0 = ret.Get(0).(time.Time)
+	}
+	return r0
+}
+
+// Clock_UTCNow_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UTCNow'
+type Clock_UTCNow_Call struct {
+	*mock.Call
+}
+
+// UTCNow is a helper method to define mock.On call
+func (_e *Clock_Expecter) UTCNow() *Clock_UTCNow_Call {
+	return &Clock_UTCNow_Call{Call: _e.mock.On("UTCNow")}
+}
+
+func (_c *Clock_UTCNow_Call) Run(run func()) *Clock_UTCNow_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *Clock_UTCNow_Call) Return(time1 time.Time) *Clock_UTCNow_Call {
+	_c.Call.Return(time1)
+	return _c
+}
+
+func (_c *Clock_UTCNow_Call) RunAndReturn(run func() time.Time) *Clock_UTCNow_Call {
 	_c.Call.Return(run)
 	return _c
 }
