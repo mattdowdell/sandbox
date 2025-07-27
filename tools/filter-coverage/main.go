@@ -15,11 +15,9 @@ import (
 	"time"
 
 	"golang.org/x/mod/modfile"
-)
 
-const (
-	exitSuccess = iota
-	exitFailure
+	"github.com/mattdowdell/sandbox/internal/drivers/exit"
+	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
 var (
@@ -35,21 +33,7 @@ func main() {
 }
 
 func run() int {
-	logger := slog.New(slog.NewTextHandler(flag.CommandLine.Output(), &slog.HandlerOptions{
-		Level: &level,
-		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
-			if len(groups) > 0 {
-				return a
-			}
-
-			if a.Key == slog.TimeKey && a.Value.Kind() == slog.KindTime {
-				return slog.String(slog.TimeKey, a.Value.Time().Format(time.Kitchen))
-			}
-
-			return a
-		},
-	}))
-	slog.SetDefault(logger)
+	setupDefaultLogger()
 
 	flag.Usage = func() {
 		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s <coverprofile>\n", filepath.Base(os.Args[0]))
@@ -64,41 +48,60 @@ func run() int {
 
 	if flag.NArg() < 1 {
 		slog.Error("missing argument")
-		return exitFailure
+		return exit.Failure
 	}
 
 	profile, err := os.Open(flag.Arg(0))
 	if err != nil {
-		slog.Error("failed to open coverprofile", slog.Any("err", err))
-		return exitFailure
+		slog.Error("failed to open coverprofile", slogx.Err(err))
+		return exit.Failure
 	}
 	defer profile.Close()
 
 	prefix, err := extractModulePrefix(*modfilePath)
 	if err != nil {
-		slog.Error("failed to extract module path", slog.Any("err", err))
-		return exitFailure
+		slog.Error("failed to extract module path", slogx.Err(err))
+		return exit.Failure
 	}
 
 	filtered, err := filterFile(profile, prefix)
 	if err != nil {
-		slog.Error("failed to filter file", slog.Any("err", err))
-		return exitFailure
+		slog.Error("failed to filter file", slogx.Err(err))
+		return exit.Failure
 	}
 
 	out, err := os.OpenFile(*output, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o644)
 	if err != nil {
-		slog.Error("failed to open output file", slog.Any("err", err))
-		return exitFailure
+		slog.Error("failed to open output file", slogx.Err(err))
+		return exit.Failure
 	}
 	defer out.Close()
 
 	if _, err := out.WriteString(filtered); err != nil {
-		slog.Error("failed to write to output file", slog.Any("err", err))
-		return exitFailure
+		slog.Error("failed to write to output file", slogx.Err(err))
+		return exit.Failure
 	}
 
-	return exitSuccess
+	return exit.Success
+}
+
+func setupDefaultLogger() {
+	logger := slog.New(slog.NewTextHandler(flag.CommandLine.Output(), &slog.HandlerOptions{
+		Level: &level,
+		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+			if len(groups) > 0 {
+				return a
+			}
+
+			if a.Key == slog.TimeKey && a.Value.Kind() == slog.KindTime {
+				return slog.String(slog.TimeKey, a.Value.Time().Format(time.Kitchen))
+			}
+
+			return a
+		},
+	}))
+
+	slog.SetDefault(logger)
 }
 
 func filterFile(profile *os.File, modPath string) (string, error) {

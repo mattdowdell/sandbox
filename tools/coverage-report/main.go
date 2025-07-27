@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"time"
 
 	"github.com/mattdowdell/sandbox/internal/drivers/exit"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
@@ -20,6 +21,8 @@ func main() {
 }
 
 func run() int {
+	setupDefaultLogger()
+
 	flag.Parse()
 
 	current, err := PackageCoverageFromFile(*flagCurrent)
@@ -50,4 +53,23 @@ func run() int {
 	}
 
 	return exit.Success
+}
+
+func setupDefaultLogger() {
+	logger := slog.New(slog.NewTextHandler(flag.CommandLine.Output(), &slog.HandlerOptions{
+		Level: slog.LevelInfo,
+		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+			if len(groups) > 0 {
+				return a
+			}
+
+			if a.Key == slog.TimeKey && a.Value.Kind() == slog.KindTime {
+				return slog.String(slog.TimeKey, a.Value.Time().Format(time.Kitchen))
+			}
+
+			return a
+		},
+	}))
+
+	slog.SetDefault(logger)
 }
