@@ -2,7 +2,8 @@
 
 # generated files
 *.sum                              linguist-generated
-buf.lock                           linguist-generated
+*.lock                             linguist-generated
+*.lock.json                        linguist-generated
 wire_gen.go                        linguist-generated
 gen/example/**                     linguist-generated
 mocks/**                           linguist-generated

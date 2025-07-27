@@ -20,6 +20,6 @@ indent_size = 4
 [*.{go}]
 indent_style = tab
 
-[*.{yml,yaml,js,feature}]
+[*.{yml,yaml,js,feature,libsonnet,jsonnet}]
 indent_style = space
 indent_size = 2
