@@ -35,6 +35,18 @@ $(GOLANGCI_LINT): $(BINGO_DIR)/golangci-lint.mod
 	@echo "(re)installing $(GOBIN)/golangci-lint-v2.3.0"
 	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=golangci-lint.mod -o=$(GOBIN)/golangci-lint-v2.3.0 "github.com/golangci/golangci-lint/v2/cmd/golangci-lint"
 
+JB := $(GOBIN)/jb-v0.6.0
+$(JB): $(BINGO_DIR)/jb.mod
+	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
+	@echo "(re)installing $(GOBIN)/jb-v0.6.0"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=jb.mod -o=$(GOBIN)/jb-v0.6.0 "github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb"
+
+JSONNET := $(GOBIN)/jsonnet-v0.21.0
+$(JSONNET): $(BINGO_DIR)/jsonnet.mod
+	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
+	@echo "(re)installing $(GOBIN)/jsonnet-v0.21.0"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=jsonnet.mod -o=$(GOBIN)/jsonnet-v0.21.0 "github.com/google/go-jsonnet/cmd/jsonnet"
+
 MOCKERY := $(GOBIN)/mockery-v3.5.1
 $(MOCKERY): $(BINGO_DIR)/mockery.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.

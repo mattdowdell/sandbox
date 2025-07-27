@@ -20,6 +20,18 @@ golangci-lint := join(gopath, "bin", "golangci-lint-v2.3.0")
 install-golangci-lint:
     {{ if path_exists(golangci-lint) == "true" { "" } else { "bingo get golangci-lint" } }}
 
+jb := join(gopath, "bin", "jb-v0.6.0")
+
+[private]
+install-jb:
+    {{ if path_exists(jb) == "true" { "" } else { "bingo get jb" } }}
+
+jsonnet := join(gopath, "bin", "jsonnet-v0.21.0")
+
+[private]
+install-jsonnet:
+    {{ if path_exists(jsonnet) == "true" { "" } else { "bingo get jsonnet" } }}
+
 mockery := join(gopath, "bin", "mockery-v3.5.1")
 
 [private]

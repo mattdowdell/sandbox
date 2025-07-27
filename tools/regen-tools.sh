@@ -13,10 +13,10 @@ for tool in $tools
 do
 	if [[ "$tool" == protoc-gen-* ]]
 	then
-		filename=`bingo list | grep "\b$tool\b" | awk '{print $1}'`
+		filename=`bingo list | awk '{print $1 " " $2}' | grep "\b${tool}\b" | awk '{print $1}'`
 		echo "${tool} := join(gopath, \"bin\", \"$filename\")"
 	else
-		filename=`bingo list | grep "\b$tool\b" | awk '{print $2}'`
+		filename=`bingo list | awk '{print $1 " " $2 }' | grep "\b${tool}\b" | awk '{print $2}'`
 		echo "${tool} := join(gopath, \"bin\", \"$filename\")"
 	fi
 

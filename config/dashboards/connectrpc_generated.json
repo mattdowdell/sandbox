@@ -1,0 +1,162 @@
+{
+   "panels": [
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0
+         },
+         "id": 1,
+         "title": "Latency",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "description": "The P99 latency for success responses across the current time range.",
+         "gridPos": {
+            "h": "3",
+            "w": "4"
+         },
+         "id": 2,
+         "pluginVersion": "v11.4.0",
+         "title": "P99 Average (Success)",
+         "type": "stat"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "description": "The P99 latency for error responses across the current time range.",
+         "gridPos": {
+            "h": "3",
+            "w": "4"
+         },
+         "id": 3,
+         "pluginVersion": "v11.4.0",
+         "title": "P99 Average (Error)",
+         "type": "stat"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "description": "The P90 latency for success responses across the current time range.",
+         "gridPos": {
+            "h": "3",
+            "w": "4"
+         },
+         "id": 4,
+         "pluginVersion": "v11.4.0",
+         "title": "P90 Average (Success)",
+         "type": "stat"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "description": "The P90 latency for error responses across the current time range.",
+         "gridPos": {
+            "h": "3",
+            "w": "4"
+         },
+         "id": 5,
+         "pluginVersion": "v11.4.0",
+         "title": "P90 Average (Error)",
+         "type": "stat"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "description": "The P50 latency for success responses across the current time range.",
+         "gridPos": {
+            "h": "3",
+            "w": "4"
+         },
+         "id": 6,
+         "pluginVersion": "v11.4.0",
+         "title": "P50 Average (Success)",
+         "type": "stat"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "description": "The P50 latency for error responses across the current time range.",
+         "gridPos": {
+            "h": "3",
+            "w": "4"
+         },
+         "id": 7,
+         "pluginVersion": "v11.4.0",
+         "title": "P50 Average (Error)",
+         "type": "stat"
+      }
+   ],
+   "refresh": "1m",
+   "schemaVersion": 39,
+   "templating": {
+      "list": [
+         {
+            "current": {
+               "selected": false,
+               "text": "All",
+               "value": "$__all"
+            },
+            "description": "Filter panels by service name.",
+            "includeAll": true,
+            "label": "Service Name",
+            "name": "service_name",
+            "query": "label_values(rpc.server.duration_bucket{rpc.system=\"connect_rpc\"}, service.name)",
+            "refresh": 2,
+            "sort": 1,
+            "type": "query"
+         },
+         {
+            "current": {
+               "selected": false,
+               "text": "All",
+               "value": "$__all"
+            },
+            "description": "Filter panels by RPC service.",
+            "includeAll": true,
+            "label": "RPC Service",
+            "name": "rpc_service",
+            "query": "label_values(rpc.server.duration_bucket{rpc.system=\"connect_rpc\",service.name=~\"$service_name\"}, rpc.service)",
+            "refresh": 2,
+            "sort": 1,
+            "type": "query"
+         },
+         {
+            "current": {
+               "selected": false,
+               "text": "All",
+               "value": "$__all"
+            },
+            "description": "Filter panels by RPC method.",
+            "includeAll": true,
+            "label": "RPC Method",
+            "name": "rpc_method",
+            "query": "label_values(rpc.server.duration_bucket{rpc.system=\"connect_rpc\",service.name=~\"$service_name\",rpc.service=~\"$rpc_service\"}, rpc.method)",
+            "refresh": 2,
+            "sort": 1,
+            "type": "query"
+         }
+      ]
+   },
+   "time": {
+      "from": "now-1h",
+      "to": "now"
+   },
+   "timezone": "browser",
+   "title": "ConnectRPC (generated)"
+}
