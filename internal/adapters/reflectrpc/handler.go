@@ -7,6 +7,7 @@ import (
 	"connectrpc.com/grpchealth"
 	"connectrpc.com/grpcreflect"
 
+	"github.com/mattdowdell/sandbox/gen/authn/v1/authnv1connect"
 	"github.com/mattdowdell/sandbox/gen/example/v1/examplev1connect"
 )
 
@@ -21,6 +22,7 @@ func New() *Handler {
 // Register adds the handler to the given multiplexer.
 func (*Handler) Register(mux *http.ServeMux, opts []connect.HandlerOption) {
 	reflector := grpcreflect.NewStaticReflector(
+		authnv1connect.AuthnServiceName,
 		examplev1connect.ExampleServiceName,
 		grpchealth.HealthV1ServiceName,
 	)

@@ -8,6 +8,7 @@ import (
 	"connectrpc.com/validate"
 	"go.opentelemetry.io/contrib/processors/baggagecopy"
 
+	"github.com/mattdowdell/sandbox/internal/adapters/authnrpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/healthrpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/reflectrpc"
@@ -39,14 +40,16 @@ func loggerOptions() []logging.Option {
 //
 // [google/wire#207]: https://github.com/google/wire/issues/207.
 func collectHandlers(
-	example *examplerpc.Handler,
-	reflect *reflectrpc.Handler,
-	health *healthrpc.Handler,
+	authnHandler *authnrpc.Handler,
+	exampleHandler *examplerpc.Handler,
+	reflectHandler *reflectrpc.Handler,
+	healthHandler *healthrpc.Handler,
 ) []rpcserver.Handler {
 	return []rpcserver.Handler{
-		example,
-		reflect,
-		health,
+		authnHandler,
+		exampleHandler,
+		reflectHandler,
+		healthHandler,
 	}
 }
 

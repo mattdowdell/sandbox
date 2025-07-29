@@ -9,6 +9,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/google/wire"
 
+	"github.com/mattdowdell/sandbox/internal/adapters/authnrpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/healthrpc"
@@ -93,6 +94,7 @@ func ProvideApp(ctx context.Context) (*App, error) {
 		rpcserver.NewRecoverer,
 		collectHandlerOptions,
 		// handlers
+		authnrpc.New,
 		examplerpc.New,
 		reflectrpc.New,
 		healthrpc.New,

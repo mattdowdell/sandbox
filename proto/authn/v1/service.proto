@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package authn.v1;
+
+import "authn/v1/messages.proto";
+
+option go_package = "github.com/mattdowdell/sandbox/gen/authn/v1;authnv1";
+
+// ...
+service AuthnService {
+  // ...
+  rpc Login(LoginRequest) returns (LoginResponse) {}
+
+  // ...
+  rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse) {}
+}

@@ -23,6 +23,7 @@ require (
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/go-jet/jet/v2 v2.13.0
 	github.com/gofrs/uuid/v5 v5.3.2
+	github.com/golang-jwt/jwt/v5 v5.2.3
 	github.com/google/uuid v1.6.0
 	github.com/google/wire v0.6.0
 	github.com/jackc/pgerrcode v0.0.0-20240316143900-6e2875d9b438
