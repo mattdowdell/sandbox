@@ -46,8 +46,7 @@ runs:
         image-ref: ${{ inputs.repository }}:${{ inputs.version }}
         scan-type: image
         trivy-config: trivy.yaml
-        format: template
-        template: "@/contrib/sarif.tpl"
+        format: sarif
         output: trivy-results.sarif
 
     - name: Upload Trivy scan results

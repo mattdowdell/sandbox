@@ -188,8 +188,7 @@ jobs:
           scan-type: fs
           trivy-config: trivy.yaml
           version: v${{ steps.trivy-version.outputs.tag }}
-          format: template
-          template: "@/contrib/sarif.tpl"
+          format: sarif
           output: trivy-results.sarif
 
       - name: Upload Trivy scan results
