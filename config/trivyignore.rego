@@ -25,6 +25,11 @@ ignore {
     input.Name == "public-domain"
 }
 
+ignore {
+    input.PkgName = "media-types"
+    input.Name = "ad-hoc"
+}
+
 # ---------------------------------
 # Copyleft licensed Go dependencies
 # ---------------------------------
