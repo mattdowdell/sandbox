@@ -18,6 +18,7 @@ import (
 	"github.com/mattdowdell/sandbox/internal/drivers/clock"
 	"github.com/mattdowdell/sandbox/internal/drivers/config"
 	"github.com/mattdowdell/sandbox/internal/drivers/config/flagoptions"
+	"github.com/mattdowdell/sandbox/internal/drivers/jwtx"
 	"github.com/mattdowdell/sandbox/internal/drivers/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
 	"github.com/mattdowdell/sandbox/internal/drivers/pgsql"
@@ -42,15 +43,19 @@ func ProvideApp(ctx context.Context) (*App, error) {
 	v := loggerOptions()
 	logger := logging.NewAsDefaultFromConfig(loggingConfig, v...)
 	rpcserverConfig := mainConfig.RPCServer
-	handler := authnrpc.New()
+	clockClock := clock.New()
+	gen := uuid.NewGen()
+	issuerConfig := mainConfig.Issuer
+	issuer := jwtx.NewIssuerFromConfig(clockClock, gen, issuerConfig)
+	parserConfig := mainConfig.Parser
+	parser := jwtx.NewParserFromConfig(parserConfig)
+	handler := authnrpc.New(issuer, parser)
 	pgsqlConfig := mainConfig.Database
 	db, err := pgsql.NewFromConfig(ctx, pgsqlConfig)
 	if err != nil {
 		return nil, err
 	}
 	provider := datastore.NewProvider(db)
-	clockClock := clock.New()
-	gen := uuid.NewGen()
 	createResource := usecases.NewCreateResource(clockClock, gen)
 	getResource := usecases.NewGetResource()
 	listResources := usecases.NewListResources()

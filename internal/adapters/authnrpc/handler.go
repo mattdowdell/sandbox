@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"connectrpc.com/connect"
+	"github.com/golang-jwt/jwt/v5"
 
 	"github.com/mattdowdell/sandbox/gen/authn/v1/authnv1connect"
 )
@@ -11,25 +12,28 @@ import (
 // Non-allocating compile-time check for interface implementation.
 var _ authnv1connect.AuthnServiceHandler = (*Handler)(nil)
 
-// ...
+// Parser is used to parse a JWT.
 type Parser interface {
-	Parse(string) error
+	Parse(string) (jwt.Claims, error)
 }
 
-// ...
+// Issuer is used to issue JWTs.
 type Issuer interface {
-	Issue(string) (string, error)
+	Issue(string, uint32) (string, error)
 }
 
 // Handler implements the AuthnService RPC.
 type Handler struct {
-	parser Parser
 	issuer Issuer
+	parser Parser
 }
 
 // New creates a new Handler.
-func New() *Handler {
-	return &Handler{}
+func New(issuer Issuer, parser Parser) *Handler {
+	return &Handler{
+		issuer: issuer,
+		parser: parser,
+	}
 }
 
 // Register adds the handler to the given multiplexer.

@@ -8,6 +8,7 @@ import (
 	"connectrpc.com/validate"
 	"go.opentelemetry.io/contrib/processors/baggagecopy"
 
+	"github.com/mattdowdell/sandbox/gen/authn/v1/authnv1connect"
 	"github.com/mattdowdell/sandbox/internal/adapters/authnrpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/healthrpc"
@@ -110,6 +111,7 @@ func authnOptions() []authn.Option {
 			grpchealth.HealthV1ServiceName,
 			grpcreflect.ReflectV1ServiceName,
 			grpcreflect.ReflectV1AlphaServiceName,
+			authnv1connect.AuthnServiceName,
 		),
 	}
 }

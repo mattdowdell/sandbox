@@ -8,10 +8,10 @@ option go_package = "github.com/mattdowdell/sandbox/gen/authn/v1;authnv1";
 
 // ...
 message LoginRequest {
-  // ...
+  // The identity to login with.
   string id = 1 [(buf.validate.field).required = true];
 
-  // ...
+  // The secret for the given identity.
   string secret = 2 [(buf.validate.field).required = true];
 }
 
@@ -29,11 +29,12 @@ message LoginResponse {
 
 // ...
 message AuthenticateRequest {
-  // ...
+  // The token to use for authentication.
   string token = 1 [(buf.validate.field).required = true];
 }
 
 // ...
 message AuthenticateResponse {
+  // The `sub` claim from the token.
   string subject = 1 [(buf.validate.field).required = true];
 }

@@ -25,9 +25,9 @@ const (
 // ...
 type LoginRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// ...
+	// The identity to login with.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// ...
+	// The secret for the given identity.
 	Secret        string `protobuf:"bytes,2,opt,name=secret,proto3" json:"secret,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -144,7 +144,7 @@ func (x *LoginResponse) GetExpiresIn() uint32 {
 // ...
 type AuthenticateRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// ...
+	// The token to use for authentication.
 	Token         string `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -189,7 +189,9 @@ func (x *AuthenticateRequest) GetToken() string {
 
 // ...
 type AuthenticateResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The `sub` claim from the token.
+	Subject       string `protobuf:"bytes,1,opt,name=subject,proto3" json:"subject,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -224,6 +226,13 @@ func (*AuthenticateResponse) Descriptor() ([]byte, []int) {
 	return file_authn_v1_messages_proto_rawDescGZIP(), []int{3}
 }
 
+func (x *AuthenticateResponse) GetSubject() string {
+	if x != nil {
+		return x.Subject
+	}
+	return ""
+}
+
 var File_authn_v1_messages_proto protoreflect.FileDescriptor
 
 const file_authn_v1_messages_proto_rawDesc = "" +
@@ -239,8 +248,9 @@ const file_authn_v1_messages_proto_rawDesc = "" +
 	"\n" +
 	"expires_in\x18\x03 \x01(\rB\a\xbaH\x04*\x02 \x00R\texpiresIn\"3\n" +
 	"\x13AuthenticateRequest\x12\x1c\n" +
-	"\x05token\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x05token\"\x16\n" +
-	"\x14AuthenticateResponseB5Z3github.com/mattdowdell/sandbox/gen/authn/v1;authnv1b\x06proto3"
+	"\x05token\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x05token\"8\n" +
+	"\x14AuthenticateResponse\x12 \n" +
+	"\asubject\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\asubjectB5Z3github.com/mattdowdell/sandbox/gen/authn/v1;authnv1b\x06proto3"
 
 var (
 	file_authn_v1_messages_proto_rawDescOnce sync.Once

@@ -10,6 +10,10 @@ template-data:
   unroll-variadic: true
 
 packages:
+  # internal dependencies
+  github.com/mattdowdell/sandbox/internal/adapters/authnrpc:
+    config:
+      all: true
   github.com/mattdowdell/sandbox/internal/adapters/examplerpc:
     config:
       all: true
@@ -29,7 +33,12 @@ packages:
   # external dependencies
   connectrpc.com/connect:
     config:
-      dir: "mocks/external/{{ dir .SrcPackagePath }}/mock{{ .SrcPackagePath | base }}"
+      dir: "mocks/external/connectrpc.com/mockconnect"
     interfaces:
       AnyRequest: {}
       StreamingHandlerConn: {}
+  github.com/golang-jwt/jwt/v5:
+    config:
+      dir: "mocks/external/github.com/golang-jwt/mockjwt/v5"
+    interfaces:
+      Claims: {}

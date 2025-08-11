@@ -1,13 +1,13 @@
 package jwtx
 
 import (
+	"fmt"
+
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// ...
-//
-// TODO: rename to parser config?
-type Config struct {
+// ParserConfig contains configuration for creating a Parser.
+type ParserConfig struct {
 	// The expected values of the `aud` claim to validate when parsing a JWT. Any of the provided
 	// values will be accepted.
 	Audience []string `koanf:"audience"`
@@ -15,50 +15,55 @@ type Config struct {
 	// The expected value of the `iss` claim to validate when parsing a JWT.
 	Issuer string `koanf:"issuer"`
 
-	// ...
+	// The signing algorithm methods accepted by the parser.
 	Methods []string `koanf:"methods"`
 }
 
-// TODO: move to shared adapter
-type Claims interface {
-	GetSubject() (string, error)
-}
-
-// ...
+// Parser is used to validate and parse JWTs based on given configuration.
 type Parser struct {
 	parser *jwt.Parser
 }
 
-// ...
-func NewParserFromConfig(conf Config) *Parser {
+// NewParserFromConfig creates a new Parser using the given configuration.
+func NewParserFromConfig(conf ParserConfig) *Parser {
 	return NewParser(conf.Audience, conf.Issuer, conf.Methods)
 }
 
-// ...
+// NewParser creates a new Parser.
 func NewParser(audience []string, issuer string, methods []string) *Parser {
-	parser := jwt.NewParser(
+	opts := []jwt.ParserOption{
 		jwt.WithAudience(audience...),
 		jwt.WithExpirationRequired(),
 		jwt.WithIssuer(issuer),
 		jwt.WithStrictDecoding(),
 		jwt.WithValidMethods(methods),
-	)
+	}
+
+	// TODO: append jwt.WithTimeFunc to make unit tests deterministic
 
 	return &Parser{
-		parser: parser,
+		parser: jwt.NewParser(opts...),
 	}
 }
 
-// ...
-func (p *Parser) Parse(input string) (Claims, error) {
+// Parse validates and parses the given token into claims.
+func (p *Parser) Parse(input string) (jwt.Claims, error) {
 	token, err := p.parser.Parse(input, keyFunc)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse token: %w", err)
 	}
 
 	return token.Claims, err
 }
 
 func keyFunc(token *jwt.Token) (any, error) {
-	return nil, nil
+	switch token.Method {
+	case jwt.SigningMethodHS256:
+		return []byte("secret"), nil
+
+	// case &jwt.SigningMethodEd25519{}:
+
+	default:
+		return nil, fmt.Errorf("unexpected signing method: %s", token.Method.Alg())
+	}
 }

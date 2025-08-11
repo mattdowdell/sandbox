@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/mattdowdell/sandbox/internal/drivers/config"
+	"github.com/mattdowdell/sandbox/internal/drivers/jwtx"
 	"github.com/mattdowdell/sandbox/internal/drivers/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
 	"github.com/mattdowdell/sandbox/internal/drivers/pgsql"
@@ -19,6 +20,8 @@ type Config struct {
 	LoggerProvider otelx.LoggerProviderConfig `koanf:"loggerprovider"`
 	OtelConnect    otelconnectx.Config        `koanf:"otelconnect"`
 	RPCServer      rpcserver.Config           `koanf:"rpcserver"`
+	Issuer         jwtx.IssuerConfig          `koanf:"issuer"`
+	Parser         jwtx.ParserConfig          `koanf:"parser"`
 }
 
 // LoadConfig loads the service configuration.
