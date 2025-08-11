@@ -110,7 +110,7 @@ fmt-yaml: install-yamlfmt
 
 # Run all code generators.
 [group('generators')]
-gen: gen-buf gen-go gen-just
+gen: gen-buf gen-go gen-tools
 
 # Run the Protobuf generator.
 [group('generators')]
@@ -142,10 +142,11 @@ gen-go-mockery: install-mockery
 gen-go-wire: install-wire
     {{ wire }} gen ./cmd/...
 
-# Run the justfile generator.
+# Run the tools generator.
 [group('generators')]
-gen-just:
+gen-tools:
     ./tools/regen-tools.sh > .tools.just
+    ./tools/regen-buf-gen.sh > buf.gen.yaml
 
 # Check for uncommitted changes.
 [private]

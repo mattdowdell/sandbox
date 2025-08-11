@@ -83,7 +83,7 @@ jobs:
       - name: Regenerate
         run: |
           # look for tool updates first as it can cause other commands to fail
-          just gen-just
+          just gen-tools
           just checks
 
       - name: Commit diff
