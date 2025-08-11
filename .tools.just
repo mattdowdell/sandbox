@@ -2,7 +2,7 @@
 
 gopath := shell("go env GOPATH")
 
-buf := join(gopath, "bin", "buf-v1.55.1")
+buf := join(gopath, "bin", "buf-v1.56.0")
 
 [private]
 install-buf:
@@ -14,13 +14,13 @@ godog := join(gopath, "bin", "godog-v0.15.1")
 install-godog:
     {{ if path_exists(godog) == "true" { "" } else { "bingo get godog" } }}
 
-golangci-lint := join(gopath, "bin", "golangci-lint-v2.3.0")
+golangci-lint := join(gopath, "bin", "golangci-lint-v2.3.1")
 
 [private]
 install-golangci-lint:
     {{ if path_exists(golangci-lint) == "true" { "" } else { "bingo get golangci-lint" } }}
 
-mockery := join(gopath, "bin", "mockery-v3.5.1")
+mockery := join(gopath, "bin", "mockery-v3.5.2")
 
 [private]
 install-mockery:
