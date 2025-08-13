@@ -1,0 +1,60 @@
+---
+name: Tool Updates
+
+on:
+  workflow_dispatch:
+
+jobs:
+  collect:
+    name: Collect
+    permissions:
+      contents: read
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Collect
+        run: |
+          echo "names=`bingo list | \
+            tail -n+3 | \
+            awk '{print $1}' | \
+            jq -ncR '[inputs]'`" >> "$GITHUB_OUTPUT"
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+  update:
+    name: Update
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    needs: collect
+    strategy:
+      matrix:
+        name: ${{ fromJSON(needs.collect.outputs.names) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Update
+        id: update
+        uses: ./.github/actions/setup-checks
+        with:
+          name: ${{ matrix.name }}
+
+      - name: Output
+        run: |
+          echo name=${NAME}
+          echo updated=${UPDATED}
+          echo version=${VERSION}
+        env:
+          NAME: ${{ matrix.name }}
+          UPDATED: ${{ steps.update.output.updated }}
+          VERSION: ${{ steps.update.output.version }}
