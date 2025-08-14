@@ -30,12 +30,41 @@ type Parser struct {
 }
 
 // NewParserFromConfig creates a new Parser using the given configuration.
-func NewParserFromConfig(clock repositories.Clock, conf ParserConfig) *Parser {
+func NewParserFromConfig(clock repositories.Clock, conf ParserConfig) (*Parser, error) {
 	return NewParser(clock, conf.Audience, conf.Issuer, conf.Methods)
 }
 
 // NewParser creates a new Parser.
-func NewParser(clock repositories.Clock, audience []string, issuer string, methods []string) *Parser {
+func NewParser(
+	clock repositories.Clock,
+	audience []string,
+	issuer string,
+	methods []string,
+) (*Parser, error) {
+	if len(audience) == 0 {
+		return nil, errors.New("audience must not be empty for parser")
+	}
+
+	for i, value := range audience {
+		if value == "" {
+			return nil, fmt.Errorf("audience[%d] must not be empty for parser", i)
+		}
+	}
+
+	if issuer == "" {
+		return nil, errors.New("issuer must not be empty for parser")
+	}
+
+	if len(methods) == 0 {
+		return nil, errors.New("methods must not be empty for parser")
+	}
+
+	for i, value := range methods {
+		if value == "" {
+			return nil, fmt.Errorf("methods[%d] must not be empty for parser", i)
+		}
+	}
+
 	return &Parser{
 		parser: jwt.NewParser(
 			jwt.WithAudience(audience...),
@@ -45,7 +74,7 @@ func NewParser(clock repositories.Clock, audience []string, issuer string, metho
 			jwt.WithValidMethods(methods),
 			jwt.WithTimeFunc(clock.UTCNow),
 		),
-	}
+	}, nil
 }
 
 // Parse validates and parses the given token into claims.

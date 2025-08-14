@@ -1,6 +1,7 @@
 package jwtx
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -31,7 +32,7 @@ func NewIssuerFromConfig(
 	clock repositories.Clock,
 	generator repositories.UUIDGenerator,
 	conf IssuerConfig,
-) *Issuer {
+) (*Issuer, error) {
 	return NewIssuer(
 		clock,
 		generator,
@@ -46,13 +47,21 @@ func NewIssuer(
 	generator repositories.UUIDGenerator,
 	issuer string,
 	audience string,
-) *Issuer {
+) (*Issuer, error) {
+	if issuer == "" {
+		return nil, errors.New("issuer must not be empty for issuer")
+	}
+
+	if audience == "" {
+		return nil, errors.New("audience must not be empty for issuer")
+	}
+
 	return &Issuer{
 		clock:     clock,
 		generator: generator,
 		issuer:    issuer,
 		audience:  audience,
-	}
+	}, nil
 }
 
 // Issue creates a new JWT with the given subject as the subject claim.

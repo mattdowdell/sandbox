@@ -7,6 +7,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/mattdowdell/sandbox/internal/drivers/jwtx"
 	"github.com/mattdowdell/sandbox/mocks/domain/mockrepositories"
@@ -39,22 +40,61 @@ func Test_NewIssuerFromConfig(t *testing.T) {
 	}
 
 	// act
-	issuer := jwtx.NewIssuerFromConfig(clock, generator, conf)
+	issuer, err := jwtx.NewIssuerFromConfig(clock, generator, conf)
 
 	// assert
 	assert.NotNil(t, issuer)
+	assert.NoError(t, err)
 }
 
-func Test_NewIssuer(t *testing.T) {
+func Test_NewIssuer_Success(t *testing.T) {
 	// arrange
 	clock := mockrepositories.NewClock(t)
 	generator := mockrepositories.NewUUIDGenerator(t)
 
 	// act
-	issuer := jwtx.NewIssuer(clock, generator, testIssuer, testAudience)
+	issuer, err := jwtx.NewIssuer(clock, generator, testIssuer, testAudience)
 
 	// assert
 	assert.NotNil(t, issuer)
+	assert.NoError(t, err)
+}
+
+func Test_NewIssuer_Error(t *testing.T) {
+	testCases := []struct {
+		name     string
+		issuer   string
+		audience string
+		want     string
+	}{
+		{
+			name:     "missing issuer",
+			issuer:   "",
+			audience: testAudience,
+			want:     "issuer must not be empty for issuer",
+		},
+		{
+			name:     "missing audience",
+			issuer:   testIssuer,
+			audience: "",
+			want:     "audience must not be empty for issuer",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// arrange
+			clock := mockrepositories.NewClock(t)
+			generator := mockrepositories.NewUUIDGenerator(t)
+
+			// act
+			issuer, err := jwtx.NewIssuer(clock, generator, tc.issuer, tc.audience)
+
+			// assert
+			assert.Nil(t, issuer)
+			assert.EqualError(t, err, tc.want)
+		})
+	}
 }
 
 func Test_Issuer_Issue_Success(t *testing.T) {
@@ -65,7 +105,8 @@ func Test_Issuer_Issue_Success(t *testing.T) {
 	generator := mockrepositories.NewUUIDGenerator(t)
 	generator.EXPECT().NewV4().Return(testID, nil).Once()
 
-	issuer := jwtx.NewIssuer(clock, generator, testIssuer, testAudience)
+	issuer, err := jwtx.NewIssuer(clock, generator, testIssuer, testAudience)
+	require.NoError(t, err)
 
 	// act
 	got, err := issuer.Issue(testSubject, testExpiresInSeconds)
@@ -83,7 +124,8 @@ func Test_Issuer_Issue_Error(t *testing.T) {
 	generator := mockrepositories.NewUUIDGenerator(t)
 	generator.EXPECT().NewV4().Return(uuid.Nil, errors.New("example")).Once()
 
-	issuer := jwtx.NewIssuer(clock, generator, testIssuer, testAudience)
+	issuer, err := jwtx.NewIssuer(clock, generator, testIssuer, testAudience)
+	require.NoError(t, err)
 
 	// act
 	got, err := issuer.Issue(testSubject, testExpiresInSeconds)

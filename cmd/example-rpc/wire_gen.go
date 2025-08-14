@@ -46,9 +46,15 @@ func ProvideApp(ctx context.Context) (*App, error) {
 	clockClock := clock.New()
 	gen := uuid.NewGen()
 	issuerConfig := mainConfig.Issuer
-	issuer := jwtx.NewIssuerFromConfig(clockClock, gen, issuerConfig)
+	issuer, err := jwtx.NewIssuerFromConfig(clockClock, gen, issuerConfig)
+	if err != nil {
+		return nil, err
+	}
 	parserConfig := mainConfig.Parser
-	parser := jwtx.NewParserFromConfig(clockClock, parserConfig)
+	parser, err := jwtx.NewParserFromConfig(clockClock, parserConfig)
+	if err != nil {
+		return nil, err
+	}
 	handler := authnrpc.New(issuer, parser)
 	pgsqlConfig := mainConfig.Database
 	db, err := pgsql.NewFromConfig(ctx, pgsqlConfig)

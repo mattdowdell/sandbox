@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/mattdowdell/sandbox/internal/drivers/jwtx"
 	"github.com/mattdowdell/sandbox/mocks/domain/mockrepositories"
@@ -45,21 +46,83 @@ func Test_NewParserFromConfig(t *testing.T) {
 	}
 
 	// act
-	parser := jwtx.NewParserFromConfig(clock, conf)
+	parser, err := jwtx.NewParserFromConfig(clock, conf)
 
 	// assert
 	assert.NotNil(t, parser)
+	assert.NoError(t, err)
 }
 
-func Test_NewParser(t *testing.T) {
+func Test_NewParser_Success(t *testing.T) {
 	// arrange
 	clock := mockrepositories.NewClock(t)
 
 	// act
-	parser := jwtx.NewParser(clock, []string{testAudience}, testIssuer, []string{testMethod})
+	parser, err := jwtx.NewParser(clock, []string{testAudience}, testIssuer, []string{testMethod})
 
 	// assert
 	assert.NotNil(t, parser)
+	assert.NoError(t, err)
+}
+
+func Test_NewParser_Error(t *testing.T) {
+	testCases := []struct {
+		name     string
+		audience []string
+		issuer   string
+		methods  []string
+		want     string
+	}{
+		{
+			name:     "empty audience",
+			audience: []string{},
+			issuer:   testIssuer,
+			methods:  []string{testMethod},
+			want:     "audience must not be empty for parser",
+		},
+		{
+			name:     "empty audience value",
+			audience: []string{""},
+			issuer:   testIssuer,
+			methods:  []string{testMethod},
+			want:     "audience[0] must not be empty for parser",
+		},
+		{
+			name:     "empty issuer",
+			audience: []string{testAudience},
+			issuer:   "",
+			methods:  []string{testMethod},
+			want:     "issuer must not be empty for parser",
+		},
+		{
+			name:     "empty methods",
+			audience: []string{testAudience},
+			issuer:   testIssuer,
+			methods:  []string{},
+			want:     "methods must not be empty for parser",
+		},
+		{
+			name:     "empty methods value",
+			audience: []string{testAudience},
+			issuer:   testIssuer,
+			methods:  []string{""},
+			want:     "methods[0] must not be empty for parser",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// arrange
+			clock := mockrepositories.NewClock(t)
+
+			// act
+			parser, err := jwtx.NewParser(clock, tc.audience, tc.issuer, tc.methods)
+
+			// assert
+			assert.Nil(t, parser)
+			assert.EqualError(t, err, tc.want)
+		})
+	}
 }
 
 func Test_Parser_Parse_Success(t *testing.T) {
@@ -69,7 +132,8 @@ func Test_Parser_Parse_Success(t *testing.T) {
 	clock := mockrepositories.NewClock(t)
 	clock.EXPECT().UTCNow().Return(now).Once()
 
-	parser := jwtx.NewParser(clock, []string{testAudience}, testIssuer, []string{testMethod})
+	parser, err := jwtx.NewParser(clock, []string{testAudience}, testIssuer, []string{testMethod})
+	require.NoError(t, err)
 
 	// act
 	claims, err := parser.Parse(testToken)
@@ -176,7 +240,8 @@ func Test_Parser_Parse_Error(t *testing.T) {
 			clock := mockrepositories.NewClock(t)
 			clock.EXPECT().UTCNow().Return(testIssuedAt).Maybe()
 
-			parser := jwtx.NewParser(clock, tc.audience, tc.issuer, []string{testMethod})
+			parser, err := jwtx.NewParser(clock, tc.audience, tc.issuer, []string{testMethod})
+			require.NoError(t, err)
 
 			// act
 			claims, err := parser.Parse(tc.input)
