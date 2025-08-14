@@ -1,22 +1,26 @@
 package jwtx
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/golang-jwt/jwt/v5"
+
+	"github.com/mattdowdell/sandbox/internal/drivers/config/splitter"
 )
 
 // ParserConfig contains configuration for creating a Parser.
 type ParserConfig struct {
 	// The expected values of the `aud` claim to validate when parsing a JWT. Any of the provided
-	// values will be accepted.
-	Audience []string `koanf:"audience"`
+	// values will be accepted. Configuration values should be space delimited strings.
+	Audience splitter.Space `koanf:"audience"`
 
 	// The expected value of the `iss` claim to validate when parsing a JWT.
 	Issuer string `koanf:"issuer"`
 
-	// The signing algorithm methods accepted by the parser.
-	Methods []string `koanf:"methods"`
+	// The signing algorithm methods accepted by the parser. Configuration values should be space
+	// delimited strings.
+	Methods splitter.Space `koanf:"methods"`
 }
 
 // Parser is used to validate and parse JWTs based on given configuration.
@@ -51,6 +55,15 @@ func (p *Parser) Parse(input string) (jwt.Claims, error) {
 	token, err := p.parser.Parse(input, keyFunc)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse token: %w", err)
+	}
+
+	subject, err := token.Claims.GetSubject()
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse token: invalid sub claim: %w", err)
+	}
+
+	if subject == "" {
+		return nil, errors.New("failed to parse token: missing sub claim")
 	}
 
 	return token.Claims, err

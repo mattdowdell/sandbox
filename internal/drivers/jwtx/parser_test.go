@@ -10,6 +10,27 @@ import (
 
 const (
 	testMethod = "HS256"
+
+	testTokenMissingAudience = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJpc3N1ZXIiLCJzdWIi" +
+		"OiJzdWJqZWN0IiwiZXhwIjoxNzU2NDcyNDAwLCJpYXQiOjE3NTY0Njg4MDAsImp0aSI6IjdhZGZhNGZkLWViNWUt" +
+		"NGEzMS1iY2U5LTY3Y2UyN2I3NGIwZiJ9.Ss1Fn6ood6FR5cyp9kH8aq_V6L5g7ROIAEIWR39TGy0"
+	testTokenMissingIssuer = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzdWJqZWN0IiwiYXVkIj" +
+		"pbImF1ZGllbmNlIl0sImV4cCI6MTc1NjQ3MjQwMCwiaWF0IjoxNzU2NDY4ODAwLCJqdGkiOiI3YWRmYTRmZC1lYj" +
+		"VlLTRhMzEtYmNlOS02N2NlMjdiNzRiMGYifQ.ymkbpzZIWenvSOUtgK8SoeC95imVv5cVwCg54j70Y3U"
+	testTokenMissingSubject = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJpc3N1ZXIiLCJhdWQiO" +
+		"lsiYXVkaWVuY2UiXSwiZXhwIjoxNzU2NDcyNDAwLCJpYXQiOjE3NTY0Njg4MDAsImp0aSI6IjdhZGZhNGZkLWViN" +
+		"WUtNGEzMS1iY2U5LTY3Y2UyN2I3NGIwZiJ9.AC1w2ia17qXPazGbyXRmeISh_CiEM0wyFxZJ8RCQj0Q"
+	testTokenMissingExpiresAt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJpc3N1ZXIiLCJzdWI" +
+		"iOiJzdWJqZWN0IiwiYXVkIjpbImF1ZGllbmNlIl0sImlhdCI6MTc1NjQ2ODgwMCwianRpIjoiN2FkZmE0ZmQtZWI" +
+		"1ZS00YTMxLWJjZTktNjdjZTI3Yjc0YjBmIn0.CNfCmx1ew-i_ALuVNfbduyEIsPL8xhRQ-shXkeZ5XCI"
+	testTokenExpired = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJpc3N1ZXIiLCJzdWIiOiJzdWJq" +
+		"ZWN0IiwiYXVkIjpbImF1ZGllbmNlIl0sImV4cCI6MTcyNDkzNjQwMCwiaWF0IjoxNzI0OTMyODAwLCJqdGkiOiI3" +
+		"YWRmYTRmZC1lYjVlLTRhMzEtYmNlOS02N2NlMjdiNzRiMGYifQ.ISDEZI73SU4r9IgqjMCdiUx3QiS65Dpk9RlUl" +
+		"blD9Xg"
+	testTokenUnexpectedMethod = "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJpc3N1ZXIiLCJz" +
+		"dWIiOiJzdWJqZWN0IiwiYXVkIjpbImF1ZGllbmNlIl0sImV4cCI6MTc1NjQ3MjQwMCwiaWF0IjoxNzU2NDY4ODAw" +
+		"LCJqdGkiOiI3YWRmYTRmZC1lYjVlLTRhMzEtYmNlOS02N2NlMjdiNzRiMGYifQ.I1CePjpsyfxHw49wZxdSTdmXu" +
+		"FVeaj1mu05rAOlC94uKJN_UUJESoVUk1sPg26Wa"
 )
 
 func Test_NewParserFromConfig(t *testing.T) {
@@ -77,19 +98,67 @@ func Test_Parser_Parse_Error(t *testing.T) {
 			input:    testToken,
 			want:     "failed to parse token: token has invalid claims: token has invalid audience",
 		},
-		// TODO: missing audience
+		{
+			name:     "wrong audience",
+			audience: []string{"other"},
+			issuer:   testIssuer,
+			input:    testToken,
+			want:     "failed to parse token: token has invalid claims: token has invalid audience",
+		},
+		{
+			name:     "missing audience",
+			audience: []string{testAudience},
+			issuer:   testIssuer,
+			input:    testTokenMissingAudience,
+			want: "failed to parse token: token has invalid claims: " +
+				"token is missing required claim: aud claim is required",
+		},
 		{
 			name:     "wrong issuer",
 			audience: []string{testAudience},
 			issuer:   "other",
 			input:    testToken,
-			want:     "failed to parse token: token has invalid claims: token has invalid issuer",
+			want: "failed to parse token: token has invalid claims: " +
+				"token has invalid issuer",
 		},
-		// TODO: missing issuer
-		// TODO: missing subject
-		// TODO: missing expires at
-		// TODO: expired
-		// TODO: unexpected signing method
+		{
+			name:     "missing issuer",
+			audience: []string{testAudience},
+			issuer:   testIssuer,
+			input:    testTokenMissingIssuer,
+			want: "failed to parse token: token has invalid claims: " +
+				"token is missing required claim: iss claim is required",
+		},
+		{
+			name:     "missing subject",
+			audience: []string{testAudience},
+			issuer:   testIssuer,
+			input:    testTokenMissingSubject,
+			want:     "failed to parse token: missing sub claim",
+		},
+		{
+			name:     "missing expires at",
+			audience: []string{testAudience},
+			issuer:   testIssuer,
+			input:    testTokenMissingExpiresAt,
+			want: "failed to parse token: token has invalid claims: " +
+				"token is missing required claim: exp claim is required",
+		},
+		{
+			name:     "expired",
+			audience: []string{testAudience},
+			issuer:   testIssuer,
+			input:    testTokenExpired,
+			want:     "failed to parse token: token has invalid claims: token is expired",
+		},
+		{
+			name:     "unexpected signing method",
+			audience: []string{testAudience},
+			issuer:   testIssuer,
+			input:    testTokenUnexpectedMethod,
+			want: "failed to parse token: token signature is invalid: " +
+				"signing method HS384 is invalid",
+		},
 	}
 
 	for _, tc := range testCases {

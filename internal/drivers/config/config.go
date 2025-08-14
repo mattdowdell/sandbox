@@ -158,7 +158,7 @@ func envProvider(prefix string) *env.Env {
 	return env.Provider(delimiter, env.Opt{
 		Prefix: prefix,
 		TransformFunc: func(k, v string) (string, any) {
-			return transformKey(k, prefix), transformValue(v)
+			return transformKey(k, prefix), v
 		},
 	})
 }
@@ -185,13 +185,4 @@ func transformKey(key, prefix string) string {
 		"_",
 		delimiter,
 	)
-}
-
-func transformValue(value string) any {
-	values := strings.Split(value, " ")
-	if len(values) != 1 {
-		return values
-	}
-
-	return value
 }
