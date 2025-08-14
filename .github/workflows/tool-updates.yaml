@@ -4,6 +4,8 @@ name: Tool Updates
 on:
   workflow_dispatch:
 
+permissions: {}
+
 jobs:
   collect:
     name: Collect
