@@ -6,6 +6,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 
+	"github.com/mattdowdell/sandbox/internal/domain/repositories"
 	"github.com/mattdowdell/sandbox/internal/drivers/config/splitter"
 )
 
@@ -29,24 +30,21 @@ type Parser struct {
 }
 
 // NewParserFromConfig creates a new Parser using the given configuration.
-func NewParserFromConfig(conf ParserConfig) *Parser {
-	return NewParser(conf.Audience, conf.Issuer, conf.Methods)
+func NewParserFromConfig(clock repositories.Clock, conf ParserConfig) *Parser {
+	return NewParser(clock, conf.Audience, conf.Issuer, conf.Methods)
 }
 
 // NewParser creates a new Parser.
-func NewParser(audience []string, issuer string, methods []string) *Parser {
-	opts := []jwt.ParserOption{
-		jwt.WithAudience(audience...),
-		jwt.WithExpirationRequired(),
-		jwt.WithIssuer(issuer),
-		jwt.WithStrictDecoding(),
-		jwt.WithValidMethods(methods),
-	}
-
-	// TODO: append jwt.WithTimeFunc to make unit tests deterministic
-
+func NewParser(clock repositories.Clock, audience []string, issuer string, methods []string) *Parser {
 	return &Parser{
-		parser: jwt.NewParser(opts...),
+		parser: jwt.NewParser(
+			jwt.WithAudience(audience...),
+			jwt.WithExpirationRequired(),
+			jwt.WithIssuer(issuer),
+			jwt.WithStrictDecoding(),
+			jwt.WithValidMethods(methods),
+			jwt.WithTimeFunc(clock.UTCNow),
+		),
 	}
 }
 

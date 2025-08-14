@@ -2,10 +2,12 @@ package jwtx_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/drivers/jwtx"
+	"github.com/mattdowdell/sandbox/mocks/domain/mockrepositories"
 )
 
 const (
@@ -35,6 +37,7 @@ const (
 
 func Test_NewParserFromConfig(t *testing.T) {
 	// arrange
+	clock := mockrepositories.NewClock(t)
 	conf := jwtx.ParserConfig{
 		Audience: []string{testAudience},
 		Issuer:   testIssuer,
@@ -42,7 +45,7 @@ func Test_NewParserFromConfig(t *testing.T) {
 	}
 
 	// act
-	parser := jwtx.NewParserFromConfig(conf)
+	parser := jwtx.NewParserFromConfig(clock, conf)
 
 	// assert
 	assert.NotNil(t, parser)
@@ -50,9 +53,10 @@ func Test_NewParserFromConfig(t *testing.T) {
 
 func Test_NewParser(t *testing.T) {
 	// arrange
+	clock := mockrepositories.NewClock(t)
 
 	// act
-	parser := jwtx.NewParser([]string{testAudience}, testIssuer, []string{testMethod})
+	parser := jwtx.NewParser(clock, []string{testAudience}, testIssuer, []string{testMethod})
 
 	// assert
 	assert.NotNil(t, parser)
@@ -60,7 +64,12 @@ func Test_NewParser(t *testing.T) {
 
 func Test_Parser_Parse_Success(t *testing.T) {
 	// arrange
-	parser := jwtx.NewParser([]string{testAudience}, testIssuer, []string{testMethod})
+	now := time.Now().UTC()
+
+	clock := mockrepositories.NewClock(t)
+	clock.EXPECT().UTCNow().Return(now).Once()
+
+	parser := jwtx.NewParser(clock, []string{testAudience}, testIssuer, []string{testMethod})
 
 	// act
 	claims, err := parser.Parse(testToken)
@@ -164,7 +173,10 @@ func Test_Parser_Parse_Error(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// arrange
-			parser := jwtx.NewParser(tc.audience, tc.issuer, []string{testMethod})
+			clock := mockrepositories.NewClock(t)
+			clock.EXPECT().UTCNow().Return(testIssuedAt).Maybe()
+
+			parser := jwtx.NewParser(clock, tc.audience, tc.issuer, []string{testMethod})
 
 			// act
 			claims, err := parser.Parse(tc.input)
