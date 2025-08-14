@@ -10,7 +10,6 @@ import (
 var (
 	ErrUnauthenticated = newError(connect.CodeUnauthenticated, "missing or invalid authentication")
 	ErrInternal        = newError(connect.CodeInternal, "internal error")
-	ErrUnimplemented   = newError(connect.CodeUnimplemented, "unimplemented")
 )
 
 // newError creates an error response using the given code and message.

@@ -22,7 +22,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// ...
+// LoginRequest is used to obtain a token for use as authentication in subsequent requests.
 type LoginRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The identity to login with.
@@ -77,14 +77,15 @@ func (x *LoginRequest) GetSecret() string {
 	return ""
 }
 
-// ...
+// LoginResponse is returned for successful Login requests. It is based on the OAuth2 access token
+// response.
 type LoginResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// ...
+	// The token to use for authentication in subsequent requests.
 	AccessToken string `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
-	// ...
+	// The type of token.
 	TokenType string `protobuf:"bytes,2,opt,name=token_type,json=tokenType,proto3" json:"token_type,omitempty"`
-	// ...
+	// The number of seconds until the token expires.
 	ExpiresIn     uint32 `protobuf:"varint,3,opt,name=expires_in,json=expiresIn,proto3" json:"expires_in,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -141,7 +142,7 @@ func (x *LoginResponse) GetExpiresIn() uint32 {
 	return 0
 }
 
-// ...
+// AuthenticationRequest is used to validate a token.
 type AuthenticateRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The token to use for authentication.
@@ -187,7 +188,7 @@ func (x *AuthenticateRequest) GetToken() string {
 	return ""
 }
 
-// ...
+// AuthenticateResponse is returned for successful Authenticate requests.
 type AuthenticateResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The `sub` claim from the token.
