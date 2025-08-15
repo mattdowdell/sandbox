@@ -1,0 +1,55 @@
+---
+name: Bingo Update
+
+inputs:
+  name:
+    description: The name of the tool to check for updates.
+    required: true
+
+outputs:
+  updated:
+    description: "Whether the version was updated."
+    value: ${{ steps.updated.outputs.updates }}
+  version:
+    description: "The version after any updates were applied."
+    value: ${{ steps.updated.outputs.version }}
+
+runs:
+  using: composite
+  steps:
+    - name: Get package
+      id: package
+      run: |
+        echo "url=`bingo list | \
+          tail -n+3 | \
+          grep '^${NAME}\b' | \
+          awk '{print $3}' | \
+          sed s/@.\*/@latest/`" >> "$GITHUB_OUTPUT"
+      env:
+        NAME: ${{ inputs.name }}
+
+    - name: Get update
+      run: bingo get ${PACKAGE}
+      env:
+        PACKAGE: ${{ steps.package.outputs.url }}
+
+    - name: Check for update
+      id: updated
+      run: |
+        # make sure new files are included in the diff
+        git add .
+
+        if git diff HEAD --quiet -- .
+        then
+          echo "updated=false" >> "$GITHUB_OUTPUT"
+        else
+          echo "updated=true" >> "$GITHUB_OUTPUT"
+        fi
+
+        echo "version=`bingo list | \
+          tail -n+3 | \
+          grep '^${NAME}\b' | \
+          awk '{print $3}' | `
+          cut -d@ -f2` >> "$GITHUB_OUTPUT"
+      env:
+        NAME: ${{ inputs.name }}
