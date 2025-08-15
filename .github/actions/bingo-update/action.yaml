@@ -29,6 +29,7 @@ runs:
 
     - name: Get package
       id: package
+      shell: bash
       run: |
         echo "url=`bingo list | \
           tail -n+3 | \
@@ -39,12 +40,14 @@ runs:
         NAME: ${{ inputs.name }}
 
     - name: Get update
+      shell: bash
       run: bingo get ${PACKAGE}
       env:
         PACKAGE: ${{ steps.package.outputs.url }}
 
     - name: Check for update
       id: updated
+      shell: bash
       run: |
         # make sure new files are included in the diff
         git add .
