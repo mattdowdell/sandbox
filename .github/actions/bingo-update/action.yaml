@@ -33,9 +33,9 @@ runs:
       run: |
         echo "url=`bingo list | \
           tail -n+3 | \
-          grep '^${NAME}\b' | \
+          grep "^${NAME}\b" | \
           awk '{print $3}' | \
-          sed s/@.\*/@latest/`" >> "$GITHUB_OUTPUT"
+          cut -d@ -f1`" >> "$GITHUB_OUTPUT"
       env:
         NAME: ${{ inputs.name }}
 
