@@ -73,6 +73,11 @@ func Test_Attrs(t *testing.T) {
 			want: slog.Bool("sampled", true),
 		},
 		{
+			name: "subject",
+			got:  slogx.Subject("example"),
+			want: slog.String("subject", "example"),
+		},
+		{
 			name: "rpc system",
 			got:  slogx.RPCSystem("connect"),
 			want: slog.String("rpc_system", "connect"),

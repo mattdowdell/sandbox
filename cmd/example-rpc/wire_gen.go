@@ -85,8 +85,11 @@ func ProvideApp(ctx context.Context) (*App, error) {
 		return nil, err
 	}
 	loggingInterceptor := logging2.New()
+	httpClient := connectClient()
+	clientConfig := mainConfig.Authn
+	authnServiceClient := authnClient(httpClient, clientConfig, interceptor, validateInterceptor)
 	v3 := authnOptions()
-	authnInterceptor := authn.New(v3...)
+	authnInterceptor := authn.New(authnServiceClient, v3...)
 	v4 := collectInterceptors(interceptor, validateInterceptor, loggingInterceptor, authnInterceptor)
 	v5 := recovererOptions()
 	recoverer, err := rpcserver.NewRecoverer(v5...)

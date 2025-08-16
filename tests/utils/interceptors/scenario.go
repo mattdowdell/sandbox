@@ -1,4 +1,4 @@
-package examplev1client
+package interceptors
 
 import (
 	"context"
@@ -6,8 +6,22 @@ import (
 	"strings"
 
 	"connectrpc.com/connect"
+	"github.com/cucumber/godog"
 	"go.opentelemetry.io/otel/baggage"
 )
+
+type scenarioCtxKey struct{}
+
+// ...
+func ScenarioIntoContext(ctx context.Context, scen *godog.Scenario) context.Context {
+	return context.WithValue(ctx, scenarioCtxKey{}, scen.Name)
+}
+
+// ...
+func ScenarioFromContext(ctx context.Context) (string, bool) {
+	name, ok := ctx.Value(scenarioCtxKey{}).(string)
+	return name, ok
+}
 
 // ...
 func ScenarioUnaryInterceptor(next connect.UnaryFunc) connect.UnaryFunc {

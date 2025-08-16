@@ -40,6 +40,7 @@ func ProvideApp(ctx context.Context) (*App, error) {
 		LoadConfig,
 		wire.FieldsOf(
 			new(Config),
+			"Authn",
 			"Database",
 			"Issuer",
 			"LoggerProvider",
@@ -95,6 +96,8 @@ func ProvideApp(ctx context.Context) (*App, error) {
 		validatex.New,
 		otelconnectx.NewFromConfig,
 		logginginterceptor.New,
+		connectClient,
+		authnClient,
 		authnOptions,
 		authn.New,
 		collectInterceptors,

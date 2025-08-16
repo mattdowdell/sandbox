@@ -17,6 +17,7 @@ const (
 	TraceIDKey      = "trace_id"
 	SpanIDKey       = "span_id"
 	SampledKey      = "sampled"
+	SubjectKey      = "subject"
 	RPCSystemKey    = "rpc_system"
 	RPCServiceKey   = "rpc_service"
 	RPCMethodKey    = "rpc_method"
@@ -62,6 +63,11 @@ func SpanID(span trace.Span) slog.Attr {
 // ...
 func Sampled(span trace.Span) slog.Attr {
 	return slog.Bool(SampledKey, span.SpanContext().IsSampled())
+}
+
+// ...
+func Subject(subject string) slog.Attr {
+	return slog.String(SubjectKey, subject)
 }
 
 // ...

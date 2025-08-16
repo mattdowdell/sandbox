@@ -8,7 +8,9 @@ import (
 
 	"github.com/cucumber/godog"
 
+	"github.com/mattdowdell/sandbox/tests/utils/authnv1client"
 	"github.com/mattdowdell/sandbox/tests/utils/examplev1client"
+	"github.com/mattdowdell/sandbox/tests/utils/interceptors"
 	"github.com/mattdowdell/sandbox/tests/utils/step"
 )
 
@@ -20,14 +22,22 @@ func init() {
 }
 
 func Test_ExampleService(t *testing.T) {
-	client, err := examplev1client.New("http://localhost:5000")
+	exampleClient, err := examplev1client.New("http://localhost:5000")
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	authnClient, err := authnv1client.New("http://localhost:5000")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ctx := examplev1client.IntoContext(t.Context(), exampleClient)
+	ctx = authnv1client.IntoContext(ctx, authnClient)
+
 	o := opts
 	o.TestingT = t
-	o.DefaultContext = examplev1client.IntoContext(t.Context(), client)
+	o.DefaultContext = ctx
 
 	suite := godog.TestSuite{
 		Name:                "example_service",
@@ -47,7 +57,7 @@ func Test_ExampleService(t *testing.T) {
 
 func InitializeScenario(sc *godog.ScenarioContext) {
 	sc.Before(func(ctx context.Context, scen *godog.Scenario) (context.Context, error) {
-		return examplev1client.ScenarioIntoContext(ctx, scen), nil
+		return interceptors.ScenarioIntoContext(ctx, scen), nil
 	})
 
 	sc.Given(`^a name of (\d+) printable ASCII characters$`, step.PrintableASCIIChars)

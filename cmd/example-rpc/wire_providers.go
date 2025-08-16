@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/http"
+
 	"connectrpc.com/connect"
 	"connectrpc.com/grpchealth"
 	"connectrpc.com/grpcreflect"
@@ -27,10 +29,11 @@ func baggageFilter() baggagecopy.Filter {
 
 // loggerOptions provides logger configuration options.
 func loggerOptions() []logging.Option {
-	extractor := otelx.NewExtractor(otelx.WithSpanID(true), otelx.WithSampled(true))
+	otelExtractor := otelx.NewExtractor(otelx.WithSpanID(true), otelx.WithSampled(true))
+	authnExtractor := authn.NewExtractor()
 
 	return []logging.Option{
-		logging.WithExtractors(extractor),
+		logging.WithExtractors(otelExtractor, authnExtractor),
 	}
 }
 
@@ -102,6 +105,25 @@ func collectHandlerOptions(
 // ...
 func recovererOptions() []rpcserver.RecovererOption {
 	return nil
+}
+
+// ...
+func connectClient() connect.HTTPClient {
+	return http.DefaultClient
+}
+
+// authnClient is used to apply relevant interceptors to the authn service client.
+//
+// It exists because it is used in an authn interceptor and connect interceptor are used for both
+// clients and servers. As a result, an unresolvable cycle occurs if the client tries to accept a
+// slice of interceptors too.
+func authnClient(
+	client connect.HTTPClient,
+	conf authn.ClientConfig,
+	otelconnec *otelconnect.Interceptor,
+	validat *validate.Interceptor,
+) authnv1connect.AuthnServiceClient {
+	return authn.NewClientFromConfig(client, conf, otelconnec, validat)
 }
 
 // ...
