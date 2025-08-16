@@ -76,6 +76,6 @@ jobs:
           echo latest=${LATEST}
         env:
           NAME: ${{ matrix.name }}
-          UPDATED: ${{ steps.update.output.updated }}
-          CURRENT: ${{ steps.update.output.current }}
-          LATEST: ${{ steps.update.output.latest }}
+          UPDATED: ${{ steps.update.outputs.updated }}
+          CURRENT: ${{ steps.update.outputs.current }}
+          LATEST: ${{ steps.update.outputs.latest }}

@@ -10,12 +10,12 @@ inputs:
     required: true
 
 outputs:
-  updated:
-    description: "Whether the version was updated."
-    value: ${{ steps.updated.outputs.updated }}
   current:
     description: "The current version for the tool."
     value: ${{ steps.package.outputs.version }}
+  updated:
+    description: "Whether the version was updated."
+    value: ${{ steps.updated.outputs.updated }}
   latest:
     description: "The latest available version for the tool."
     value: ${{ steps.updated.outputs.version }}
