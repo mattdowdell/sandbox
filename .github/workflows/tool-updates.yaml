@@ -3,13 +3,12 @@ name: Tool Updates
 
 on:
   workflow_dispatch:
-
-inputs:
-  dry-run:
-    description: Whether to run the update in dry-run mode.
-    type: boolean
-    required: false
-    default: true
+    inputs:
+      dry-run:
+        description: Whether to run the update in dry-run mode.
+        type: boolean
+        required: false
+        default: true
 
 permissions: {}
 
