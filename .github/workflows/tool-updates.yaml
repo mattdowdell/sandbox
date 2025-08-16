@@ -4,6 +4,13 @@ name: Tool Updates
 on:
   workflow_dispatch:
 
+inputs:
+  dry-run:
+    description: Whether to run the update in dry-run mode.
+    type: boolean
+    required: false
+    default: true
+
 permissions: {}
 
 jobs:
@@ -60,6 +67,7 @@ jobs:
         uses: ./.github/actions/bingo-update
         with:
           name: ${{ matrix.name }}
+          dry-run: ${{ inputs.dry-run }}
 
       - name: Output
         run: |
