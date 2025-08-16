@@ -42,4 +42,10 @@ done
 
 # list: success
 echo '{}' | grpc-client-cli -a localhost:5000 -s ExampleService -m ListResources
+
+# login
+echo '{"id":"example","secret":"example"}' | grpc-client-cli -a localhost:5000 -s AuthnService -m Login
+
+# authenticate
+echo '{"token":"<token>"}' | grpc-client-cli -a localhost:5000 -s AuthnService -m Authenticate
 ```

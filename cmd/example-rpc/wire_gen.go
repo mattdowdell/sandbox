@@ -9,6 +9,7 @@ package main
 import (
 	"context"
 	"github.com/gofrs/uuid/v5"
+	"github.com/mattdowdell/sandbox/internal/adapters/authnrpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/healthrpc"
@@ -17,6 +18,7 @@ import (
 	"github.com/mattdowdell/sandbox/internal/drivers/clock"
 	"github.com/mattdowdell/sandbox/internal/drivers/config"
 	"github.com/mattdowdell/sandbox/internal/drivers/config/flagoptions"
+	"github.com/mattdowdell/sandbox/internal/drivers/jwtx"
 	"github.com/mattdowdell/sandbox/internal/drivers/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
 	"github.com/mattdowdell/sandbox/internal/drivers/pgsql"
@@ -41,14 +43,25 @@ func ProvideApp(ctx context.Context) (*App, error) {
 	v := loggerOptions()
 	logger := logging.NewAsDefaultFromConfig(loggingConfig, v...)
 	rpcserverConfig := mainConfig.RPCServer
+	clockClock := clock.New()
+	gen := uuid.NewGen()
+	issuerConfig := mainConfig.Issuer
+	issuer, err := jwtx.NewIssuerFromConfig(clockClock, gen, issuerConfig)
+	if err != nil {
+		return nil, err
+	}
+	parserConfig := mainConfig.Parser
+	parser, err := jwtx.NewParserFromConfig(clockClock, parserConfig)
+	if err != nil {
+		return nil, err
+	}
+	handler := authnrpc.New(issuer, parser)
 	pgsqlConfig := mainConfig.Database
 	db, err := pgsql.NewFromConfig(ctx, pgsqlConfig)
 	if err != nil {
 		return nil, err
 	}
 	provider := datastore.NewProvider(db)
-	clockClock := clock.New()
-	gen := uuid.NewGen()
 	createResource := usecases.NewCreateResource(clockClock, gen)
 	getResource := usecases.NewGetResource()
 	listResources := usecases.NewListResources()
@@ -58,10 +71,10 @@ func ProvideApp(ctx context.Context) (*App, error) {
 	listAuditEvents := usecases.NewListAuditEvents()
 	watchAuditEvents := usecases.NewWatchAuditEvents()
 	auditEvent := usecasefacades.NewAuditEvent(provider, listAuditEvents, watchAuditEvents)
-	handler := examplerpc.New(resource, auditEvent)
+	examplerpcHandler := examplerpc.New(resource, auditEvent)
 	reflectrpcHandler := reflectrpc.New()
 	healthrpcHandler := healthrpc.New()
-	v2 := collectHandlers(handler, reflectrpcHandler, healthrpcHandler)
+	v2 := collectHandlers(handler, examplerpcHandler, reflectrpcHandler, healthrpcHandler)
 	otelconnectxConfig := mainConfig.OtelConnect
 	interceptor, err := otelconnectx.NewFromConfig(otelconnectxConfig)
 	if err != nil {

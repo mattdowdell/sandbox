@@ -1,4 +1,4 @@
--- TODO: document
+-- Initial database migration.
 
 -- +goose Up
 
@@ -12,7 +12,8 @@ CREATE TABLE resources (
 
 -- For storing audit events for the service.
 --
--- TODO: document use for resource id/type.
+-- The resource ID and type reference the resource the audit event targets. It is assumed that these
+-- values uniquely identify any resource in the system.
 CREATE TABLE audit_events (
 	id UUID PRIMARY KEY,
 	operation TEXT NOT NULL,

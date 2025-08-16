@@ -799,6 +799,61 @@ func (_m *UUIDGenerator) EXPECT() *UUIDGenerator_Expecter {
 	return &UUIDGenerator_Expecter{mock: &_m.Mock}
 }
 
+// NewV4 provides a mock function for the type UUIDGenerator
+func (_mock *UUIDGenerator) NewV4() (uuid.UUID, error) {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for NewV4")
+	}
+
+	var r0 uuid.UUID
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func() (uuid.UUID, error)); ok {
+		return returnFunc()
+	}
+	if returnFunc, ok := ret.Get(0).(func() uuid.UUID); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(uuid.UUID)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func() error); ok {
+		r1 = returnFunc()
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// UUIDGenerator_NewV4_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'NewV4'
+type UUIDGenerator_NewV4_Call struct {
+	*mock.Call
+}
+
+// NewV4 is a helper method to define mock.On call
+func (_e *UUIDGenerator_Expecter) NewV4() *UUIDGenerator_NewV4_Call {
+	return &UUIDGenerator_NewV4_Call{Call: _e.mock.On("NewV4")}
+}
+
+func (_c *UUIDGenerator_NewV4_Call) Run(run func()) *UUIDGenerator_NewV4_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *UUIDGenerator_NewV4_Call) Return(uUID uuid.UUID, err error) *UUIDGenerator_NewV4_Call {
+	_c.Call.Return(uUID, err)
+	return _c
+}
+
+func (_c *UUIDGenerator_NewV4_Call) RunAndReturn(run func() (uuid.UUID, error)) *UUIDGenerator_NewV4_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewV7 provides a mock function for the type UUIDGenerator
 func (_mock *UUIDGenerator) NewV7() (uuid.UUID, error) {
 	ret := _mock.Called()

@@ -6,7 +6,7 @@ import (
 	"connectrpc.com/connect"
 )
 
-// ...
+// Common errors to be returned by handler methods.
 var (
 	ErrResourceNotFound      = newError(connect.CodeNotFound, "resource does not exist")
 	ErrResourceAlreadyExists = newError(connect.CodeAlreadyExists, "resource name already in use")
@@ -14,7 +14,7 @@ var (
 	ErrUnimplemented         = newError(connect.CodeUnimplemented, "unimplemented")
 )
 
-// ...
+// newError creates an error response using the given code and message.
 func newError(code connect.Code, msg string) *connect.Error {
 	return connect.NewError(code, errors.New(msg))
 }
