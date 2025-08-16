@@ -3,6 +3,12 @@ name: Tool Updates
 
 on:
   workflow_dispatch:
+    inputs:
+      dry-run:
+        description: Whether to run the update in dry-run mode.
+        type: boolean
+        required: false
+        default: true
 
 permissions: {}
 
@@ -12,6 +18,8 @@ jobs:
     permissions:
       contents: read
     runs-on: "ubuntu-latest"
+    outputs:
+      names: ${{ steps.collect.outputs.names }}
     steps:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -19,15 +27,23 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      - name: Install Go
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+        with:
+          go-version-file: "go.mod"
+
+      - name: Install bingo
+        uses: mattdowdell/go-installer@7af1f9ff5af1447fd122d6b144ddce2562b76e09 # v0.3.0
+        with:
+          package: github.com/bwplotka/bingo
+
       - name: Collect
+        id: collect
         run: |
           echo "names=`bingo list | \
             tail -n+3 | \
             awk '{print $1}' | \
             jq -ncR '[inputs]'`" >> "$GITHUB_OUTPUT"
-        with:
-          fetch-depth: 0
-          persist-credentials: false
 
   update:
     name: Update
@@ -47,16 +63,19 @@ jobs:
 
       - name: Update
         id: update
-        uses: ./.github/actions/setup-checks
+        uses: ./.github/actions/bingo-update
         with:
           name: ${{ matrix.name }}
+          dry-run: ${{ inputs.dry-run }}
 
       - name: Output
         run: |
           echo name=${NAME}
           echo updated=${UPDATED}
-          echo version=${VERSION}
+          echo current=${CURRENT}
+          echo latest=${LATEST}
         env:
           NAME: ${{ matrix.name }}
-          UPDATED: ${{ steps.update.output.updated }}
-          VERSION: ${{ steps.update.output.version }}
+          UPDATED: ${{ steps.update.outputs.updated }}
+          CURRENT: ${{ steps.update.outputs.current }}
+          LATEST: ${{ steps.update.outputs.latest }}
