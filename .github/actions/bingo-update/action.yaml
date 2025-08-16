@@ -12,10 +12,13 @@ inputs:
 outputs:
   updated:
     description: "Whether the version was updated."
-    value: ${{ steps.updated.outputs.updates }}
-  version:
-    description: "The latest available version for the tool."
+    value: ${{ steps.updated.outputs.updated }}
+  current:
+    description: "The current version for the tool."
     value: ${{ steps.package.outputs.version }}
+  latest:
+    description: "The latest available version for the tool."
+    value: ${{ steps.updated.outputs.version }}
 
 runs:
   using: composite
@@ -66,5 +69,11 @@ runs:
         else
           echo "updated=true" >> "$GITHUB_OUTPUT"
         fi
+
+        echo "version=`bingo list | \
+          tail -n+3 | \
+          grep "^${NAME}\b" | \
+          awk '{print $3}' | \
+          cut -d@ -f2`" >> "$GITHUB_OUTPUT"
       env:
         NAME: ${{ inputs.name }}

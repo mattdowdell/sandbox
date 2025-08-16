@@ -72,8 +72,10 @@ jobs:
         run: |
           echo name=${NAME}
           echo updated=${UPDATED}
-          echo version=${VERSION}
+          echo current=${CURRENT}
+          echo latest=${LATEST}
         env:
           NAME: ${{ matrix.name }}
           UPDATED: ${{ steps.update.output.updated }}
-          VERSION: ${{ steps.update.output.version }}
+          CURRENT: ${{ steps.update.output.current }}
+          LATEST: ${{ steps.update.output.latest }}
