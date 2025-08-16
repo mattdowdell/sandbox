@@ -14,8 +14,8 @@ outputs:
     description: "Whether the version was updated."
     value: ${{ steps.updated.outputs.updates }}
   version:
-    description: "The version after any updates were applied."
-    value: ${{ steps.updated.outputs.version }}
+    description: "The latest available version for the tool."
+    value: ${{ steps.package.outputs.version }}
 
 runs:
   using: composite
@@ -39,12 +39,17 @@ runs:
           grep "^${NAME}\b" | \
           awk '{print $3}' | \
           cut -d@ -f1`" >> "$GITHUB_OUTPUT"
+        echo "version=`bingo list | \
+          tail -n+3 | \
+          grep "^${NAME}\b" | \
+          awk '{print $3}' | \
+          cut -d@ -f2`" >> "$GITHUB_OUTPUT"
       env:
         NAME: ${{ inputs.name }}
 
     - name: Get update
       shell: bash
-      run: bingo get ${PACKAGE}
+      run: bingo get ${PACKAGE}@latest
       env:
         PACKAGE: ${{ steps.package.outputs.url }}
 
@@ -61,11 +66,5 @@ runs:
         else
           echo "updated=true" >> "$GITHUB_OUTPUT"
         fi
-
-        echo "version=`bingo list | \
-          tail -n+3 | \
-          grep '^${NAME}\b' | \
-          awk '{print $3}' | `
-          cut -d@ -f2` >> "$GITHUB_OUTPUT"
       env:
         NAME: ${{ inputs.name }}
