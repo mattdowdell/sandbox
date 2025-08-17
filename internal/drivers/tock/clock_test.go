@@ -1,4 +1,4 @@
-package clock_test
+package tock_test
 
 import (
 	"testing"
@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mattdowdell/sandbox/internal/drivers/clock"
+	"github.com/mattdowdell/sandbox/internal/drivers/tock"
 )
 
 func assertWithinRange(t *testing.T, expected, actual, delta time.Duration) {
@@ -18,7 +18,7 @@ func assertWithinRange(t *testing.T, expected, actual, delta time.Duration) {
 
 func Test_Clock_UTCNow(t *testing.T) {
 	// arrange
-	c := clock.New()
+	c := tock.New()
 
 	// act
 	now := c.UTCNow()
@@ -34,7 +34,7 @@ func Test_Clock_UTCNow(t *testing.T) {
 
 func Test_Clock_LocalNow(t *testing.T) {
 	// arrange
-	c := clock.New()
+	c := tock.New()
 
 	// act
 	now := c.LocalNow()
@@ -45,7 +45,7 @@ func Test_Clock_LocalNow(t *testing.T) {
 
 func Test_Clock_Since(t *testing.T) {
 	// arrange
-	c := clock.New()
+	c := tock.New()
 
 	// act
 	got := c.Since(time.Now().Add(time.Hour * -1))
@@ -56,7 +56,7 @@ func Test_Clock_Since(t *testing.T) {
 
 func Test_Clock_Until(t *testing.T) {
 	// arrange
-	c := clock.New()
+	c := tock.New()
 
 	// act
 	got := c.Until(time.Now().Add(time.Hour))
