@@ -15,7 +15,7 @@ import (
 
 // ...
 type App struct {
-	conf       Config
+	conf       *Config
 	logger     *slog.Logger
 	db         *sql.DB
 	tpShutdown otelx.TracerProviderShutdown
@@ -27,7 +27,7 @@ type App struct {
 //
 //nolint:gocritic // config is large(ish), but this is called once
 func NewApp(
-	conf Config,
+	conf *Config,
 	logger *slog.Logger,
 	db *sql.DB,
 	tpShutdown otelx.TracerProviderShutdown,

@@ -119,7 +119,7 @@ gen-buf: install-buf install-protoc-gen-connect-go install-protoc-gen-go
 
 # Run the Go generators.
 [group('generators')]
-gen-go: gen-go-jet gen-go-mockery gen-go-wire
+gen-go: gen-go-jet gen-go-mockery
 
 # Run the Go jet generator
 [group('generators')]
@@ -136,11 +136,6 @@ gen-go-jet:
 gen-go-mockery: install-mockery
     rm -rf mocks/
     {{ mockery }}
-
-# Run the Go wire generator.
-[group('generators')]
-gen-go-wire: install-wire
-    {{ wire }} gen ./cmd/...
 
 # Run the tools generator.
 [group('generators')]
