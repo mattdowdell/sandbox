@@ -79,11 +79,11 @@ runs:
         NAME: ${{ inputs.name }}
 
     - name: Setup checks
-      if: ${{ steps.updated.outputs.updated == "true" }}
+      if: steps.updated.outputs.updated == "true"
       uses: ./.github/actions/setup-checks
 
     - name: Start database
-      if: ${{ steps.updated.outputs.updated == "true" }}
+      if: steps.updated.outputs.updated == "true"
       uses: hoverkraft-tech/compose-action@40041ff1b97dbf152cd2361138c2b03fa29139df # v2.3.0
       with:
         compose-file: compose.yaml
@@ -94,7 +94,7 @@ runs:
           migrate
 
     - name: Regenerate
-      if: ${{ steps.updated.outputs.updated == "true" }}
+      if: steps.updated.outputs.updated == "true"
       shell: bash
       run: |
         # do for tool updates first and separately, otherwise other commands will fail
@@ -102,7 +102,7 @@ runs:
         just checks
 
     - name: Create PR
-      if: ${{ steps.updated.outputs.updated == "true" && inputs.dry-run != false }}
+      if: steps.updated.outputs.updated == "true" && inputs.dry-run != false
       shell: bash
       run: |
         # make sure new files are included in the diff
