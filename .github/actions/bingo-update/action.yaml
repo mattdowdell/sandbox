@@ -115,7 +115,7 @@ runs:
         git switch --create tool-update/${NAME}-${LATEST}
 
         git commit -m "Update ${NAME} from ${CURRENT} to ${LATEST}"
-        git push --set-upstream-to origin tool-update/${NAME}-${LATEST}
+        git push --set-upstream origin tool-update/${NAME}-${LATEST}
       env:
         NAME: ${{ inputs.name }}
         CURRENT: ${{ steps.package.outputs.version }}
