@@ -86,8 +86,8 @@ func ProvideApp(ctx context.Context) (*App, error) {
 	}
 	loggingInterceptor := logging2.New()
 	httpClient := connectClient()
-	clientConfig := mainConfig.Authn
-	authnServiceClient := authnClient(httpClient, clientConfig, interceptor, validateInterceptor)
+	authnConfig := mainConfig.Authn
+	authnServiceClient := authnClient(httpClient, authnConfig, interceptor, validateInterceptor)
 	v3 := authnOptions()
 	authnInterceptor := authn.New(authnServiceClient, v3...)
 	v4 := collectInterceptors(interceptor, validateInterceptor, loggingInterceptor, authnInterceptor)
