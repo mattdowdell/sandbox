@@ -79,7 +79,7 @@ runs:
         NAME: ${{ inputs.name }}
 
     - name: Setup checks
-      if: steps.updated.outputs.updated == true
+      if: steps.updated.outputs.updated == 'true'
       uses: ./.github/actions/setup-checks
 
     - name: Start database
