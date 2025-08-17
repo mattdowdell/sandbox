@@ -102,7 +102,7 @@ runs:
         just checks
 
     - name: Create PR
-      if: steps.updated.outputs.updated == 'true' && inputs.dry-run != 'false'
+      if: steps.updated.outputs.updated == 'true' && inputs.dry-run == 'false'
       shell: bash
       run: |
         # make sure new files are included in the diff
