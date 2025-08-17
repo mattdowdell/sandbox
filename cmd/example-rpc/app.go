@@ -20,7 +20,7 @@ type AppConfig struct {
 
 // ...
 type App struct {
-	conf            Config
+	conf            *Config
 	shutdownTimeout time.Duration
 	logger          *slog.Logger
 	server          *rpcserver.Server
@@ -33,7 +33,7 @@ type App struct {
 //
 //nolint:gocritic // config is large(ish), but this is called once
 func NewApp(
-	conf Config,
+	conf *Config,
 	logger *slog.Logger,
 	server *rpcserver.Server,
 	tpShutdown otelx.TracerProviderShutdown,

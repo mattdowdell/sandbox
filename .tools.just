@@ -38,12 +38,6 @@ protoc-gen-go := join(gopath, "bin", "protoc-gen-go-v1.36.7")
 install-protoc-gen-go:
     {{ if path_exists(protoc-gen-go) == "true" { "" } else { "bingo get protoc-gen-go" } }}
 
-wire := join(gopath, "bin", "wire-v0.6.0")
-
-[private]
-install-wire:
-    {{ if path_exists(wire) == "true" { "" } else { "bingo get wire" } }}
-
 yamlfmt := join(gopath, "bin", "yamlfmt-v0.17.2")
 
 [private]

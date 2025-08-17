@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/mattdowdell/sandbox/internal/drivers/config"
 	"github.com/mattdowdell/sandbox/internal/drivers/jwtx"
 	"github.com/mattdowdell/sandbox/internal/drivers/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
@@ -22,12 +21,4 @@ type Config struct {
 	RPCServer      rpcserver.Config           `koanf:"rpcserver"`
 	Issuer         jwtx.IssuerConfig          `koanf:"issuer"`
 	Parser         jwtx.ParserConfig          `koanf:"parser"`
-}
-
-// LoadConfig loads the service configuration.
-//
-// This is effectively a workaround for wire not supporting generics. For more details, see
-// https://github.com/google/wire/issues/354.
-func LoadConfig(conf *config.Config) (Config, error) {
-	return config.Load[Config](conf)
 }

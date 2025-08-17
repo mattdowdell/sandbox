@@ -46,17 +46,22 @@ type Options struct {
 }
 
 // Config provides loading of configuration values for a service.
-type Config struct {
+type Config[T any] struct {
 	inner *koanf.Koanf
 	opts  *Options
 }
 
 // New creates a new Config instance.
-func New(opts *Options) *Config {
-	return &Config{
+func New[T any](opts *Options) *Config[T] {
+	return &Config[T]{
 		inner: koanf.New(delimiter),
 		opts:  opts,
 	}
+}
+
+// Load creates a new Config instance and immediately calls it's Load method.
+func Load[T any](opts *Options) (*T, error) {
+	return New[T](opts).Load()
 }
 
 // Load reads configuration using the given options, using it to populate a struct.
@@ -97,39 +102,37 @@ func New(opts *Options) *Config {
 // [defaults]: https://pkg.go.dev/github.com/creasty/defaults
 // [defaults.Setter]: https://pkg.go.dev/github.com/creasty/defaults#Setter
 // [encoding/json.Unmarshaler]: https://pkg.go.dev/encoding/json#Unmarshaler
-func Load[T any](conf *Config) (T, error) {
-	var zero T
-
-	if err := conf.loadEnv(); err != nil {
-		return zero, err
+func (c *Config[T]) Load() (*T, error) {
+	if err := c.loadEnv(); err != nil {
+		return nil, err
 	}
 
-	if err := conf.loadFiles(); err != nil {
-		return zero, err
+	if err := c.loadFiles(); err != nil {
+		return nil, err
 	}
 
-	if err := conf.loadMounts(); err != nil {
-		return zero, err
+	if err := c.loadMounts(); err != nil {
+		return nil, err
 	}
 
-	var val T
+	conf := new(T)
 
-	if err := defaults.Set(&val); err != nil {
-		return zero, err
+	if err := defaults.Set(conf); err != nil {
+		return nil, err
 	}
 
-	if err := conf.inner.Unmarshal("", &val); err != nil {
-		return zero, err
+	if err := c.inner.Unmarshal("", conf); err != nil {
+		return nil, err
 	}
 
-	return val, nil
+	return conf, nil
 }
 
-func (c *Config) loadEnv() error {
+func (c *Config[T]) loadEnv() error {
 	return c.inner.Load(envProvider(c.opts.EnvPrefix), nil)
 }
 
-func (c *Config) loadFiles() error {
+func (c *Config[T]) loadFiles() error {
 	for _, path := range c.opts.Files {
 		parser, err := fileParser(path)
 		if err != nil {
@@ -144,7 +147,7 @@ func (c *Config) loadFiles() error {
 	return nil
 }
 
-func (c *Config) loadMounts() error {
+func (c *Config[T]) loadMounts() error {
 	for _, path := range c.opts.Mounts {
 		if err := c.inner.Load(k8smount.Provider(path, delimiter), nil); err != nil {
 			return err

@@ -47,13 +47,11 @@ func Test_Load(t *testing.T) {
 		EnvPrefix: "APP_",
 	}
 
-	conf := config.New(options)
-
 	// act
-	got, err := config.Load[MyConfig](conf)
+	got, err := config.Load[MyConfig](options)
 
 	// assert
-	want := MyConfig{
+	want := &MyConfig{
 		Foo: splitter.Comma{"foo", "bar", "baz"},
 		Bar: splitter.Space{"foo", "bar", "baz"},
 	}
