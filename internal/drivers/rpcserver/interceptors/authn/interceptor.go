@@ -28,14 +28,20 @@ var (
 // Interceptor validates that RPC requests have valid authorization. Authorization can be skipped
 // for specific services when creating the interceptor.
 //
+// For authorization to be considered valid it must include a Bearer token that is accepted by the
+// AuthnService. This roughly includes checking whether the provided JWT can be parsed, is signed
+// with the expected secret, has not expired and has various claims with expected values, including
+// issuer and audience. On success, the subject claim is stored in the context to use anywhere the
+// client identity is required.
+//
 // This implementation takes a different approach to [connectrpc.com/authn] which provides HTTP
 // middleware to wrap the HTTP request handler. By using HTTP middleware, authorization is checked
 // before the request body is read and parsed. This saves resources, and protects the server from
 // malicious requests. However, it sacrifices observability added by interceptors that only run once
 // the request body has been parsed. While the risks of a malicious request are significant for
 // public endpoints, they may be acceptable for internal endpoints. Additionally, if observability
-// is added external, such as by Istio's sidecar, using HTTP middleware may not result in a loss of
-// observability.
+// is added externally, such as by Istio's sidecar, using HTTP middleware may not result in a loss
+// of observability.
 //
 // See [connectrpc/otelconnect-go#164] for whether otelconnect could provide a middleware and so
 // provide observability for the authn module's middleware too.

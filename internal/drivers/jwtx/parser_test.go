@@ -23,6 +23,10 @@ const (
 	testTokenMissingSubject = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJpc3N1ZXIiLCJhdWQiO" +
 		"lsiYXVkaWVuY2UiXSwiZXhwIjoxNzU2NDcyNDAwLCJpYXQiOjE3NTY0Njg4MDAsImp0aSI6IjdhZGZhNGZkLWViN" +
 		"WUtNGEzMS1iY2U5LTY3Y2UyN2I3NGIwZiJ9.AC1w2ia17qXPazGbyXRmeISh_CiEM0wyFxZJ8RCQj0Q"
+	testTokenInvalidSubject = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJpc3N1ZXIiLCJzdWIiO" +
+		"jEyMzQ1LCJhdWQiOlsiYXVkaWVuY2UiXSwiZXhwIjoxNzU2NDcyNDAwLCJpYXQiOjE3NTY0Njg4MDAsImp0aSI6I" +
+		"jdhZGZhNGZkLWViNWUtNGEzMS1iY2U5LTY3Y2UyN2I3NGIwZiJ9.hXYzEXSmXIROYKQB9VevXwnUHsEbVS-qXVu9" +
+		"7npGhAQ"
 	testTokenMissingExpiresAt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJpc3N1ZXIiLCJzdWI" +
 		"iOiJzdWJqZWN0IiwiYXVkIjpbImF1ZGllbmNlIl0sImlhdCI6MTc1NjQ2ODgwMCwianRpIjoiN2FkZmE0ZmQtZWI" +
 		"1ZS00YTMxLWJjZTktNjdjZTI3Yjc0YjBmIn0.CNfCmx1ew-i_ALuVNfbduyEIsPL8xhRQ-shXkeZ5XCI"
@@ -208,6 +212,14 @@ func Test_Parser_Parse_Error(t *testing.T) {
 			issuer:   testIssuer,
 			input:    testTokenMissingSubject,
 			want:     "failed to parse token: missing sub claim",
+		},
+		{
+			name:     "invalid subject",
+			audience: []string{testAudience},
+			issuer:   testIssuer,
+			input:    testTokenInvalidSubject,
+			want: "failed to parse token: invalid sub claim: invalid type for claim: " +
+				"sub is invalid",
 		},
 		{
 			name:     "missing expires at",

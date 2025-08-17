@@ -6,22 +6,22 @@ import (
 	"github.com/mattdowdell/sandbox/gen/authn/v1/authnv1connect"
 )
 
-// ...
-type ClientConfig struct {
-	// ...
+// Config provides configuration for an AuthnService client.
+type Config struct {
+	// The address for the AuthnService server.
 	Address string `koanf:"address"`
 }
 
-// ...
+// NewClientFromConfig creates a new AuthnService client using the given configuration.
 func NewClientFromConfig(
 	client connect.HTTPClient,
-	conf ClientConfig,
+	conf Config,
 	interceptors ...connect.Interceptor,
 ) authnv1connect.AuthnServiceClient {
 	return NewClient(client, conf.Address, interceptors...)
 }
 
-// ...
+// NewClient creates a new AuthnService client.
 func NewClient(
 	client connect.HTTPClient,
 	address string,

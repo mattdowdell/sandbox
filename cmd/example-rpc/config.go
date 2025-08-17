@@ -14,7 +14,7 @@ import (
 // Config contains the service configuration.
 type Config struct {
 	App            AppConfig                  `koanf:",squash"`
-	Authn          authn.ClientConfig         `koanf:"authn"`
+	Authn          authn.Config               `koanf:"authn"`
 	Database       pgsql.Config               `koanf:"database"`
 	Issuer         jwtx.IssuerConfig          `koanf:"issuer"`
 	Logging        logging.Config             `koanf:"logging"`

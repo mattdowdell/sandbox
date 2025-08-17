@@ -22,7 +22,8 @@ import (
 	logginginterceptor "github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/logging"
 )
 
-// ...
+// baggageFilter provides the filter to use when copying baggage to and from the request for use in
+// tracing and logging.
 func baggageFilter() baggagecopy.Filter {
 	return baggagecopy.AllowAllMembers
 }
@@ -102,12 +103,12 @@ func collectHandlerOptions(
 	}
 }
 
-// ...
+// recovererOptions provides options to configure the recoverer interceptor.
 func recovererOptions() []rpcserver.RecovererOption {
 	return nil
 }
 
-// ...
+// connectClient provides the base client to use for ConnectRPC requests.
 func connectClient() connect.HTTPClient {
 	return http.DefaultClient
 }
@@ -119,14 +120,14 @@ func connectClient() connect.HTTPClient {
 // slice of interceptors too.
 func authnClient(
 	client connect.HTTPClient,
-	conf authn.ClientConfig,
+	conf authn.Config,
 	otelconnec *otelconnect.Interceptor,
 	validat *validate.Interceptor,
 ) authnv1connect.AuthnServiceClient {
 	return authn.NewClientFromConfig(client, conf, otelconnec, validat)
 }
 
-// ...
+// authnOptions provides options to configure the authn interceptor.
 func authnOptions() []authn.Option {
 	return []authn.Option{
 		authn.WithIgnoreService(

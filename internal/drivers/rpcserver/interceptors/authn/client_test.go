@@ -15,7 +15,7 @@ const (
 
 func Test_NewClientFromConfig(t *testing.T) {
 	// arrange
-	conf := authn.ClientConfig{
+	conf := authn.Config{
 		Address: testAddress,
 	}
 
