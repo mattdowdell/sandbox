@@ -77,3 +77,41 @@ runs:
           cut -d@ -f2`" >> "$GITHUB_OUTPUT"
       env:
         NAME: ${{ inputs.name }}
+
+    - name: Setup checks
+      if: ${{ steps.updated.outputs.updated == "true" }}
+      uses: ./.github/actions/setup-checks
+
+    - name: Start database
+      if: ${{ steps.updated.outputs.updated == "true" }}
+      uses: hoverkraft-tech/compose-action@40041ff1b97dbf152cd2361138c2b03fa29139df # v2.3.0
+      with:
+        compose-file: compose.yaml
+        up-flags: --build --wait
+        down-flags: --volumes --remove-orphans
+        services: |
+          postgres
+          migrate
+
+    - name: Regenerate
+      if: ${{ steps.updated.outputs.updated == "true" }}
+      run: |
+        # do for tool updates first and separately, otherwise other commands will fail
+        just gen-tools
+        just checks
+
+    - name: Create PR
+      if: ${{ steps.updated.outputs.updated == "true" && inputs.dry-run != false }}
+      shell: bash
+      run: |
+        # make sure new files are included in the diff
+        git add .
+        git diff HEAD -- .
+
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+        git switch --create tool-update/${NAME}-${LATEST}
+
+        git commit -m "Update ${NAME} to ${LATEST}"
+        git push --set-upstream-to origin tool-update/${NAME}-${LATEST}
