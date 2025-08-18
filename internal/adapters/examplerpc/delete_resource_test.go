@@ -5,7 +5,6 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/gofrs/uuid/v5"
-	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
@@ -13,6 +12,7 @@ import (
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
 	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/mocks/adapters/mockexamplerpc"
+	"github.com/mattdowdell/sandbox/pkg/slogt"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
