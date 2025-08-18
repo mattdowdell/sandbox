@@ -20,7 +20,7 @@ golangci-lint := join(gopath, "bin", "golangci-lint-v2.4.0")
 install-golangci-lint:
     {{ if path_exists(golangci-lint) == "true" { "" } else { "bingo get golangci-lint" } }}
 
-mockery := join(gopath, "bin", "mockery-v3.5.2")
+mockery := join(gopath, "bin", "mockery-v3.5.3")
 
 [private]
 install-mockery:
