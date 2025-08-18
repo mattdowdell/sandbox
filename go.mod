@@ -1,6 +1,6 @@
 module github.com/mattdowdell/sandbox
 
-go 1.24
+go 1.25
 
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.7-20250717185734-6c6e0d3c608e.1
@@ -34,7 +34,6 @@ require (
 	github.com/knadh/koanf/providers/env/v2 v2.0.0
 	github.com/knadh/koanf/providers/file v1.2.0
 	github.com/knadh/koanf/v2 v2.2.2
-	github.com/neilotoole/slogt v1.1.0
 	github.com/pressly/goose/v3 v3.24.3
 	github.com/samber/slog-multi v1.4.1
 	github.com/stretchr/testify v1.10.0

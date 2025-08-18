@@ -5,13 +5,13 @@ import (
 	"testing"
 
 	"connectrpc.com/connect"
-	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 
 	authnv1 "github.com/mattdowdell/sandbox/gen/authn/v1"
 	"github.com/mattdowdell/sandbox/internal/adapters/authnrpc"
 	"github.com/mattdowdell/sandbox/mocks/adapters/mockauthnrpc"
 	"github.com/mattdowdell/sandbox/mocks/external/github.com/golang-jwt/mockjwt/v5"
+	"github.com/mattdowdell/sandbox/pkg/slogt"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 

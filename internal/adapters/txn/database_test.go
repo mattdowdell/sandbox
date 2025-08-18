@@ -4,11 +4,11 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/txn"
 	"github.com/mattdowdell/sandbox/mocks/adapters/mocktxn"
+	"github.com/mattdowdell/sandbox/pkg/slogt"
 )
 
 func Test_Func(t *testing.T) {
