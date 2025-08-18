@@ -2,12 +2,17 @@ package authn
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"connectrpc.com/connect"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 
+	authnv1 "github.com/mattdowdell/sandbox/gen/authn/v1"
+	"github.com/mattdowdell/sandbox/gen/authn/v1/authnv1connect"
+	"github.com/mattdowdell/sandbox/internal/drivers/jwtx"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
@@ -15,8 +20,19 @@ import (
 // Non-allocating compile-time check for interface compliance.
 var _ connect.Interceptor = (*Interceptor)(nil)
 
+var (
+	errUnavailable = connect.NewError(connect.CodeUnavailable, errors.New("service unavailable"))
+	errInternal    = connect.NewError(connect.CodeInternal, errors.New("internal error"))
+)
+
 // Interceptor validates that RPC requests have valid authorization. Authorization can be skipped
 // for specific services when creating the interceptor.
+//
+// For authorization to be considered valid it must include a Bearer token that is accepted by the
+// AuthnService. This roughly includes checking whether the provided JWT can be parsed, is signed
+// with the expected secret, has not expired and has various claims with expected values, including
+// issuer and audience. On success, the subject claim is stored in the context to use anywhere the
+// client identity is required.
 //
 // This implementation takes a different approach to [connectrpc.com/authn] which provides HTTP
 // middleware to wrap the HTTP request handler. By using HTTP middleware, authorization is checked
@@ -24,8 +40,8 @@ var _ connect.Interceptor = (*Interceptor)(nil)
 // malicious requests. However, it sacrifices observability added by interceptors that only run once
 // the request body has been parsed. While the risks of a malicious request are significant for
 // public endpoints, they may be acceptable for internal endpoints. Additionally, if observability
-// is added external, such as by Istio's sidecar, using HTTP middleware may not result in a loss of
-// observability.
+// is added externally, such as by Istio's sidecar, using HTTP middleware may not result in a loss
+// of observability.
 //
 // See [connectrpc/otelconnect-go#164] for whether otelconnect could provide a middleware and so
 // provide observability for the authn module's middleware too.
@@ -37,12 +53,14 @@ var _ connect.Interceptor = (*Interceptor)(nil)
 type Interceptor struct {
 	connect.Interceptor
 
+	client  authnv1connect.AuthnServiceClient
 	ignores map[string]struct{}
 }
 
 // New creates an Interceptor.
-func New(options ...Option) *Interceptor {
+func New(client authnv1connect.AuthnServiceClient, options ...Option) *Interceptor {
 	i := &Interceptor{
+		client:  client,
 		ignores: map[string]struct{}{},
 	}
 
@@ -60,10 +78,12 @@ func (i *Interceptor) WrapUnary(next connect.UnaryFunc) connect.UnaryFunc {
 			return next(ctx, req)
 		}
 
-		if err := i.authenticate(ctx, req.Spec().Procedure, req.Header()); err != nil {
+		subject, err := i.authenticate(ctx, req.Spec().Procedure, req.Header())
+		if err != nil {
 			return nil, err
 		}
 
+		ctx = jwtx.SubjectIntoContext(ctx, subject)
 		return next(ctx, req)
 	}
 }
@@ -71,10 +91,12 @@ func (i *Interceptor) WrapUnary(next connect.UnaryFunc) connect.UnaryFunc {
 // WrapStreamingHandler implements a server streaming request interceptor.
 func (i *Interceptor) WrapStreamingHandler(next connect.StreamingHandlerFunc) connect.StreamingHandlerFunc {
 	return func(ctx context.Context, conn connect.StreamingHandlerConn) error {
-		if err := i.authenticate(ctx, conn.Spec().Procedure, conn.RequestHeader()); err != nil {
+		subject, err := i.authenticate(ctx, conn.Spec().Procedure, conn.RequestHeader())
+		if err != nil {
 			return err
 		}
 
+		ctx = jwtx.SubjectIntoContext(ctx, subject)
 		return next(ctx, conn)
 	}
 }
@@ -84,7 +106,7 @@ func (i *Interceptor) authenticate(
 	ctx context.Context,
 	procedure string,
 	headers http.Header,
-) error {
+) (string, error) {
 	span := trace.SpanFromContext(ctx)
 	logger := slogx.FromContext(ctx)
 
@@ -94,7 +116,7 @@ func (i *Interceptor) authenticate(
 		span.AddEvent("authentication skipped")
 		logger.DebugContext(ctx, "authentication skipped")
 
-		return nil
+		return "", nil
 	}
 
 	token, err := bearerToken(headers)
@@ -104,18 +126,39 @@ func (i *Interceptor) authenticate(
 
 		logger.DebugContext(ctx, "invalid authorization", slogx.Err(err))
 
-		return connect.NewError(connect.CodeUnauthenticated, err)
+		return "", connect.NewError(connect.CodeUnauthenticated, err)
 	}
 
-	// TODO: parse token into claims + validate
-	if err := parseToken(token); err != nil {
-		span.SetStatus(codes.Error, "failed to parse token")
+	resp, err := i.client.Authenticate(ctx, connect.NewRequest(&authnv1.AuthenticateRequest{
+		Token: token,
+	}))
+	if err != nil {
 		span.RecordError(err)
 
-		logger.DebugContext(ctx, "failed to parse token", slogx.Err(err))
+		//nolint:exhaustive // not all codes are returned and they'd map to internal anyway
+		switch connect.CodeOf(err) {
+		case connect.CodeUnauthenticated:
+			span.SetStatus(codes.Error, "failed authentication")
+			logger.DebugContext(ctx, "failed authentication", slogx.Err(err))
 
-		return connect.NewError(connect.CodeUnauthenticated, err)
+			return "", err
+
+		case connect.CodeUnavailable:
+			span.SetStatus(codes.Error, "authentication unavailable")
+			logger.ErrorContext(ctx, "authentication unavailable", slogx.Err(err))
+
+			return "", errUnavailable
+
+		default:
+			span.SetStatus(codes.Error, "authentication error")
+			logger.ErrorContext(ctx, "authentication error", slogx.Err(err))
+
+			return "", errInternal
+		}
 	}
 
-	return nil
+	subject := resp.Msg.GetSubject()
+	span.SetAttributes(attribute.String("subject", subject))
+
+	return subject, nil
 }

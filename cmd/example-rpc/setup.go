@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log/slog"
+	"net/http"
 
 	"connectrpc.com/connect"
 	"connectrpc.com/grpchealth"
@@ -175,7 +176,14 @@ func initHandlerOptions(conf *Config) ([]connect.HandlerOption, error) {
 
 	loggingInterceptor := logginginterceptor.New()
 
-	authnInterceptor := authn.New(authn.WithIgnoreService(
+	client := authn.NewClientFromConfig(
+		http.DefaultClient,
+		conf.Authn,
+		otelconnectInterceptor,
+		validateInterceptor,
+	)
+
+	authnInterceptor := authn.New(client, authn.WithIgnoreService(
 		grpchealth.HealthV1ServiceName,
 		grpcreflect.ReflectV1ServiceName,
 		grpcreflect.ReflectV1AlphaServiceName,

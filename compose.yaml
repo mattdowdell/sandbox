@@ -13,6 +13,7 @@ services:
     entrypoint: ["/example-rpc"]
     environment:
       GOCOVERDIR: "/covdata"
+      APP_AUTHN_ADDRESS: "http://localhost:5000"
       APP_DATABASE_HOSTNAME: "postgres"
       APP_DATABASE_USERNAME: "postgres"
       APP_DATABASE_PASSWORD: "secret"

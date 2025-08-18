@@ -11,6 +11,11 @@ template-data:
 
 packages:
   # internal dependencies
+  github.com/mattdowdell/sandbox/gen/authn/v1/authnv1connect:
+    config:
+      dir: "mocks/gen/authn/v1/mockauthnv1connect"
+    interfaces:
+      AuthnServiceClient: {}
   github.com/mattdowdell/sandbox/internal/adapters/authnrpc:
     config:
       all: true

@@ -44,11 +44,3 @@ func bearerToken(headers http.Header) (string, error) {
 
 	return value[len(bearerPrefix):], nil
 }
-
-// parseToken is currently a placeholder to suppress a linter identifying that the success value
-// returned by bearerToken is unused.
-//
-// In the future, it will be responsible for parsing a JWT into claims and validating those claims.
-func parseToken(_ string) error {
-	return nil
-}

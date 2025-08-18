@@ -1,4 +1,4 @@
-package examplev1client
+package interceptors
 
 import (
 	"context"
