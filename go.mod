@@ -36,7 +36,7 @@ require (
 	github.com/knadh/koanf/v2 v2.2.2
 	github.com/pressly/goose/v3 v3.24.3
 	github.com/samber/slog-multi v1.4.1
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.0
 	go.opentelemetry.io/contrib/bridges/otelslog v0.12.0
 	go.opentelemetry.io/contrib/instrumentation/runtime v0.62.0
 	go.opentelemetry.io/contrib/processors/baggagecopy v0.10.0
