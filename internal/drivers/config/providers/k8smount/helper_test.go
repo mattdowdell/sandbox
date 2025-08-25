@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"testing"
 	"time"
 )
 
 const (
-	configmapTimeFmt = "2006_01_02_15_04_05.0000000000"
-	dataDir          = "..data"
+	mountTimeFmt = "..2006_01_02_15_04_05.0000000000"
+	dataDir      = "..data"
 )
 
 // writeVolumeMount creates a file structure that matches how a ConfigMap or Secret will be mounted
@@ -32,37 +33,62 @@ const (
 //	database.hostname -> ..data/database.hostname
 //	database.name -> ..data/database.name
 //	database.port -> ..data/database.port
-func writeVolumeMount(mount string, data map[string]string) error {
-	dir := time.Now().UTC().Format(configmapTimeFmt)
+func writeVolumeMount(tb testing.TB, mount string, data map[string]string) error {
+	tb.Helper()
 
+	return writeVolumeMountAtTime(tb, time.Now(), mount, data)
+}
+
+// writeVolumeMountAtTime creates a file structure that matches how a ConfigMap or Secret will be
+// mounted in a Kubernetes Pod, using the given time. See writeVolumeMount for a detailed
+// description of the resulting file structure.
+//
+// This function can be called multiple times with different times, with the most recent call taking
+// precedence if any conflicts occur.
+func writeVolumeMountAtTime(tb testing.TB, t time.Time, mount string, data map[string]string) error {
+	tb.Helper()
+
+	dir := t.UTC().Format(mountTimeFmt)
 	dirPath := filepath.Join(mount, dir)
 
 	for key, value := range data {
-		if err := writeFile(filepath.Join(dirPath, key), value); err != nil {
+		if err := writeFile(tb, filepath.Join(dirPath, key), value); err != nil {
 			return err
 		}
 	}
 
-	if err := os.Chdir(mount); err != nil {
-		return fmt.Errorf("failed to change dir to %q: %w", mount, err)
+	tb.Chdir(mount)
+
+	if err := os.Remove(dataDir); err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("failed to cleanup existing symlink %s: %w", dataDir, err)
 	}
 
-	if err := os.Symlink(dir, "..data"); err != nil {
+	if err := os.Symlink(dir, dataDir); err != nil {
 		return fmt.Errorf("failed to create %s symlink to %q: %w", "..data", dir, err)
 	}
+
+	tb.Log("created symlink: ..data ->", dir)
 
 	for key := range data {
 		target := filepath.Join(dataDir, key)
 
+		if err := os.Remove(key); err != nil && !os.IsNotExist(err) {
+			return fmt.Errorf("failed to cleanup existing symlink %s: %w", key, err)
+		}
+
 		if err := os.Symlink(target, key); err != nil {
 			return fmt.Errorf("failed to create %q symlink to %q: %w", key, target, err)
 		}
+
+		tb.Log("created symlink:", key, "->", target)
 	}
 
 	return nil
 }
 
-func writeFile(path, content string) error {
+func writeFile(tb testing.TB, path, content string) error {
+	tb.Helper()
+
 	dir := filepath.Dir(path)
 
 	if err := os.MkdirAll(dir, 0o755); err != nil {
@@ -73,7 +99,7 @@ func writeFile(path, content string) error {
 		return fmt.Errorf("failed to create file %q: %w", path, err)
 	}
 
-	fmt.Println("created:", path)
+	tb.Log("wrote:", path)
 
 	return nil
 }

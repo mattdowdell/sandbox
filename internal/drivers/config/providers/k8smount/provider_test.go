@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -53,10 +54,10 @@ func Test_K8SMount_Read_WithFiles(t *testing.T) {
 	// arrange
 	dir := t.TempDir()
 
-	require.NoError(t, writeFile(filepath.Join(dir, "a"), "a"))
-	require.NoError(t, writeFile(filepath.Join(dir, "b.c"), "c"))
-	require.NoError(t, writeFile(filepath.Join(dir, "d.e.f"), "f"))
-	require.NoError(t, writeFile(filepath.Join(dir, "dir", "file"), "a")) // should be ignored
+	require.NoError(t, writeFile(t, filepath.Join(dir, "a"), "a"))
+	require.NoError(t, writeFile(t, filepath.Join(dir, "b.c"), "c"))
+	require.NoError(t, writeFile(t, filepath.Join(dir, "d.e.f"), "f"))
+	require.NoError(t, writeFile(t, filepath.Join(dir, "g", "h"), "h"))
 
 	provider := k8smount.Provider(dir, "." /*delim*/)
 
@@ -74,6 +75,9 @@ func Test_K8SMount_Read_WithFiles(t *testing.T) {
 				"f": "f",
 			},
 		},
+		"g": map[string]any{
+			"h": "h",
+		},
 	}
 
 	assert.Equal(t, want, got)
@@ -84,7 +88,44 @@ func Test_K8SMount_Read_WithVolumeMount(t *testing.T) {
 	// arrange
 	dir := t.TempDir()
 
-	require.NoError(t, writeVolumeMount(dir, map[string]string{
+	require.NoError(t, writeVolumeMount(t, dir, map[string]string{
+		"a.foo": "foo-value",
+		"b.bar": "bar-value",
+		"b.baz": "baz-value",
+	}))
+
+	provider := k8smount.Provider(dir, "." /*delim*/)
+
+	// act
+	got, err := provider.Read()
+
+	// assert
+	want := map[string]any{
+		"a": map[string]any{
+			"foo": "foo-value",
+		},
+		"b": map[string]any{
+			"bar": "bar-value",
+			"baz": "baz-value",
+		},
+	}
+
+	assert.Equal(t, want, got)
+	assert.NoError(t, err)
+}
+
+func Test_K8SMount_Read_WithVolumeMount_Changing(t *testing.T) {
+	// arrange
+	now := time.Now()
+	dir := t.TempDir()
+
+	require.NoError(t, writeVolumeMountAtTime(t, now.Add(time.Hour*1), dir, map[string]string{
+		"a.foo": "old-foo-value",
+		"b.bar": "old-bar-value",
+		"b.baz": "oldbaz-value",
+	}))
+
+	require.NoError(t, writeVolumeMountAtTime(t, now, dir, map[string]string{
 		"a.foo": "foo-value",
 		"b.bar": "bar-value",
 		"b.baz": "baz-value",
@@ -130,7 +171,7 @@ func Test_K8SMount_Watch_Success(t *testing.T) {
 	// arrange
 	dir := t.TempDir()
 
-	require.NoError(t, writeFile(filepath.Join(dir, "a"), "a"))
+	require.NoError(t, writeFile(t, filepath.Join(dir, "a"), "a"))
 
 	provider := k8smount.Provider(dir, "." /*delim*/)
 
@@ -146,7 +187,7 @@ func Test_K8SMount_Watch_Success(t *testing.T) {
 	}))
 
 	for !watched.Load() {
-		require.NoError(t, writeFile(filepath.Join(dir, "a"), "b"))
+		require.NoError(t, writeFile(t, filepath.Join(dir, "a"), "b"))
 	}
 
 	// assert
@@ -187,7 +228,7 @@ func Test_K8SMount_Watch_UnexpectedEvent(t *testing.T) {
 	// arrange
 	dir := t.TempDir()
 
-	require.NoError(t, writeFile(filepath.Join(dir, "a"), "a"))
+	require.NoError(t, writeFile(t, filepath.Join(dir, "a"), "a"))
 
 	provider := k8smount.Provider(dir, "." /*delim*/)
 

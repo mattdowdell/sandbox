@@ -34,7 +34,7 @@ type K8SMount struct {
 // Provider creates a new K8SMount provider capable of reading in mounted secrets and configmaps in
 // a Kubernetes pod.
 //
-// The given path should be the mount point of the configmap or secret. The delimiter is used to
+// The given mount should be the mount point of the configmap or secret. The delimiter is used to
 // create a hierarchy of keys based on the mounted filename. For example, a configmap mounted at
 // "/mnt/config/" with a key of "log.level" set to "INFO" would result in {"log":{"level":"INFO"}}
 // being read as configuration.
@@ -61,40 +61,67 @@ func (k *K8SMount) Read() (map[string]any, error) {
 	mountFS := root.FS()
 
 	if err := fs.WalkDir(mountFS, ".", func(path string, d fs.DirEntry, err error) error {
+		key, content, err := k.walkDir(mountFS, path, d, err)
 		if err != nil {
 			return err
 		}
 
-		// skip sub-directories as path separators are invalid in keys
-		// FIXME: data can be mounted at paths depending on how the pod volume is configured
-		if d.IsDir() {
-			if path == "." {
-				return nil
-			}
-
-			return fs.SkipDir
+		if key != "" {
+			data[key] = content
 		}
-
-		// paths with a ".." prefix are reserved for the actual data files to be stored under
-		// instead of reading those, use symlinks in the root of the mount instead
-		if strings.HasPrefix(path, "..") {
-			return nil
-		}
-
-		content, err := fs.ReadFile(mountFS, path)
-		if err != nil {
-			return fmt.Errorf("failed to read file: %w", err)
-		}
-
-		key := strings.TrimPrefix(path, k.mount)
-		data[key] = string(content)
 
 		return nil
 	}); err != nil {
 		return nil, fmt.Errorf("failed to read configuration from mount: %q: %w", k.mount, err)
 	}
 
-	return maps.Unflatten(data, k.delim), nil
+	return maps.Unflatten(maps.Unflatten(data, k.delim), "/"), nil
+}
+
+//nolint:gocritic // named return vars don't make code much more readable
+func (k *K8SMount) walkDir(mountFS fs.FS, path string, d fs.DirEntry, err error) (string, string, error) {
+	if err != nil {
+		return "", "", err
+	}
+
+	if path == "." && d.IsDir() {
+		return "", "", nil
+	}
+
+	resolved := path
+
+	for d.Type()&os.ModeSymlink != 0 {
+		p, err := fs.ReadLink(mountFS, resolved)
+		if err != nil {
+			return "", "", err
+		}
+
+		info, err := fs.Lstat(mountFS, p)
+		if err != nil {
+			return "", "", err
+		}
+
+		d = fs.FileInfoToDirEntry(info)
+		resolved = p
+	}
+
+	if d.IsDir() {
+		// don't skip ..data as it causes the symlinks we want to look at to be skipped
+		// instead, just skip the timestamp based directories
+		if strings.HasPrefix(path, "..") && path != "..data" {
+			return "", "", fs.SkipDir
+		}
+
+		return "", "", nil
+	}
+
+	content, err := fs.ReadFile(mountFS, path)
+	if err != nil {
+		return "", "", fmt.Errorf("failed to read file: %w", err)
+	}
+
+	key := strings.TrimPrefix(path, k.mount)
+	return key, string(content), nil
 }
 
 // Watch starts a watcher in a goroutine for the files under the mount point and calls the given
@@ -147,6 +174,7 @@ func (k *K8SMount) watchDir(fn func(err error)) {
 			lastEventTime = time.Now()
 
 			// mounts are only meant to be updated for the lifetime of the pod
+			// TODO: test what happens when we edit a configmap
 			if !event.Has(fsnotify.Write | fsnotify.Chmod) {
 				fn(fmt.Errorf("%w: %s", ErrUnexpectedEvent, event.String()))
 				return
