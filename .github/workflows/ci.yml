@@ -30,7 +30,7 @@ jobs:
 
       - name: Size
         id: size
-        uses: mattdowdell/pr-sizer@e523aba6b9ee5306cd9c69cb08fd59a893e399ca # v0.3.0
+        uses: mattdowdell/pr-sizer@c5ee9ba36b7ef4b2bb4b6f016f06745e65e9567e # v0.3.1
 
       - name: Outputs
         run: |
