@@ -2,7 +2,6 @@ package jwtx_test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -131,10 +130,8 @@ func Test_NewParser_Error(t *testing.T) {
 
 func Test_Parser_Parse_Success(t *testing.T) {
 	// arrange
-	now := time.Now().UTC()
-
 	clock := mockrepositories.NewClock(t)
-	clock.EXPECT().UTCNow().Return(now).Once()
+	clock.EXPECT().UTCNow().Return(testIssuedAt).Once()
 
 	parser, err := jwtx.NewParser(clock, []string{testAudience}, testIssuer, []string{testMethod})
 	require.NoError(t, err)
