@@ -57,6 +57,24 @@ dev-down:
 [group('development environment')]
 dev-restart: dev-down dev-up
 
+# start the development environment.
+[group('development environment')]
+tilt-up:
+    tilt up
+
+# Stop the development environment.
+[group('development environment')]
+tilt-down:
+    tilt-down
+
+[private]
+_kind-up: install-kind install-ctlptl
+    {{ ctlptl }} apply --filename ".ctlptl-config.yaml"
+
+[private]
+_kind-down: install-kind install-ctlptl
+    {{ ctlptl }} delete --filename ".ctlptl-config.yaml"
+
 # Run all automated code modifications.
 checks: tidy vendor gen fmt
 
@@ -241,6 +259,7 @@ build:
 db-exec:
     PGPASSWORD={{ db_pass }} psql \
         --host {{ db_host }} \
+        --port {{ db_port }} \
         --username {{ db_user }}
 
 # Insert sample data into the database.
@@ -248,6 +267,7 @@ db-exec:
 db-seed:
     PGPASSWORD={{ db_pass }} psql \
         --host {{ db_host }} \
+        --port {{ db_port }} \
         --username {{ db_user }} \
         --echo-all \
         --file ./tools/seed.sql
