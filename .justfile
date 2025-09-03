@@ -116,7 +116,7 @@ fmt-just:
 # Run the YAML formatter
 [group('formatters')]
 fmt-yaml: install-yamlfmt
-    {{ yamlfmt }} -conf .yamlfmt.yaml .
+    {{ yamlfmt }} .
 
 # Run all code generators.
 [group('generators')]
