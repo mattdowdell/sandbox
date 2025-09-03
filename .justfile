@@ -57,6 +57,16 @@ dev-down:
 [group('development environment')]
 dev-restart: dev-down dev-up
 
+# start the development environment.
+[group('development environment')]
+tilt-up:
+    tilt up
+
+# Stop the development environment.
+[group('development environment')]
+tilt-down:
+    tilt-down
+
 # Run all automated code modifications.
 checks: tidy vendor gen fmt
 
@@ -106,7 +116,7 @@ fmt-just:
 # Run the YAML formatter
 [group('formatters')]
 fmt-yaml: install-yamlfmt
-    {{ yamlfmt }} .
+    {{ yamlfmt }} -conf .yamlfmt.yaml .
 
 # Run all code generators.
 [group('generators')]
@@ -241,6 +251,7 @@ build:
 db-exec:
     PGPASSWORD={{ db_pass }} psql \
         --host {{ db_host }} \
+        --port {{ db_port }} \
         --username {{ db_user }}
 
 # Insert sample data into the database.
@@ -248,6 +259,7 @@ db-exec:
 db-seed:
     PGPASSWORD={{ db_pass }} psql \
         --host {{ db_host }} \
+        --port {{ db_port }} \
         --username {{ db_user }} \
         --echo-all \
         --file ./tools/seed.sql
@@ -286,3 +298,14 @@ _container-scan service:
         --config trivy.yaml \
         --docker-host unix://{{ env('HOME') }}/.colima/default/docker.sock \
         {{ service }}:local
+
+
+# ----------------
+
+[private]
+_kind-up: install-kind install-ctlptl
+    {{ ctlptl }} apply --filename ".ctlptl-config.yaml"
+
+[private]
+_kind-down: install-kind install-ctlptl
+    {{ ctlptl }} delete --filename ".ctlptl-config.yaml"

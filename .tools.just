@@ -8,6 +8,12 @@ buf := join(gopath, "bin", "buf-v1.57.0")
 install-buf:
     {{ if path_exists(buf) == "true" { "" } else { "bingo get buf" } }}
 
+ctlptl := join(gopath, "bin", "ctlptl-v0.8.42")
+
+[private]
+install-ctlptl:
+    {{ if path_exists(ctlptl) == "true" { "" } else { "bingo get ctlptl" } }}
+
 godog := join(gopath, "bin", "godog-v0.15.1")
 
 [private]
@@ -19,6 +25,12 @@ golangci-lint := join(gopath, "bin", "golangci-lint-v2.4.0")
 [private]
 install-golangci-lint:
     {{ if path_exists(golangci-lint) == "true" { "" } else { "bingo get golangci-lint" } }}
+
+kind := join(gopath, "bin", "kind")
+
+[private]
+install-kind:
+    {{ if path_exists(kind) == "true" { "" } else { "bingo get kind -l" } }}
 
 mockery := join(gopath, "bin", "mockery-v3.5.4")
 
