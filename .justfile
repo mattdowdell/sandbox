@@ -67,6 +67,14 @@ tilt-up:
 tilt-down:
     tilt-down
 
+[private]
+_kind-up: install-kind install-ctlptl
+    {{ ctlptl }} apply --filename ".ctlptl-config.yaml"
+
+[private]
+_kind-down: install-kind install-ctlptl
+    {{ ctlptl }} delete --filename ".ctlptl-config.yaml"
+
 # Run all automated code modifications.
 checks: tidy vendor gen fmt
 
@@ -298,14 +306,3 @@ _container-scan service:
         --config trivy.yaml \
         --docker-host unix://{{ env('HOME') }}/.colima/default/docker.sock \
         {{ service }}:local
-
-
-# ----------------
-
-[private]
-_kind-up: install-kind install-ctlptl
-    {{ ctlptl }} apply --filename ".ctlptl-config.yaml"
-
-[private]
-_kind-down: install-kind install-ctlptl
-    {{ ctlptl }} delete --filename ".ctlptl-config.yaml"
