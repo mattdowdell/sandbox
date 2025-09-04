@@ -65,7 +65,7 @@ tilt-up:
 # Stop the development environment.
 [group('development environment')]
 tilt-down:
-    tilt-down
+    tilt down
 
 [private]
 _kind-up: install-kind install-ctlptl

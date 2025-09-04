@@ -33,7 +33,8 @@ helm_remote(
     "tempo",
     repo_name="grafana",
     repo_url="https://grafana.github.io/helm-charts",
-    # TODO: version=
+    # renovate: datasource=helm depName=tempo packageName=grafana.github.io/helm-charts/tempo
+    version="1.23.3",
 )
 
 k8s_resource(
@@ -49,7 +50,8 @@ helm_remote(
     "victoria-metrics-single",
     repo_name="vm",
     repo_url="https://victoriametrics.github.io/helm-charts",
-    # TODO: version=
+    # renovate: datasource=helm depName=victoria-metrics-single packageName=victoriametrics.github.io/helm-charts/victoria-metrics-single
+    version="0.24.4",
 )
 
 k8s_resource(
@@ -63,7 +65,8 @@ helm_remote(
     "victoria-logs-single",
     repo_name="vm",
     repo_url="https://victoriametrics.github.io/helm-charts",
-    # TODO: version=
+    # renovate: datasource=helm depName=victoria-logs-single packageName=victoriametrics.github.io/helm-charts/victoria-logs-single
+    version="0.11.7",
 )
 
 k8s_resource(
@@ -76,7 +79,8 @@ helm_remote(
     "grafana",
     repo_name="grafana",
     repo_url="https://grafana.github.io/helm-charts",
-    # TODO: version=
+    # renovate: datasource=helm depName=grafana packageName=grafana.github.io/helm-charts/grafana
+    version="9.4.4",
     values=[".tilt/grafana/values.yaml"],
 )
 
