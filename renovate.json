@@ -18,5 +18,16 @@
       "groupName": "X-Repositories"
     }
   ],
-  "postUpdateOptions": ["gomodTidy", "goModVendor", "gomodUpdateImportPaths"]
+  "postUpdateOptions": ["gomodTidy", "goModVendor", "gomodUpdateImportPaths"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^Tiltfile$/",
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-zA-Z0-9._-]+?) depName=(?<depName>[^\\s]+?) packageName=(?<packageName>[^\\s]+?)\\s+version=['\"](?<currentValue>.+?)['\"]"
+      ]
+    },
+  ]
 }
