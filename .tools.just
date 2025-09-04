@@ -8,7 +8,7 @@ buf := join(gopath, "bin", "buf-v1.57.0")
 install-buf:
     {{ if path_exists(buf) == "true" { "" } else { "bingo get buf" } }}
 
-ctlptl := join(gopath, "bin", "ctlptl-v0.8.42")
+ctlptl := join(gopath, "bin", "ctlptl-v0.8.43")
 
 [private]
 install-ctlptl:
