@@ -26,7 +26,7 @@
         "/^Tiltfile$/",
       ],
       "matchStrings": [
-        "# renovate: datasource=(?<datasource>[a-zA-Z0-9._-]+?) depName=(?<depName>[^\\s]+?) packageName=(?<packageName>[^\\s]+?)\\s+version=['\"](?<currentValue>.+?)['\"]"
+        "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>.+?) packageName=(?<packageName>.+?) registryUrl=(?<registryUrl>.+?)\\s+version=['\"](?<currentValue>.+?)['\"]"
       ]
     },
   ]
