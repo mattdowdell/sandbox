@@ -23,7 +23,62 @@ load("ext://helm_remote", "helm_remote")
 # Database
 # --------
 
-# TODO
+helm_remote(
+    "cloudnative-pg",
+    repo_name="cnpg",
+    repo_url="https://cloudnative-pg.github.io/charts",
+    namespace="cnpg-system",
+    create_namespace=True,
+    # renovate: datasource=helm depName=cloudnative-pg packageName=cloudnative-pg registryUrl=https://cloudnative-pg.github.io/charts
+    version="0.26.0",
+)
+
+k8s_resource(
+    "cloudnative-pg",
+    objects=[
+        "cnpg-system:namespace",
+        "backups.postgresql.cnpg.io:customresourcedefinition",
+        "clusterimagecatalogs.postgresql.cnpg.io:customresourcedefinition",
+        "clusters.postgresql.cnpg.io:customresourcedefinition",
+        "databases.postgresql.cnpg.io:customresourcedefinition",
+        "failoverquorums.postgresql.cnpg.io:customresourcedefinition",
+        "imagecatalogs.postgresql.cnpg.io:customresourcedefinition",
+        "poolers.postgresql.cnpg.io:customresourcedefinition",
+        "publications.postgresql.cnpg.io:customresourcedefinition",
+        "scheduledbackups.postgresql.cnpg.io:customresourcedefinition",
+        "subscriptions.postgresql.cnpg.io:customresourcedefinition",
+        "cnpg-mutating-webhook-configuration:mutatingwebhookconfiguration",
+        "cloudnative-pg:serviceaccount",
+        "cloudnative-pg:clusterrole",
+        "cloudnative-pg-view:clusterrole",
+        "cloudnative-pg-edit:clusterrole",
+        "cloudnative-pg:clusterrolebinding",
+        "cnpg-controller-manager-config:configmap",
+        "cnpg-default-monitoring:configmap",
+        "cnpg-validating-webhook-configuration:validatingwebhookconfiguration",
+    ],
+    labels="postgresql",
+)
+
+k8s_kind("Cluster", api_version="postgresql.cnpg.io/v1")
+
+helm_remote(
+    "cluster",
+    repo_name="cnpg",
+    repo_url="https://cloudnative-pg.github.io/charts",
+    namespace="default",
+    # renovate: datasource=helm depName=cluster packageName=cluster registryUrl=https://cloudnative-pg.github.io/charts
+    version="0.3.1",
+    values=[".tilt/postgresql/values.yaml"],
+)
+
+k8s_resource(
+    "cluster-postgresql",
+    new_name="postgresql",
+    labels="postgresql",
+    resource_deps=["cloudnative-pg"],
+    port_forwards=["127.0.0.1:5432:5432"],
+)
 
 # -------------
 # Observability
