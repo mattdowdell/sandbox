@@ -17,7 +17,71 @@ load("ext://helm_remote", "helm_remote")
 # Local services
 # --------------
 
-# TODO
+# docker_build(
+#     ref="example-dev:local",
+#     context=".",
+#     dockerfile="Dockerfile.dev",
+#     target="dev",
+#     pull=True,
+#     # TODO: filter to just Dockerfile.dev
+# )
+
+docker_build(
+    ref="example-rpc",
+    context=".",
+    target="runtime",
+    pull=True,
+    build_args={
+        "SERVICE": "example-rpc",
+        "GO_BUILD_ARGS": "", # TODO: pass from env
+    },
+    # TODO: filter to just go files + Dockerfile
+)
+
+docker_build(
+    ref="example-db-migrate",
+    context=".",
+    target="runtime",
+    pull=True,
+    build_args={
+        "SERVICE": "example-db-migrate",
+        "GO_BUILD_ARGS": "", # TODO: pass from env
+    },
+    # TODO: filter to just go files + Dockerfile
+)
+
+k8s_yaml(helm(
+    "helm/example",
+    values=["helm/example/values-dev.yaml"],
+))
+
+k8s_resource(
+    "example-rpc",
+    objects=[
+        "example:configmap",
+        "chart-example:service",
+        "chart-example:serviceaccount",
+    ],
+    labels=["services"],
+    port_forwards=["127.0.0.1:5000:5000"],
+    resource_deps=[
+        "postgresql",
+        "tempo",
+        "victoria-metrics-single-server",
+        "victoria-logs-single-server",
+    ],
+)
+
+k8s_resource(
+    "example-db-migrate",
+    labels=["services"],
+    resource_deps=[
+        "postgresql",
+        "tempo",
+        "victoria-metrics-single-server",
+        "victoria-logs-single-server",
+    ],
+)
 
 # --------
 # Database

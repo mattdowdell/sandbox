@@ -180,6 +180,26 @@ lint-buf: install-buf
 lint-go: install-golangci-lint
     {{ golangci-lint }} run
 
+# Run the Helm linters.
+[group('linters')]
+lint-helm: lint-helm-kubeconform lint-helm-kubescore
+
+# Run the Kubeconform Helm linter.
+[group('linters')]
+lint-helm-kubeconform: install-kubeconform
+    helm template example ./helm/base -f ./helm/base/values-dev.yaml | \
+        {{ kubeconform }} -verbose -strict -summary
+
+# Run the Kube-score Helm linter.
+[group('linters')]
+lint-helm-kubescore: install-kube-score
+    helm template example ./helm/base -f ./helm/base/values-dev.yaml | \
+        {{ kube-score }} score - \
+            --ignore-test container-resources \
+            --ignore-test container-image-tag \
+            --ignore-test pod-networkpolicy \
+            --ignore-test container-ephemeral-storage-request-and-limit
+
 # Run all linter fixers.
 [group('linters')]
 lint-fix:

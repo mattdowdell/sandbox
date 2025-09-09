@@ -42,6 +42,8 @@ colima start
 docker context ls
 ```
 
+_TODO: Go, bingo, helm, tilt_
+
 ## Environment
 
 The development environment can be started, stopped and restarted with:
