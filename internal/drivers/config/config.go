@@ -16,7 +16,7 @@ import (
 	"github.com/mattdowdell/sandbox/internal/drivers/config/providers/k8smount"
 )
 
-// The delimiter to use for splitting and joining configuration keys.
+// The delimiter to use for joining configuration keys.
 const (
 	delimiter = "."
 )
@@ -24,9 +24,9 @@ const (
 // Options provides the values to bootstrap configuration collection.
 type Options struct {
 	// The prefix of environment variables to read configuration from. Matching environment
-	// variables have the prefix removed, are converted to lowercase and any underscores are
-	// replaced with ".". For example, "APP_LOG_LEVEL" with a prefix of "APP_" would become
-	// "log.level".
+	// variables have the prefix removed, are converted to lowercase and any underscores ("_") are
+	// replaced with periods ("."). For example, "APP_LOG_LEVEL" with a prefix of "APP_" would
+	// become "log.level".
 	EnvPrefix string
 
 	// The file paths to read configuration from. Supported file formats and extensions are:
@@ -40,8 +40,8 @@ type Options struct {
 	Files []string
 
 	// The directories of Kubernetes pod mounts to read configuration from. The filenames of the
-	// mounted values become the configuration keys. For example, a configmap field of "log.level"
-	// can be accessed at the same name.
+	// mounted values become the configuration keys. Any underscores ("_") in the key are replaced
+	// with periods ("."). For example, a configmap field of "log_level" would become "log.level".
 	Mounts []string
 }
 
@@ -149,7 +149,7 @@ func (c *Config[T]) loadFiles() error {
 
 func (c *Config[T]) loadMounts() error {
 	for _, path := range c.opts.Mounts {
-		if err := c.inner.Load(k8smount.Provider(path, delimiter), nil); err != nil {
+		if err := c.inner.Load(k8smount.Provider(path, "_" /*delimiter*/), nil); err != nil {
 			return err
 		}
 	}

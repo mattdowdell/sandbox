@@ -30,22 +30,27 @@ A toy Go microservice intended for use as reference material.
 # ready: success
 echo '{}' | grpc-client-cli -a localhost:5000 -s Health -m Check
 
+# login
+echo '{"id":"example","secret":"example"}' | grpc-client-cli -a localhost:5000 -s AuthnService -m Login
+
+token=`echo '{"id":"example","secret":"example"}' | \
+  grpc-client-cli -a localhost:5000 -s AuthnService -m Login | \
+  jq -r '.access_token'`
+
+# authenticate
+echo "{\"token\":\"${token>}\"}" | grpc-client-cli -a localhost:5000 -s AuthnService -m Authenticate
+
 # create: success
 echo '{"resource":{"name":"example"}}' | \
-	grpc-client-cli -a localhost:5000 -s ExampleService -m CreateResource
+	grpc-client-cli -a localhost:5000 -s ExampleService -m CreateResource -H "Authorization: Bearer $token"
 
 # create: success (bulk)
 for i in {1..100}; do
 	echo "{\"resource\":{\"name\":\"example-$i\"}}" | \
-		grpc-client-cli -a localhost:5000 -s ExampleService -m CreateResource
+		grpc-client-cli -a localhost:5000 -s ExampleService -m CreateResource -H "Authorization: Bearer $token"
 done
 
 # list: success
-echo '{}' | grpc-client-cli -a localhost:5000 -s ExampleService -m ListResources
+echo '{}' | grpc-client-cli -a localhost:5000 -s ExampleService -m ListResources -H "Authorization: Bearer $token"
 
-# login
-echo '{"id":"example","secret":"example"}' | grpc-client-cli -a localhost:5000 -s AuthnService -m Login
-
-# authenticate
-echo '{"token":"<token>"}' | grpc-client-cli -a localhost:5000 -s AuthnService -m Authenticate
 ```
