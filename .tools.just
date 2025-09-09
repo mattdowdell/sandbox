@@ -32,6 +32,18 @@ kind := join(gopath, "bin", "kind")
 install-kind:
     {{ if path_exists(kind) == "true" { "" } else { "bingo get kind -l" } }}
 
+kube-score := join(gopath, "bin", "kube-score-v1.20.0")
+
+[private]
+install-kube-score:
+    {{ if path_exists(kube-score) == "true" { "" } else { "bingo get kube-score" } }}
+
+kubeconform := join(gopath, "bin", "kubeconform-v0.7.0")
+
+[private]
+install-kubeconform:
+    {{ if path_exists(kubeconform) == "true" { "" } else { "bingo get kubeconform" } }}
+
 mockery := join(gopath, "bin", "mockery-v3.5.4")
 
 [private]
