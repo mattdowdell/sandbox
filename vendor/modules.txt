@@ -42,7 +42,7 @@ github.com/XSAM/otelsql/internal/semconv
 # github.com/antlr4-go/antlr/v4 v4.13.1
 ## explicit; go 1.22
 github.com/antlr4-go/antlr/v4
-# github.com/aws/aws-sdk-go-v2 v1.38.3
+# github.com/aws/aws-sdk-go-v2 v1.39.0
 ## explicit; go 1.22
 github.com/aws/aws-sdk-go-v2/aws
 github.com/aws/aws-sdk-go-v2/aws/defaults
@@ -84,7 +84,7 @@ github.com/aws/aws-sdk-go-v2/credentials/stscreds
 ## explicit; go 1.22
 github.com/aws/aws-sdk-go-v2/feature/ec2/imds
 github.com/aws/aws-sdk-go-v2/feature/ec2/imds/internal/config
-# github.com/aws/aws-sdk-go-v2/feature/rds/auth v1.6.6
+# github.com/aws/aws-sdk-go-v2/feature/rds/auth v1.6.7
 ## explicit; go 1.22
 github.com/aws/aws-sdk-go-v2/feature/rds/auth
 # github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.6
