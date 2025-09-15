@@ -33,7 +33,7 @@ require (
 	github.com/knadh/koanf/parsers/yaml v1.1.0
 	github.com/knadh/koanf/providers/env/v2 v2.0.0
 	github.com/knadh/koanf/providers/file v1.2.0
-	github.com/knadh/koanf/v2 v2.2.2
+	github.com/knadh/koanf/v2 v2.3.0
 	github.com/pressly/goose/v3 v3.25.0
 	github.com/samber/slog-multi v1.5.0
 	github.com/stretchr/testify v1.11.1
