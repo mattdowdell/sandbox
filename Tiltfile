@@ -135,7 +135,7 @@ helm_remote(
     repo_name="grafana",
     repo_url="https://grafana.github.io/helm-charts",
     # renovate: datasource=helm depName=grafana packageName=grafana registryUrl=https://grafana.github.io/helm-charts
-    version="9.4.5",
+    version="10.0.0",
     values=[".tilt/grafana/values.yaml"],
 )
 
