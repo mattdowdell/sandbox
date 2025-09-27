@@ -1,4 +1,4 @@
-package otelx
+package logx
 
 import (
 	"context"
@@ -7,10 +7,12 @@ import (
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp"
 	"go.opentelemetry.io/otel/log/global"
 	sdklog "go.opentelemetry.io/otel/sdk/log"
+
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
 )
 
-// LoggerProviderConfig contains configuration for configuring an OpenTelemetry logger provider.
-type LoggerProviderConfig struct {
+// ProviderConfig contains configuration for configuring an OpenTelemetry logger provider.
+type ProviderConfig struct {
 	// Use HTTP instead of HTTPS for the log exporter's HTTP connection.
 	Insecure bool `koanf:"insecure"`
 
@@ -21,15 +23,15 @@ type LoggerProviderConfig struct {
 	Path string `koanf:"path" default:"/v1/logs"`
 }
 
-// LoggerProviderShutdown provides a dedicated type for the logger provider shutdown function.
-type LoggerProviderShutdown func(context.Context) error
+// ProviderShutdown provides a dedicated type for the logger provider shutdown function.
+type ProviderShutdown func(context.Context) error
 
 // SetupLoggerProviderFromConfig calls NewLoggerProvider with the given configuration.
 func SetupLoggerProviderFromConfig(
 	ctx context.Context,
-	conf LoggerProviderConfig,
+	conf ProviderConfig,
 	filter baggagecopy.Filter,
-) (LoggerProviderShutdown, error) {
+) (ProviderShutdown, error) {
 	return SetupLoggerProvider(ctx, conf.Insecure, conf.Endpoint, conf.Path, filter)
 }
 
@@ -45,7 +47,7 @@ func SetupLoggerProvider(
 	endpoint string,
 	path string,
 	filter baggagecopy.Filter,
-) (LoggerProviderShutdown, error) {
+) (ProviderShutdown, error) {
 	opts := []otlploghttp.Option{
 		otlploghttp.WithEndpoint(endpoint),
 		otlploghttp.WithURLPath(path),
@@ -59,7 +61,7 @@ func SetupLoggerProvider(
 		return nil, err
 	}
 
-	res, err := newResource()
+	res, err := otelx.NewResource()
 	if err != nil {
 		return nil, err
 	}

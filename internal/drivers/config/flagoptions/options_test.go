@@ -47,14 +47,12 @@ func Test_New(t *testing.T) {
 	envFiles := []string{testEnvPath1, testEnvPath2}
 	envMounts := []string{testEnvPath3, testEnvPath4}
 
-	testCases := []struct {
-		name string
+	tests := map[string]struct {
 		args []string
 		env  map[string]string
 		want *config.Options
 	}{
-		{
-			name: "defaults",
+		"defaults": {
 			args: []string{t.Name()},
 			want: &config.Options{
 				EnvPrefix: "APP_",
@@ -62,8 +60,7 @@ func Test_New(t *testing.T) {
 				Mounts:    []string{},
 			},
 		},
-		{
-			name: "arguments",
+		"arguments": {
 			args: []string{
 				t.Name(),
 				"-config.envprefix=ARG_",
@@ -76,8 +73,7 @@ func Test_New(t *testing.T) {
 				Mounts:    argMounts,
 			},
 		},
-		{
-			name: "environment",
+		"environment": {
 			env: map[string]string{
 				"CONFIG_ENVPREFIX": "ENV_",
 				"CONFIG_FILES":     joinPathList(envFiles),
@@ -89,8 +85,7 @@ func Test_New(t *testing.T) {
 				Mounts:    envMounts,
 			},
 		},
-		{
-			name: "both",
+		"both": {
 			args: []string{
 				t.Name(),
 				"-config.envprefix=ARG_",
@@ -110,12 +105,12 @@ func Test_New(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			// arrange
-			setArgs(t, tc.args...)
+			setArgs(t, tt.args...)
 
-			for key, val := range tc.env {
+			for key, val := range tt.env {
 				t.Setenv(key, val)
 			}
 
@@ -123,7 +118,7 @@ func Test_New(t *testing.T) {
 			got := flagoptions.New()
 
 			// assert
-			assert.Equal(t, tc.want, got)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

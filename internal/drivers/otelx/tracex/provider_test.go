@@ -1,5 +1,5 @@
 //nolint:dupl // similar to meter_test.go/tracer_test.go
-package otelx_test
+package tracex_test
 
 import (
 	"context"
@@ -12,17 +12,17 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/contrib/processors/baggagecopy"
 
-	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx/tracex"
 )
 
-func urlToTracerProviderConfig(t *testing.T, input string) otelx.TracerProviderConfig {
+func urlToProviderConfig(t *testing.T, input string) tracex.ProviderConfig {
 	t.Helper()
 
 	u, err := url.Parse(input)
 	require.NoError(t, err)
 
-	return otelx.TracerProviderConfig{
-		Insecure: isHTTP(u.Scheme),
+	return tracex.ProviderConfig{
+		Insecure: u.Scheme == "http",
 		Endpoint: u.Host,
 		Path:     u.Path,
 	}
@@ -35,10 +35,10 @@ func Test_SetupTracerProviderFromConfig_Success(t *testing.T) {
 	}))
 	defer server.Close()
 
-	conf := urlToTracerProviderConfig(t, server.URL)
+	conf := urlToProviderConfig(t, server.URL)
 
 	// act
-	shutdown, err := otelx.SetupTracerProviderFromConfig(t.Context(), conf, baggagecopy.AllowAllMembers)
+	shutdown, err := tracex.SetupTracerProviderFromConfig(t.Context(), conf, baggagecopy.AllowAllMembers)
 
 	// assert
 	if assert.NotNil(t, shutdown) {
@@ -53,10 +53,10 @@ func Test_SetupTracerProviderFromConfig_Error(t *testing.T) {
 	ctx, cancel := context.WithCancel(t.Context())
 	cancel()
 
-	conf := otelx.TracerProviderConfig{}
+	conf := tracex.ProviderConfig{}
 
 	// act
-	shutdown, err := otelx.SetupTracerProviderFromConfig(ctx, conf, baggagecopy.AllowAllMembers)
+	shutdown, err := tracex.SetupTracerProviderFromConfig(ctx, conf, baggagecopy.AllowAllMembers)
 
 	// assert
 	assert.Nil(t, shutdown)

@@ -64,54 +64,47 @@ build	vcs.time=2025-05-27T09:23:42Z
 build	vcs.modified=true`
 
 func Test_extractVersion(t *testing.T) {
-	testCases := []struct {
-		name string
+	tests := map[string]struct {
 		have string
 		want string
 	}{
-		{
-			name: "main",
+		"main": {
 			have: "github.com/mattdowdell/sandbox/cmd/example-health",
 			want: "v0.0.120",
 		},
-		{
-			name: "dependency",
+		"dependency": {
 			have: "go.opentelemetry.io/otel",
 			want: "v1.36.0",
 		},
-		{
-			name: "dependency subpackage",
+		"dependency subpackage": {
 			have: "go.opentelemetry.io/otel/subpackage",
 			want: "v1.36.0",
 		},
-		{
-			name: "submodule",
+		"submodule": {
 			have: "go.opentelemetry.io/otel/log",
 			want: "v0.12.2",
 		},
-		{
-			name: "submodule subpackage",
+		"submodule subpackage": {
 			have: "go.opentelemetry.io/otel/log/subpackage",
 			want: "v0.12.2",
 		},
-		{
-			name: "not found",
+		"not found": {
 			have: "github.com/does/not/exist",
 			want: "(unknown)",
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			// arrange
 			info, err := debug.ParseBuildInfo(buildInfoData)
 			require.NoError(t, err)
 
 			// act
-			got := extractVersion(tc.have, info)
+			got := extractVersion(tt.have, info)
 
 			// assert
-			assert.Equal(t, tc.want, got)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

@@ -1,4 +1,4 @@
-package otelx
+package otelt
 
 import (
 	"context"
@@ -57,7 +57,7 @@ func Span(ctx context.Context, traceID, spanID string, sampled bool) (context.Co
 }
 
 // ...
-func TestMeterProvider() (metric.MeterProvider, MetricCollectFn) {
+func MeterProvider() (metric.MeterProvider, MetricCollectFn) {
 	reader := sdkmetric.NewManualReader()
 	provider := sdkmetric.NewMeterProvider(sdkmetric.WithReader(reader))
 
@@ -73,7 +73,7 @@ func TestMeterProvider() (metric.MeterProvider, MetricCollectFn) {
 }
 
 // ...
-func TestTracerProvider() (trace.TracerProvider, TraceCollectFn) {
+func TracerProvider() (trace.TracerProvider, TraceCollectFn) {
 	recorder := tracetest.NewSpanRecorder()
 	provider := sdktrace.NewTracerProvider(sdktrace.WithSpanProcessor(recorder))
 

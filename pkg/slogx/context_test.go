@@ -13,27 +13,23 @@ import (
 func Test_FromContext(t *testing.T) {
 	toAdd := slog.New(slog.DiscardHandler)
 
-	testCases := []struct {
-		name string
+	tests := map[string]struct {
 		have func(context.Context) context.Context
 		want *slog.Logger
 	}{
-		{
-			name: "empty",
+		"empty": {
 			have: func(ctx context.Context) context.Context {
 				return ctx
 			},
 			want: slog.Default(),
 		},
-		{
-			name: "nil",
+		"nil": {
 			have: func(ctx context.Context) context.Context {
 				return slogx.IntoContext(ctx, nil /*logger*/)
 			},
 			want: slog.Default(),
 		},
-		{
-			name: "present",
+		"present": {
 			have: func(ctx context.Context) context.Context {
 				return slogx.IntoContext(ctx, toAdd)
 			},
@@ -41,16 +37,16 @@ func Test_FromContext(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			// arrange
-			ctx := tc.have(t.Context())
+			ctx := tt.have(t.Context())
 
 			// act
 			logger := slogx.FromContext(ctx)
 
 			// assert
-			assert.Same(t, tc.want, logger)
+			assert.Same(t, tt.want, logger)
 		})
 	}
 }

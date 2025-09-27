@@ -9,7 +9,9 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/runtime"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore"
-	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx/logx"
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx/metricx"
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx/tracex"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
@@ -18,9 +20,9 @@ type App struct {
 	conf       *Config
 	logger     *slog.Logger
 	db         *sql.DB
-	tpShutdown otelx.TracerProviderShutdown
-	mpShutdown otelx.MeterProviderShutdown
-	lpShutdown otelx.LoggerProviderShutdown
+	tpShutdown tracex.ProviderShutdown
+	mpShutdown metricx.ProviderShutdown
+	lpShutdown logx.ProviderShutdown
 }
 
 // ...
@@ -30,9 +32,9 @@ func NewApp(
 	conf *Config,
 	logger *slog.Logger,
 	db *sql.DB,
-	tpShutdown otelx.TracerProviderShutdown,
-	mpShutdown otelx.MeterProviderShutdown,
-	lpShutdown otelx.LoggerProviderShutdown,
+	tpShutdown tracex.ProviderShutdown,
+	mpShutdown metricx.ProviderShutdown,
+	lpShutdown logx.ProviderShutdown,
 ) *App {
 	return &App{
 		conf:       conf,

@@ -15,66 +15,62 @@ type MyConfig struct {
 }
 
 func Test_Comma_UnmarshalText(t *testing.T) {
-	testCases := []struct {
+	tests := map[string]struct {
 		name string
 		have string
 		want []string
 	}{
-		{
-			name: "empty",
+		"empty": {
 			have: "",
 			want: []string{},
 		},
-		{
-			name: "non-empty",
+		"non-empty": {
 			have: "foo,bar,baz",
 			want: []string{"foo", "bar", "baz"},
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			// arrange
 			c := splitter.Comma{}
 
 			// act
-			err := c.UnmarshalText([]byte(tc.have))
+			err := c.UnmarshalText([]byte(tt.have))
 
 			// assert
-			assert.Equal(t, tc.want, c.Unwrap())
+			assert.Equal(t, tt.want, c.Unwrap())
 			assert.NoError(t, err)
 		})
 	}
 }
 
 func Test_Space_UnmarshalText(t *testing.T) {
-	testCases := []struct {
+	tests := map[string]struct {
 		name string
 		have string
 		want []string
 	}{
-		{
-			name: "empty",
+		"empty": {
 			have: "",
 			want: []string{},
 		},
-		{
-			name: "non-empty",
+		"non-empty": {
 			have: "foo bar baz",
 			want: []string{"foo", "bar", "baz"},
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			// arrange
 			s := splitter.Space{}
 
 			// act
-			err := s.UnmarshalText([]byte(tc.have))
+			err := s.UnmarshalText([]byte(tt.have))
 
 			// assert
-			assert.Equal(t, tc.want, s.Unwrap())
+			assert.Equal(t, tt.want, s.Unwrap())
 			assert.NoError(t, err)
 		})
 	}
