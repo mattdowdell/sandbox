@@ -50,7 +50,7 @@ mockery := join(gopath, "bin", "mockery-v3.5.5")
 install-mockery:
     {{ if path_exists(mockery) == "true" { "" } else { "bingo get mockery" } }}
 
-protoc-gen-connect-go := join(gopath, "bin", "protoc-gen-connect-go-v1.18.1")
+protoc-gen-connect-go := join(gopath, "bin", "protoc-gen-connect-go-v1.19.0")
 
 [private]
 install-protoc-gen-connect-go:

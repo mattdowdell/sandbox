@@ -9,4 +9,4 @@ retract (
 	v1.9.0
 )
 
-require connectrpc.com/connect v1.18.1 // cmd/protoc-gen-connect-go
+require connectrpc.com/connect v1.19.0 // cmd/protoc-gen-connect-go
