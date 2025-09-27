@@ -16,7 +16,6 @@ type MyConfig struct {
 
 func Test_Comma_UnmarshalText(t *testing.T) {
 	tests := map[string]struct {
-		name string
 		have string
 		want []string
 	}{
@@ -47,7 +46,6 @@ func Test_Comma_UnmarshalText(t *testing.T) {
 
 func Test_Space_UnmarshalText(t *testing.T) {
 	tests := map[string]struct {
-		name string
 		have string
 		want []string
 	}{
