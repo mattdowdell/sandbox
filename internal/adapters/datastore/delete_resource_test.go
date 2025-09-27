@@ -79,32 +79,29 @@ func Test_Datastore_DeleteResource_RowsAffectedError(t *testing.T) {
 func Test_Datastore_DeleteResource_RowsAffectedInvalid(t *testing.T) {
 	id := uuid.Must(uuid.NewV7())
 
-	testCases := []struct {
-		name string
+	tests := map[string]struct {
 		have int64
 		want string
 	}{
-		{
-			name: "no rows affected",
+		"no rows affected": {
 			have: 0,
 			want: fmt.Sprintf("not found: %s", id),
 		},
-		{
-			name: "multiple rows affected",
+		"multiple rows affected": {
 			have: 2,
 			want: "internal error: too many deletes: 2",
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			// arrange
 			db, mock := newMockDB(t)
 
 			mock.
 				ExpectExec(deleteResourceSQL).
 				WithArgs(id).
-				WillReturnResult(sqlmock.NewResult(0, tc.have))
+				WillReturnResult(sqlmock.NewResult(0, tt.have))
 
 			store := datastore.NewDatastore(db)
 
@@ -112,7 +109,7 @@ func Test_Datastore_DeleteResource_RowsAffectedInvalid(t *testing.T) {
 			err := store.DeleteResource(t.Context(), id)
 
 			// assert
-			assert.EqualError(t, err, tc.want)
+			assert.EqualError(t, err, tt.want)
 		})
 	}
 }

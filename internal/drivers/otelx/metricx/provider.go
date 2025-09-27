@@ -1,4 +1,4 @@
-package otelx
+package metricx
 
 import (
 	"context"
@@ -6,10 +6,12 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
+
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
 )
 
-// MeterProviderConfig contains configuration for configuring an OpenTelemetry meter provider.
-type MeterProviderConfig struct {
+// ProviderConfig contains configuration for configuring an OpenTelemetry meter provider.
+type ProviderConfig struct {
 	// Use HTTP instead of HTTPS for the metric exporter's HTTP connection.
 	Insecure bool `koanf:"insecure"`
 
@@ -21,13 +23,13 @@ type MeterProviderConfig struct {
 }
 
 // MeterProviderShutdown provides a dedicated type for the meter provider shutdown function.
-type MeterProviderShutdown func(context.Context) error
+type ProviderShutdown func(context.Context) error
 
 // SetupMeterProviderFromConfig calls SetupMeterProvider with the given configuration.
 func SetupMeterProviderFromConfig(
 	ctx context.Context,
-	conf MeterProviderConfig,
-) (MeterProviderShutdown, error) {
+	conf ProviderConfig,
+) (ProviderShutdown, error) {
 	return SetupMeterProvider(ctx, conf.Insecure, conf.Endpoint, conf.Path)
 }
 
@@ -42,7 +44,7 @@ func SetupMeterProvider(
 	insecure bool,
 	endpoint string,
 	path string,
-) (MeterProviderShutdown, error) {
+) (ProviderShutdown, error) {
 	opts := []otlpmetrichttp.Option{
 		otlpmetrichttp.WithEndpoint(endpoint),
 		otlpmetrichttp.WithURLPath(path),
@@ -56,7 +58,7 @@ func SetupMeterProvider(
 		return nil, err
 	}
 
-	res, err := newResource()
+	res, err := otelx.NewResource()
 	if err != nil {
 		return nil, err
 	}

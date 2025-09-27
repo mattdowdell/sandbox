@@ -1,4 +1,4 @@
-package otelx
+package tracex
 
 import (
 	"context"
@@ -7,10 +7,12 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
 )
 
-// TracerProviderConfig contains configuration for configuring an OpenTelemetry tracer provider.
-type TracerProviderConfig struct {
+// ProviderConfig contains configuration for configuring an OpenTelemetry tracer provider.
+type ProviderConfig struct {
 	// Use HTTP instead of HTTPS for the trace exporter's HTTP connection.
 	Insecure bool `koanf:"insecure"`
 
@@ -21,15 +23,15 @@ type TracerProviderConfig struct {
 	Path string `koanf:"path" default:"/v1/traces"`
 }
 
-// TracerProviderShutdown provides a dedicated type for the tracer provider shutdown function.
-type TracerProviderShutdown func(context.Context) error
+// ProviderShutdown provides a dedicated type for the tracer provider shutdown function.
+type ProviderShutdown func(context.Context) error
 
 // SetupTracerProviderFromConfig calls SetupTracerProvider with the given configuration.
 func SetupTracerProviderFromConfig(
 	ctx context.Context,
-	conf TracerProviderConfig,
+	conf ProviderConfig,
 	filter baggagecopy.Filter,
-) (TracerProviderShutdown, error) {
+) (ProviderShutdown, error) {
 	return SetupTracerProvider(ctx, conf.Insecure, conf.Endpoint, conf.Path, filter)
 }
 
@@ -48,7 +50,7 @@ func SetupTracerProvider(
 	endpoint string,
 	path string,
 	filter baggagecopy.Filter,
-) (TracerProviderShutdown, error) {
+) (ProviderShutdown, error) {
 	opts := []otlptracehttp.Option{
 		otlptracehttp.WithEndpoint(endpoint),
 		otlptracehttp.WithURLPath(path),
@@ -62,7 +64,7 @@ func SetupTracerProvider(
 		return nil, err
 	}
 
-	res, err := newResource()
+	res, err := otelx.NewResource()
 	if err != nil {
 		return nil, err
 	}

@@ -1,4 +1,4 @@
-package otelx
+package tracex
 
 import (
 	"go.opentelemetry.io/otel"

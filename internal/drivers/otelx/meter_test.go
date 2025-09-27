@@ -6,32 +6,29 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx/otelt"
 )
 
 func Test_Meter(t *testing.T) {
-	provider, _ := otelx.TestMeterProvider()
+	provider, _ := otelt.MeterProvider()
 
-	testCases := []struct {
-		name    string
+	tests := map[string]struct {
 		options []otelx.MeterOption
 	}{
-		{
-			name: "no options",
-		},
-		{
-			name: "with provider",
+		"no options": {},
+		"with provider": {
 			options: []otelx.MeterOption{
 				otelx.WithMeterProvider(provider),
 			},
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			// arrange
 
 			// act
-			meter := otelx.Meter(tc.options...)
+			meter := otelx.Meter(tt.options...)
 
 			// assert
 			assert.NotNil(t, meter)

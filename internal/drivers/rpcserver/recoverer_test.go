@@ -13,7 +13,7 @@ import (
 	"go.opentelemetry.io/otel/sdk/metric/metricdata/metricdatatest"
 	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 
-	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx/otelt"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver"
 )
 
@@ -30,7 +30,7 @@ func Test_NewRecoverer(t *testing.T) {
 
 func Test_Recoverer_Handle(t *testing.T) {
 	// arrange
-	provider, collect := otelx.TestMeterProvider()
+	provider, collect := otelt.MeterProvider()
 	_ = collect
 
 	recoverer, err := rpcserver.NewRecoverer(

@@ -10,6 +10,9 @@ import (
 	"github.com/mattdowdell/sandbox/internal/drivers/config/flagoptions"
 	"github.com/mattdowdell/sandbox/internal/drivers/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx/logx"
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx/metricx"
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx/tracex"
 	"github.com/mattdowdell/sandbox/internal/drivers/pgsql"
 )
 
@@ -34,29 +37,30 @@ func SetupApp(ctx context.Context) (*App, error) {
 	return NewApp(conf, logger, db, tpShutdown, mpShutdown, lpShutdown), nil
 }
 
+//nolint:gocritic // result types are differentiated by package name.
 func setupObservability(
 	ctx context.Context,
 	conf *Config,
 ) (
-	otelx.TracerProviderShutdown,
-	otelx.MeterProviderShutdown,
-	otelx.LoggerProviderShutdown,
+	tracex.ProviderShutdown,
+	metricx.ProviderShutdown,
+	logx.ProviderShutdown,
 	*slog.Logger,
 	error,
 ) {
 	filter := baggagecopy.AllowAllMembers
 
-	tpShutdown, err := otelx.SetupTracerProviderFromConfig(ctx, conf.TracerProvider, filter)
+	tpShutdown, err := tracex.SetupTracerProviderFromConfig(ctx, conf.TracerProvider, filter)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
 
-	mpShutdown, err := otelx.SetupMeterProviderFromConfig(ctx, conf.MeterProvider)
+	mpShutdown, err := metricx.SetupMeterProviderFromConfig(ctx, conf.MeterProvider)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
 
-	lpShutdown, err := otelx.SetupLoggerProviderFromConfig(ctx, conf.LoggerProvider, filter)
+	lpShutdown, err := logx.SetupLoggerProviderFromConfig(ctx, conf.LoggerProvider, filter)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}

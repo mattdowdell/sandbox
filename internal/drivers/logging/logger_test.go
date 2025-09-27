@@ -10,6 +10,7 @@ import (
 
 	"github.com/mattdowdell/sandbox/internal/drivers/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx/otelt"
 )
 
 const (
@@ -97,7 +98,7 @@ func Test_Output_WithExtractor(t *testing.T) {
 		logging.WithExtractors(extractor),
 	)
 
-	ctx := otelx.MustSpan(t.Context(), testTraceID, testSpanID, true /*sampled*/)
+	ctx := otelt.MustSpan(t.Context(), testTraceID, testSpanID, true /*sampled*/)
 
 	// act
 	logger.InfoContext(ctx, "example")

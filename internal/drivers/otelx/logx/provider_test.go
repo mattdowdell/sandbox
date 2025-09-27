@@ -1,5 +1,5 @@
 //nolint:dupl // similar to meter_test.go/tracer_test.go
-package otelx_test
+package logx_test
 
 import (
 	"net/http"
@@ -11,21 +11,17 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/contrib/processors/baggagecopy"
 
-	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx/logx"
 )
 
-func isHTTP(scheme string) bool {
-	return scheme == "http"
-}
-
-func urlToLoggerProviderConfig(t *testing.T, input string) otelx.LoggerProviderConfig {
+func urlToProviderConfig(t *testing.T, input string) logx.ProviderConfig {
 	t.Helper()
 
 	u, err := url.Parse(input)
 	require.NoError(t, err)
 
-	return otelx.LoggerProviderConfig{
-		Insecure: isHTTP(u.Scheme),
+	return logx.ProviderConfig{
+		Insecure: u.Scheme == "http",
 		Endpoint: u.Host,
 		Path:     u.Path,
 	}
@@ -38,10 +34,10 @@ func Test_SetupLoggerProviderFromConfig_Success(t *testing.T) {
 	}))
 	defer server.Close()
 
-	conf := urlToLoggerProviderConfig(t, server.URL)
+	conf := urlToProviderConfig(t, server.URL)
 
 	// act
-	shutdown, err := otelx.SetupLoggerProviderFromConfig(t.Context(), conf, baggagecopy.AllowAllMembers)
+	shutdown, err := logx.SetupLoggerProviderFromConfig(t.Context(), conf, baggagecopy.AllowAllMembers)
 
 	// assert
 	if assert.NotNil(t, shutdown) {
@@ -53,12 +49,12 @@ func Test_SetupLoggerProviderFromConfig_Success(t *testing.T) {
 
 func Test_SetupLoggerProviderFromConfig_Error(t *testing.T) {
 	// arrange
-	conf := otelx.LoggerProviderConfig{
+	conf := logx.ProviderConfig{
 		Endpoint: "\t",
 	}
 
 	// act
-	shutdown, err := otelx.SetupLoggerProviderFromConfig(t.Context(), conf, baggagecopy.AllowAllMembers)
+	shutdown, err := logx.SetupLoggerProviderFromConfig(t.Context(), conf, baggagecopy.AllowAllMembers)
 
 	// assert
 	assert.Nil(t, shutdown)

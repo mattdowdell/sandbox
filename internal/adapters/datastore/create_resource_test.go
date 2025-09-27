@@ -51,13 +51,11 @@ func Test_Datastore_CreateResource_Success(t *testing.T) {
 }
 
 func Test_Datastore_CreateResource_Error(t *testing.T) {
-	testCases := []struct {
-		name string
+	tests := map[string]struct {
 		have error
 		want string
 	}{
-		{
-			name: "unique violation",
+		"unique violation": {
 			have: &pgconn.PgError{
 				Severity: "ERROR",
 				Code:     pgerrcode.UniqueViolation,
@@ -66,15 +64,14 @@ func Test_Datastore_CreateResource_Error(t *testing.T) {
 			want: `already exists: ERROR: duplicate key value violates unique constraint ` +
 				`"resources_name_key" (SQLSTATE 23505)`,
 		},
-		{
-			name: "other error",
+		"other error": {
 			have: errors.New("example"),
 			want: "internal error: example",
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			// arrange
 			id := uuid.Must(uuid.NewV7())
 			now := time.Now()
@@ -84,7 +81,7 @@ func Test_Datastore_CreateResource_Error(t *testing.T) {
 			mock.
 				ExpectExec(createResourceSQL).
 				WithArgs(id, testResourceName, now, now.Add(time.Hour)).
-				WillReturnError(tc.have)
+				WillReturnError(tt.have)
 
 			store := datastore.NewDatastore(db)
 
@@ -99,7 +96,7 @@ func Test_Datastore_CreateResource_Error(t *testing.T) {
 			err := store.CreateResource(t.Context(), resource)
 
 			// assert
-			assert.EqualError(t, err, tc.want)
+			assert.EqualError(t, err, tt.want)
 		})
 	}
 }
