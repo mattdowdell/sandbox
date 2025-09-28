@@ -11,17 +11,13 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-// ...
+// Type aliases for collect functions.
 type (
 	MetricCollectFn func(context.Context) (metricdata.ResourceMetrics, error)
 	TraceCollectFn  func() []sdktrace.ReadOnlySpan
 )
 
-// NewMeterProvider provides a [metric.MeterProvider] suitable for use in unit tests.
-//
-// TODO: discuss the collect function.
-//
-// [metric.MeterProvider]: # todo
+// NewMeterProvider provides a MeterProvider suitable for use in unit tests.
 func NewMeterProvider() (metric.MeterProvider, MetricCollectFn) {
 	reader := sdkmetric.NewManualReader()
 	provider := sdkmetric.NewMeterProvider(sdkmetric.WithReader(reader))
@@ -37,11 +33,7 @@ func NewMeterProvider() (metric.MeterProvider, MetricCollectFn) {
 	}
 }
 
-// NewTracerProvider provides a [trace.TracerProvider] suitable for use in unit tests.
-//
-// TODO: discuss the collect function
-//
-// [trace.TracerProvider]: #todo
+// NewTracerProvider provides a TracerProvider suitable for use in unit tests.
 func NewTracerProvider() (trace.TracerProvider, TraceCollectFn) {
 	recorder := tracetest.NewSpanRecorder()
 	provider := sdktrace.NewTracerProvider(sdktrace.WithSpanProcessor(recorder))

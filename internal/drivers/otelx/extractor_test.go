@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
-	"github.com/mattdowdell/sandbox/internal/drivers/otelx/otelt"
+	"github.com/mattdowdell/sandbox/pkg/otelt"
 )
 
 const (
