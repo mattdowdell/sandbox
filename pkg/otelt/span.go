@@ -20,7 +20,7 @@ func MustSpan(ctx context.Context, traceID, spanID string, sampled bool) context
 // NewSpan creates a [trace.Span] using the give trace ID, span ID and sampled value and adds it to
 // the given context. It can be used to produce a span with a deterministic value.
 //
-// [trace.Span]: #todo
+// [trace.Span]: https://pkg.go.dev/go.opentelemetry.io/otel/trace#Span
 func NewSpan(ctx context.Context, traceID, spanID string, sampled bool) (context.Context, error) {
 	tID, err := trace.TraceIDFromHex(traceID)
 	if err != nil {
