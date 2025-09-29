@@ -9,7 +9,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc/health/grpc_health_v1"
 
-	"github.com/mattdowdell/sandbox/internal/drivers/otelx/otelt"
+	"github.com/mattdowdell/sandbox/pkg/otelt"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 

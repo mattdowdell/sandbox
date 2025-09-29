@@ -6,11 +6,11 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
-	"github.com/mattdowdell/sandbox/internal/drivers/otelx/otelt"
+	"github.com/mattdowdell/sandbox/pkg/otelt"
 )
 
 func Test_Meter(t *testing.T) {
-	provider, _ := otelt.MeterProvider()
+	provider, _ := otelt.NewMeterProvider()
 
 	tests := map[string]struct {
 		options []otelx.MeterOption
