@@ -26,19 +26,31 @@ func New(migrations []Migration) (*Herd, error) {
 		return nil, fmt.Errorf("failed to collect system migrations: %w", err)
 	}
 
+	systemHelper := newMigrationHelper()
+
+	system, err := newMigrator(systemMigrations)
+	if err != nil {
+		panic(err)
+	}
+
+	user, err := newMigrator(migrations)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Herd{
-		system: newMigrator(systemMigrations),
-		user:   newMigrator(migrations),
+		system: system,
+		user:   user,
 	}, nil
 }
 
 // Migrate migrates the database using the configured migrations.
 func (h *Herd) Migrate(ctx context.Context, db *sql.DB) (*Result, error) {
-	if _, err := h.system.migrate(ctx, db, &migrateOpts{}); err != nil {
+	if _, err := h.system.migrate(ctx, db, false /*dryRun*/); err != nil {
 		return nil, fmt.Errorf("failed to execute system migrations: %w", err)
 	}
 
-	result, err := h.user.migrate(ctx, db, &migrateOpts{})
+	result, err := h.user.migrate(ctx, db, false /*dryRun*/)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute user migrations: %w", err)
 	}

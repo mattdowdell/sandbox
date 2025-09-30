@@ -10,8 +10,9 @@ import (
 	"strings"
 )
 
-// Executable contains the sql ExecContext method.
-type Executable interface {
+// ...
+type DB interface {
+	QueryRowContext(context.Context, string, ...any) *sql.Row
 	ExecContext(context.Context, string, ...any) (sql.Result, error)
 }
 
@@ -25,17 +26,17 @@ type Migration interface {
 	Name() string
 
 	// Version returns the migration version.
-	Version() int
+	Version() int64
 
 	// Migrate executes the migration.
-	Migrate(context.Context, Executable) error
+	Migrate(context.Context, DB) error
 }
 
 // FileMigration is an implementation of Migration and can represent a single SQL file containing a
 // migration.
 type FileMigration struct {
 	name     string
-	version  int
+	version  int64
 	contents string
 }
 
@@ -104,7 +105,7 @@ func NewFileMigrationFromFilename(filename, contents string) (*FileMigration, er
 		return nil, fmt.Errorf("unable to extract version and name from filename: %q", filename)
 	}
 
-	v, err := strconv.Atoi(version)
+	v, err := strconv.ParseInt(version, 10 /*base*/, 64 /*bitSize*/)
 	if err != nil {
 		return nil, fmt.Errorf("unable to parse version to int for filename %q: %w", filename, err)
 	}
@@ -113,11 +114,7 @@ func NewFileMigrationFromFilename(filename, contents string) (*FileMigration, er
 }
 
 // NewFileMigration creates a new FileMigration.
-func NewFileMigration(name string, version int, contents string) (*FileMigration, error) {
-	if version < 0 {
-		return nil, fmt.Errorf("version must be > 0, found: %d", version)
-	}
-
+func NewFileMigration(name string, version int64, contents string) (*FileMigration, error) {
 	return &FileMigration{
 		name:     name,
 		version:  version,
@@ -131,12 +128,12 @@ func (m *FileMigration) Name() string {
 }
 
 // Version returns the migration version.
-func (m *FileMigration) Version() int {
+func (m *FileMigration) Version() int64 {
 	return m.version
 }
 
 // Migrate executes the migration.
-func (m *FileMigration) Migrate(ctx context.Context, tx Executable) error {
-	_, err := tx.ExecContext(ctx, m.contents)
+func (m *FileMigration) Migrate(ctx context.Context, db DB) error {
+	_, err := db.ExecContext(ctx, m.contents)
 	return err
 }

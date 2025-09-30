@@ -4,7 +4,7 @@
 CREATE TABLE herd_system_migrations (
 	id UUID PRIMARY KEY,
 	migrated_at TIMESTAMPTZ (0) NOT NULL,
-	migration_version TEXT NOT NULL,
+	migration_version BIGINT NOT NULL,
 	code_version TEXT NOT NULL,
 );
 
@@ -12,6 +12,6 @@ CREATE TABLE herd_system_migrations (
 CREATE TABLE herd_user_migrations (
 	id UUID PRIMARY KEY,
 	migrated_at TIMESTAMPTZ (0) NOT NULL,
-	migration_version TEXT NOT NULL,
+	migration_version BIGINT NOT NULL,
 	code_version TEXT NOT NULL,
 );

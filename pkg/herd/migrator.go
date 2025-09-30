@@ -15,24 +15,45 @@ import (
 // ...
 type migrateOpts struct {
 	dryRun bool
+	limit int64
 }
 
 // ...
 type migrator struct {
+	helper     *migrationHelper
 	migrations []Migration
+
 }
 
 // ...
-func newMigrator(migrations []Migration) *migrator {
-	// TODO: require 1 migration to be present?
+func newMigrator(helper *migrationHelper, migrations []Migration) (*migrator, error) {
+	if len(migrations) == 0 {
+		return nil, fmt.Errorf("at least 1 migration must be present")
+	}
 
 	slices.SortFunc(migrations, func(a, b Migration) int {
 		return cmp.Compare(a.Version(), b.Version())
 	})
 
-	return &migrator{
-		migrations: migrations,
+	for i := range migrations {
+		version := migrations[i].Version()
+		if version <= 0 {
+			return nil, fmt.Errorf("migration versions must be > 0, found: %d", version)
+		}
+
+		if i == 0 {
+			continue
+		}
+
+		if migrations[i - 1].Version() == version {
+			return nil, fmt.Errorf("duplicate migration version found: %d", version)
+		}
 	}
+
+	return &migrator{
+		helper: helper,
+		migrations: migrations,
+	}, nil
 }
 
 // ...
@@ -49,15 +70,21 @@ func (m *migrator) migrate(ctx context.Context, db *sql.DB, opts *migrateOpts) (
 		}
 	}()
 
-	// TODO: filter to just pending migrations
+	currentVersion, err := m.helper.getCurrentVersion(ctx, tx)
+	if err != nil {
+		return nil, err
+	}
 
-	for _, migration := range m.migrations {
+	pending := slices.DeleteFunc(m.migrations, func(m Migration) bool {
+		return m.Version() <= currentVersion || opts.limit >
+	})
+
+	for _, migration := range pending {
 		if err := migration.Migrate(ctx, tx); err != nil {
 			return nil, fmt.Errorf("migration %s %d failed: %w", migration.Name(), migration.Version(), err)
 		}
 	}
 
-	// TODO: support dry run
 	if !opts.dryRun {
 		if err := tx.Commit(); err != nil {
 			return nil, fmt.Errorf("failed to commit transaction: %w", err)
