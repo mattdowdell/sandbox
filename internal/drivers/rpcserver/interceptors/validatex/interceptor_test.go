@@ -12,9 +12,8 @@ func Test_NewFromConfig(t *testing.T) {
 	// arrange
 
 	// act
-	interceptor, err := validatex.New()
+	interceptor := validatex.New()
 
 	// assert
 	assert.NotNil(t, interceptor)
-	assert.NoError(t, err)
 }
