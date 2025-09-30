@@ -173,11 +173,7 @@ func initHandlerOptions(conf *Config) ([]connect.HandlerOption, error) {
 		return nil, err
 	}
 
-	validateInterceptor, err := validatex.New()
-	if err != nil {
-		return nil, err
-	}
-
+	validateInterceptor := validatex.New()
 	loggingInterceptor := logginginterceptor.New()
 
 	client := authn.NewClientFromConfig(
