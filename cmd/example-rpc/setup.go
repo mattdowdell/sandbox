@@ -33,8 +33,8 @@ import (
 	logginginterceptor "github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/otelconnectx"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/validatex"
-	"github.com/mattdowdell/sandbox/internal/drivers/tock"
 	"github.com/mattdowdell/sandbox/internal/usecases"
+	"github.com/mattdowdell/sandbox/pkg/timex"
 )
 
 func SetupApp(ctx context.Context) (*App, error) {
@@ -50,7 +50,7 @@ func SetupApp(ctx context.Context) (*App, error) {
 		return nil, err
 	}
 
-	clock := tock.New()
+	clock := timex.NewClock()
 	uuidgen := uuid.NewGen()
 
 	resource, auditEvent, err := initFacades(ctx, conf, clock, uuidgen)
