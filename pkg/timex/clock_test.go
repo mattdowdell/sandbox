@@ -16,12 +16,12 @@ func assertWithinRange(t *testing.T, expected, actual, delta time.Duration) {
 	assert.LessOrEqual(t, expected-delta, actual)
 }
 
-func Test_Timer_UTCNow(t *testing.T) {
+func Test_Clock_UTCNow(t *testing.T) {
 	// arrange
-	timer := timex.NewTimer()
+	clock := timex.NewClock()
 
 	// act
-	now := timer.UTCNow()
+	now := clock.UTCNow()
 
 	// assert
 	assert.WithinDuration(t, time.Now(), now, time.Second)
@@ -32,34 +32,34 @@ func Test_Timer_UTCNow(t *testing.T) {
 	assert.Equal(t, 0, offset)
 }
 
-func Test_Timer_Now(t *testing.T) {
+func Test_Clock_Now(t *testing.T) {
 	// arrange
-	timer := timex.NewTimer()
+	clock := timex.NewClock()
 
 	// act
-	now := timer.Now()
+	now := clock.Now()
 
 	// assert
 	assert.WithinDuration(t, time.Now(), now, time.Second)
 }
 
-func Test_Timer_Since(t *testing.T) {
+func Test_Clock_Since(t *testing.T) {
 	// arrange
-	timer := timex.NewTimer()
+	clock := timex.NewClock()
 
 	// act
-	got := timer.Since(time.Now().Add(time.Hour * -1))
+	got := clock.Since(time.Now().Add(time.Hour * -1))
 
 	// assert
 	assertWithinRange(t, time.Hour, got, time.Second)
 }
 
-func Test_Timer_Until(t *testing.T) {
+func Test_Clock_Until(t *testing.T) {
 	// arrange
-	timer := timex.NewTimer()
+	clock := timex.NewClock()
 
 	// act
-	got := timer.Until(time.Now().Add(time.Hour))
+	got := clock.Until(time.Now().Add(time.Hour))
 
 	// assert
 	assertWithinRange(t, time.Hour, got, time.Second)

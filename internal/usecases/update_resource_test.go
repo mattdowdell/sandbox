@@ -16,10 +16,10 @@ import (
 
 func Test_NewUpdateResource(t *testing.T) {
 	// arrange
-	timer := mockrepositories.NewTimer(t)
+	clock := mockrepositories.NewClock(t)
 
 	// act
-	usecase := usecases.NewUpdateResource(timer)
+	usecase := usecases.NewUpdateResource(clock)
 
 	// assert
 	assert.NotNil(t, usecase)
@@ -30,10 +30,10 @@ func Test_UpdateResource_Success(t *testing.T) {
 	id := uuid.Must(uuid.NewV7())
 	now := time.Now().UTC().Round(time.Second)
 
-	timer := mockrepositories.NewTimer(t)
-	timer.EXPECT().UTCNow().Return(now).Once()
+	clock := mockrepositories.NewClock(t)
+	clock.EXPECT().UTCNow().Return(now).Once()
 
-	usecase := usecases.NewUpdateResource(timer)
+	usecase := usecases.NewUpdateResource(clock)
 	logger := slogt.New(t)
 
 	expected := &entities.Resource{
@@ -79,10 +79,10 @@ func Test_UpdateResource_Error(t *testing.T) {
 			id := uuid.Must(uuid.NewV7())
 			now := time.Now().UTC().Round(time.Second)
 
-			timer := mockrepositories.NewTimer(t)
-			timer.EXPECT().UTCNow().Return(now).Once()
+			clock := mockrepositories.NewClock(t)
+			clock.EXPECT().UTCNow().Return(now).Once()
 
-			usecase := usecases.NewUpdateResource(timer)
+			usecase := usecases.NewUpdateResource(clock)
 			logger := slogt.New(t)
 
 			expected := &entities.Resource{

@@ -21,7 +21,7 @@ type IssuerConfig struct {
 
 // Issuer is used to create new JWTs based on given configuration.
 type Issuer struct {
-	timer     repositories.Timer
+	clock     repositories.Clock
 	generator repositories.UUIDGenerator
 	issuer    string
 	audience  string
@@ -29,12 +29,12 @@ type Issuer struct {
 
 // NewIssuerFromConfig creates a new Issuer using the given configuration.
 func NewIssuerFromConfig(
-	timer repositories.Timer,
+	clock repositories.Clock,
 	generator repositories.UUIDGenerator,
 	conf IssuerConfig,
 ) (*Issuer, error) {
 	return NewIssuer(
-		timer,
+		clock,
 		generator,
 		conf.Issuer,
 		conf.Audience,
@@ -43,7 +43,7 @@ func NewIssuerFromConfig(
 
 // NewIssuer creates a new Issuer.
 func NewIssuer(
-	timer repositories.Timer,
+	clock repositories.Clock,
 	generator repositories.UUIDGenerator,
 	issuer string,
 	audience string,
@@ -57,7 +57,7 @@ func NewIssuer(
 	}
 
 	return &Issuer{
-		timer:     timer,
+		clock:     clock,
 		generator: generator,
 		issuer:    issuer,
 		audience:  audience,
@@ -66,7 +66,7 @@ func NewIssuer(
 
 // Issue creates a new JWT with the given subject as the subject claim.
 func (i *Issuer) Issue(subject string, expiresInSeconds uint32) (string, error) {
-	now := i.timer.UTCNow()
+	now := i.clock.UTCNow()
 	expiresIn := time.Second * time.Duration(expiresInSeconds)
 
 	id, err := i.generator.NewV4()

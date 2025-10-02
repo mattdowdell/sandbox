@@ -21,11 +21,11 @@ const (
 
 func Test_NewCreateResource(t *testing.T) {
 	// arrange
-	timer := mockrepositories.NewTimer(t)
+	clock := mockrepositories.NewClock(t)
 	uuidgen := mockrepositories.NewUUIDGenerator(t)
 
 	// act
-	usecase := usecases.NewCreateResource(timer, uuidgen)
+	usecase := usecases.NewCreateResource(clock, uuidgen)
 
 	// assert
 	assert.NotNil(t, usecase)
@@ -36,13 +36,13 @@ func Test_CreateResource_Success(t *testing.T) {
 	now := time.Now().UTC().Round(time.Second)
 	id := uuid.Must(uuid.NewV7())
 
-	timer := mockrepositories.NewTimer(t)
-	timer.EXPECT().UTCNow().Return(now).Once()
+	clock := mockrepositories.NewClock(t)
+	clock.EXPECT().UTCNow().Return(now).Once()
 
 	uuidgen := mockrepositories.NewUUIDGenerator(t)
 	uuidgen.EXPECT().NewV7().Return(id, nil).Once()
 
-	usecase := usecases.NewCreateResource(timer, uuidgen)
+	usecase := usecases.NewCreateResource(clock, uuidgen)
 	logger := slogt.New(t)
 
 	expected := &entities.Resource{
@@ -69,12 +69,12 @@ func Test_CreateResource_Success(t *testing.T) {
 
 func Test_CreateResource_IDFailed(t *testing.T) {
 	// arrange
-	timer := mockrepositories.NewTimer(t)
+	clock := mockrepositories.NewClock(t)
 
 	uuidgen := mockrepositories.NewUUIDGenerator(t)
 	uuidgen.EXPECT().NewV7().Return(uuid.Nil, errors.New("example")).Once()
 
-	usecase := usecases.NewCreateResource(timer, uuidgen)
+	usecase := usecases.NewCreateResource(clock, uuidgen)
 	logger := slogt.New(t)
 	store := mockrepositories.NewResource(t)
 
@@ -108,13 +108,13 @@ func Test_CreateResource_CreateFailed(t *testing.T) {
 			now := time.Now().UTC().Round(time.Second)
 			id := uuid.Must(uuid.NewV7())
 
-			timer := mockrepositories.NewTimer(t)
-			timer.EXPECT().UTCNow().Return(now).Once()
+			clock := mockrepositories.NewClock(t)
+			clock.EXPECT().UTCNow().Return(now).Once()
 
 			uuidgen := mockrepositories.NewUUIDGenerator(t)
 			uuidgen.EXPECT().NewV7().Return(id, nil).Once()
 
-			usecase := usecases.NewCreateResource(timer, uuidgen)
+			usecase := usecases.NewCreateResource(clock, uuidgen)
 			logger := slogt.New(t)
 
 			expected := &entities.Resource{

@@ -41,7 +41,7 @@ const (
 
 func Test_NewParserFromConfig(t *testing.T) {
 	// arrange
-	timer := mockrepositories.NewTimer(t)
+	clock := mockrepositories.NewClock(t)
 	conf := jwtx.ParserConfig{
 		Audience: []string{testAudience},
 		Issuer:   testIssuer,
@@ -49,7 +49,7 @@ func Test_NewParserFromConfig(t *testing.T) {
 	}
 
 	// act
-	parser, err := jwtx.NewParserFromConfig(timer, conf)
+	parser, err := jwtx.NewParserFromConfig(clock, conf)
 
 	// assert
 	assert.NotNil(t, parser)
@@ -58,10 +58,10 @@ func Test_NewParserFromConfig(t *testing.T) {
 
 func Test_NewParser_Success(t *testing.T) {
 	// arrange
-	timer := mockrepositories.NewTimer(t)
+	clock := mockrepositories.NewClock(t)
 
 	// act
-	parser, err := jwtx.NewParser(timer, []string{testAudience}, testIssuer, []string{testMethod})
+	parser, err := jwtx.NewParser(clock, []string{testAudience}, testIssuer, []string{testMethod})
 
 	// assert
 	assert.NotNil(t, parser)
@@ -110,10 +110,10 @@ func Test_NewParser_Error(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			timer := mockrepositories.NewTimer(t)
+			clock := mockrepositories.NewClock(t)
 
 			// act
-			parser, err := jwtx.NewParser(timer, tt.audience, tt.issuer, tt.methods)
+			parser, err := jwtx.NewParser(clock, tt.audience, tt.issuer, tt.methods)
 
 			// assert
 			assert.Nil(t, parser)
@@ -124,10 +124,10 @@ func Test_NewParser_Error(t *testing.T) {
 
 func Test_Parser_Parse_Success(t *testing.T) {
 	// arrange
-	timer := mockrepositories.NewTimer(t)
-	timer.EXPECT().UTCNow().Return(testIssuedAt).Once()
+	clock := mockrepositories.NewClock(t)
+	clock.EXPECT().UTCNow().Return(testIssuedAt).Once()
 
-	parser, err := jwtx.NewParser(timer, []string{testAudience}, testIssuer, []string{testMethod})
+	parser, err := jwtx.NewParser(clock, []string{testAudience}, testIssuer, []string{testMethod})
 	require.NoError(t, err)
 
 	// act
@@ -223,10 +223,10 @@ func Test_Parser_Parse_Error(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			timer := mockrepositories.NewTimer(t)
-			timer.EXPECT().UTCNow().Return(testIssuedAt).Maybe()
+			clock := mockrepositories.NewClock(t)
+			clock.EXPECT().UTCNow().Return(testIssuedAt).Maybe()
 
-			parser, err := jwtx.NewParser(timer, tt.audience, tt.issuer, []string{testMethod})
+			parser, err := jwtx.NewParser(clock, tt.audience, tt.issuer, []string{testMethod})
 			require.NoError(t, err)
 
 			// act

@@ -50,10 +50,10 @@ func SetupApp(ctx context.Context) (*App, error) {
 		return nil, err
 	}
 
-	timer := timex.NewTimer()
+	clock := timex.NewClock()
 	uuidgen := uuid.NewGen()
 
-	resource, auditEvent, err := initFacades(ctx, conf, timer, uuidgen)
+	resource, auditEvent, err := initFacades(ctx, conf, clock, uuidgen)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func SetupApp(ctx context.Context) (*App, error) {
 		return nil, err
 	}
 
-	handlers, err := initHandlers(conf, timer, uuidgen, resource, auditEvent)
+	handlers, err := initHandlers(conf, clock, uuidgen, resource, auditEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +110,7 @@ func initObservability(
 func initFacades(
 	ctx context.Context,
 	conf *Config,
-	timer repositories.Timer,
+	clock repositories.Clock,
 	uuidgen repositories.UUIDGenerator,
 ) (*usecasefacades.Resource, *usecasefacades.AuditEvent, error) {
 	db, err := pgsql.NewFromConfig(ctx, conf.Database)
@@ -120,10 +120,10 @@ func initFacades(
 
 	provider := datastore.NewProvider(db)
 
-	createResource := usecases.NewCreateResource(timer, uuidgen)
+	createResource := usecases.NewCreateResource(clock, uuidgen)
 	getResource := usecases.NewGetResource()
 	listResources := usecases.NewListResources()
-	updateResource := usecases.NewUpdateResource(timer)
+	updateResource := usecases.NewUpdateResource(clock)
 	deleteResource := usecases.NewDeleteResource()
 	listAuditevents := usecases.NewListAuditEvents()
 	watchAuditEvents := usecases.NewWatchAuditEvents()
@@ -144,17 +144,17 @@ func initFacades(
 
 func initHandlers(
 	conf *Config,
-	timer repositories.Timer,
+	clock repositories.Clock,
 	uuidgen repositories.UUIDGenerator,
 	resource examplerpc.ResourceFacade,
 	auditEvent examplerpc.AuditEventFacade,
 ) ([]rpcserver.Handler, error) {
-	issuer, err := jwtx.NewIssuerFromConfig(timer, uuidgen, conf.Issuer)
+	issuer, err := jwtx.NewIssuerFromConfig(clock, uuidgen, conf.Issuer)
 	if err != nil {
 		return nil, err
 	}
 
-	parser, err := jwtx.NewParserFromConfig(timer, conf.Parser)
+	parser, err := jwtx.NewParserFromConfig(clock, conf.Parser)
 	if err != nil {
 		return nil, err
 	}

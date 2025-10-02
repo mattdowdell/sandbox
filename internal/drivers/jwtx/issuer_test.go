@@ -31,7 +31,7 @@ var (
 
 func Test_NewIssuerFromConfig(t *testing.T) {
 	// arrange
-	timer := mockrepositories.NewTimer(t)
+	clock := mockrepositories.NewClock(t)
 	generator := mockrepositories.NewUUIDGenerator(t)
 
 	conf := jwtx.IssuerConfig{
@@ -40,7 +40,7 @@ func Test_NewIssuerFromConfig(t *testing.T) {
 	}
 
 	// act
-	issuer, err := jwtx.NewIssuerFromConfig(timer, generator, conf)
+	issuer, err := jwtx.NewIssuerFromConfig(clock, generator, conf)
 
 	// assert
 	assert.NotNil(t, issuer)
@@ -49,11 +49,11 @@ func Test_NewIssuerFromConfig(t *testing.T) {
 
 func Test_NewIssuer_Success(t *testing.T) {
 	// arrange
-	timer := mockrepositories.NewTimer(t)
+	clock := mockrepositories.NewClock(t)
 	generator := mockrepositories.NewUUIDGenerator(t)
 
 	// act
-	issuer, err := jwtx.NewIssuer(timer, generator, testIssuer, testAudience)
+	issuer, err := jwtx.NewIssuer(clock, generator, testIssuer, testAudience)
 
 	// assert
 	assert.NotNil(t, issuer)
@@ -81,11 +81,11 @@ func Test_NewIssuer_Error(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			timer := mockrepositories.NewTimer(t)
+			clock := mockrepositories.NewClock(t)
 			generator := mockrepositories.NewUUIDGenerator(t)
 
 			// act
-			issuer, err := jwtx.NewIssuer(timer, generator, tt.issuer, tt.audience)
+			issuer, err := jwtx.NewIssuer(clock, generator, tt.issuer, tt.audience)
 
 			// assert
 			assert.Nil(t, issuer)
@@ -96,13 +96,13 @@ func Test_NewIssuer_Error(t *testing.T) {
 
 func Test_Issuer_Issue_Success(t *testing.T) {
 	// arrange
-	timer := mockrepositories.NewTimer(t)
-	timer.EXPECT().UTCNow().Return(testIssuedAt).Once()
+	clock := mockrepositories.NewClock(t)
+	clock.EXPECT().UTCNow().Return(testIssuedAt).Once()
 
 	generator := mockrepositories.NewUUIDGenerator(t)
 	generator.EXPECT().NewV4().Return(testID, nil).Once()
 
-	issuer, err := jwtx.NewIssuer(timer, generator, testIssuer, testAudience)
+	issuer, err := jwtx.NewIssuer(clock, generator, testIssuer, testAudience)
 	require.NoError(t, err)
 
 	// act
@@ -115,13 +115,13 @@ func Test_Issuer_Issue_Success(t *testing.T) {
 
 func Test_Issuer_Issue_Error(t *testing.T) {
 	// arrange
-	timer := mockrepositories.NewTimer(t)
-	timer.EXPECT().UTCNow().Return(testIssuedAt).Once()
+	clock := mockrepositories.NewClock(t)
+	clock.EXPECT().UTCNow().Return(testIssuedAt).Once()
 
 	generator := mockrepositories.NewUUIDGenerator(t)
 	generator.EXPECT().NewV4().Return(uuid.Nil, errors.New("example")).Once()
 
-	issuer, err := jwtx.NewIssuer(timer, generator, testIssuer, testAudience)
+	issuer, err := jwtx.NewIssuer(clock, generator, testIssuer, testAudience)
 	require.NoError(t, err)
 
 	// act

@@ -13,15 +13,15 @@ import (
 
 // UpdateResource provides the business logic for updating a resource.
 type UpdateResource struct {
-	timer repositories.Timer
+	clock repositories.Clock
 }
 
 // NewUpdateResource creates a new UpdateResource.
 func NewUpdateResource(
-	timer repositories.Timer,
+	clock repositories.Clock,
 ) *UpdateResource {
 	return &UpdateResource{
-		timer: timer,
+		clock: clock,
 	}
 }
 
@@ -35,7 +35,7 @@ func (u *UpdateResource) Execute(
 	store repositories.Resource,
 	changes *entities.Resource,
 ) (*entities.Resource, error) {
-	changes.Update(u.timer.UTCNow())
+	changes.Update(u.clock.UTCNow())
 
 	resource, err := store.UpdateResource(ctx, changes)
 	if err != nil {

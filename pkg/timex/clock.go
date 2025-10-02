@@ -4,20 +4,20 @@ import (
 	"time"
 )
 
-// Timer provides a wrapper around functions in [time] to support dependency injection and mocking
+// Clock provides a wrapper around functions in [time] to support dependency injection and mocking
 // in unit tests.
-type Timer struct{}
+type Clock struct{}
 
-// NewTimer creates a new Timer.
-func NewTimer() *Timer {
-	return &Timer{}
+// NewClock creates a new Clock.
+func NewClock() *Clock {
+	return &Clock{}
 }
 
 // UTCNow returns the current time in UTC.
 //
 // This should be used when storing the time. It must not be used for calculating the duration
 // between 2 points in time as it lacks any monotonic representation.
-func (*Timer) UTCNow() time.Time {
+func (*Clock) UTCNow() time.Time {
 	return time.Now().UTC()
 }
 
@@ -25,16 +25,16 @@ func (*Timer) UTCNow() time.Time {
 //
 // This should only be used to calculate the durations between 2 points in time via the Since and
 // Until methods.
-func (*Timer) Now() time.Time {
+func (*Clock) Now() time.Time {
 	return time.Now()
 }
 
 // Since returns the time elapsed since the given value.
-func (t *Timer) Since(value time.Time) time.Duration {
-	return t.Now().Sub(value)
+func (c *Clock) Since(t time.Time) time.Duration {
+	return c.Now().Sub(t)
 }
 
 // Until returns the duration until the given value.
-func (t *Timer) Until(value time.Time) time.Duration {
-	return value.Sub(t.Now())
+func (c *Clock) Until(t time.Time) time.Duration {
+	return t.Sub(c.Now())
 }
