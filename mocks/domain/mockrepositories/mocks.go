@@ -243,12 +243,12 @@ func (_m *Clock) EXPECT() *Clock_Expecter {
 	return &Clock_Expecter{mock: &_m.Mock}
 }
 
-// LocalNow provides a mock function for the type Clock
-func (_mock *Clock) LocalNow() time.Time {
+// Now provides a mock function for the type Clock
+func (_mock *Clock) Now() time.Time {
 	ret := _mock.Called()
 
 	if len(ret) == 0 {
-		panic("no return value specified for LocalNow")
+		panic("no return value specified for Now")
 	}
 
 	var r0 time.Time
@@ -260,29 +260,29 @@ func (_mock *Clock) LocalNow() time.Time {
 	return r0
 }
 
-// Clock_LocalNow_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'LocalNow'
-type Clock_LocalNow_Call struct {
+// Clock_Now_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Now'
+type Clock_Now_Call struct {
 	*mock.Call
 }
 
-// LocalNow is a helper method to define mock.On call
-func (_e *Clock_Expecter) LocalNow() *Clock_LocalNow_Call {
-	return &Clock_LocalNow_Call{Call: _e.mock.On("LocalNow")}
+// Now is a helper method to define mock.On call
+func (_e *Clock_Expecter) Now() *Clock_Now_Call {
+	return &Clock_Now_Call{Call: _e.mock.On("Now")}
 }
 
-func (_c *Clock_LocalNow_Call) Run(run func()) *Clock_LocalNow_Call {
+func (_c *Clock_Now_Call) Run(run func()) *Clock_Now_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run()
 	})
 	return _c
 }
 
-func (_c *Clock_LocalNow_Call) Return(time1 time.Time) *Clock_LocalNow_Call {
+func (_c *Clock_Now_Call) Return(time1 time.Time) *Clock_Now_Call {
 	_c.Call.Return(time1)
 	return _c
 }
 
-func (_c *Clock_LocalNow_Call) RunAndReturn(run func() time.Time) *Clock_LocalNow_Call {
+func (_c *Clock_Now_Call) RunAndReturn(run func() time.Time) *Clock_Now_Call {
 	_c.Call.Return(run)
 	return _c
 }

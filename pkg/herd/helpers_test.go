@@ -2,6 +2,8 @@ package herd_test
 
 import (
 	"database/sql"
+	"io/fs"
+	"os"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -21,4 +23,22 @@ func newMockDB(t *testing.T) (*sql.DB, sqlmock.Sqlmock) {
 	})
 
 	return db, mock
+}
+
+// ...
+func writeFile(t *testing.T, path string) {
+	t.Helper()
+
+	err := os.WriteFile(path, nil, 0o600)
+	require.NoErrorf(t, err, "failed to create file: %s", path)
+}
+
+// ...
+func openRootFS(t *testing.T, dir string) fs.FS {
+	t.Helper()
+
+	root, err := os.OpenRoot(dir)
+	require.NoError(t, err)
+
+	return root.FS()
 }

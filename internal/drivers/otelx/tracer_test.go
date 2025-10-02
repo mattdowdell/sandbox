@@ -7,11 +7,11 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
-	"github.com/mattdowdell/sandbox/internal/drivers/otelx/otelt"
+	"github.com/mattdowdell/sandbox/pkg/otelt"
 )
 
 func Test_Tracer(t *testing.T) {
-	provider, _ := otelt.TracerProvider()
+	provider, _ := otelt.NewTracerProvider()
 
 	tests := map[string]struct {
 		options []otelx.TracerOption

@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mattdowdell/sandbox/internal/drivers/otelx/otelt"
+	"github.com/mattdowdell/sandbox/pkg/otelt"
 )
 
 const (
@@ -43,37 +43,5 @@ func Test_MustSpan_Error(t *testing.T) {
 				otelt.MustSpan(t.Context(), tt.traceID, tt.spanID, true /*sampled*/)
 			})
 		})
-	}
-}
-
-func Test_MeterProvider(t *testing.T) {
-	// arrange
-
-	// act
-	provider, collect := otelt.MeterProvider()
-
-	// assert
-	assert.NotNil(t, provider)
-
-	if assert.NotNil(t, collect) {
-		metrics, err := collect(t.Context())
-
-		assert.Empty(t, metrics.ScopeMetrics)
-		assert.NoError(t, err)
-	}
-}
-
-func Test_TracerProvider(t *testing.T) {
-	// arrange
-
-	// act
-	provider, collect := otelt.TracerProvider()
-
-	// assert
-	assert.NotNil(t, provider)
-
-	if assert.NotNil(t, collect) {
-		spans := collect()
-		assert.Empty(t, spans)
 	}
 }
