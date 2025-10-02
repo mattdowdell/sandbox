@@ -30,13 +30,13 @@ type Parser struct {
 }
 
 // NewParserFromConfig creates a new Parser using the given configuration.
-func NewParserFromConfig(clock repositories.Clock, conf ParserConfig) (*Parser, error) {
-	return NewParser(clock, conf.Audience, conf.Issuer, conf.Methods)
+func NewParserFromConfig(timer repositories.Timer, conf ParserConfig) (*Parser, error) {
+	return NewParser(timer, conf.Audience, conf.Issuer, conf.Methods)
 }
 
 // NewParser creates a new Parser.
 func NewParser(
-	clock repositories.Clock,
+	timer repositories.Timer,
 	audience []string,
 	issuer string,
 	methods []string,
@@ -72,7 +72,7 @@ func NewParser(
 			jwt.WithIssuer(issuer),
 			jwt.WithStrictDecoding(),
 			jwt.WithValidMethods(methods),
-			jwt.WithTimeFunc(clock.UTCNow),
+			jwt.WithTimeFunc(timer.UTCNow),
 		),
 	}, nil
 }

@@ -1,4 +1,4 @@
-package tock_test
+package timex_test
 
 import (
 	"testing"
@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mattdowdell/sandbox/internal/drivers/tock"
+	"github.com/mattdowdell/sandbox/pkg/timex"
 )
 
 func assertWithinRange(t *testing.T, expected, actual, delta time.Duration) {
@@ -16,12 +16,12 @@ func assertWithinRange(t *testing.T, expected, actual, delta time.Duration) {
 	assert.LessOrEqual(t, expected-delta, actual)
 }
 
-func Test_Clock_UTCNow(t *testing.T) {
+func Test_Timer_UTCNow(t *testing.T) {
 	// arrange
-	c := tock.New()
+	timer := timex.NewTimer()
 
 	// act
-	now := c.UTCNow()
+	now := timer.UTCNow()
 
 	// assert
 	assert.WithinDuration(t, time.Now(), now, time.Second)
@@ -32,34 +32,34 @@ func Test_Clock_UTCNow(t *testing.T) {
 	assert.Equal(t, 0, offset)
 }
 
-func Test_Clock_LocalNow(t *testing.T) {
+func Test_Timer_Now(t *testing.T) {
 	// arrange
-	c := tock.New()
+	timer := timex.NewTimer()
 
 	// act
-	now := c.LocalNow()
+	now := timer.Now()
 
 	// assert
 	assert.WithinDuration(t, time.Now(), now, time.Second)
 }
 
-func Test_Clock_Since(t *testing.T) {
+func Test_Timer_Since(t *testing.T) {
 	// arrange
-	c := tock.New()
+	timer := timex.NewTimer()
 
 	// act
-	got := c.Since(time.Now().Add(time.Hour * -1))
+	got := timer.Since(time.Now().Add(time.Hour * -1))
 
 	// assert
 	assertWithinRange(t, time.Hour, got, time.Second)
 }
 
-func Test_Clock_Until(t *testing.T) {
+func Test_Timer_Until(t *testing.T) {
 	// arrange
-	c := tock.New()
+	timer := timex.NewTimer()
 
 	// act
-	got := c.Until(time.Now().Add(time.Hour))
+	got := timer.Until(time.Now().Add(time.Hour))
 
 	// assert
 	assertWithinRange(t, time.Hour, got, time.Second)

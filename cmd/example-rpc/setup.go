@@ -33,8 +33,8 @@ import (
 	logginginterceptor "github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/otelconnectx"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/validatex"
-	"github.com/mattdowdell/sandbox/internal/drivers/tock"
 	"github.com/mattdowdell/sandbox/internal/usecases"
+	"github.com/mattdowdell/sandbox/pkg/timex"
 )
 
 func SetupApp(ctx context.Context) (*App, error) {
@@ -50,10 +50,10 @@ func SetupApp(ctx context.Context) (*App, error) {
 		return nil, err
 	}
 
-	clock := tock.New()
+	timer := timex.NewTimer()
 	uuidgen := uuid.NewGen()
 
-	resource, auditEvent, err := initFacades(ctx, conf, clock, uuidgen)
+	resource, auditEvent, err := initFacades(ctx, conf, timer, uuidgen)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func SetupApp(ctx context.Context) (*App, error) {
 		return nil, err
 	}
 
-	handlers, err := initHandlers(conf, clock, uuidgen, resource, auditEvent)
+	handlers, err := initHandlers(conf, timer, uuidgen, resource, auditEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +110,7 @@ func initObservability(
 func initFacades(
 	ctx context.Context,
 	conf *Config,
-	clock repositories.Clock,
+	timer repositories.Timer,
 	uuidgen repositories.UUIDGenerator,
 ) (*usecasefacades.Resource, *usecasefacades.AuditEvent, error) {
 	db, err := pgsql.NewFromConfig(ctx, conf.Database)
@@ -120,10 +120,10 @@ func initFacades(
 
 	provider := datastore.NewProvider(db)
 
-	createResource := usecases.NewCreateResource(clock, uuidgen)
+	createResource := usecases.NewCreateResource(timer, uuidgen)
 	getResource := usecases.NewGetResource()
 	listResources := usecases.NewListResources()
-	updateResource := usecases.NewUpdateResource(clock)
+	updateResource := usecases.NewUpdateResource(timer)
 	deleteResource := usecases.NewDeleteResource()
 	listAuditevents := usecases.NewListAuditEvents()
 	watchAuditEvents := usecases.NewWatchAuditEvents()
@@ -144,17 +144,17 @@ func initFacades(
 
 func initHandlers(
 	conf *Config,
-	clock repositories.Clock,
+	timer repositories.Timer,
 	uuidgen repositories.UUIDGenerator,
 	resource examplerpc.ResourceFacade,
 	auditEvent examplerpc.AuditEventFacade,
 ) ([]rpcserver.Handler, error) {
-	issuer, err := jwtx.NewIssuerFromConfig(clock, uuidgen, conf.Issuer)
+	issuer, err := jwtx.NewIssuerFromConfig(timer, uuidgen, conf.Issuer)
 	if err != nil {
 		return nil, err
 	}
 
-	parser, err := jwtx.NewParserFromConfig(clock, conf.Parser)
+	parser, err := jwtx.NewParserFromConfig(timer, conf.Parser)
 	if err != nil {
 		return nil, err
 	}

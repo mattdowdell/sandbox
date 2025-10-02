@@ -13,17 +13,17 @@ import (
 
 // CreateResource provides the business logic for creating a resource.
 type CreateResource struct {
-	clock   repositories.Clock
+	timer   repositories.Timer
 	uuidgen repositories.UUIDGenerator
 }
 
 // NewCreateResource creates a new CreateResource.
 func NewCreateResource(
-	clock repositories.Clock,
+	timer repositories.Timer,
 	uuidgen repositories.UUIDGenerator,
 ) *CreateResource {
 	return &CreateResource{
-		clock:   clock,
+		timer:   timer,
 		uuidgen: uuidgen,
 	}
 }
@@ -44,7 +44,7 @@ func (u *CreateResource) Execute(
 		return nil, domain.ErrInternal
 	}
 
-	resource.Init(id, u.clock.UTCNow())
+	resource.Init(id, u.timer.UTCNow())
 
 	if err := store.CreateResource(ctx, resource); err != nil {
 		if errors.Is(err, domain.ErrAlreadyExists) {

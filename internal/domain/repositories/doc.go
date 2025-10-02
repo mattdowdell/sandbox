@@ -29,7 +29,7 @@
 //
 // # Deviations
 //
-// Some repositories might seem out of place initially, such as Clock and UUIDGenerator. These are
+// Some repositories might seem out of place initially, such as Timer and UUIDGenerator. These are
 // more closely aligned with good application design principles rather than Clean Architecture. They
 // are intended to abstract an external touch point of the application, namely interaction with the
 // OS, to simplify testing and ensure portability. In this case they abstract getting the system
