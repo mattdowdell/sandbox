@@ -15,7 +15,7 @@ var migrationFS embed.FS
 func Example() {
 	ctx := context.Background()
 
-	migrations, _ := herd.CollectFileMigrationsFromFS(migrationFS)
+	migrations, _ := herd.CollectFileMigrations(migrationFS)
 	migrator, _ := herd.New(migrations)
 
 	db, _ := sql.Open("example", "dsn")
