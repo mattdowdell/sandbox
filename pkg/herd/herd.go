@@ -57,12 +57,3 @@ func (h *Herd) Migrate(ctx context.Context, db *sql.DB) (*Result, error) {
 
 	return result, nil
 }
-
-// Result contains the result of the migration.
-type Result struct {
-	// The migration version after the migrations were applied.
-	Current int
-
-	// The migration version before the migrations were applied.
-	Previous int
-}

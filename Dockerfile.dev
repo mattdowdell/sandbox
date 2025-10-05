@@ -8,7 +8,7 @@
 # ------------
 
 FROM ghcr.io/gitleaks/gitleaks:v8.28.0@sha256:cdbb7c955abce02001a9f6c9f602fb195b7fadc1e812065883f695d1eeaba854 AS gitleaks
-FROM ghcr.io/aquasecurity/trivy:0.66.0@sha256:086971aaf400beebd94e8300fd8ea623774419597169156cec56eec5b00dfb1e AS trivy
+FROM ghcr.io/aquasecurity/trivy:0.67.0@sha256:94711c60051c6cab848a292e3a67f62623fcee361b2bb661f43b17184f4afdac AS trivy
 
 # -------------
 # Devenv target

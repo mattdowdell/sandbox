@@ -6,92 +6,104 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log/slog"
 	"slices"
-
-	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
-// ...
-type migrateOpts struct {
-	dryRun bool
-	limit int64
+// Result contains the migration version before and after the pending migrations were applied.
+type Result struct {
+	// Before is the migration version before applying any migrations. A value of 0 indicates that
+	// no migrations had been applied previously.
+	Before int64
+
+	// After is the migration version after applying any migrations. After will equal Before when no
+	// pending migrations were found.
+	After int64
 }
 
-// ...
+// migrator applies system or user-defined migrations to the database.
 type migrator struct {
-	helper     *migrationHelper
 	migrations []Migration
-
+	recorder   *recorder
 }
 
-// ...
-func newMigrator(helper *migrationHelper, migrations []Migration) (*migrator, error) {
-	if len(migrations) == 0 {
-		return nil, fmt.Errorf("at least 1 migration must be present")
-	}
-
+// newMigrator creates a new migrator.
+func newMigrator(migrations []Migration, rec *recorder) (*migrator, error) {
 	slices.SortFunc(migrations, func(a, b Migration) int {
 		return cmp.Compare(a.Version(), b.Version())
 	})
 
-	for i := range migrations {
-		version := migrations[i].Version()
-		if version <= 0 {
-			return nil, fmt.Errorf("migration versions must be > 0, found: %d", version)
+	for i, m := range migrations {
+		if m.Version() < 1 {
+			return nil, fmt.Errorf("migration version must be > 0, found: %d", m.Version())
 		}
 
-		if i == 0 {
-			continue
-		}
-
-		if migrations[i - 1].Version() == version {
-			return nil, fmt.Errorf("duplicate migration version found: %d", version)
+		// rely on sorting to detect duplicates
+		if i > 0 && m.Version() == migrations[i-1].Version() {
+			return nil, fmt.Errorf("duplicate migration version found: %d", m.Version())
 		}
 	}
 
 	return &migrator{
-		helper: helper,
 		migrations: migrations,
+		recorder:   rec,
 	}, nil
 }
 
-// ...
-func (m *migrator) migrate(ctx context.Context, db *sql.DB, opts *migrateOpts) (*Result, error) {
+// migrate applies pending migrations to the database.
+func (m *migrator) Migrate(
+	ctx context.Context,
+	db *sql.DB,
+	herdVersion int64,
+) (result *Result, err error) {
 	tx, err := db.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
-		return nil, fmt.Errorf("failed to start transaction: %w", err)
+		return nil, fmt.Errorf("failed to begin transaction: %w", err)
 	}
 
-	// TODO: return this error
+	// If we call Commit before Rollback, an atomic bool is flipped, Rollback will always return
+	// sql.ErrTxDone and the driver's rollback implementation is never called. This occurs
+	// regardless of whether Commit failed.
 	defer func() {
-		if err := tx.Rollback(); err != nil && !errors.Is(err, sql.ErrTxDone) {
-			slog.ErrorContext(ctx, "failed to rollback transaction", slogx.Err(err))
+		if err2 := tx.Rollback(); err2 != nil && !errors.Is(err2, sql.ErrTxDone) {
+			err = errors.Join(err, fmt.Errorf("failed to rollback transaction: %w", err2))
 		}
 	}()
 
-	currentVersion, err := m.helper.getCurrentVersion(ctx, tx)
+	before, err := m.recorder.GetCurrentVersion(ctx, tx)
 	if err != nil {
 		return nil, err
 	}
 
-	pending := slices.DeleteFunc(m.migrations, func(m Migration) bool {
-		return m.Version() <= currentVersion || opts.limit >
+	pending := slices.DeleteFunc(slices.Clone(m.migrations), func(m Migration) bool {
+		return m.Version() <= before
 	})
 
 	for _, migration := range pending {
 		if err := migration.Migrate(ctx, tx); err != nil {
-			return nil, fmt.Errorf("migration %s %d failed: %w", migration.Name(), migration.Version(), err)
+			return nil, fmt.Errorf("failed to apply migration %d: %w", migration.Version(), err)
+		}
+
+		if err := m.recorder.RecordMigration(
+			ctx,
+			tx,
+			migration.Version(),
+			herdVersion,
+		); err != nil {
+			return nil, fmt.Errorf("failed to record migration %d: %w", migration.Version(), err)
 		}
 	}
 
-	if !opts.dryRun {
-		if err := tx.Commit(); err != nil {
-			return nil, fmt.Errorf("failed to commit transaction: %w", err)
-		}
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	after := before
+	if len(pending) > 0 {
+		after = pending[len(pending)-1].Version()
 	}
 
 	return &Result{
-		// TODO: return previous + new version
+		Before: before,
+		After:  after,
 	}, nil
 }
