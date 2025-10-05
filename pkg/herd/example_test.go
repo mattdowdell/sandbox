@@ -15,8 +15,9 @@ var migrationFS embed.FS
 func Example() {
 	ctx := context.Background()
 
+	var clock herd.Clock // TODO: rework into an option
 	migrations, _ := herd.CollectFileMigrations(migrationFS)
-	migrator, _ := herd.New(migrations)
+	migrator, _ := herd.New(clock, migrations)
 
 	db, _ := sql.Open("example", "dsn")
 

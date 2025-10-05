@@ -20,20 +20,21 @@ type Herd struct {
 }
 
 // New creates a new Herd instance with the given migrations.
-func New(migrations []Migration) (*Herd, error) {
-	systemMigrations, err := CollectFileMigrationsFromFS(migrationFS)
+func New(clock Clock, migrations []Migration) (*Herd, error) {
+	systemMigrations, err := CollectFileMigrations(migrationFS)
 	if err != nil {
 		return nil, fmt.Errorf("failed to collect system migrations: %w", err)
 	}
 
-	systemHelper := newMigrationHelper()
+	systemRecorder := newRecorder(clock, tableNameSystem, "CODE_VERSION", "CODE_REVISION")
+	userRecorder := newRecorder(clock, tableNameUser, "CODE_VERSION", "CODE_REVISION")
 
-	system, err := newMigrator(systemMigrations)
+	system, err := newMigrator(systemMigrations, systemRecorder)
 	if err != nil {
-		panic(err)
+		panic(err) // TODO: return error
 	}
 
-	user, err := newMigrator(migrations)
+	user, err := newMigrator(migrations, userRecorder)
 	if err != nil {
 		return nil, err
 	}
@@ -46,14 +47,15 @@ func New(migrations []Migration) (*Herd, error) {
 
 // Migrate migrates the database using the configured migrations.
 func (h *Herd) Migrate(ctx context.Context, db *sql.DB) (*Result, error) {
-	if _, err := h.system.migrate(ctx, db, false /*dryRun*/); err != nil {
+	systemResult, err := h.system.Migrate(ctx, db, 0 /*herdVersion*/)
+	if err != nil {
 		return nil, fmt.Errorf("failed to execute system migrations: %w", err)
 	}
 
-	result, err := h.user.migrate(ctx, db, false /*dryRun*/)
+	userResult, err := h.user.Migrate(ctx, db, systemResult.After)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute user migrations: %w", err)
 	}
 
-	return result, nil
+	return userResult, nil
 }
