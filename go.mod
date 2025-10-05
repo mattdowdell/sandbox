@@ -5,7 +5,7 @@ go 1.25
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.9-20250912141014-52f32327d4b0.1
 	buf.build/gen/go/grpc/grpc/connectrpc/go v1.19.0-20250429200738-0ee95b84c2c7.1
-	buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.9-20250429200738-0ee95b84c2c7.1
+	buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.10-20250429200738-0ee95b84c2c7.1
 	buf.build/go/protovalidate v1.0.0
 	connectrpc.com/connect v1.19.0
 	connectrpc.com/grpchealth v1.4.0
@@ -54,7 +54,7 @@ require (
 	golang.org/x/net v0.44.0
 	golang.org/x/tools v0.37.0
 	google.golang.org/grpc v1.75.1
-	google.golang.org/protobuf v1.36.9
+	google.golang.org/protobuf v1.36.10
 )
 
 require (
