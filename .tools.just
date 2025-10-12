@@ -56,7 +56,7 @@ protoc-gen-connect-go := join(gopath, "bin", "protoc-gen-connect-go-v1.19.0")
 install-protoc-gen-connect-go:
     {{ if path_exists(protoc-gen-connect-go) == "true" { "" } else { "bingo get protoc-gen-connect-go" } }}
 
-protoc-gen-go := join(gopath, "bin", "protoc-gen-go-v1.36.9")
+protoc-gen-go := join(gopath, "bin", "protoc-gen-go-v1.36.10")
 
 [private]
 install-protoc-gen-go:
