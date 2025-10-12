@@ -55,7 +55,12 @@ func Test_newMigrator_Success(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			clock := mockrepositories.NewClock(t)
-			recorder := herd.NewRecorder(clock, herd.TableNameUser, testCodeVersion, testCodeRevision)
+			recorder := herd.NewRecorder(
+				clock.Now,
+				herd.TableNameUser,
+				testCodeVersion,
+				testCodeRevision,
+			)
 
 			// act
 			migrator, err := herd.NewMigrator(tt.have, recorder)
@@ -93,7 +98,12 @@ func Test_newMigrator_Error(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			clock := mockrepositories.NewClock(t)
-			recorder := herd.NewRecorder(clock, herd.TableNameUser, testCodeVersion, testCodeRevision)
+			recorder := herd.NewRecorder(
+				clock.Now,
+				herd.TableNameUser,
+				testCodeVersion,
+				testCodeRevision,
+			)
 
 			// act
 			migrator, err := herd.NewMigrator(tt.have, recorder)
@@ -120,7 +130,8 @@ func Test_migrator_Migrate_Success(t *testing.T) {
 
 				db, mock := newMockDB(t)
 				mock.ExpectBegin()
-				mock.ExpectQuery(herd.UserVersionQuery).WillReturnRows(sqlmock.NewRows(testQueryRows))
+				mock.ExpectQuery(herd.UserVersionQuery).
+					WillReturnRows(sqlmock.NewRows(testQueryRows))
 				mock.ExpectCommit()
 
 				return db
@@ -156,7 +167,8 @@ func Test_migrator_Migrate_Success(t *testing.T) {
 
 				db, mock := newMockDB(t)
 				mock.ExpectBegin()
-				mock.ExpectQuery(herd.UserVersionQuery).WillReturnRows(sqlmock.NewRows(testQueryRows))
+				mock.ExpectQuery(herd.UserVersionQuery).
+					WillReturnRows(sqlmock.NewRows(testQueryRows))
 				mock.ExpectExec(testMigration).WillReturnResult(driver.ResultNoRows)
 				mock.ExpectExec(herd.UserRecordQuery).
 					WithArgs(testMigrationVersion, now, testCodeVersion, testCodeRevision, testHerdVersion).
@@ -202,7 +214,12 @@ func Test_migrator_Migrate_Success(t *testing.T) {
 			clock := mockrepositories.NewClock(t)
 			clock.EXPECT().Now().Return(now).Maybe()
 
-			recorder := herd.NewRecorder(clock, herd.TableNameUser, testCodeVersion, testCodeRevision)
+			recorder := herd.NewRecorder(
+				clock.Now,
+				herd.TableNameUser,
+				testCodeVersion,
+				testCodeRevision,
+			)
 
 			migrator, err := herd.NewMigrator(tt.migrations, recorder)
 			require.NoError(t, err)
@@ -262,7 +279,8 @@ func Test_migrator_Migrate_Error(t *testing.T) {
 
 				db, mock := newMockDB(t)
 				mock.ExpectBegin()
-				mock.ExpectQuery(herd.UserVersionQuery).WillReturnRows(sqlmock.NewRows(testQueryRows))
+				mock.ExpectQuery(herd.UserVersionQuery).
+					WillReturnRows(sqlmock.NewRows(testQueryRows))
 				mock.ExpectExec(testMigration).WillReturnError(errors.New("exec error"))
 				mock.ExpectRollback()
 
@@ -279,7 +297,8 @@ func Test_migrator_Migrate_Error(t *testing.T) {
 
 				db, mock := newMockDB(t)
 				mock.ExpectBegin()
-				mock.ExpectQuery(herd.UserVersionQuery).WillReturnRows(sqlmock.NewRows(testQueryRows))
+				mock.ExpectQuery(herd.UserVersionQuery).
+					WillReturnRows(sqlmock.NewRows(testQueryRows))
 				mock.ExpectExec(testMigration).WillReturnResult(driver.ResultNoRows)
 				mock.ExpectExec(herd.UserRecordQuery).WillReturnError(errors.New("exec error"))
 				mock.ExpectRollback()
@@ -297,7 +316,8 @@ func Test_migrator_Migrate_Error(t *testing.T) {
 
 				db, mock := newMockDB(t)
 				mock.ExpectBegin()
-				mock.ExpectQuery(herd.UserVersionQuery).WillReturnRows(sqlmock.NewRows(testQueryRows))
+				mock.ExpectQuery(herd.UserVersionQuery).
+					WillReturnRows(sqlmock.NewRows(testQueryRows))
 				mock.ExpectExec(testMigration).WillReturnResult(driver.ResultNoRows)
 				mock.ExpectExec(herd.UserRecordQuery).WillReturnResult(driver.ResultNoRows)
 				mock.ExpectCommit().WillReturnError(errors.New("commit error"))
@@ -315,7 +335,8 @@ func Test_migrator_Migrate_Error(t *testing.T) {
 
 				db, mock := newMockDB(t)
 				mock.ExpectBegin()
-				mock.ExpectQuery(herd.UserVersionQuery).WillReturnRows(sqlmock.NewRows(testQueryRows))
+				mock.ExpectQuery(herd.UserVersionQuery).
+					WillReturnRows(sqlmock.NewRows(testQueryRows))
 				mock.ExpectExec(testMigration).WillReturnResult(driver.ResultNoRows)
 				mock.ExpectExec(herd.UserRecordQuery).WillReturnError(errors.New("exec error"))
 				mock.ExpectRollback().WillReturnError(errors.New("rollback error"))
@@ -333,7 +354,12 @@ func Test_migrator_Migrate_Error(t *testing.T) {
 			clock := mockrepositories.NewClock(t)
 			clock.EXPECT().Now().Return(now).Maybe()
 
-			recorder := herd.NewRecorder(clock, herd.TableNameUser, testCodeVersion, testCodeRevision)
+			recorder := herd.NewRecorder(
+				clock.Now,
+				herd.TableNameUser,
+				testCodeVersion,
+				testCodeRevision,
+			)
 
 			migrator, err := herd.NewMigrator(tt.migrations, recorder)
 			require.NoError(t, err)

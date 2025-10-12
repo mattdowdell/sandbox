@@ -108,6 +108,12 @@ linters:
         linters:
           # allow less strict logging for tools
           - sloglint
+
+      - path: .*/example_test\.go$
+        linters:
+          # allow less strict logging for examples
+          - sloglint
+
       # use sloglint for context checks in log/slog.
       - text: '(slog|log)\.\w+'
         linters:
