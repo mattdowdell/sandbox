@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// ...
+// Option adjust the behaviour of Herd.
 type Option interface {
 	apply(*herdOpts)
 }
@@ -42,7 +42,7 @@ type nowFuncOpt struct {
 	nowFunc func() time.Time
 }
 
-// WithNowFunc
+// WithNowFunc overrides the use of [time.Now] for recording when a migration was applied.
 func WithNowFunc(fn func() time.Time) Option {
 	return &nowFuncOpt{fn}
 }
