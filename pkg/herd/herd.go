@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"embed"
-	"errors"
 	"fmt"
 )
 
@@ -27,8 +26,9 @@ func New(migrations []Migration, options ...Option) (*Herd, error) {
 		option.apply(opts)
 	}
 
-	if opts.buildInfo == nil {
-		return nil, errors.New("build info is unavailable")
+	version, revision, err := opts.codeInfo()
+	if err != nil {
+		return nil, err
 	}
 
 	systemMigrations, err := CollectFileMigrations(migrationFS)
@@ -36,8 +36,8 @@ func New(migrations []Migration, options ...Option) (*Herd, error) {
 		return nil, fmt.Errorf("failed to collect system migrations: %w", err)
 	}
 
-	systemRecorder := newRecorder(opts.nowFunc, tableNameSystem, "CODE_VERSION", "CODE_REVISION")
-	userRecorder := newRecorder(opts.nowFunc, tableNameUser, "CODE_VERSION", "CODE_REVISION")
+	systemRecorder := newRecorder(opts.nowFunc, tableNameSystem, version, revision)
+	userRecorder := newRecorder(opts.nowFunc, tableNameUser, version, revision)
 
 	system, err := newMigrator(systemMigrations, systemRecorder)
 	if err != nil {

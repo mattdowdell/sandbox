@@ -1,6 +1,7 @@
 package herd
 
 import (
+	"errors"
 	"runtime/debug"
 	"time"
 )
@@ -13,6 +14,29 @@ type Option interface {
 type herdOpts struct {
 	buildInfo *debug.BuildInfo
 	nowFunc   func() time.Time
+}
+
+func (o *herdOpts) codeInfo() (version, revision string, err error) {
+	if o.buildInfo == nil {
+		return "", "", errors.New("build info is unavailable")
+	}
+
+	version = o.buildInfo.Main.Version
+	if version == "" {
+		return "", "", errors.New("unable to extract code version from build info")
+	}
+
+	for _, setting := range o.buildInfo.Settings {
+		if setting.Key == "vcs.revision" {
+			revision = setting.Value
+		}
+	}
+
+	if revision == "" {
+		return "", "", errors.New("unable to extract code revision from build info")
+	}
+
+	return version, revision, nil
 }
 
 func defaultHerdOpts() *herdOpts {
