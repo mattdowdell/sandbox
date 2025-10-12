@@ -71,11 +71,11 @@ $(PROTOC_GEN_CONNECT_GO): $(BINGO_DIR)/protoc-gen-connect-go.mod
 	@echo "(re)installing $(GOBIN)/protoc-gen-connect-go-v1.19.0"
 	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=protoc-gen-connect-go.mod -o=$(GOBIN)/protoc-gen-connect-go-v1.19.0 "connectrpc.com/connect/cmd/protoc-gen-connect-go"
 
-PROTOC_GEN_GO := $(GOBIN)/protoc-gen-go-v1.36.9
+PROTOC_GEN_GO := $(GOBIN)/protoc-gen-go-v1.36.10
 $(PROTOC_GEN_GO): $(BINGO_DIR)/protoc-gen-go.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/protoc-gen-go-v1.36.9"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=protoc-gen-go.mod -o=$(GOBIN)/protoc-gen-go-v1.36.9 "google.golang.org/protobuf/cmd/protoc-gen-go"
+	@echo "(re)installing $(GOBIN)/protoc-gen-go-v1.36.10"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=protoc-gen-go.mod -o=$(GOBIN)/protoc-gen-go-v1.36.10 "google.golang.org/protobuf/cmd/protoc-gen-go"
 
 YAMLFMT := $(GOBIN)/yamlfmt-v0.17.2
 $(YAMLFMT): $(BINGO_DIR)/yamlfmt.mod
