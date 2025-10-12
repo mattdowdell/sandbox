@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"embed"
+	"errors"
 	"fmt"
 )
 
@@ -20,18 +21,27 @@ type Herd struct {
 }
 
 // New creates a new Herd instance with the given migrations.
-func New(clock Clock, migrations []Migration) (*Herd, error) {
+func New(migrations []Migration, options ...Option) (*Herd, error) {
+	opts := defaultHerdOpts()
+	for _, option := range options {
+		option.apply(opts)
+	}
+
+	if opts.buildInfo == nil {
+		return nil, errors.New("build info is unavailable")
+	}
+
 	systemMigrations, err := CollectFileMigrations(migrationFS)
 	if err != nil {
 		return nil, fmt.Errorf("failed to collect system migrations: %w", err)
 	}
 
-	systemRecorder := newRecorder(clock, tableNameSystem, "CODE_VERSION", "CODE_REVISION")
-	userRecorder := newRecorder(clock, tableNameUser, "CODE_VERSION", "CODE_REVISION")
+	systemRecorder := newRecorder(opts.nowFunc, tableNameSystem, "CODE_VERSION", "CODE_REVISION")
+	userRecorder := newRecorder(opts.nowFunc, tableNameUser, "CODE_VERSION", "CODE_REVISION")
 
 	system, err := newMigrator(systemMigrations, systemRecorder)
 	if err != nil {
-		panic(err) // TODO: return error
+		return nil, fmt.Errorf("failed to create system migrator: %w", err)
 	}
 
 	user, err := newMigrator(migrations, userRecorder)

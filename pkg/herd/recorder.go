@@ -27,14 +27,9 @@ const (
 		"VALUES($1, $2, $3, $4, $5, $6);"
 )
 
-// Clock is used to record when a migration was applied.
-type Clock interface {
-	Now() time.Time
-}
-
 // recorder provides a table agnostic set of helpers for recording applied migrations.
 type recorder struct {
-	clock        Clock
+	nowFunc      func() time.Time
 	tableName    string
 	codeVersion  string
 	codeRevision string
@@ -42,13 +37,13 @@ type recorder struct {
 
 // newRecorder creates a new recorder.
 func newRecorder(
-	clock Clock,
+	nowFunc func() time.Time,
 	tableName string,
 	codeVersion string,
 	codeRevision string,
 ) *recorder {
 	return &recorder{
-		clock:        clock,
+		nowFunc:      nowFunc,
 		tableName:    tableName,
 		codeVersion:  codeVersion,
 		codeRevision: codeRevision,
@@ -124,7 +119,7 @@ func (r *recorder) recordMigrationArgs(
 	migrationVersion int64,
 	herdVersion int64,
 ) ([]any, error) {
-	now := r.clock.Now().UTC().Truncate(time.Second)
+	now := r.nowFunc().UTC().Truncate(time.Second)
 
 	switch r.tableName {
 	case tableNameSystem:

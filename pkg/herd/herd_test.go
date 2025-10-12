@@ -13,13 +13,11 @@ import (
 
 func Test_New(t *testing.T) {
 	// arrange
-	clock := mockrepositories.NewClock(t)
-
 	migrations, err := herd.CollectFileMigrations(migrationFS)
 	require.NoError(t, err)
 
 	// act
-	migrator, err := herd.New(clock, migrations)
+	migrator, err := herd.New(migrations)
 
 	// assert
 	assert.NotNil(t, migrator)
@@ -40,7 +38,7 @@ func Test_Herd_Migrate_Success(t *testing.T) {
 			migrations, err := herd.CollectFileMigrations(migrationFS)
 			require.NoError(t, err)
 
-			migrator, err := herd.New(clock, migrations)
+			migrator, err := herd.New(migrations, herd.WithNowFunc(clock.Now))
 			require.NoError(t, err)
 
 			db := tt.db(t)
@@ -69,7 +67,7 @@ func Test_Herd_Migrate_Error(t *testing.T) {
 			migrations, err := herd.CollectFileMigrations(migrationFS)
 			require.NoError(t, err)
 
-			migrator, err := herd.New(clock, migrations)
+			migrator, err := herd.New(migrations, herd.WithNowFunc(clock.Now))
 			require.NoError(t, err)
 
 			db := tt.db(t)
