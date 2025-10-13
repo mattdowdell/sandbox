@@ -17,11 +17,11 @@ GO     ?= $(shell which go)
 #	@echo "Running buf"
 #	@$(BUF) <flags/args..>
 #
-BUF := $(GOBIN)/buf-v1.57.2
+BUF := $(GOBIN)/buf-v1.58.0
 $(BUF): $(BINGO_DIR)/buf.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/buf-v1.57.2"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=buf.mod -o=$(GOBIN)/buf-v1.57.2 "github.com/bufbuild/buf/cmd/buf"
+	@echo "(re)installing $(GOBIN)/buf-v1.58.0"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=buf.mod -o=$(GOBIN)/buf-v1.58.0 "github.com/bufbuild/buf/cmd/buf"
 
 CTLPTL := $(GOBIN)/ctlptl-v0.8.43
 $(CTLPTL): $(BINGO_DIR)/ctlptl.mod
