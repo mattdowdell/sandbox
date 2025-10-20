@@ -62,7 +62,7 @@ protoc-gen-go := join(gopath, "bin", "protoc-gen-go-v1.36.10")
 install-protoc-gen-go:
     {{ if path_exists(protoc-gen-go) == "true" { "" } else { "bingo get protoc-gen-go" } }}
 
-yamlfmt := join(gopath, "bin", "yamlfmt-v0.17.2")
+yamlfmt := join(gopath, "bin", "yamlfmt-v0.19.0")
 
 [private]
 install-yamlfmt:
