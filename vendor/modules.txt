@@ -198,8 +198,8 @@ github.com/erikgeiser/coninput
 ## explicit; go 1.17
 github.com/fsnotify/fsnotify
 github.com/fsnotify/fsnotify/internal
-# github.com/go-jet/jet/v2 v2.13.0
-## explicit; go 1.22
+# github.com/go-jet/jet/v2 v2.14.0
+## explicit; go 1.23.0
 github.com/go-jet/jet/v2/generator/metadata
 github.com/go-jet/jet/v2/generator/postgres
 github.com/go-jet/jet/v2/generator/template
@@ -340,6 +340,11 @@ github.com/knadh/koanf/providers/file
 # github.com/knadh/koanf/v2 v2.3.0
 ## explicit; go 1.23.0
 github.com/knadh/koanf/v2
+# github.com/lib/pq v1.10.9
+## explicit; go 1.13
+github.com/lib/pq
+github.com/lib/pq/oid
+github.com/lib/pq/scram
 # github.com/lucasb-eyer/go-colorful v1.2.0
 ## explicit; go 1.12
 github.com/lucasb-eyer/go-colorful
