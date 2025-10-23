@@ -92,11 +92,11 @@ func (s *SQLBuilder) write(data []byte) {
 }
 
 func isPreSeparator(b byte) bool {
-	return b == ' ' || b == '.' || b == ',' || b == '(' || b == '\n' || b == ':'
+	return b == ' ' || b == '.' || b == ',' || b == '(' || b == '\n' || b == ':' || b == '['
 }
 
 func isPostSeparator(b byte) bool {
-	return b == ' ' || b == '.' || b == ',' || b == ')' || b == '\n' || b == ':'
+	return b == ' ' || b == '.' || b == ',' || b == ')' || b == '\n' || b == ':' || b == '[' || b == ']'
 }
 
 // WriteAlias is used to add alias to output SQL
@@ -309,8 +309,8 @@ func shouldQuoteIdentifier(identifier string) bool {
 	}
 
 	// check if contains non ascii characters
-	for _, c := range identifier {
-		if unicode.IsNumber(c) || c == '_' {
+	for i, c := range identifier {
+		if (unicode.IsNumber(c) && i > 0) || c == '_' {
 			continue
 		}
 		if c > unicode.MaxASCII || !unicode.IsLetter(c) || unicode.IsUpper(c) {

@@ -21,7 +21,7 @@ require (
 	github.com/creasty/defaults v1.8.0
 	github.com/cucumber/godog v0.15.1
 	github.com/fsnotify/fsnotify v1.9.0
-	github.com/go-jet/jet/v2 v2.13.0
+	github.com/go-jet/jet/v2 v2.14.0
 	github.com/gofrs/uuid/v5 v5.3.2
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/google/uuid v1.6.0
@@ -99,6 +99,7 @@ require (
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/pgtype v1.14.4 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
+	github.com/lib/pq v1.10.9 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-localereader v0.0.1 // indirect

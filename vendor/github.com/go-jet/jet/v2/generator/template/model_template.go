@@ -2,14 +2,17 @@ package template
 
 import (
 	"fmt"
-	"github.com/go-jet/jet/v2/generator/metadata"
-	"github.com/go-jet/jet/v2/internal/utils/dbidentifier"
-	"github.com/google/uuid"
-	"github.com/jackc/pgtype"
+	"github.com/lib/pq"
 	"path/filepath"
 	"reflect"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/jackc/pgtype"
+
+	"github.com/go-jet/jet/v2/generator/metadata"
+	"github.com/go-jet/jet/v2/internal/utils/dbidentifier"
 )
 
 // Model is template for model files generation
@@ -47,6 +50,12 @@ func (m Model) UseView(tableModelFunc func(table metadata.Table) TableModel) Mod
 // UseEnum returns new Model template with replaced template for enum model files generation
 func (m Model) UseEnum(enumFunc func(enumMetaData metadata.Enum) EnumModel) Model {
 	m.Enum = enumFunc
+	return m
+}
+
+// ShouldSkip returns new Model template with new skip flag set
+func (m Model) ShouldSkip(skip bool) Model {
+	m.Skip = skip
 	return m
 }
 
@@ -106,10 +115,10 @@ func getTableModelImports(modelType TableModel, tableMetaData metadata.Table) []
 	importPaths := map[string]bool{}
 	for _, columnMetaData := range tableMetaData.Columns {
 		field := modelType.Field(columnMetaData)
-		importPath := field.Type.ImportPath
-
-		if importPath != "" {
-			importPaths[importPath] = true
+		for _, importPath := range append([]string{field.Type.ImportPath}, field.Type.AdditionalImportPaths...) {
+			if importPath != "" {
+				importPaths[importPath] = true
+			}
 		}
 	}
 
@@ -207,8 +216,9 @@ func (f TableModelField) TagsString() string {
 
 // Type represents type of the struct field
 type Type struct {
-	ImportPath string
-	Name       string
+	ImportPath            string
+	AdditionalImportPaths []string
+	Name                  string
 }
 
 // NewType creates new type for dummy object
@@ -238,10 +248,21 @@ func getType(columnMetadata metadata.Column) Type {
 	userDefinedType := getUserDefinedType(columnMetadata)
 
 	if userDefinedType != "" {
-		if columnMetadata.IsNullable {
-			return Type{Name: "*" + userDefinedType}
+		var importPath string
+
+		if columnMetadata.DataType.IsArray() {
+			userDefinedType = "pq.StringArray"
+			importPath = "github.com/lib/pq"
 		}
-		return Type{Name: userDefinedType}
+
+		if columnMetadata.IsNullable {
+			userDefinedType = "*" + userDefinedType
+		}
+
+		return Type{
+			Name:       userDefinedType,
+			ImportPath: importPath,
+		}
 	}
 
 	return NewType(getGoType(columnMetadata))
@@ -251,7 +272,7 @@ func getUserDefinedType(column metadata.Column) string {
 	switch column.DataType.Kind {
 	case metadata.EnumType:
 		return dbidentifier.ToGoIdentifier(column.DataType.Name)
-	case metadata.UserDefinedType, metadata.ArrayType:
+	case metadata.UserDefinedType:
 		return "string"
 	}
 
@@ -259,17 +280,45 @@ func getUserDefinedType(column metadata.Column) string {
 }
 
 func getGoType(column metadata.Column) interface{} {
-	defaultGoType := toGoType(column)
+	goType := toGoType(column)
 
-	if column.IsNullable {
-		return reflect.New(reflect.TypeOf(defaultGoType)).Interface()
+	if column.DataType.IsArray() {
+		goType = toGoArrayType(goType, column)
 	}
 
-	return defaultGoType
+	if column.IsNullable {
+		return reflect.New(reflect.TypeOf(goType)).Interface()
+	}
+
+	return goType
+}
+
+func toGoArrayType(elemType any, column metadata.Column) any {
+	if column.DataType.Dimensions > 1 {
+		return "" // unsupported multidimensional arrays
+	}
+
+	switch elemType.(type) {
+	case bool:
+		return pq.BoolArray{}
+	case int32:
+		return pq.Int32Array{}
+	case int64:
+		return pq.Int64Array{}
+	case float32:
+		return pq.Float32Array{}
+	case float64:
+		return pq.Float64Array{}
+	case []byte:
+		return pq.ByteaArray{}
+	default:
+		return pq.StringArray{}
+	}
 }
 
 // toGoType returns model type for column info.
 func toGoType(column metadata.Column) interface{} {
+
 	switch strings.ToLower(column.DataType.Name) {
 	case "user-defined", "enum":
 		return ""
