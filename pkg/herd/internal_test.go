@@ -5,6 +5,8 @@ const (
 	TableNameSystem = tableNameSystem
 	TableNameUser   = tableNameUser
 
+	SystemExistsQuery = systemExistsQuery
+
 	SystemVersionQuery = systemVersionQuery
 	UserVersionQuery   = userVersionQuery
 

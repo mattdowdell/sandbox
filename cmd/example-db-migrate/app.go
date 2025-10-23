@@ -5,13 +5,12 @@ import (
 	"database/sql"
 	"log/slog"
 
-	"github.com/pressly/goose/v3"
 	"go.opentelemetry.io/contrib/instrumentation/runtime"
 
-	"github.com/mattdowdell/sandbox/internal/adapters/datastore"
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx/logx"
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx/metricx"
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx/tracex"
+	"github.com/mattdowdell/sandbox/pkg/herd"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
@@ -20,6 +19,7 @@ type App struct {
 	conf       *Config
 	logger     *slog.Logger
 	db         *sql.DB
+	herder     *herd.Herd
 	tpShutdown tracex.ProviderShutdown
 	mpShutdown metricx.ProviderShutdown
 	lpShutdown logx.ProviderShutdown
@@ -32,6 +32,7 @@ func NewApp(
 	conf *Config,
 	logger *slog.Logger,
 	db *sql.DB,
+	herder *herd.Herd,
 	tpShutdown tracex.ProviderShutdown,
 	mpShutdown metricx.ProviderShutdown,
 	lpShutdown logx.ProviderShutdown,
@@ -40,6 +41,7 @@ func NewApp(
 		conf:       conf,
 		logger:     logger,
 		db:         db,
+		herder:     herder,
 		tpShutdown: tpShutdown,
 		mpShutdown: mpShutdown,
 		lpShutdown: lpShutdown,
@@ -47,6 +49,8 @@ func NewApp(
 }
 
 // ...
+//
+//nolint:sloglint // little benefit defining reusable keys for a one-off application.
 func (a *App) Run(ctx context.Context) error {
 	a.logger.InfoContext(ctx, "starting", slogx.Config(a.conf))
 
@@ -55,18 +59,18 @@ func (a *App) Run(ctx context.Context) error {
 		return err
 	}
 
-	goose.SetBaseFS(datastore.MigrationFS)
-
-	if err := goose.SetDialect("postgres"); err != nil {
-		a.logger.ErrorContext(ctx, "failed to configure dialect", slogx.Err(err))
-		return err
-	}
-
-	if err := goose.UpContext(ctx, a.db, "migrations"); err != nil {
+	result, err := a.herder.Migrate(ctx, a.db)
+	if err != nil {
 		a.logger.ErrorContext(ctx, "failed to migrate db", slogx.Err(err))
 		return err
 	}
 
+	a.logger.InfoContext(
+		ctx,
+		"migrated db",
+		slog.Int64("before", result.Before),
+		slog.Int64("after", result.After),
+	)
 	return nil
 }
 

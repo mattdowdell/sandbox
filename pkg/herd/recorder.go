@@ -14,6 +14,8 @@ const (
 )
 
 const (
+	systemExistsQuery = "SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='pg_type';"
+
 	systemVersionQuery = "SELECT migration_version FROM herd_system_migrations " +
 		"ORDER BY migration_version DESC LIMIT 1;"
 	userVersionQuery = "SELECT migration_version FROM herd_user_migrations " +
@@ -53,6 +55,15 @@ func newRecorder(
 // GetCurrentVersion gets the current migration version, or 0 if no migrations were previously
 // applied.
 func (r *recorder) GetCurrentVersion(ctx context.Context, tx *sql.Tx) (int64, error) {
+	exists, err := r.checkSystemExists(ctx, tx)
+	if err != nil {
+		return 0, err
+	}
+
+	if !exists {
+		return 0, nil
+	}
+
 	query, err := r.getCurrentVersionQuery()
 	if err != nil {
 		return 0, err
@@ -66,6 +77,30 @@ func (r *recorder) GetCurrentVersion(ctx context.Context, tx *sql.Tx) (int64, er
 	}
 
 	return version, nil
+}
+
+// checkSystemExists checks that the table for tracking system migrations exists before attempting
+// to query it.
+//
+// If a query uses it before it exists, the transaction gets aborted and prevents application of
+// migrations.
+func (r *recorder) checkSystemExists(ctx context.Context, tx *sql.Tx) (bool, error) {
+	if r.tableName != tableNameSystem {
+		return true, nil
+	}
+
+	row := tx.QueryRowContext(ctx, systemExistsQuery)
+
+	var exists int64
+	if err := row.Scan(&exists); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return false, nil
+		}
+
+		return false, fmt.Errorf("failed to test if system table exists: %w", err)
+	}
+
+	return true, nil
 }
 
 func (r *recorder) getCurrentVersionQuery() (string, error) {
