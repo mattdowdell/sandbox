@@ -17,7 +17,7 @@ import (
 
 const (
 	updateResourceSQL = `UPDATE public.resources SET (name, updated_at) = ($1, $2) ` +
-		`WHERE resources.id = $3 RETURNING resources.id AS "resources.id", ` +
+		`WHERE resources.id = $3::uuid RETURNING resources.id AS "resources.id", ` +
 		`resources.name AS "resources.name", resources.created_at AS "resources.created_at", ` +
 		`resources.updated_at AS "resources.updated_at";`
 )
