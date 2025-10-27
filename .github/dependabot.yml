@@ -36,6 +36,10 @@ updates:
       x-repos:
         patterns:
           - "golang.org/x/*"
+      aws-sdk-go-v2:
+        patterns:
+          - "github.com/aws/aws-sdk-go-v2"
+          - "github.com/aws/aws-sdk-go-v2/*"
 
   - package-ecosystem: "docker"
     directories:
