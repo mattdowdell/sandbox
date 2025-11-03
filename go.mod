@@ -22,7 +22,7 @@ require (
 	github.com/cucumber/godog v0.15.1
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/go-jet/jet/v2 v2.14.0
-	github.com/gofrs/uuid/v5 v5.3.2
+	github.com/gofrs/uuid/v5 v5.4.0
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgerrcode v0.0.0-20250907135507-afb5586c32a6
