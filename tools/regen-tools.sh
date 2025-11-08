@@ -28,6 +28,9 @@ do
 	if [[ "$tool" == "kind" ]]
 	then
 		echo "    {{ if path_exists(${tool}) == \"true\" { \"\" } else { \"bingo get ${tool} -l\" } }}"
+	elif [[ "$tool" == "trivy" ]]
+	then
+		echo "    {{ if path_exists(${tool}) == \"true\" { \"\" } else { \"GOEXPERIMENT=jsonv2 bingo get ${tool}\" } }}"
 	else
 		echo "    {{ if path_exists(${tool}) == \"true\" { \"\" } else { \"bingo get ${tool}\" } }}"
 	fi
