@@ -187,7 +187,7 @@ jobs:
         with:
           scan-type: fs
           trivy-config: trivy.yaml
-          version: v${{ steps.trivy-version.outputs.version }}
+          version: ${{ steps.trivy-version.outputs.version }}
 
       # TODO: publish to github for default branch builds?
       # https://github.com/actions/starter-workflows/blob/main/code-scanning/trivy.yml
