@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	tableNameSystem = "herd_system_migrations"
-	tableNameUser   = "herd_user_migrations"
+	TableNameSystem = "herd_system_migrations"
+	TableNameUser   = "herd_user_migrations"
 )
 
 const (
@@ -26,7 +26,7 @@ const (
 		"VALUES($1, $2, $3, $4);"
 	userRecordQuery = "INSERT INTO herd_user_migrations " +
 		"(migration_version, migrated_at, code_version, code_revision, herd_version) " +
-		"VALUES($1, $2, $3, $4, $5, $6);"
+		"VALUES($1, $2, $3, $4, $5);"
 )
 
 // recorder provides a table agnostic set of helpers for recording applied migrations.
@@ -85,7 +85,7 @@ func (r *recorder) GetCurrentVersion(ctx context.Context, tx *sql.Tx) (int64, er
 // If a query uses it before it exists, the transaction gets aborted and prevents application of
 // migrations.
 func (r *recorder) checkSystemExists(ctx context.Context, tx *sql.Tx) (bool, error) {
-	if r.tableName != tableNameSystem {
+	if r.tableName != TableNameSystem {
 		return true, nil
 	}
 
@@ -105,10 +105,10 @@ func (r *recorder) checkSystemExists(ctx context.Context, tx *sql.Tx) (bool, err
 
 func (r *recorder) getCurrentVersionQuery() (string, error) {
 	switch r.tableName {
-	case tableNameSystem:
+	case TableNameSystem:
 		return systemVersionQuery, nil
 
-	case tableNameUser:
+	case TableNameUser:
 		return userVersionQuery, nil
 
 	default:
@@ -139,10 +139,10 @@ func (r *recorder) RecordMigration(
 
 func (r *recorder) recordMigrationQuery() (string, error) {
 	switch r.tableName {
-	case tableNameSystem:
+	case TableNameSystem:
 		return systemRecordQuery, nil
 
-	case tableNameUser:
+	case TableNameUser:
 		return userRecordQuery, nil
 
 	default:
@@ -157,10 +157,10 @@ func (r *recorder) recordMigrationArgs(
 	now := r.nowFunc().UTC().Truncate(time.Second)
 
 	switch r.tableName {
-	case tableNameSystem:
+	case TableNameSystem:
 		return []any{migrationVersion, now, r.codeVersion, r.codeRevision}, nil
 
-	case tableNameUser:
+	case TableNameUser:
 		return []any{migrationVersion, now, r.codeVersion, r.codeRevision, herdVersion}, nil
 
 	default:

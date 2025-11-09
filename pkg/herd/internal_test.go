@@ -2,9 +2,6 @@ package herd
 
 // Exports to support unit tests.
 const (
-	TableNameSystem = tableNameSystem
-	TableNameUser   = tableNameUser
-
 	SystemExistsQuery = systemExistsQuery
 
 	SystemVersionQuery = systemVersionQuery

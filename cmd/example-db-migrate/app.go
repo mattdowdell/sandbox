@@ -7,6 +7,7 @@ import (
 
 	"go.opentelemetry.io/contrib/instrumentation/runtime"
 
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx/logx"
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx/metricx"
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx/tracex"
@@ -52,15 +53,20 @@ func NewApp(
 //
 //nolint:sloglint // little benefit defining reusable keys for a one-off application.
 func (a *App) Run(ctx context.Context) error {
+	ctx, span := otelx.Tracer().Start(ctx, "DB Migrate")
+	defer span.End()
+
 	a.logger.InfoContext(ctx, "starting", slogx.Config(a.conf))
 
 	if err := runtime.Start(); err != nil {
+		span.RecordError(err)
 		a.logger.ErrorContext(ctx, "failed to start runtime metrics", slogx.Err(err))
 		return err
 	}
 
 	result, err := a.herder.Migrate(ctx, a.db)
 	if err != nil {
+		span.RecordError(err)
 		a.logger.ErrorContext(ctx, "failed to migrate db", slogx.Err(err))
 		return err
 	}
