@@ -23,7 +23,10 @@ const (
 	testMigration        = "-- example"
 )
 
-var testQueryRows = []string{"migration_version"}
+var (
+	testQueryRows  = []string{"migration_version"}
+	testExistsRows = []string{"exists"}
+)
 
 func Test_newMigrator_Success(t *testing.T) {
 	tests := map[string]struct {

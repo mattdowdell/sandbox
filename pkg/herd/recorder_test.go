@@ -44,15 +44,55 @@ func Test_newRecorder(t *testing.T) {
 func Test_recorder_GetCurrentVersion_Success(t *testing.T) {
 	tests := map[string]struct {
 		table string
-		query string
+		db    func(*testing.T) *sql.DB
+		want  int64
 	}{
-		"system": {
+		"system missing": {
 			table: herd.TableNameSystem,
-			query: herd.SystemVersionQuery,
+			db: func(t *testing.T) *sql.DB {
+				t.Helper()
+
+				db, mock := newMockDB(t)
+				mock.ExpectBegin()
+				mock.ExpectQuery(herd.SystemExistsQuery).
+					WillReturnRows(sqlmock.NewRows(testExistsRows))
+
+				return db
+			},
+			want: 0,
+		},
+		"system exists": {
+			table: herd.TableNameSystem,
+			db: func(t *testing.T) *sql.DB {
+				t.Helper()
+
+				db, mock := newMockDB(t)
+				mock.ExpectBegin()
+				mock.ExpectQuery(herd.SystemExistsQuery).
+					WillReturnRows(sqlmock.NewRows(testExistsRows).
+						AddRow(1))
+				mock.ExpectQuery(herd.SystemVersionQuery).
+					WillReturnRows(sqlmock.NewRows(testQueryRows).
+						AddRow(1))
+
+				return db
+			},
+			want: 1,
 		},
 		"user": {
 			table: herd.TableNameUser,
-			query: herd.UserVersionQuery,
+			db: func(t *testing.T) *sql.DB {
+				t.Helper()
+
+				db, mock := newMockDB(t)
+				mock.ExpectBegin()
+				mock.ExpectQuery(herd.UserVersionQuery).
+					WillReturnRows(sqlmock.NewRows(testQueryRows).
+						AddRow(1))
+
+				return db
+			},
+			want: 1,
 		},
 	}
 
@@ -61,10 +101,7 @@ func Test_recorder_GetCurrentVersion_Success(t *testing.T) {
 			// arrange
 			clock := mockrepositories.NewClock(t)
 			recorder := herd.NewRecorder(clock.Now, tt.table, testCodeVersion, testCodeRevision)
-
-			db, mock := newMockDB(t)
-			mock.ExpectBegin()
-			mock.ExpectQuery(tt.query).WillReturnRows(sqlmock.NewRows(testQueryRows).AddRow(1))
+			db := tt.db(t)
 
 			tx, err := db.BeginTx(t.Context(), &sql.TxOptions{})
 			require.NoError(t, err)
@@ -73,7 +110,7 @@ func Test_recorder_GetCurrentVersion_Success(t *testing.T) {
 			version, err := recorder.GetCurrentVersion(t.Context(), tx)
 
 			// assert
-			assert.Equal(t, int64(1), version)
+			assert.Equal(t, tt.want, version)
 			assert.NoError(t, err)
 		})
 	}
@@ -97,6 +134,19 @@ func Test_recorder_GetCurrentVersion_Error(t *testing.T) {
 			},
 			want: "internal error: unexpected table name: invalid",
 		},
+		"exists error": {
+			table: herd.TableNameSystem,
+			db: func(t *testing.T) *sql.DB {
+				t.Helper()
+
+				db, mock := newMockDB(t)
+				mock.ExpectBegin()
+				mock.ExpectQuery(herd.SystemExistsQuery).WillReturnError(errors.New("exists error"))
+
+				return db
+			},
+			want: "failed to test if system table exists: exists error",
+		},
 		"query error": {
 			table: herd.TableNameSystem,
 			db: func(t *testing.T) *sql.DB {
@@ -104,6 +154,9 @@ func Test_recorder_GetCurrentVersion_Error(t *testing.T) {
 
 				db, mock := newMockDB(t)
 				mock.ExpectBegin()
+				mock.ExpectQuery(herd.SystemExistsQuery).
+					WillReturnRows(sqlmock.NewRows(testExistsRows).
+						AddRow(1))
 				mock.ExpectQuery(herd.SystemVersionQuery).WillReturnError(errors.New("query error"))
 
 				return db
