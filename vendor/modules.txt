@@ -357,9 +357,6 @@ github.com/mattn/go-localereader
 # github.com/mattn/go-runewidth v0.0.16
 ## explicit; go 1.9
 github.com/mattn/go-runewidth
-# github.com/mfridman/interpolate v0.0.2
-## explicit; go 1.19
-github.com/mfridman/interpolate
 # github.com/mitchellh/copystructure v1.2.0
 ## explicit; go 1.15
 github.com/mitchellh/copystructure
@@ -386,22 +383,11 @@ github.com/pelletier/go-toml/v2/unstable
 # github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
 ## explicit
 github.com/pmezard/go-difflib/difflib
-# github.com/pressly/goose/v3 v3.26.0
-## explicit; go 1.23.0
-github.com/pressly/goose/v3
-github.com/pressly/goose/v3/database
-github.com/pressly/goose/v3/database/dialect
-github.com/pressly/goose/v3/internal/controller
-github.com/pressly/goose/v3/internal/dialects
-github.com/pressly/goose/v3/internal/gooseutil
-github.com/pressly/goose/v3/internal/legacystore
-github.com/pressly/goose/v3/internal/sqlparser
-github.com/pressly/goose/v3/lock
-github.com/pressly/goose/v3/lock/internal/store
-github.com/pressly/goose/v3/lock/internal/table
 # github.com/rivo/uniseg v0.4.7
 ## explicit; go 1.18
 github.com/rivo/uniseg
+# github.com/rogpeppe/go-internal v1.14.1
+## explicit; go 1.23
 # github.com/samber/lo v1.51.0
 ## explicit; go 1.18
 github.com/samber/lo
@@ -414,9 +400,6 @@ github.com/samber/slog-common
 # github.com/samber/slog-multi v1.5.0
 ## explicit; go 1.21
 github.com/samber/slog-multi
-# github.com/sethvargo/go-retry v0.3.0
-## explicit; go 1.21
-github.com/sethvargo/go-retry
 # github.com/spf13/pflag v1.0.7
 ## explicit; go 1.12
 github.com/spf13/pflag
@@ -542,9 +525,6 @@ go.opentelemetry.io/proto/otlp/logs/v1
 go.opentelemetry.io/proto/otlp/metrics/v1
 go.opentelemetry.io/proto/otlp/resource/v1
 go.opentelemetry.io/proto/otlp/trace/v1
-# go.uber.org/multierr v1.11.0
-## explicit; go 1.19
-go.uber.org/multierr
 # go.yaml.in/yaml/v3 v3.0.4
 ## explicit; go 1.16
 go.yaml.in/yaml/v3
@@ -572,7 +552,6 @@ golang.org/x/net/internal/timeseries
 golang.org/x/net/trace
 # golang.org/x/sync v0.17.0
 ## explicit; go 1.24.0
-golang.org/x/sync/errgroup
 golang.org/x/sync/semaphore
 # golang.org/x/sys v0.37.0
 ## explicit; go 1.24.0

@@ -6,6 +6,7 @@ import (
 
 	"go.opentelemetry.io/contrib/processors/baggagecopy"
 
+	"github.com/mattdowdell/sandbox/internal/adapters/datastore"
 	"github.com/mattdowdell/sandbox/internal/drivers/config"
 	"github.com/mattdowdell/sandbox/internal/drivers/config/flagoptions"
 	"github.com/mattdowdell/sandbox/internal/drivers/logging"
@@ -14,6 +15,7 @@ import (
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx/metricx"
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx/tracex"
 	"github.com/mattdowdell/sandbox/internal/drivers/pgsql"
+	"github.com/mattdowdell/sandbox/pkg/herd"
 )
 
 func SetupApp(ctx context.Context) (*App, error) {
@@ -34,7 +36,17 @@ func SetupApp(ctx context.Context) (*App, error) {
 		return nil, err
 	}
 
-	return NewApp(conf, logger, db, tpShutdown, mpShutdown, lpShutdown), nil
+	migrations, err := herd.CollectFileMigrations(datastore.MigrationFS)
+	if err != nil {
+		return nil, err
+	}
+
+	herder, err := herd.New(migrations)
+	if err != nil {
+		return nil, err
+	}
+
+	return NewApp(conf, logger, db, herder, tpShutdown, mpShutdown, lpShutdown), nil
 }
 
 //nolint:gocritic // result types are differentiated by package name.

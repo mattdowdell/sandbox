@@ -78,6 +78,24 @@ func Test_CollectFileMigrations_Error(t *testing.T) {
 	}
 }
 
+func Test_NewFileMigrationFromFS_Error(t *testing.T) {
+	// arrange
+	dir := t.TempDir()
+	filesystem := openRootFS(t, dir)
+
+	// act
+	migration, err := herd.NewFileMigrationFromFS(filesystem, "does_not_exist.sql")
+
+	// assert
+	assert.Nil(t, migration)
+	assert.EqualError(
+		t,
+		err,
+		"failed to read migration from filesystem: openat does_not_exist.sql: "+
+			"no such file or directory",
+	)
+}
+
 func Test_FileMigration_Migrate(t *testing.T) {
 	// arrange
 	migration := herd.NewFileMigration(1, "-- example")
