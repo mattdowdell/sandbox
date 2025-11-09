@@ -101,7 +101,7 @@ services:
     restart: always
 
   jaeger:
-    image: "mirror.gcr.io/jaegertracing/jaeger:2.10.0"
+    image: "mirror.gcr.io/jaegertracing/jaeger:2.11.0"
     pull_policy: "always"
     ports:
       - "127.0.0.1:16686:16686"
@@ -112,7 +112,7 @@ services:
     restart: always
 
   victoria-metrics:
-    image: "mirror.gcr.io/victoriametrics/victoria-metrics:v1.126.0"
+    image: "mirror.gcr.io/victoriametrics/victoria-metrics:v1.128.0"
     pull_policy: "always"
     ports:
       - "127.0.0.1:8428:8428"
@@ -134,7 +134,7 @@ services:
     restart: always
 
   grafana:
-    image: "mirror.gcr.io/grafana/grafana:12.2.0"
+    image: "mirror.gcr.io/grafana/grafana:12.2.1"
     pull_policy: "always"
     environment:
       GF_AUTH_ANONYMOUS_ENABLED: "true"

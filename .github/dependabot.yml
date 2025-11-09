@@ -15,6 +15,8 @@ updates:
       day: "monday"
       time: "08:00"
       timezone: "Europe/London"
+    cooldown:
+      default-days: 4
 
   - package-ecosystem: "gomod"
     directory: "/"
@@ -23,12 +25,21 @@ updates:
       day: "monday"
       time: "08:00"
       timezone: "Europe/London"
+    cooldown:
+      default-days: 4
     # lots of go dependencies, increase limit accordingly
     open-pull-requests-limit: 20
     groups:
       otel:
         patterns:
           - "go.opentelemetry.io/*"
+      x-repos:
+        patterns:
+          - "golang.org/x/*"
+      aws-sdk-go-v2:
+        patterns:
+          - "github.com/aws/aws-sdk-go-v2"
+          - "github.com/aws/aws-sdk-go-v2/*"
 
   - package-ecosystem: "docker"
     directories:
@@ -39,6 +50,8 @@ updates:
       day: "monday"
       time: "08:00"
       timezone: "Europe/London"
+    cooldown:
+      default-days: 4
 
   - package-ecosystem: "docker-compose"
     directory: "/"
@@ -47,3 +60,5 @@ updates:
       day: "monday"
       time: "08:00"
       timezone: "Europe/London"
+    cooldown:
+      default-days: 4

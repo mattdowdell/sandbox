@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	deleteResourceSQL = "DELETE FROM public.resources WHERE resources.id = $1;"
+	deleteResourceSQL = "DELETE FROM public.resources WHERE resources.id = $1::uuid;"
 )
 
 func Test_Datastore_DeleteResource_Success(t *testing.T) {

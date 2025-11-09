@@ -4,9 +4,9 @@
 
 version: v2
 plugins:
-  - local: protoc-gen-go-v1.36.9
+  - local: protoc-gen-go-v1.36.10
     out: gen
     opt: paths=source_relative
-  - local: protoc-gen-connect-go-v1.19.0
+  - local: protoc-gen-connect-go-v1.19.1
     out: gen
     opt: paths=source_relative

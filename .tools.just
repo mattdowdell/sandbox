@@ -2,7 +2,7 @@
 
 gopath := shell("go env GOPATH")
 
-buf := join(gopath, "bin", "buf-v1.57.2")
+buf := join(gopath, "bin", "buf-v1.59.0")
 
 [private]
 install-buf:
@@ -50,19 +50,19 @@ mockery := join(gopath, "bin", "mockery-v3.5.5")
 install-mockery:
     {{ if path_exists(mockery) == "true" { "" } else { "bingo get mockery" } }}
 
-protoc-gen-connect-go := join(gopath, "bin", "protoc-gen-connect-go-v1.19.0")
+protoc-gen-connect-go := join(gopath, "bin", "protoc-gen-connect-go-v1.19.1")
 
 [private]
 install-protoc-gen-connect-go:
     {{ if path_exists(protoc-gen-connect-go) == "true" { "" } else { "bingo get protoc-gen-connect-go" } }}
 
-protoc-gen-go := join(gopath, "bin", "protoc-gen-go-v1.36.9")
+protoc-gen-go := join(gopath, "bin", "protoc-gen-go-v1.36.10")
 
 [private]
 install-protoc-gen-go:
     {{ if path_exists(protoc-gen-go) == "true" { "" } else { "bingo get protoc-gen-go" } }}
 
-yamlfmt := join(gopath, "bin", "yamlfmt-v0.17.2")
+yamlfmt := join(gopath, "bin", "yamlfmt-v0.20.0")
 
 [private]
 install-yamlfmt:

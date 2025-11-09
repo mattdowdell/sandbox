@@ -30,7 +30,7 @@ helm_remote(
     namespace="cnpg-system",
     create_namespace=True,
     # renovate: datasource=helm depName=cloudnative-pg packageName=cloudnative-pg registryUrl=https://cloudnative-pg.github.io/charts
-    version="0.26.0",
+    version="0.26.1",
 )
 
 k8s_resource(
@@ -89,7 +89,7 @@ helm_remote(
     repo_name="grafana",
     repo_url="https://grafana.github.io/helm-charts",
     # renovate: datasource=helm depName=tempo packageName=tempo registryUrl=https://grafana.github.io/helm-charts
-    version="1.23.3",
+    version="1.24.0",
 )
 
 k8s_resource(
@@ -106,7 +106,7 @@ helm_remote(
     repo_name="vm",
     repo_url="https://victoriametrics.github.io/helm-charts",
     # renovate: datasource=helm depName=victoria-metrics-single packageName=victoria-metrics-single registryUrl=https://victoriametrics.github.io/helm-charts
-    version="0.24.6",
+    version="0.25.2",
 )
 
 k8s_resource(
@@ -121,7 +121,7 @@ helm_remote(
     repo_name="vm",
     repo_url="https://victoriametrics.github.io/helm-charts",
     # renovate: datasource=helm depName=victoria-logs-single packageName=victoria-logs-single registryUrl=https://victoriametrics.github.io/helm-charts
-    version="0.11.11",
+    version="0.11.17",
 )
 
 k8s_resource(
@@ -135,7 +135,7 @@ helm_remote(
     repo_name="grafana",
     repo_url="https://grafana.github.io/helm-charts",
     # renovate: datasource=helm depName=grafana packageName=grafana registryUrl=https://grafana.github.io/helm-charts
-    version="10.0.0",
+    version="10.1.4",
     values=[".tilt/grafana/values.yaml"],
 )
 
