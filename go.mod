@@ -34,7 +34,7 @@ require (
 	github.com/knadh/koanf/providers/env/v2 v2.0.0
 	github.com/knadh/koanf/providers/file v1.2.0
 	github.com/knadh/koanf/v2 v2.3.0
-	github.com/samber/slog-multi v1.5.0
+	github.com/samber/slog-multi v1.6.0
 	github.com/stretchr/testify v1.11.1
 	go.opentelemetry.io/contrib/bridges/otelslog v0.13.0
 	go.opentelemetry.io/contrib/instrumentation/runtime v0.63.0
@@ -112,7 +112,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
-	github.com/samber/lo v1.51.0 // indirect
+	github.com/samber/lo v1.52.0 // indirect
 	github.com/samber/slog-common v0.19.0 // indirect
 	github.com/spf13/pflag v1.0.7 // indirect
 	github.com/stoewer/go-strcase v1.3.1 // indirect
