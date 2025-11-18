@@ -3,6 +3,7 @@
 
 dir: 'mocks/{{ trimPrefix "github.com/mattdowdell/sandbox/internal/" .SrcPackagePath | dir }}/mock{{ .SrcPackagePath | base }}'
 filename: "mocks.go"
+include-auto-generated: true
 structname: "{{ .InterfaceName }}"
 pkgname: "mock{{ .SrcPackageName }}"
 template: "testify"
