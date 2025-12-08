@@ -16,7 +16,7 @@ updates:
       time: "08:00"
       timezone: "Europe/London"
     cooldown:
-      default-days: 4
+      default-days: 7
 
   - package-ecosystem: "gomod"
     directory: "/"
@@ -26,7 +26,7 @@ updates:
       time: "08:00"
       timezone: "Europe/London"
     cooldown:
-      default-days: 4
+      default-days: 7
     # lots of go dependencies, increase limit accordingly
     open-pull-requests-limit: 20
     groups:
@@ -51,7 +51,7 @@ updates:
       time: "08:00"
       timezone: "Europe/London"
     cooldown:
-      default-days: 4
+      default-days: 7
 
   - package-ecosystem: "docker-compose"
     directory: "/"
@@ -61,4 +61,4 @@ updates:
       time: "08:00"
       timezone: "Europe/London"
     cooldown:
-      default-days: 4
+      default-days: 7
