@@ -68,7 +68,7 @@ helm_remote(
     repo_url="https://cloudnative-pg.github.io/charts",
     namespace="default",
     # renovate: datasource=helm depName=cluster packageName=cluster registryUrl=https://cloudnative-pg.github.io/charts
-    version="0.3.1",
+    version="0.4.0",
     values=[".tilt/postgresql/values.yaml"],
 )
 
