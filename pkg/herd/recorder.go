@@ -14,7 +14,7 @@ const (
 )
 
 const (
-	systemExistsQuery = "SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='pg_type';"
+	systemExistsQuery = "SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='herd_system_migrations';"
 
 	systemVersionQuery = "SELECT migration_version FROM herd_system_migrations " +
 		"ORDER BY migration_version DESC LIMIT 1;"
