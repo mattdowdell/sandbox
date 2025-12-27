@@ -7,10 +7,10 @@
 //	kind: ConfigMap
 //	metadata:
 //	  name: example
-//  data:
-//    foo: "true"
-//    bar: "1"
-//    baz: "value"
+//	data:
+//	  foo: "true"
+//	  bar: "1"
+//	  baz: "value"
 //
 // If ConfigMap fields contains structured data, such as JSON or YAML, the file provider with the
 // appropriate parser should be used instead.
