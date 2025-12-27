@@ -1,3 +1,4 @@
+// Package flagoptions implements [config.Options] using the standard library [flag] package.
 package flagoptions
 
 import (
@@ -11,14 +12,15 @@ import (
 
 // New creates a new Options instance populated with values from CLI flags.
 //
-//   - -config.envprefix is the prefix for environment variables to read configuration from.
-//   - -config.files is a list of file paths to read configuration from.
-//   - -config.mounts is a list of kubernetes pod mount paths to read configuration from.
+//   - `-config.envprefix` is the prefix for environment variables to read configuration from.
+//   - `-config.files` is a list of file paths to read configuration from.
+//   - `-config.mounts` is a list of kubernetes pod mount paths to read configuration from.
 //
 // Internally, a new [flag.FlagSet] instance is created with just the above flags allowed.
-// Unrecognised flags will cause the process to exit. This is usually acceptable for a binary, but
-// may cause problems if relying on flags defined in other modules/packages. In these cases, use
-// NewWithFlagSet to either set the global FlagSet instance or another instance.
+// Unrecognised flags will cause the process to exit via [flag.ExitOnError]. This is usually
+// acceptable for a binary, but may cause problems if relying on flags defined in other modules or
+// packages. In these cases, use NewWithFlagSet to either set the global FlagSet instance or another
+// instance.
 func New() *config.Options {
 	// copied from flag, apparently execl can cause os.Args to be empty
 	var name string
@@ -29,15 +31,17 @@ func New() *config.Options {
 	// use a flagset instead of flag.String, etc. so that multiple calls don't cause an error.
 	flagset := flag.NewFlagSet(name, flag.ExitOnError)
 
+	// we can ignore the error because errors only come from flagset.Parse() and we've configured
+	// the flagset to call os.Exit() if any errors occur.
 	options, _ := NewWithFlagSet(flagset)
 	return options
 }
 
 // NewWithFlagSet creates a new Options instance populated with values from CLI flags.
 //
-//   - -config.envprefix is the prefix for environment variables to read configuration from.
-//   - -config.files is a list of file paths to read configuration from.
-//   - -config.mounts is a list of kubernetes pod mount paths to read configuration from.
+//   - `-config.envprefix` is the prefix for environment variables to read configuration from.
+//   - `-config.files` is a list of file paths to read configuration from.
+//   - `-config.mounts` is a list of kubernetes pod mount paths to read configuration from.
 //
 // New creates a separate [flag.FlagSet] instance which is appropriate for normal binaries. However,
 // this separation means that flags defined with [flag.String], etc. in other packages will result
@@ -47,10 +51,11 @@ func New() *config.Options {
 //	// ignore errors, configured with flag.ExitOnError
 //	options, _ := flagoptions.NewWithFlagSet(flag.Commandline)
 func NewWithFlagSet(flagset *flag.FlagSet) (*config.Options, error) {
-	// define flags within the function so environment variables can var across unit tests
+	// define flags within the function so environment variables are re-read for each call
+	// if defined globally, environment variables never change which is problematic for unit tests
 	envPrefix := flagset.String(
 		"config.envprefix",
-		envOrDefault("CONFIG_ENVPREFIX", "APP_"),
+		envOrDefault("CONFIG_ENVPREFIX", ""),
 		"The environment variable prefix to filter by for configuration.",
 	)
 	files := flagset.String(

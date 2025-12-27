@@ -1,6 +1,7 @@
 package k8smount_test
 
 import (
+	"context"
 	"log"
 
 	"github.com/knadh/koanf/v2"
@@ -31,9 +32,13 @@ func ExampleK8SMount_Watch() {
 
 	log.Println("config loaded: example=", k.Get("example"))
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	if err := provider.Watch(func(err error) {
 		if err != nil {
 			log.Println("watch stopping:", err)
+			cancel()
 			return
 		}
 
@@ -44,14 +49,16 @@ func ExampleK8SMount_Watch() {
 				log.Println("provider unwatch error:", err)
 			}
 
+			cancel()
 			return
 		}
 
 		log.Println("config loaded: example=", k.Get("example"))
 	}); err != nil {
-		log.Fatal("watch failed:", err)
+		log.Println("watch failed:", err)
+		cancel()
 	}
 
-	// wait forever
-	select {}
+	// keep going until failure
+	<-ctx.Done()
 }

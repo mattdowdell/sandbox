@@ -7,16 +7,21 @@ import (
 	"strings"
 )
 
+type splitter interface {
+	encoding.TextUnmarshaler
+	Unwrap() []string
+}
+
 // Non-allocating compile-time checks for interface compliance.
 var (
-	_ encoding.TextUnmarshaler = (*Comma)(nil)
-	_ encoding.TextUnmarshaler = (*Space)(nil)
+	_ splitter = (*Comma)(nil)
+	_ splitter = (*Space)(nil)
 )
 
 // Comma unmarshals a string into a slice of strings using a comma as a delimiter.
 type Comma []string
 
-// ...
+// UnmarshalText implements [encoding.TextUnmarshaler].
 func (c *Comma) UnmarshalText(text []byte) error {
 	if len(text) > 0 {
 		*c = strings.Split(string(text), ",")
@@ -33,7 +38,7 @@ func (c *Comma) Unwrap() []string {
 // Comma unmarshals a string into a slice of strings using a space as a delimiter.
 type Space []string
 
-// ...
+// UnmarshalText implements [encoding.TextUnmarshaler].
 func (s *Space) UnmarshalText(text []byte) error {
 	if len(text) > 0 {
 		*s = strings.Split(string(text), " ")

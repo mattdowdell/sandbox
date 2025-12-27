@@ -132,7 +132,7 @@ func (k *K8SMount) walkDir(mountFS fs.FS, path string, d fs.DirEntry, err error)
 // If an error occurs, the function is called with the error before the watch is stopped. If the
 // function is called with a nil error value, a change was detected successfully and watching will
 // continue.
-func (k *K8SMount) Watch(fn func(err error)) error {
+func (k *K8SMount) Watch(fn func(error)) error {
 	if k.watching.Swap(true) {
 		return ErrAlreadyWatched
 	}
@@ -149,7 +149,7 @@ func (k *K8SMount) Watch(fn func(err error)) error {
 }
 
 //nolint:gocognit // short enough that the complaxity is acceptable
-func (k *K8SMount) watchDir(fn func(err error)) {
+func (k *K8SMount) watchDir(fn func(error)) {
 	defer k.watching.Store(false)
 
 	var (
