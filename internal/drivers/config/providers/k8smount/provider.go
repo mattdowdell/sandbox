@@ -54,6 +54,9 @@ type K8SMount struct {
 // create a hierarchy of keys based on the mounted filename. For example, a configmap mounted at
 // "/mnt/config/" with a key of "log.level" set to "INFO" and a delimiter of "." would result in
 // {"log":{"level":"INFO"}} being read as configuration.
+//
+// Keys mounted in directories are always split. For example, if the above key was mounted at
+// "log/level" instead, it will always produce {"log":{"level":"INFO"}} as the result.
 func Provider(mount, delim string) *K8SMount {
 	return &K8SMount{
 		mount: filepath.Clean(mount),
