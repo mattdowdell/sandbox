@@ -52,8 +52,8 @@ type K8SMount struct {
 //
 // The given mount should be the mount point of the configmap or secret. The delimiter is used to
 // create a hierarchy of keys based on the mounted filename. For example, a configmap mounted at
-// "/mnt/config/" with a key of "log.level" set to "INFO" would result in {"log":{"level":"INFO"}}
-// being read as configuration.
+// "/mnt/config/" with a key of "log.level" set to "INFO" and a delimiter of "." would result in
+// {"log":{"level":"INFO"}} being read as configuration.
 func Provider(mount, delim string) *K8SMount {
 	return &K8SMount{
 		mount: filepath.Clean(mount),
