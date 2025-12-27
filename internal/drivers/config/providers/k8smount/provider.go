@@ -1,3 +1,19 @@
+// Package k8smount contains a Koanf provider for loading configuration from Kubernetes volume
+// mounts, i.e. Secrets or ConfigMaps mounted into a Pod.
+//
+// This is most appropriate for key-value data. Using a ConfigMap as an example:
+//
+//	apiVersion: v1
+//	kind: ConfigMap
+//	metadata:
+//	  name: example
+//  data:
+//    foo: "true"
+//    bar: "1"
+//    baz: "value"
+//
+// If ConfigMap fields contains structured data, such as JSON or YAML, the file provider with the
+// appropriate parser should be used instead.
 package k8smount
 
 import (
@@ -173,17 +189,13 @@ func (k *K8SMount) watchDir(fn func(error)) {
 			lastEvent = event.String()
 			lastEventTime = time.Now()
 
-			// mounts are only meant to be updated for the lifetime of the pod
-			// TODO: test what happens when we edit a configmap
-			if !event.Has(fsnotify.Write | fsnotify.Chmod) {
-				fn(fmt.Errorf("%w: %s", ErrUnexpectedEvent, event.String()))
+			// ignore chmod
+			if event.Has(fsnotify.Chmod) {
 				return
 			}
 
-			// ignore chmod
-			if !event.Has(fsnotify.Chmod) {
-				fn(nil)
-			}
+			// TODO: report which key was updated
+			fn(nil)
 
 		case err, ok := <-k.watcher.Errors:
 			if !ok {
