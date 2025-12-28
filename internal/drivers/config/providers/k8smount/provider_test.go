@@ -1,7 +1,6 @@
 package k8smount_test
 
 import (
-	"os"
 	"path/filepath"
 	"sync/atomic"
 	"testing"
