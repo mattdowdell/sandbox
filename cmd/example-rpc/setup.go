@@ -148,7 +148,7 @@ func initFacades(
 
 func initHandlers(
 	conf *Config,
-	loader *config.Config[Config],
+	loader *config.Loader[Config],
 	clock repositories.Clock,
 	uuidgen repositories.UUIDGenerator,
 	resource examplerpc.ResourceFacade,

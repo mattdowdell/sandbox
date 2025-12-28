@@ -1,3 +1,14 @@
+// Package config provides support for loading configuration from various sources into a struct. It
+// is a thin wrapper around [Koanf].
+//
+// This is designed for use with microservices running in Kubernetes, but may work well elsewhere
+// too. Configuration may come from the following sources:
+//
+//   - Environment variables, e.g. those added to a Pod's container directly or via a ConfigMap.
+//   - JSON, YAML or TOML files, e.g. volume mounts on a Pod via a ConfigMap or Secret.
+//   - Single value files, e.g. simple key-value pairs from a volume mount.
+//
+// [Koanf]: https://pkg.go.dev/github.com/knadh/koanf/v2
 package config
 
 import (
@@ -21,7 +32,7 @@ const (
 	delimiter = "."
 )
 
-// Options provides the values to bootstrap configuration collection.
+// Options provides the values to bootstrap configuration loading.
 type Options struct {
 	// The prefix of environment variables to read configuration from. Matching environment
 	// variables have the prefix removed, are converted to lowercase and any underscores ("_") are
@@ -39,27 +50,27 @@ type Options struct {
 	// a JSON file containing {"log":{"level":"info"}} would become "log.level".
 	Files []string
 
-	// The directories of Kubernetes pod mounts to read configuration from. The filenames of the
+	// The directories of Kubernetes volume mounts to read configuration from. The filenames of the
 	// mounted values become the configuration keys. Any underscores ("_") in the key are replaced
 	// with periods ("."). For example, a configmap field of "log_level" would become "log.level".
 	Mounts []string
 }
 
-// Config provides loading of configuration values for a service.
-type Config[T any] struct {
+// Loader provides loading of configuration values for a service into a struct.
+type Loader[T any] struct {
 	inner *koanf.Koanf
 	opts  *Options
 }
 
-// New creates a new Config instance.
-func New[T any](opts *Options) *Config[T] {
-	return &Config[T]{
+// New creates a new Loader instance.
+func New[T any](opts *Options) *Loader[T] {
+	return &Loader[T]{
 		inner: koanf.New(delimiter),
 		opts:  opts,
 	}
 }
 
-// Load creates a new Config instance and immediately calls it's Load method.
+// Load creates a new Loader instance and immediately calls it's Load method.
 func Load[T any](opts *Options) (*T, error) {
 	return New[T](opts).Load()
 }
@@ -102,16 +113,16 @@ func Load[T any](opts *Options) (*T, error) {
 // [defaults]: https://pkg.go.dev/github.com/creasty/defaults
 // [defaults.Setter]: https://pkg.go.dev/github.com/creasty/defaults#Setter
 // [encoding/json.Unmarshaler]: https://pkg.go.dev/encoding/json#Unmarshaler
-func (c *Config[T]) Load() (*T, error) {
-	if err := c.loadEnv(); err != nil {
+func (l *Loader[T]) Load() (*T, error) {
+	if err := l.loadEnv(); err != nil {
 		return nil, err
 	}
 
-	if err := c.loadFiles(); err != nil {
+	if err := l.loadFiles(); err != nil {
 		return nil, err
 	}
 
-	if err := c.loadMounts(); err != nil {
+	if err := l.loadMounts(); err != nil {
 		return nil, err
 	}
 
@@ -121,25 +132,25 @@ func (c *Config[T]) Load() (*T, error) {
 		return nil, err
 	}
 
-	if err := c.inner.Unmarshal("", conf); err != nil {
+	if err := l.inner.Unmarshal("", conf); err != nil {
 		return nil, err
 	}
 
 	return conf, nil
 }
 
-func (c *Config[T]) loadEnv() error {
-	return c.inner.Load(envProvider(c.opts.EnvPrefix), nil)
+func (l *Loader[T]) loadEnv() error {
+	return l.inner.Load(envProvider(l.opts.EnvPrefix), nil)
 }
 
-func (c *Config[T]) loadFiles() error {
-	for _, path := range c.opts.Files {
+func (l *Loader[T]) loadFiles() error {
+	for _, path := range l.opts.Files {
 		parser, err := fileParser(path)
 		if err != nil {
 			return err
 		}
 
-		if err := c.inner.Load(file.Provider(path), parser); err != nil {
+		if err := l.inner.Load(file.Provider(path), parser); err != nil {
 			return err
 		}
 	}
@@ -147,9 +158,9 @@ func (c *Config[T]) loadFiles() error {
 	return nil
 }
 
-func (c *Config[T]) loadMounts() error {
-	for _, path := range c.opts.Mounts {
-		if err := c.inner.Load(k8smount.Provider(path, "_" /*delimiter*/), nil); err != nil {
+func (l *Loader[T]) loadMounts() error {
+	for _, path := range l.opts.Mounts {
+		if err := l.inner.Load(k8smount.Provider(path, "_" /*delimiter*/), nil); err != nil {
 			return err
 		}
 	}

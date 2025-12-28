@@ -14,11 +14,11 @@ var _ configv1connect.ConfigServiceHandler = (*Handler[struct{}])(nil)
 
 // Handler implements the ConfigService RPC.
 type Handler[T any] struct {
-	loader *config.Config[T]
+	loader *config.Loader[T]
 }
 
 // New creates a new Handler.
-func New[T any](loader *config.Config[T]) *Handler[T] {
+func New[T any](loader *config.Loader[T]) *Handler[T] {
 	return &Handler[T]{
 		loader: loader,
 	}
