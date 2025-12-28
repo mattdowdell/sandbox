@@ -31,10 +31,7 @@ import (
 	"github.com/knadh/koanf/v2"
 )
 
-var (
-	ErrUnexpectedEvent = errors.New("unexpected event")
-	ErrAlreadyWatched  = errors.New("mount is already being watched")
-)
+var ErrAlreadyWatched = errors.New("mount is already being watched")
 
 // Non-allocating compile-time check for interface implementation.
 var _ koanf.Provider = (*K8SMount)(nil)

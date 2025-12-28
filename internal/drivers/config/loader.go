@@ -32,7 +32,7 @@ const (
 	delimiter = "."
 )
 
-// Options provides the values to bootstrap configuration collection.
+// Options provides the values to bootstrap configuration loading.
 type Options struct {
 	// The prefix of environment variables to read configuration from. Matching environment
 	// variables have the prefix removed, are converted to lowercase and any underscores ("_") are

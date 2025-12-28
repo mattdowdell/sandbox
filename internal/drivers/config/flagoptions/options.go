@@ -1,4 +1,6 @@
 // Package flagoptions implements [config.Options] using the standard library [flag] package.
+//
+// [config.Options]: https://pkg.go.dev/github.com/mattdowdell/sandbox/internal/drivers/config#Options
 package flagoptions
 
 import (
