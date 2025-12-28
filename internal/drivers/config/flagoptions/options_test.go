@@ -55,7 +55,7 @@ func Test_New(t *testing.T) {
 		"defaults": {
 			args: []string{t.Name()},
 			want: &config.Options{
-				EnvPrefix: "APP_",
+				EnvPrefix: "",
 				Files:     []string{},
 				Mounts:    []string{},
 			},
@@ -134,7 +134,7 @@ func Test_NewWithFlagSet_Success(t *testing.T) {
 
 	// assert
 	want := &config.Options{
-		EnvPrefix: "APP_",
+		EnvPrefix: "",
 		Files:     []string{},
 		Mounts:    []string{},
 	}
