@@ -11,6 +11,8 @@ import (
 var (
 	_ encoding.TextUnmarshaler = (*Comma)(nil)
 	_ encoding.TextUnmarshaler = (*Space)(nil)
+	_ encoding.TextMarshaler   = (*Comma)(nil)
+	_ encoding.TextMarshaler   = (*Space)(nil)
 )
 
 // Comma unmarshals a string into a slice of strings using a comma as a delimiter.
@@ -23,6 +25,11 @@ func (c *Comma) UnmarshalText(text []byte) error {
 	}
 
 	return nil
+}
+
+// MarshalText implements [encoding.TextMarshaler].
+func (c Comma) MarshalText() ([]byte, error) {
+	return []byte(strings.Join(c.Unwrap(), ",")), nil
 }
 
 // Unwrap returns the underlying string slice after unmarshaling.
@@ -40,6 +47,11 @@ func (s *Space) UnmarshalText(text []byte) error {
 	}
 
 	return nil
+}
+
+// MarshalText implements [encoding.TextMarshaler].
+func (s Space) MarshalText() ([]byte, error) {
+	return []byte(strings.Join(s.Unwrap(), " ")), nil
 }
 
 // Unwrap returns the underlying string slice after unmarshaling.

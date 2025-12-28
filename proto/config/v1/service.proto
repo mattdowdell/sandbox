@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package config.v1;
+
+import "config/v1/messages.proto";
+
+option go_package = "github.com/mattdowdell/sandbox/gen/config/v1;configv1";
+
+// ConfigService provides methods for interacting with the current configuration.
+service ConfigService {
+  // GetConfig returns the current configuration values.
+  rpc GetConfig(GetConfigRequest) returns (GetConfigResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // GetConfig returns a single current configuration value.
+  rpc GetConfigValue(GetConfigValueRequest) returns (GetConfigValueResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}

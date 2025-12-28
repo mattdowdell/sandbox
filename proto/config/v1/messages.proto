@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package config.v1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/mattdowdell/sandbox/gen/config/v1;configv1";
+
+// GetConfigRequest is used to get the current configuration.
+message GetConfigRequest {}
+
+// GetConfigResponse is returned with the current configuration.
+message GetConfigResponse {
+  // The current configuration as key-value pairs. Sensitive values will be replaced with
+  // "********".
+  map<string, string> config = 1;
+}
+
+// GetConfigValueRequest is used to get the a single current configuration value.
+message GetConfigValueRequest {
+  string key = 1 [(buf.validate.field).required = true];
+}
+
+// GetConfigValueResponse is returned with a current configuration value.
+message GetConfigValueResponse {
+  // A current configuration value. Sensitive values will be replaced with "********".
+  string value = 1;
+}
