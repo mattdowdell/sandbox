@@ -13,6 +13,7 @@ const (
 	emptyCtxKey ctxKey = iota + 1
 	resourceCtxKey
 	errCtxKey
+	configValueCtxKey
 )
 
 // ...
@@ -55,4 +56,18 @@ func ErrFromContext(ctx context.Context) (have, err error) {
 	}
 
 	return nil, errors.New("empty not found in context")
+}
+
+// ...
+func ConfigValueIntoContext(ctx context.Context, value string) context.Context {
+	return context.WithValue(ctx, configValueCtxKey, value)
+}
+
+// ...
+func ConfigValueFromContext(ctx context.Context) (string, error) {
+	if val, ok := ctx.Value(configValueCtxKey).(string); ok && val != "" {
+		return val, nil
+	}
+
+	return "", errors.New("config value not found in context")
 }

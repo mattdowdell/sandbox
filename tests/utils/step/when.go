@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/mattdowdell/sandbox/tests/utils/examplev1client"
+	"github.com/mattdowdell/sandbox/tests/utils/configv1client"
 	"github.com/mattdowdell/sandbox/tests/utils/input"
 	"github.com/mattdowdell/sandbox/tests/utils/output"
 )
@@ -93,4 +94,24 @@ func DeleteResource(ctx context.Context) (context.Context, error) {
 	}
 
 	return output.EmptyIntoContext(ctx), nil
+}
+
+// ...
+func GetConfigValue(ctx context.Context) (context.Context, error) {
+	client, err := configv1client.FromContext(ctx)
+	if err != nil {
+		return ctx, err
+	}
+
+	key, err := input.ConfigKeyFromContext(ctx)
+	if err != nil {
+		return ctx, err
+	}
+
+	value, err := client.GetConfigValue(ctx, key)
+	if err != nil {
+		return output.ErrIntoContext(ctx, err), nil
+	}
+
+	return output.ConfigValueIntoContext(ctx, value), nil
 }

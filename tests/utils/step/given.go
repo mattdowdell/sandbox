@@ -115,6 +115,21 @@ func ValidAuthentication(ctx context.Context) (context.Context, error) {
 	return input.AuthnIntoContext(ctx, "Bearer "+token), nil
 }
 
+// ...
+func NonExistingConfigKey(ctx context.Context) (context.Context, error) {
+	return input.ConfigKeyIntoContext(ctx, "does_not_exist"), nil
+}
+
+// ...
+func EmptyConfigKey(ctx context.Context) (context.Context, error) {
+	return input.ConfigKeyIntoContext(ctx, ""), nil
+}
+
+// ...
+func ExistingConfigKey(ctx context.Context, key string) (context.Context, error) {
+	return input.ConfigKeyIntoContext(ctx, key), nil
+}
+
 // printableASCII returns a set of printable ASCII characters for use with RandomString.
 func printableASCII() string {
 	var output []rune
