@@ -11,7 +11,7 @@ import (
 	"github.com/mattdowdell/sandbox/mocks/adapters/mockconfigrpc"
 )
 
-type TestConfig struct{
+type TestConfig struct {
 	Foo string
 }
 

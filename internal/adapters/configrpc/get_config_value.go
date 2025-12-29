@@ -31,6 +31,7 @@ func (h *Handler[T]) GetConfigValue(
 
 	value, ok := encoded[req.Msg.GetKey()]
 	if !ok {
+		//nolint:sloglint // not much benefit from standardising this key
 		slog.DebugContext(ctx, "requested config key was not found", slog.String("key", req.Msg.GetKey()))
 		return nil, ErrValueNotFound
 	}

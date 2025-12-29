@@ -14,8 +14,6 @@ import (
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
-
-
 func Test_Handler_GetConfigValue_Success(t *testing.T) {
 	// arrange
 	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
