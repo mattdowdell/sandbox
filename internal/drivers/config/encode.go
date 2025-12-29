@@ -1,4 +1,4 @@
-package models
+package config
 
 import (
 	"encoding"
@@ -11,6 +11,12 @@ import (
 	"strings"
 )
 
+const (
+	koanfTag      = "koanf"
+	jsonTag       = "json"
+	redactedValue = "********"
+)
+
 var ErrNotStruct = errors.New("non-struct found")
 
 var (
@@ -18,13 +24,27 @@ var (
 	jsonMarshaler = reflect.TypeOf(new(json.Marshaler)).Elem()
 )
 
-// Encode converts a configuration struct to a flattened map.
+// Encode converts a configuration struct to a flattened map using the given delimiter for nested
+// keys and all values as strings. It is intended for debugging only and is not guaranteed to
+// produce an entirely accurate representation of the original configuration.
+//
+// Values can be redacted with a JSON struct tag set to "-". For example:
+//
+//	type Example struct {
+//		Password string `koanf:"password" json:"-"`
+//	}
+//
+// Encoding all primitive types is supported natively. If a type implements [encoding.TextMarshaler]
+// or [encoding/json.Marshaler], that result will be returned instead. Arrays, slices and maps
+// cannot currently be encoded, but a placeholder message is returned instead of raising an error.
+//
+// Private struct fields are ignored.
 func Encode[T any](value T, delim string) (map[string]string, error) {
 	v := reflect.ValueOf(value)
 	return encodeStruct(v, "" /*prefix*/, delim)
 }
 
-// ...
+//nolint:gocognit // no easy way to break up field encoding
 func encodeStruct(value reflect.Value, prefix, delim string) (map[string]string, error) {
 	if k := value.Kind(); k == reflect.Pointer {
 		value = value.Elem()
@@ -36,11 +56,26 @@ func encodeStruct(value reflect.Value, prefix, delim string) (map[string]string,
 
 	result := map[string]string{}
 
-	// TODO: check for marshal implementation, e.g. time.Time
+	if prefix != "" {
+		encoded, ok, err := marshalFieldValue(value)
+		if err != nil {
+			return nil, err
+		}
+
+		if ok {
+			result[prefix] = encoded
+			return result, nil
+		}
+	}
 
 	for i := range value.NumField() {
 		val := value.Field(i)
 		field := value.Type().Field(i)
+
+		if !field.IsExported() {
+			continue
+		}
+
 		name := fieldName(&field)
 
 		if val.Kind() == reflect.Struct {
@@ -59,7 +94,7 @@ func encodeStruct(value reflect.Value, prefix, delim string) (map[string]string,
 		}
 
 		if isRedacted(&field) {
-			result[key] = "********"
+			result[key] = redactedValue
 			continue
 		}
 
@@ -76,7 +111,7 @@ func encodeStruct(value reflect.Value, prefix, delim string) (map[string]string,
 
 func fieldName(field *reflect.StructField) string {
 	name := strings.ToLower(field.Name)
-	tag := field.Tag.Get("koanf")
+	tag := field.Tag.Get(koanfTag)
 
 	// TODO: if anonymous and squash is used, return an empty string
 
@@ -88,14 +123,13 @@ func fieldName(field *reflect.StructField) string {
 }
 
 func isRedacted(field *reflect.StructField) bool {
-	tag := field.Tag.Get("json")
+	tag := field.Tag.Get(jsonTag)
 
 	n, _, _ := strings.Cut(tag, ",")
 	return n == "-"
 }
 
-//nolint:revive // boolean last makes more sense in this case
-func marshalFieldValue(value reflect.Value) (string, error, bool) {
+func marshalFieldValue(value reflect.Value) (val string, ok bool, err error) {
 	typ := value.Type()
 
 	if typ.Implements(textMarshaler) {
@@ -104,10 +138,10 @@ func marshalFieldValue(value reflect.Value) (string, error, bool) {
 
 		data, err := m.MarshalText()
 		if err != nil {
-			return "", err, true
+			return "", true, err
 		}
 
-		return string(data), nil, true
+		return string(data), true, nil
 	}
 
 	if typ.Implements(jsonMarshaler) {
@@ -116,19 +150,23 @@ func marshalFieldValue(value reflect.Value) (string, error, bool) {
 
 		data, err := m.MarshalJSON()
 		if err != nil {
-			return "", err, true
+			return "", true, err
 		}
 
-		return string(data), nil, true
+		return string(data), true, nil
 	}
 
-	return "", nil, false
+	return "", false, nil
 }
 
 func encodeFieldValue(value reflect.Value) (string, error) {
-	encoded, err, ok := marshalFieldValue(value)
+	encoded, ok, err := marshalFieldValue(value)
+	if err != nil {
+		return "", err
+	}
+
 	if ok {
-		return encoded, err
+		return encoded, nil
 	}
 
 	//nolint:exhaustive // support just primitive types for now

@@ -7,7 +7,7 @@ import (
 	"connectrpc.com/connect"
 
 	"github.com/mattdowdell/sandbox/gen/config/v1"
-	"github.com/mattdowdell/sandbox/internal/adapters/configrpc/models"
+	"github.com/mattdowdell/sandbox/internal/drivers/config"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/rpcerrors"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
@@ -23,7 +23,7 @@ func (h *Handler[T]) GetConfigValue(
 		return nil, rpcerrors.ErrInternal
 	}
 
-	encoded, err := models.Encode(conf, "." /*delim*/)
+	encoded, err := config.Encode(conf, "." /*delim*/)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to encode configuration", slogx.Err(err))
 		return nil, rpcerrors.ErrInternal

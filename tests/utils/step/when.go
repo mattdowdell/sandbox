@@ -3,8 +3,8 @@ package step
 import (
 	"context"
 
-	"github.com/mattdowdell/sandbox/tests/utils/examplev1client"
 	"github.com/mattdowdell/sandbox/tests/utils/configv1client"
+	"github.com/mattdowdell/sandbox/tests/utils/examplev1client"
 	"github.com/mattdowdell/sandbox/tests/utils/input"
 	"github.com/mattdowdell/sandbox/tests/utils/output"
 )
