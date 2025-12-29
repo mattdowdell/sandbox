@@ -113,7 +113,7 @@ func initFacades(
 	clock repositories.Clock,
 	uuidgen repositories.UUIDGenerator,
 ) (*usecasefacades.Resource, *usecasefacades.AuditEvent, error) {
-	db, err := pgsql.NewFromConfig(ctx, conf.Database)
+	db, _, err := pgsql.NewFromConfig(ctx, conf.Database)
 	if err != nil {
 		return nil, nil, err
 	}
