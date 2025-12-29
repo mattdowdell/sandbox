@@ -44,7 +44,7 @@ const (
 type ConfigServiceClient interface {
 	// GetConfig returns the current configuration values.
 	GetConfig(context.Context, *connect.Request[v1.GetConfigRequest]) (*connect.Response[v1.GetConfigResponse], error)
-	// GetConfig returns a single current configuration value.
+	// GetConfigValue returns a single current configuration value.
 	GetConfigValue(context.Context, *connect.Request[v1.GetConfigValueRequest]) (*connect.Response[v1.GetConfigValueResponse], error)
 }
 
@@ -96,7 +96,7 @@ func (c *configServiceClient) GetConfigValue(ctx context.Context, req *connect.R
 type ConfigServiceHandler interface {
 	// GetConfig returns the current configuration values.
 	GetConfig(context.Context, *connect.Request[v1.GetConfigRequest]) (*connect.Response[v1.GetConfigResponse], error)
-	// GetConfig returns a single current configuration value.
+	// GetConfigValue returns a single current configuration value.
 	GetConfigValue(context.Context, *connect.Request[v1.GetConfigValueRequest]) (*connect.Response[v1.GetConfigValueResponse], error)
 }
 

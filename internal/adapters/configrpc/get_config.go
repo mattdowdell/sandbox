@@ -12,7 +12,7 @@ import (
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
-// ...
+// GetConfig returns the current configuration values.
 func (h *Handler[T]) GetConfig(
 	ctx context.Context,
 	_ *connect.Request[configv1.GetConfigRequest],

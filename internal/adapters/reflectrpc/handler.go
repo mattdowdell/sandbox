@@ -7,12 +7,12 @@ import (
 	"connectrpc.com/grpcreflect"
 )
 
-// ...
+// Handler implements the ServerReflection RPC.
 type Handler struct {
 	services []string
 }
 
-// ...
+// New creates a new Handler.
 func New(services []string) *Handler {
 	return &Handler{
 		services: services,

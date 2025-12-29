@@ -13,7 +13,7 @@ service ConfigService {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
-  // GetConfig returns a single current configuration value.
+  // GetConfigValue returns a single current configuration value.
   rpc GetConfigValue(GetConfigValueRequest) returns (GetConfigValueResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }

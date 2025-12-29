@@ -12,7 +12,7 @@ import (
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
-// ...
+// GetConfigValue returns a single current configuration value.
 func (h *Handler[T]) GetConfigValue(
 	ctx context.Context,
 	req *connect.Request[configv1.GetConfigValueRequest],
@@ -31,7 +31,7 @@ func (h *Handler[T]) GetConfigValue(
 
 	value, ok := encoded[req.Msg.GetKey()]
 	if !ok {
-		slog.DebugContext(ctx, "requested config key was not found")
+		slog.DebugContext(ctx, "requested config key was not found", slog.String("key", req.Msg.GetKey()))
 		return nil, ErrValueNotFound
 	}
 

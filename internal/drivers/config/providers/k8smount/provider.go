@@ -1,7 +1,7 @@
 // Package k8smount contains a Koanf provider for loading configuration from Kubernetes volume
 // mounts, i.e. Secrets or ConfigMaps mounted into a Pod.
 //
-// This is most appropriate for key-value data. Using a ConfigMap as an example:
+// This is most appropriate for key-value data, such as the following example ConfigMap.
 //
 //	apiVersion: v1
 //	kind: ConfigMap

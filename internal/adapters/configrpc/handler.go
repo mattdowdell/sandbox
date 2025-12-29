@@ -6,19 +6,22 @@ import (
 	"connectrpc.com/connect"
 
 	"github.com/mattdowdell/sandbox/gen/config/v1/configv1connect"
-	"github.com/mattdowdell/sandbox/internal/drivers/config"
 )
 
 // Non-allocating compile-time check for interface implementation.
 var _ configv1connect.ConfigServiceHandler = (*Handler[struct{}])(nil)
 
+type Loader[T any] interface {
+	Load() (*T, error)
+}
+
 // Handler implements the ConfigService RPC.
 type Handler[T any] struct {
-	loader *config.Loader[T]
+	loader Loader[T]
 }
 
 // New creates a new Handler.
-func New[T any](loader *config.Loader[T]) *Handler[T] {
+func New[T any](loader Loader[T]) *Handler[T] {
 	return &Handler[T]{
 		loader: loader,
 	}
