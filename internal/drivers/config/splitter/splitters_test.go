@@ -44,6 +44,39 @@ func Test_Comma_UnmarshalText(t *testing.T) {
 	}
 }
 
+func Test_Comma_MarshalText(t *testing.T) {
+	tests := map[string]struct {
+		have splitter.Comma
+		want string
+	}{
+		"nil": {
+			have: splitter.Comma{},
+			want: "",
+		},
+		"empty": {
+			have: splitter.Comma{},
+			want: "",
+		},
+		"non-empty": {
+			have: splitter.Comma{"foo", "bar", "baz"},
+			want: "foo,bar,baz",
+		},
+	}
+
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+
+			// act
+			got, err := tt.have.MarshalText()
+
+			// assert
+			assert.Equal(t, tt.want, string(got))
+			assert.NoError(t, err)
+		})
+	}
+}
+
 func Test_Space_UnmarshalText(t *testing.T) {
 	tests := map[string]struct {
 		have string
@@ -69,6 +102,39 @@ func Test_Space_UnmarshalText(t *testing.T) {
 
 			// assert
 			assert.Equal(t, tt.want, s.Unwrap())
+			assert.NoError(t, err)
+		})
+	}
+}
+
+func Test_Space_MarshalText(t *testing.T) {
+	tests := map[string]struct {
+		have splitter.Space
+		want string
+	}{
+		"nil": {
+			have: splitter.Space{},
+			want: "",
+		},
+		"empty": {
+			have: splitter.Space{},
+			want: "",
+		},
+		"non-empty": {
+			have: splitter.Space{"foo", "bar", "baz"},
+			want: "foo bar baz",
+		},
+	}
+
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+
+			// act
+			got, err := tt.have.MarshalText()
+
+			// assert
+			assert.Equal(t, tt.want, string(got))
 			assert.NoError(t, err)
 		})
 	}

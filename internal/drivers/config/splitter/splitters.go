@@ -9,6 +9,8 @@ import (
 
 type splitter interface {
 	encoding.TextUnmarshaler
+	encoding.TextMarshaler
+
 	Unwrap() []string
 }
 
@@ -30,6 +32,11 @@ func (c *Comma) UnmarshalText(text []byte) error {
 	return nil
 }
 
+// MarshalText implements [encoding.TextMarshaler].
+func (c Comma) MarshalText() ([]byte, error) {
+	return []byte(strings.Join(c.Unwrap(), ",")), nil
+}
+
 // Unwrap returns the underlying string slice after unmarshaling.
 func (c *Comma) Unwrap() []string {
 	return []string(*c)
@@ -45,6 +52,11 @@ func (s *Space) UnmarshalText(text []byte) error {
 	}
 
 	return nil
+}
+
+// MarshalText implements [encoding.TextMarshaler].
+func (s Space) MarshalText() ([]byte, error) {
+	return []byte(strings.Join(s.Unwrap(), " ")), nil
 }
 
 // Unwrap returns the underlying string slice after unmarshaling.

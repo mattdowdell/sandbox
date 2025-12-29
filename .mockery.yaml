@@ -20,6 +20,9 @@ packages:
   github.com/mattdowdell/sandbox/internal/adapters/authnrpc:
     config:
       all: true
+  github.com/mattdowdell/sandbox/internal/adapters/configrpc:
+    config:
+      all: true
   github.com/mattdowdell/sandbox/internal/adapters/examplerpc:
     config:
       all: true
