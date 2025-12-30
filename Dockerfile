@@ -7,7 +7,7 @@
 # Build target
 # ------------
 
-FROM --platform=$BUILDPLATFORM mirror.gcr.io/golang:1.25-bookworm@sha256:09f53deea14d4019922334afe6258b7b776afc1d57952be2012f2c8c4076db05 AS build
+FROM --platform=$BUILDPLATFORM mirror.gcr.io/golang:1.25-bookworm@sha256:01762abf6fea478a3bdf5778b1453c734f1780baf1b96655d42e0ebf2fa2b73b AS build
 
 WORKDIR /go/src
 
