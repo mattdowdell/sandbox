@@ -33,6 +33,12 @@ const (
 )
 
 // Options provides the values to bootstrap configuration loading.
+//
+// This struct is intended to be populated on startup based on environment variables or CLI options.
+// Support for this is provided by the [flagoptions] package which is based on the [flag] package.
+// However, this can trivially be replaced if an alternative library is desired instead.
+//
+// [flagoptions]: https://pkg.go.dev/github.com/mattdowdell/sandbox/internal/drivers/config/flagoptions
 type Options struct {
 	// The prefix of environment variables to read configuration from. Matching environment
 	// variables have the prefix removed, are converted to lowercase and any underscores ("_") are
@@ -106,7 +112,8 @@ func Load[T any](opts *Options) (*T, error) {
 //	}
 //
 // A default-able field type can be anything supported by [defaults], or an implementation of
-// [defaults.Setter], [encoding.TextUnmarshaler], or [encoding/json.Unmarshaler].
+// [defaults.Setter], [encoding.TextUnmarshaler], or [encoding/json.Unmarshaler]. An invalid default
+// value will be skipped and will not cause an error to be returned.
 //
 // [mapstructure]: https://pkg.go.dev/github.com/go-viper/mapstructure/v2
 // [encoding.TextUnmarshaler]: https://pkg.go.dev/encoding#TextUnmarshaler
@@ -189,7 +196,7 @@ func fileParser(path string) (koanf.Parser, error) {
 		return toml.Parser(), nil
 
 	default:
-		return nil, fmt.Errorf("supported file extension for path: %q", path)
+		return nil, fmt.Errorf("unsupported file extension for path: %q", path)
 	}
 }
 
