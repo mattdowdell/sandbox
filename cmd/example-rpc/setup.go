@@ -42,7 +42,11 @@ import (
 
 func SetupApp(ctx context.Context) (*App, error) {
 	options := flagoptions.New()
-	loader := config.New[Config](options)
+
+	loader, err := config.New[Config](options)
+	if err != nil {
+		return nil, err
+	}
 
 	conf, err := loader.Load()
 	if err != nil {
