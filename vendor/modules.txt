@@ -35,8 +35,8 @@ connectrpc.com/validate
 # github.com/DATA-DOG/go-sqlmock v1.5.2
 ## explicit; go 1.15
 github.com/DATA-DOG/go-sqlmock
-# github.com/XSAM/otelsql v0.40.0
-## explicit; go 1.23.0
+# github.com/XSAM/otelsql v0.41.0
+## explicit; go 1.24.0
 github.com/XSAM/otelsql
 github.com/XSAM/otelsql/internal/semconv
 # github.com/antlr4-go/antlr/v4 v4.13.1

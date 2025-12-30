@@ -8,6 +8,35 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [0.41.0] - 2025-12-16
+
+### ⚠️ Notice ⚠️
+
+This release contains breaking changes:
+
+- `RegisterDBStatsMetrics` now returns `(metric.Registration, error)` (previously returned only `error`) so callers can `Unregister()` the callback and avoid memory leaks.
+  - If you need to unregister: `reg, err := RegisterDBStatsMetrics(...)` + `defer reg.Unregister()`.
+  - If you do not need to unregister: `_, err := RegisterDBStatsMetrics(...)`.
+- `WithAttributes` now appends attributes when specified multiple times (previously overwrote existing attributes).
+  - If you relied on overwriting: consolidate your attributes into a single `WithAttributes(...)` call.
+
+### Added
+
+- `WithTextMapPropagator` allows customization of the OTel text map propagator used by SQLCommenter. (#540)
+  This is an experimental feature and may be changed or removed in a later release.
+
+### Removed
+
+- Drop support for [Go 1.23]. (#533)
+
+### Changed
+
+- Reduce allocations and improve performance when creating spans. (#549)
+- Reduce allocations when recording metrics. (#550)
+- `RegisterDBStatsMetrics` now returns a `metric.Registration` so callbacks can be unregistered. (#580)
+- `WithAttributes` now accumulates attributes across multiple calls instead of overwriting. (#576)
+- Upgrade OTel to `v1.39.0`. (#583)
+
 ## [0.40.0] - 2025-09-08
 
 This release is the last to support [Go 1.23].
@@ -475,7 +504,8 @@ It contains instrumentation for trace and depends on OTel `v0.18.0`.
 [Go 1.24]: https://go.dev/doc/go1.24
 [Go 1.23]: https://go.dev/doc/go1.23
 
-[Unreleased]: https://github.com/XSAM/otelsql/compare/v0.40.0...HEAD
+[Unreleased]: https://github.com/XSAM/otelsql/compare/v0.41.0...HEAD
+[0.41.0]: https://github.com/XSAM/otelsql/releases/tag/v0.41.0
 [0.40.0]: https://github.com/XSAM/otelsql/releases/tag/v0.40.0
 [0.39.0]: https://github.com/XSAM/otelsql/releases/tag/v0.39.0
 [0.38.0]: https://github.com/XSAM/otelsql/releases/tag/v0.38.0

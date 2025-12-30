@@ -31,7 +31,7 @@ func SetupApp(ctx context.Context) (*App, error) {
 		return nil, err
 	}
 
-	db, err := pgsql.NewFromConfig(ctx, conf.Database)
+	db, _, err := pgsql.NewFromConfig(ctx, conf.Database)
 	if err != nil {
 		return nil, err
 	}
