@@ -47,11 +47,11 @@ $(GOLANGCI_LINT): $(BINGO_DIR)/golangci-lint.mod
 	@echo "(re)installing $(GOBIN)/golangci-lint-v2.7.2"
 	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=golangci-lint.mod -o=$(GOBIN)/golangci-lint-v2.7.2 "github.com/golangci/golangci-lint/v2/cmd/golangci-lint"
 
-KIND := $(GOBIN)/kind-v0.30.0
+KIND := $(GOBIN)/kind-v0.31.0
 $(KIND): $(BINGO_DIR)/kind.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/kind-v0.30.0"
-	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=kind.mod -o=$(GOBIN)/kind-v0.30.0 "sigs.k8s.io/kind"
+	@echo "(re)installing $(GOBIN)/kind-v0.31.0"
+	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=kind.mod -o=$(GOBIN)/kind-v0.31.0 "sigs.k8s.io/kind"
 
 KUBE_SCORE := $(GOBIN)/kube-score-v1.20.0
 $(KUBE_SCORE): $(BINGO_DIR)/kube-score.mod
