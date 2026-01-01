@@ -289,7 +289,7 @@ func Test_migrator_Migrate_Error(t *testing.T) {
 
 				return db
 			},
-			want: "failed to apply migration 2: exec error",
+			want: "failed to execute migration 2: exec error",
 		},
 		"record migration": {
 			migrations: []herd.Migration{

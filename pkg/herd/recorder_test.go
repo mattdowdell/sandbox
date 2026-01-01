@@ -41,7 +41,7 @@ func Test_newRecorder(t *testing.T) {
 	}
 }
 
-func Test_recorder_GetCurrentVersion_Success(t *testing.T) {
+func Test_recorder_CurrentVersion_Success(t *testing.T) {
 	tests := map[string]struct {
 		table string
 		db    func(*testing.T) *sql.DB
@@ -107,7 +107,7 @@ func Test_recorder_GetCurrentVersion_Success(t *testing.T) {
 			require.NoError(t, err)
 
 			// act
-			version, err := recorder.GetCurrentVersion(t.Context(), tx)
+			version, err := recorder.CurrentVersion(t.Context(), tx)
 
 			// assert
 			assert.Equal(t, tt.want, version)
@@ -116,7 +116,7 @@ func Test_recorder_GetCurrentVersion_Success(t *testing.T) {
 	}
 }
 
-func Test_recorder_GetCurrentVersion_Error(t *testing.T) {
+func Test_recorder_CurrentVersion_Error(t *testing.T) {
 	tests := map[string]struct {
 		table string
 		db    func(*testing.T) *sql.DB
@@ -177,7 +177,7 @@ func Test_recorder_GetCurrentVersion_Error(t *testing.T) {
 			require.NoError(t, err)
 
 			// act
-			version, err := recorder.GetCurrentVersion(t.Context(), tx)
+			version, err := recorder.CurrentVersion(t.Context(), tx)
 
 			// assert
 			assert.Zero(t, version)

@@ -6,6 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"time"
+
+	"go.opentelemetry.io/otel/trace"
+
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
+	"github.com/mattdowdell/sandbox/pkg/herd/internal/herdconv"
 )
 
 const (
@@ -35,6 +40,7 @@ type recorder struct {
 	tableName    string
 	codeVersion  string
 	codeRevision string
+	tracer       trace.Tracer
 }
 
 // newRecorder creates a new recorder.
@@ -49,12 +55,23 @@ func newRecorder(
 		tableName:    tableName,
 		codeVersion:  codeVersion,
 		codeRevision: codeRevision,
+		tracer:       otelx.Tracer(),
 	}
 }
 
-// GetCurrentVersion gets the current migration version, or 0 if no migrations were previously
+// TableName returns the table name used to record migrations.
+func (r *recorder) TableName() string {
+	return r.tableName
+}
+
+// CurrentVersion returns the current migration version, or 0 if no migrations were previously
 // applied.
-func (r *recorder) GetCurrentVersion(ctx context.Context, tx *sql.Tx) (int64, error) {
+func (r *recorder) CurrentVersion(ctx context.Context, tx *sql.Tx) (int64, error) {
+	ctx, span := r.tracer.Start(ctx, "Get Current Version", trace.WithAttributes(
+		herdconv.HerdTableName(r.tableName),
+	))
+	defer span.End()
+
 	exists, err := r.checkSystemExists(ctx, tx)
 	if err != nil {
 		return 0, err
@@ -76,6 +93,7 @@ func (r *recorder) GetCurrentVersion(ctx context.Context, tx *sql.Tx) (int64, er
 		return 0, fmt.Errorf("failed to scan current migration version: %w", err)
 	}
 
+	span.SetAttributes(herdconv.HerdVersionBefore(int(version)))
 	return version, nil
 }
 
@@ -123,6 +141,16 @@ func (r *recorder) RecordMigration(
 	migrationVersion int64,
 	herdVersion int64,
 ) error {
+	ctx, span := r.tracer.Start(
+		ctx,
+		fmt.Sprintf("Record Migration %d", migrationVersion),
+		trace.WithAttributes(
+			herdconv.HerdTableName(r.tableName),
+			herdconv.HerdVersionAfter(int(migrationVersion)),
+		),
+	)
+	defer span.End()
+
 	query, err := r.recordMigrationQuery()
 	if err != nil {
 		return err
