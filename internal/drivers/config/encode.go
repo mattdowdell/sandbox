@@ -17,6 +17,7 @@ const (
 	redactedValue = "********"
 )
 
+// Sentinel errors that can be returned by Encode.
 var ErrNotStruct = errors.New("non-struct found")
 
 var (

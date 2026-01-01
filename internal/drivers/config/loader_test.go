@@ -36,10 +36,11 @@ func Test_New(t *testing.T) {
 	options := &config.Options{}
 
 	// act
-	loader := config.New[TestConfig](options)
+	loader, err := config.New[TestConfig](options)
 
 	// assert
 	assert.NotNil(t, loader)
+	assert.NoError(t, err)
 }
 
 func Test_Load_FromEnv(t *testing.T) {

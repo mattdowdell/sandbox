@@ -12,24 +12,8 @@
 package config
 
 import (
-	"fmt"
-	"path/filepath"
-	"strings"
-
 	"github.com/creasty/defaults"
-	"github.com/knadh/koanf/parsers/json"
-	"github.com/knadh/koanf/parsers/toml/v2"
-	"github.com/knadh/koanf/parsers/yaml"
-	"github.com/knadh/koanf/providers/env/v2"
-	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
-
-	"github.com/mattdowdell/sandbox/internal/drivers/config/providers/k8smount"
-)
-
-// The delimiter to use for joining configuration keys.
-const (
-	delimiter = "."
 )
 
 // Options provides the values to bootstrap configuration loading.
@@ -64,21 +48,37 @@ type Options struct {
 
 // Loader provides loading of configuration values for a service into a struct.
 type Loader[T any] struct {
-	inner *koanf.Koanf
-	opts  *Options
+	inner  *koanf.Koanf
+	opts   *Options
+	env    *provider
+	files  []*provider
+	mounts []*provider
 }
 
 // New creates a new Loader instance.
-func New[T any](opts *Options) *Loader[T] {
-	return &Loader[T]{
-		inner: koanf.New(delimiter),
-		opts:  opts,
+func New[T any](opts *Options) (*Loader[T], error) {
+	files, err := fileProviders(opts.Files)
+	if err != nil {
+		return nil, err
 	}
+
+	return &Loader[T]{
+		inner:  koanf.New(delimiter),
+		opts:   opts,
+		env:    envProvider(opts.EnvPrefix),
+		files:  files,
+		mounts: mountProviders(opts.Mounts),
+	}, nil
 }
 
 // Load creates a new Loader instance and immediately calls it's Load method.
 func Load[T any](opts *Options) (*T, error) {
-	return New[T](opts).Load()
+	loader, err := New[T](opts)
+	if err != nil {
+		return nil, err
+	}
+
+	return loader.Load()
 }
 
 // Load reads configuration using the given options, using it to populate a struct.
@@ -121,16 +121,20 @@ func Load[T any](opts *Options) (*T, error) {
 // [defaults.Setter]: https://pkg.go.dev/github.com/creasty/defaults#Setter
 // [encoding/json.Unmarshaler]: https://pkg.go.dev/encoding/json#Unmarshaler
 func (l *Loader[T]) Load() (*T, error) {
-	if err := l.loadEnv(); err != nil {
+	if err := l.env.load(l.inner); err != nil {
 		return nil, err
 	}
 
-	if err := l.loadFiles(); err != nil {
-		return nil, err
+	for _, file := range l.files {
+		if err := file.load(l.inner); err != nil {
+			return nil, err
+		}
 	}
 
-	if err := l.loadMounts(); err != nil {
-		return nil, err
+	for _, mount := range l.mounts {
+		if err := mount.load(l.inner); err != nil {
+			return nil, err
+		}
 	}
 
 	conf := new(T)
@@ -144,66 +148,4 @@ func (l *Loader[T]) Load() (*T, error) {
 	}
 
 	return conf, nil
-}
-
-func (l *Loader[T]) loadEnv() error {
-	return l.inner.Load(envProvider(l.opts.EnvPrefix), nil)
-}
-
-func (l *Loader[T]) loadFiles() error {
-	for _, path := range l.opts.Files {
-		parser, err := fileParser(path)
-		if err != nil {
-			return err
-		}
-
-		if err := l.inner.Load(file.Provider(path), parser); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (l *Loader[T]) loadMounts() error {
-	for _, path := range l.opts.Mounts {
-		if err := l.inner.Load(k8smount.Provider(path, "_" /*delimiter*/), nil); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func envProvider(prefix string) *env.Env {
-	return env.Provider(delimiter, env.Opt{
-		Prefix: prefix,
-		TransformFunc: func(k, v string) (string, any) {
-			return transformKey(k, prefix), v
-		},
-	})
-}
-
-func fileParser(path string) (koanf.Parser, error) {
-	switch filepath.Ext(path) {
-	case ".json":
-		return json.Parser(), nil
-
-	case ".yaml", ".yml":
-		return yaml.Parser(), nil
-
-	case ".toml":
-		return toml.Parser(), nil
-
-	default:
-		return nil, fmt.Errorf("unsupported file extension for path: %q", path)
-	}
-}
-
-func transformKey(key, prefix string) string {
-	return strings.ReplaceAll(
-		strings.ToLower(strings.TrimPrefix(key, prefix)),
-		"_",
-		delimiter,
-	)
 }
