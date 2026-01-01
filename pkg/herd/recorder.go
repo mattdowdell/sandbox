@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
@@ -74,15 +75,22 @@ func (r *recorder) CurrentVersion(ctx context.Context, tx *sql.Tx) (int64, error
 
 	exists, err := r.checkSystemExists(ctx, tx)
 	if err != nil {
+		span.SetStatus(codes.Error, "failed to check if table exists")
+		span.RecordError(err)
+
 		return 0, err
 	}
 
 	if !exists {
+		span.SetAttributes(herdconv.HerdVersionBefore(0))
 		return 0, nil
 	}
 
 	query, err := r.getCurrentVersionQuery()
 	if err != nil {
+		span.SetStatus(codes.Error, "failed to get current version query")
+		span.RecordError(err)
+
 		return 0, err
 	}
 
@@ -90,6 +98,9 @@ func (r *recorder) CurrentVersion(ctx context.Context, tx *sql.Tx) (int64, error
 
 	var version int64
 	if err := row.Scan(&version); err != nil && !errors.Is(err, sql.ErrNoRows) {
+		span.SetStatus(codes.Error, "failed to scan current migration version")
+		span.RecordError(err)
+
 		return 0, fmt.Errorf("failed to scan current migration version: %w", err)
 	}
 
@@ -153,16 +164,28 @@ func (r *recorder) RecordMigration(
 
 	query, err := r.recordMigrationQuery()
 	if err != nil {
+		span.SetStatus(codes.Error, "failed to get record migration query")
+		span.RecordError(err)
+
 		return err
 	}
 
 	args, err := r.recordMigrationArgs(migrationVersion, herdVersion)
 	if err != nil {
+		span.SetStatus(codes.Error, "failed to get record migration args")
+		span.RecordError(err)
+
 		return err
 	}
 
-	_, err = tx.ExecContext(ctx, query, args...)
-	return err
+	if _, err = tx.ExecContext(ctx, query, args...); err != nil {
+		span.SetStatus(codes.Error, "failed to execute record migration query")
+		span.RecordError(err)
+
+		return err
+	}
+
+	return nil
 }
 
 func (r *recorder) recordMigrationQuery() (string, error) {

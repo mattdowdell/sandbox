@@ -69,7 +69,7 @@ func (h *Herd) Migrate(ctx context.Context, db *sql.DB) (*Result, error) {
 
 	systemResult, err := h.system.Migrate(ctx, db, 0 /*herdVersion*/)
 	if err != nil {
-		span.SetStatus(codes.Error, "failed to execute system migrations")
+		span.SetStatus(codes.Error, "failed to apply system migrations")
 		span.RecordError(err)
 
 		return nil, fmt.Errorf("failed to execute system migrations: %w", err)
@@ -77,7 +77,7 @@ func (h *Herd) Migrate(ctx context.Context, db *sql.DB) (*Result, error) {
 
 	userResult, err := h.user.Migrate(ctx, db, systemResult.After)
 	if err != nil {
-		span.SetStatus(codes.Error, "failed to execute user migrations")
+		span.SetStatus(codes.Error, "failed to apply user migrations")
 		span.RecordError(err)
 
 		return nil, fmt.Errorf("failed to execute user migrations: %w", err)
