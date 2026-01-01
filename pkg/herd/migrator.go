@@ -88,7 +88,7 @@ func (m *migrator) Migrate(
 		}
 	}()
 
-	before, err := m.recorder.CurrentVersion(ctx, tx)
+	before, err := m.recorder.GetCurrentVersion(ctx, tx)
 	if err != nil {
 		span.SetStatus(codes.Error, "failed to get current version")
 		span.RecordError(err)
@@ -146,6 +146,8 @@ func (m *migrator) applyMigration(
 		),
 	)
 	defer span.End()
+
+	// TODO: wrap in a method for its own span
 	if err := migration.Migrate(ctx, tx); err != nil {
 		span.SetStatus(codes.Error, "failed to execute migration")
 		span.RecordError(err)

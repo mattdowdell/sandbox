@@ -65,9 +65,9 @@ func (r *recorder) TableName() string {
 	return r.tableName
 }
 
-// CurrentVersion returns the current migration version, or 0 if no migrations were previously
+// GetCurrentVersion returns the current migration version, or 0 if no migrations were previously
 // applied.
-func (r *recorder) CurrentVersion(ctx context.Context, tx *sql.Tx) (int64, error) {
+func (r *recorder) GetCurrentVersion(ctx context.Context, tx *sql.Tx) (int64, error) {
 	ctx, span := r.tracer.Start(ctx, "Get Current Version", trace.WithAttributes(
 		herdconv.HerdTableName(r.tableName),
 	))
