@@ -36,7 +36,7 @@ func Test_New(t *testing.T) {
 	options := &config.Options{}
 
 	// act
-	loader, err := config.New[TestConfig](options)
+	loader, err := config.New(options)
 
 	// assert
 	assert.NotNil(t, loader)

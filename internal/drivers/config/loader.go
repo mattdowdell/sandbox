@@ -47,7 +47,7 @@ type Options struct {
 }
 
 // Loader provides loading of configuration values for a service into a struct.
-type Loader[T any] struct {
+type Loader struct {
 	inner  *koanf.Koanf
 	opts   *Options
 	env    *provider
@@ -56,13 +56,13 @@ type Loader[T any] struct {
 }
 
 // New creates a new Loader instance.
-func New[T any](opts *Options) (*Loader[T], error) {
+func New(opts *Options) (*Loader, error) {
 	files, err := fileProviders(opts.Files)
 	if err != nil {
 		return nil, err
 	}
 
-	return &Loader[T]{
+	return &Loader{
 		inner:  koanf.New(delimiter),
 		opts:   opts,
 		env:    envProvider(opts.EnvPrefix),
@@ -71,22 +71,28 @@ func New[T any](opts *Options) (*Loader[T], error) {
 	}, nil
 }
 
-// Load creates a new Loader instance and immediately calls it's Load method.
+// Load creates a new Loader instance and immediately calls its Load method.
 func Load[T any](opts *Options) (*T, error) {
-	loader, err := New[T](opts)
+	loader, err := New(opts)
 	if err != nil {
 		return nil, err
 	}
 
-	return loader.Load()
+	conf := new(T)
+
+	if err := loader.Load(conf); err != nil {
+		return nil, err
+	}
+
+	return conf, nil
 }
 
-// Load reads configuration using the given options, using it to populate a struct.
+// Load reads configuration, using it to populate the given struct pointer.
 //
 // Configuration is first loaded from environment variables, then files, and finally Kubernetes
 // mounts. The last loaded configuration value wins if any conflicts occur.
 //
-// The struct should contains fields with "koanf" tags identifying the configuration key to
+// The struct should contain fields with "koanf" tags identifying the configuration key to
 // assign. For example:
 //
 //	type LoggingConfig struct {
@@ -112,40 +118,37 @@ func Load[T any](opts *Options) (*T, error) {
 //	}
 //
 // A default-able field type can be anything supported by [defaults], or an implementation of
-// [defaults.Setter], [encoding.TextUnmarshaler], or [encoding/json.Unmarshaler]. An invalid default
-// value will be skipped and will not cause an error to be returned.
+// [defaults.Setter] or [encoding.TextUnmarshaler]. An invalid default value will be skipped and
+// will not cause an error to be returned.
 //
 // [mapstructure]: https://pkg.go.dev/github.com/go-viper/mapstructure/v2
 // [encoding.TextUnmarshaler]: https://pkg.go.dev/encoding#TextUnmarshaler
 // [defaults]: https://pkg.go.dev/github.com/creasty/defaults
 // [defaults.Setter]: https://pkg.go.dev/github.com/creasty/defaults#Setter
-// [encoding/json.Unmarshaler]: https://pkg.go.dev/encoding/json#Unmarshaler
-func (l *Loader[T]) Load() (*T, error) {
+func (l *Loader) Load(target any) error {
 	if err := l.env.load(l.inner); err != nil {
-		return nil, err
+		return err
 	}
 
 	for _, file := range l.files {
 		if err := file.load(l.inner); err != nil {
-			return nil, err
+			return err
 		}
 	}
 
 	for _, mount := range l.mounts {
 		if err := mount.load(l.inner); err != nil {
-			return nil, err
+			return err
 		}
 	}
 
-	conf := new(T)
-
-	if err := defaults.Set(conf); err != nil {
-		return nil, err
+	if err := defaults.Set(target); err != nil {
+		return err
 	}
 
-	if err := l.inner.Unmarshal("", conf); err != nil {
-		return nil, err
+	if err := l.inner.Unmarshal("", target); err != nil {
+		return err
 	}
 
-	return conf, nil
+	return nil
 }
