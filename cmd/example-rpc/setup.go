@@ -43,13 +43,13 @@ import (
 func SetupApp(ctx context.Context) (*App, error) {
 	options := flagoptions.New()
 
-	loader, err := config.New[Config](options)
+	loader, err := config.New(options)
 	if err != nil {
 		return nil, err
 	}
 
-	conf, err := loader.Load()
-	if err != nil {
+	conf := new(Config)
+	if err := loader.Load(conf); err != nil {
 		return nil, err
 	}
 
@@ -152,7 +152,7 @@ func initFacades(
 
 func initHandlers(
 	conf *Config,
-	loader *config.Loader[Config],
+	loader *config.Loader,
 	clock repositories.Clock,
 	uuidgen repositories.UUIDGenerator,
 	resource examplerpc.ResourceFacade,
@@ -178,7 +178,7 @@ func initHandlers(
 			grpchealth.HealthV1ServiceName,
 		}),
 		healthrpc.New(),
-		configrpc.New(loader),
+		configrpc.New[Config](loader),
 	}, nil
 }
 

@@ -17,10 +17,10 @@ type TestConfig struct {
 
 func Test_New(t *testing.T) {
 	// arrange
-	loader := mockconfigrpc.NewLoader[TestConfig](t)
+	loader := mockconfigrpc.NewLoader(t)
 
 	// act
-	handler := configrpc.New(loader)
+	handler := configrpc.New[TestConfig](loader)
 
 	// assert
 	assert.NotNil(t, handler)
@@ -28,8 +28,8 @@ func Test_New(t *testing.T) {
 
 func Test_Handler_Register(t *testing.T) {
 	// arrange
-	loader := mockconfigrpc.NewLoader[TestConfig](t)
-	handler := configrpc.New(loader)
+	loader := mockconfigrpc.NewLoader(t)
+	handler := configrpc.New[TestConfig](loader)
 	mux := http.NewServeMux()
 
 	// act

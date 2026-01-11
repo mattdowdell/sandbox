@@ -17,8 +17,9 @@ func (h *Handler[T]) GetConfigValue(
 	ctx context.Context,
 	req *connect.Request[configv1.GetConfigValueRequest],
 ) (*connect.Response[configv1.GetConfigValueResponse], error) {
-	conf, err := h.loader.Load()
-	if err != nil {
+	conf := new(T)
+
+	if err := h.loader.Load(conf); err != nil {
 		slog.ErrorContext(ctx, "failed to load configuration", slogx.Err(err))
 		return nil, rpcerrors.ErrInternal
 	}

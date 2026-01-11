@@ -11,17 +11,17 @@ import (
 // Non-allocating compile-time check for interface implementation.
 var _ configv1connect.ConfigServiceHandler = (*Handler[struct{}])(nil)
 
-type Loader[T any] interface {
-	Load() (*T, error)
+type Loader interface {
+	Load(any) error
 }
 
 // Handler implements the ConfigService RPC.
 type Handler[T any] struct {
-	loader Loader[T]
+	loader Loader
 }
 
 // New creates a new Handler.
-func New[T any](loader Loader[T]) *Handler[T] {
+func New[T any](loader Loader) *Handler[T] {
 	return &Handler[T]{
 		loader: loader,
 	}

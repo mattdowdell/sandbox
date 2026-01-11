@@ -2,10 +2,12 @@ package configrpc_test
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/mattdowdell/sandbox/gen/config/v1"
 	"github.com/mattdowdell/sandbox/internal/adapters/configrpc"
@@ -18,10 +20,22 @@ func Test_Handler_GetConfig_Success(t *testing.T) {
 	// arrange
 	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
 
-	loader := mockconfigrpc.NewLoader[TestConfig](t)
-	loader.EXPECT().Load().Return(&TestConfig{Foo: "foo"}, nil).Once()
+	loader := mockconfigrpc.NewLoader(t)
+	loader.
+		EXPECT().
+		Load(mock.AnythingOfType("*configrpc_test.TestConfig")).
+		RunAndReturn(func(target any) error {
+			tgt, ok := target.(*TestConfig)
+			if !ok {
+				return fmt.Errorf("unexpected target type: %T", target)
+			}
 
-	handler := configrpc.New(loader)
+			*tgt = TestConfig{Foo: "foo"}
+			return nil
+		}).
+		Once()
+
+	handler := configrpc.New[TestConfig](loader)
 
 	req := connect.NewRequest(&configv1.GetConfigRequest{})
 
@@ -43,10 +57,14 @@ func Test_Handler_GetConfig_LoadError(t *testing.T) {
 	// arrange
 	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
 
-	loader := mockconfigrpc.NewLoader[TestConfig](t)
-	loader.EXPECT().Load().Return(nil, errors.New("example")).Once()
+	loader := mockconfigrpc.NewLoader(t)
+	loader.
+		EXPECT().
+		Load(mock.AnythingOfType("*configrpc_test.TestConfig")).
+		Return(errors.New("example")).
+		Once()
 
-	handler := configrpc.New(loader)
+	handler := configrpc.New[TestConfig](loader)
 
 	req := connect.NewRequest(&configv1.GetConfigRequest{})
 
@@ -61,12 +79,12 @@ func Test_Handler_GetConfig_LoadError(t *testing.T) {
 func Test_Handler_GetConfig_EncodeError(t *testing.T) {
 	// arrange
 	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
-	val := true
+	val := new(bool)
 
-	loader := mockconfigrpc.NewLoader[bool](t)
-	loader.EXPECT().Load().Return(&val, nil).Once()
+	loader := mockconfigrpc.NewLoader(t)
+	loader.EXPECT().Load(val).Return(nil).Once()
 
-	handler := configrpc.New(loader)
+	handler := configrpc.New[bool](loader)
 
 	req := connect.NewRequest(&configv1.GetConfigRequest{})
 
