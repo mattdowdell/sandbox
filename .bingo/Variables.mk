@@ -83,9 +83,9 @@ $(PROTOC_GEN_GO): $(BINGO_DIR)/protoc-gen-go.mod
 	@echo "(re)installing $(GOBIN)/protoc-gen-go-v1.36.11"
 	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=protoc-gen-go.mod -o=$(GOBIN)/protoc-gen-go-v1.36.11 "google.golang.org/protobuf/cmd/protoc-gen-go"
 
-YAMLFMT := $(GOBIN)/yamlfmt-v0.20.0
+YAMLFMT := $(GOBIN)/yamlfmt-v0.21.0
 $(YAMLFMT): $(BINGO_DIR)/yamlfmt.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/yamlfmt-v0.20.0"
-	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=yamlfmt.mod -o=$(GOBIN)/yamlfmt-v0.20.0 "github.com/google/yamlfmt/cmd/yamlfmt"
+	@echo "(re)installing $(GOBIN)/yamlfmt-v0.21.0"
+	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=yamlfmt.mod -o=$(GOBIN)/yamlfmt-v0.21.0 "github.com/google/yamlfmt/cmd/yamlfmt"
 
