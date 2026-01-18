@@ -29,11 +29,11 @@ $(BUF): $(BINGO_DIR)/buf.mod
 	@echo "(re)installing $(GOBIN)/buf-v1.63.0"
 	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=buf.mod -o=$(GOBIN)/buf-v1.63.0 "github.com/bufbuild/buf/cmd/buf"
 
-CTLPTL := $(GOBIN)/ctlptl-v0.8.44
+CTLPTL := $(GOBIN)/ctlptl-v0.9.0
 $(CTLPTL): $(BINGO_DIR)/ctlptl.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/ctlptl-v0.8.44"
-	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=ctlptl.mod -o=$(GOBIN)/ctlptl-v0.8.44 "github.com/tilt-dev/ctlptl/cmd/ctlptl"
+	@echo "(re)installing $(GOBIN)/ctlptl-v0.9.0"
+	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=ctlptl.mod -o=$(GOBIN)/ctlptl-v0.9.0 "github.com/tilt-dev/ctlptl/cmd/ctlptl"
 
 GODOG := $(GOBIN)/godog-v0.15.1
 $(GODOG): $(BINGO_DIR)/godog.mod
