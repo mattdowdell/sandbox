@@ -89,7 +89,7 @@ helm_remote(
     repo_name="grafana",
     repo_url="https://grafana.github.io/helm-charts",
     # renovate: datasource=helm depName=tempo packageName=tempo registryUrl=https://grafana.github.io/helm-charts
-    version="1.24.1",
+    version="1.24.3",
 )
 
 k8s_resource(
