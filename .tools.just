@@ -8,7 +8,7 @@ buf := join(gopath, "bin", "buf-v1.63.0")
 install-buf:
     {{ if path_exists(buf) == "true" { "" } else { "bingo get buf" } }}
 
-ctlptl := join(gopath, "bin", "ctlptl-v0.8.44")
+ctlptl := join(gopath, "bin", "ctlptl-v0.9.0")
 
 [private]
 install-ctlptl:
@@ -44,7 +44,7 @@ kubeconform := join(gopath, "bin", "kubeconform-v0.7.0")
 install-kubeconform:
     {{ if path_exists(kubeconform) == "true" { "" } else { "bingo get kubeconform" } }}
 
-mockery := join(gopath, "bin", "mockery-v3.6.1")
+mockery := join(gopath, "bin", "mockery-v3.6.3")
 
 [private]
 install-mockery:
