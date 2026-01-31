@@ -54,7 +54,7 @@ runs:
       shell: bash
       if: inputs.push == 'true'
       run: |
-        cosign sign --yes ${repository}:${version}@${digest}
+        cosign sign --yes ${repository}:${version}@${digest} --verbose
       env:
         repository: ${{ inputs.repository }}
         version: ${{ inputs.version }}

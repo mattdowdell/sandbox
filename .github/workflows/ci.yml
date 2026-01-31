@@ -97,7 +97,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6.1.0
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
 
       - name: Get version
         id: version
@@ -136,7 +136,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6.1.0
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
 
       - name: Install Just
         uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff # v3.0.0
@@ -167,7 +167,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6.1.0
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
 
       - name: Install Just
         uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff # v3.0.0
@@ -329,4 +329,4 @@ jobs:
           service: example-rpc
           repository: ghcr.io/mattdowdell/sandbox/example-rpc
           version: ${{ needs.tag.outputs.long }}
-          push: ${{ github.ref_name == github.event.repository.default_branch }}
+          push: "true" # ${{ github.ref_name == github.event.repository.default_branch }}
