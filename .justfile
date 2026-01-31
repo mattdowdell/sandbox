@@ -217,7 +217,8 @@ functional-cover:
 # Delete functional test coverage artifacts.
 [group('tests')]
 functional-cover-clean:
-    rm -f .covdata/cov*
+    @# after a certain number of files, rm cannot cope, so use find instead
+    find .covdata -name 'cov*' -delete
 
 # Scan the repository for issues.
 [group('scanners')]
