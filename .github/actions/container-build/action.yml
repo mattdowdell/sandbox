@@ -35,8 +35,8 @@ runs:
         push: true
         tags: ${{ inputs.repository }}:${{ inputs.version }}
         target: runtime
-        # provenance: mode=max
-        # sbom: true
+        provenance: mode=max
+        sbom: true
       env:
         SOURCE_DATE_EPOCH: 0
 
