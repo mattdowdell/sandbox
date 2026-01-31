@@ -53,7 +53,6 @@ runs:
 
     - name: Cosign
       shell: bash
-      if: inputs.push == 'true'
       run: |
         cosign sign --yes ${repository}:${version}@${digest} --verbose
       env:
