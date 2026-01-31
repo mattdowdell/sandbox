@@ -11,10 +11,6 @@ inputs:
   version:
     description: "The version of the image, used for tagging and annotations."
     required: true
-  push:
-    description: "Whether to push the built image."
-    default: "false"
-    required: false
   trivy-version:
     description: "The version of Trivy to install."
     default: ""
@@ -35,12 +31,12 @@ runs:
           SERVICE=${{ inputs.service }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
-        load: true
-        push: ${{ inputs.push }}
+        platforms: linux/amd64, linux/arm64
+        push: true
         tags: ${{ inputs.repository }}:${{ inputs.version }}
         target: runtime
-        # TODO: provenance=max
-        # TODO: sbom=true
+        provenance: mode=max
+        sbom: true
       env:
         SOURCE_DATE_EPOCH: 0
 
@@ -55,11 +51,22 @@ runs:
     # TODO: publish to github for default branch builds
     # https://github.com/actions/starter-workflows/blob/main/code-scanning/trivy.yml
 
-    - name: Cosign
+    - name: Sign image
       shell: bash
-      if: inputs.push == 'true'
       run: |
-        cosign sign --yes ${repository}:${version}@${digest}
+        cosign sign --yes ${repository}:${version}@${digest} --verbose
+      env:
+        repository: ${{ inputs.repository }}
+        version: ${{ inputs.version }}
+        digest: ${{ steps.build.outputs.digest }}
+
+    - name: Verify signature
+      shell: bash
+      run: |
+        cosign verify \
+          --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
+          --certificate-identity="${GITHUB_SERVER_URL}/${GITHUB_WORKFLOW_REF}" \
+          ${repository}:${version}@${digest}
       env:
         repository: ${{ inputs.repository }}
         version: ${{ inputs.version }}

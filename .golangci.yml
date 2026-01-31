@@ -77,7 +77,7 @@ linters:
         - "^\\s*\\[.+?\\]:\\s+" # ignore markdown ref links
     mnd:
       ignored-functions:
-        - '^os\.OpenFile$'
+        - "^os\\.OpenFile$"
     sloglint:
       attr-only: true
       context: all
