@@ -15,6 +15,10 @@ inputs:
     description: "Whether to push the built image."
     default: "false"
     required: false
+  trivy-version:
+    description: "The version of Trivy to install."
+    default: ""
+    required: false
 
 runs:
   using: "composite"
@@ -46,6 +50,7 @@ runs:
         image-ref: ${{ inputs.repository }}:${{ inputs.version }}
         scan-type: image
         trivy-config: trivy.yaml
+        version: ${{ inputs.trivy-version }}
 
     # TODO: publish to github for default branch builds
     # https://github.com/actions/starter-workflows/blob/main/code-scanning/trivy.yml

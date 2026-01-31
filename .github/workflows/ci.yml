@@ -323,6 +323,11 @@ jobs:
       - name: Setup cosign
         uses: sigstore/cosign-installer@7e8b541eb2e61bf99390e1afd4be13a184e9ebc5 # v3.10.1
 
+      - name: Get trivy version
+        id: trivy-version
+        run: |
+          ./tools/docker-base-tag.sh Dockerfile.dev ghcr.io/aquasecurity/trivy >> $GITHUB_OUTPUT
+
       - name: Build
         uses: ./.github/actions/container-build
         with:
@@ -330,3 +335,4 @@ jobs:
           repository: ghcr.io/mattdowdell/sandbox/example-rpc
           version: ${{ needs.tag.outputs.long }}
           push: ${{ github.ref_name == github.event.repository.default_branch }}
+          trivy-version: v${{ steps.trivy-version.outputs.tag }}
