@@ -51,10 +51,24 @@ runs:
     # TODO: publish to github for default branch builds
     # https://github.com/actions/starter-workflows/blob/main/code-scanning/trivy.yml
 
-    - name: Cosign
+    - name: Sign image
       shell: bash
       run: |
         cosign sign --yes ${repository}:${version}@${digest} --verbose
+      env:
+        repository: ${{ inputs.repository }}
+        version: ${{ inputs.version }}
+        digest: ${{ steps.build.outputs.digest }}
+
+    - name: Verify signature
+      shell: bash
+      run: |
+        env
+
+        cosign verify \
+          --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
+          --certificate-identity="${{ github.server_url }}/${{ github.workflow_ref }}" \
+          ${repository}:${version}@${digest}
       env:
         repository: ${{ inputs.repository }}
         version: ${{ inputs.version }}
