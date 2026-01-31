@@ -11,10 +11,6 @@ inputs:
   version:
     description: "The version of the image, used for tagging and annotations."
     required: true
-  push:
-    description: "Whether to push the built image."
-    default: "false"
-    required: false
   trivy-version:
     description: "The version of Trivy to install."
     default: ""
@@ -35,12 +31,12 @@ runs:
           SERVICE=${{ inputs.service }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
-        load: true
-        push: ${{ inputs.push }}
+        platforms: linux/amd64
+        push: true
         tags: ${{ inputs.repository }}:${{ inputs.version }}
         target: runtime
-        # TODO: provenance=max
-        # TODO: sbom=true
+        # provenance: mode=max
+        # sbom: true
       env:
         SOURCE_DATE_EPOCH: 0
 

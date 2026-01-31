@@ -282,7 +282,6 @@ jobs:
           persist-credentials: false
 
       - name: GHCR Login
-        # if: github.ref_name == github.event.repository.default_branch
         uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
         with:
           registry: ghcr.io
@@ -293,8 +292,8 @@ jobs:
         uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
 
       - name: Setup cosign
-        # uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad # v4.0.0
-        uses: sigstore/cosign-installer@7e8b541eb2e61bf99390e1afd4be13a184e9ebc5 # v3.10.1
+        uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad # v4.0.0
+        # uses: sigstore/cosign-installer@7e8b541eb2e61bf99390e1afd4be13a184e9ebc5 # v3.10.1
 
       - name: Get trivy version
         id: trivy-version
@@ -307,5 +306,4 @@ jobs:
           service: example-rpc
           repository: ghcr.io/mattdowdell/sandbox/example-rpc
           version: ${{ needs.tag.outputs.long }}
-          push: "true" # ${{ github.ref_name == github.event.repository.default_branch }}
           trivy-version: v${{ steps.trivy-version.outputs.tag }}
