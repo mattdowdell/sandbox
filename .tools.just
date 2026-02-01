@@ -66,7 +66,7 @@ trivy := join(gopath, "bin", "trivy-v0.67.2")
 
 [private]
 install-trivy:
-    {{ if path_exists(trivy) == "true" { "" } else { "GOEXPERIMENT=jsonv2 bingo get trivy" } }}
+    {{ if path_exists(trivy) == "true" { "" } else { "bingo get trivy" } }}
 
 yamlfmt := join(gopath, "bin", "yamlfmt-v0.20.0")
 
