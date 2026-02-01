@@ -4,28 +4,24 @@ import (
 	"net/http"
 
 	"connectrpc.com/connect"
-	"connectrpc.com/grpchealth"
 	"connectrpc.com/grpcreflect"
-
-	"github.com/mattdowdell/sandbox/gen/authn/v1/authnv1connect"
-	"github.com/mattdowdell/sandbox/gen/example/v1/examplev1connect"
 )
 
-// ...
-type Handler struct{}
+// Handler implements the ServerReflection RPC.
+type Handler struct {
+	services []string
+}
 
-// ...
-func New() *Handler {
-	return &Handler{}
+// New creates a new Handler.
+func New(services []string) *Handler {
+	return &Handler{
+		services: services,
+	}
 }
 
 // Register adds the handler to the given multiplexer.
-func (*Handler) Register(mux *http.ServeMux, opts []connect.HandlerOption) {
-	reflector := grpcreflect.NewStaticReflector(
-		authnv1connect.AuthnServiceName,
-		examplev1connect.ExampleServiceName,
-		grpchealth.HealthV1ServiceName,
-	)
+func (h *Handler) Register(mux *http.ServeMux, opts []connect.HandlerOption) {
+	reflector := grpcreflect.NewStaticReflector(h.services...)
 
 	mux.Handle(grpcreflect.NewHandlerV1(reflector, opts...))
 	mux.Handle(grpcreflect.NewHandlerV1Alpha(reflector, opts...))

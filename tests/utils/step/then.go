@@ -55,6 +55,20 @@ func CheckSuccess(ctx context.Context) error {
 }
 
 // ...
+func CheckConfigValue(ctx context.Context, value string) error {
+	have, err := output.ConfigValueFromContext(ctx)
+	if err != nil {
+		return err
+	}
+
+	if have != value {
+		return fmt.Errorf("unexpected config value: want: %q, have: %q", value, have)
+	}
+
+	return nil
+}
+
+// ...
 func checkConnectErr(err error, code, msg string) error {
 	cast, err := castConnectError(err)
 	if err != nil {

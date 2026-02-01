@@ -30,14 +30,17 @@ db, err := otelsql.Open("mysql", mysqlDSN, otelsql.WithAttributes(
 if err != nil {
 	panic(err)
 }
-defer db.Close()
 
-err = otelsql.RegisterDBStatsMetrics(db, otelsql.WithAttributes(
+reg, err := otelsql.RegisterDBStatsMetrics(db, otelsql.WithAttributes(
 	semconv.DBSystemMySQL,
 ))
 if err != nil {
 	panic(err)
 }
+defer func() {
+	_ = db.Close()
+	_ = reg.Unregister()
+}()
 ```
 
 Check [Option](https://pkg.go.dev/github.com/XSAM/otelsql#Option) for more features like adding context propagation to SQL queries when enabling [`WithSQLCommenter`](https://pkg.go.dev/github.com/XSAM/otelsql#WithSQLCommenter).
@@ -138,19 +141,14 @@ This project is tested on the following systems.
 | ------- | ---------- | ------------ |
 | Ubuntu  | 1.25       | amd64        |
 | Ubuntu  | 1.24       | amd64        |
-| Ubuntu  | 1.23       | amd64        |
 | Ubuntu  | 1.25       | 386          |
 | Ubuntu  | 1.24       | 386          |
-| Ubuntu  | 1.23       | 386          |
 | MacOS   | 1.25       | amd64        |
 | MacOS   | 1.24       | amd64        |
-| MacOS   | 1.23       | amd64        |
 | Windows | 1.25       | amd64        |
 | Windows | 1.24       | amd64        |
-| Windows | 1.23       | amd64        |
 | Windows | 1.25       | 386          |
 | Windows | 1.24       | 386          |
-| Windows | 1.23       | 386          |
 
 While this project should work for other systems, no compatibility guarantees
 are made for those systems currently.

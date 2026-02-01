@@ -12,6 +12,7 @@ const (
 	idCtxKey
 	newNameCtxKey
 	authnCtxKey
+	configKeyCtxKey
 )
 
 // ...
@@ -65,4 +66,18 @@ func AuthnIntoContext(ctx context.Context, value string) context.Context {
 func AuthnFromContext(ctx context.Context) (string, bool) {
 	val, ok := ctx.Value(authnCtxKey).(string)
 	return val, ok
+}
+
+// ...
+func ConfigKeyIntoContext(ctx context.Context, value string) context.Context {
+	return context.WithValue(ctx, configKeyCtxKey, value)
+}
+
+// ...
+func ConfigKeyFromContext(ctx context.Context) (string, error) {
+	if key, ok := ctx.Value(configKeyCtxKey).(string); ok {
+		return key, nil
+	}
+
+	return "", errors.New("config key not found in context")
 }
