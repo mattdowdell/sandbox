@@ -36,8 +36,8 @@ func New(migrations []Migration, options ...Option) (*Herd, error) {
 		return nil, fmt.Errorf("failed to collect system migrations: %w", err)
 	}
 
-	systemRecorder := newRecorder(opts.nowFunc, tableNameSystem, version, revision)
-	userRecorder := newRecorder(opts.nowFunc, tableNameUser, version, revision)
+	systemRecorder := newRecorder(opts.nowFunc, TableNameSystem, version, revision)
+	userRecorder := newRecorder(opts.nowFunc, TableNameUser, version, revision)
 
 	system, err := newMigrator(systemMigrations, systemRecorder)
 	if err != nil {

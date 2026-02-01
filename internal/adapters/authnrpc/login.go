@@ -6,6 +6,7 @@ import (
 	"connectrpc.com/connect"
 
 	"github.com/mattdowdell/sandbox/gen/authn/v1"
+	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/rpcerrors"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
@@ -32,7 +33,7 @@ func (h *Handler) Login(
 	token, err := h.issuer.Issue(req.Msg.GetId(), expiresInSeconds)
 	if err != nil {
 		logger.InfoContext(ctx, "failed to issue token", slogx.Err(err))
-		return nil, ErrInternal
+		return nil, rpcerrors.ErrInternal
 	}
 
 	return connect.NewResponse(&authnv1.LoginResponse{

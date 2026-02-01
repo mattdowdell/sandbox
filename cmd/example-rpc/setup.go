@@ -12,7 +12,10 @@ import (
 	"go.opentelemetry.io/contrib/processors/baggagecopy"
 
 	"github.com/mattdowdell/sandbox/gen/authn/v1/authnv1connect"
+	"github.com/mattdowdell/sandbox/gen/config/v1/configv1connect"
+	"github.com/mattdowdell/sandbox/gen/example/v1/examplev1connect"
 	"github.com/mattdowdell/sandbox/internal/adapters/authnrpc"
+	"github.com/mattdowdell/sandbox/internal/adapters/configrpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/healthrpc"
@@ -40,8 +43,13 @@ import (
 func SetupApp(ctx context.Context) (*App, error) {
 	options := flagoptions.New()
 
-	conf, err := config.Load[Config](options)
+	loader, err := config.New(options)
 	if err != nil {
+		return nil, err
+	}
+
+	conf := new(Config)
+	if err := loader.Load(conf); err != nil {
 		return nil, err
 	}
 
@@ -63,7 +71,7 @@ func SetupApp(ctx context.Context) (*App, error) {
 		return nil, err
 	}
 
-	handlers, err := initHandlers(conf, clock, uuidgen, resource, auditEvent)
+	handlers, err := initHandlers(conf, loader, clock, uuidgen, resource, auditEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +121,7 @@ func initFacades(
 	clock repositories.Clock,
 	uuidgen repositories.UUIDGenerator,
 ) (*usecasefacades.Resource, *usecasefacades.AuditEvent, error) {
-	db, err := pgsql.NewFromConfig(ctx, conf.Database)
+	db, _, err := pgsql.NewFromConfig(ctx, conf.Database)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -144,6 +152,7 @@ func initFacades(
 
 func initHandlers(
 	conf *Config,
+	loader *config.Loader,
 	clock repositories.Clock,
 	uuidgen repositories.UUIDGenerator,
 	resource examplerpc.ResourceFacade,
@@ -162,8 +171,14 @@ func initHandlers(
 	return []rpcserver.Handler{
 		authnrpc.New(issuer, parser),
 		examplerpc.New(resource, auditEvent),
-		reflectrpc.New(),
+		reflectrpc.New([]string{
+			authnv1connect.AuthnServiceName,
+			configv1connect.ConfigServiceName,
+			examplev1connect.ExampleServiceName,
+			grpchealth.HealthV1ServiceName,
+		}),
 		healthrpc.New(),
+		configrpc.New[Config](loader),
 	}, nil
 }
 
@@ -188,6 +203,7 @@ func initHandlerOptions(conf *Config) ([]connect.HandlerOption, error) {
 		grpcreflect.ReflectV1ServiceName,
 		grpcreflect.ReflectV1AlphaServiceName,
 		authnv1connect.AuthnServiceName,
+		configv1connect.ConfigServiceName, // TODO: remove
 	))
 
 	recoverer, err := rpcserver.NewRecoverer()

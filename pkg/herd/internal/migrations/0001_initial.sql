@@ -6,7 +6,7 @@ CREATE TABLE herd_system_migrations (
 	migration_version BIGINT PRIMARY KEY,
 	migrated_at TIMESTAMPTZ (0) NOT NULL,
 	code_version TEXT NOT NULL,
-	code_revision TEXT NOT NULL,
+	code_revision TEXT NOT NULL
 );
 
 -- Create a table for recording user-defined migrations. Also include the herd_version which is the
@@ -16,5 +16,5 @@ CREATE TABLE herd_user_migrations (
 	migrated_at TIMESTAMPTZ (0) NOT NULL,
 	code_version TEXT NOT NULL,
 	code_revision TEXT NOT NULL,
-	herd_version BIGINT NOT NULL,
+	herd_version BIGINT NOT NULL
 );

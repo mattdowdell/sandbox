@@ -18,6 +18,7 @@ import (
 	"context"
 	"database/sql/driver"
 	"errors"
+	"slices"
 	"time"
 
 	"go.opentelemetry.io/otel/attribute"
@@ -29,13 +30,6 @@ import (
 	internalsemconv "github.com/XSAM/otelsql/internal/semconv"
 )
 
-// estimatedAttributesOfGettersCount is the estimated number of attributes from getter methods.
-// This value 5 is borrowed from slog which
-// performed a quantitative survey of log library use and found this value to
-// cover 95% of all use-cases (https://go.dev/blog/slog#performance).
-// This may not be accurate for metrics or traces, but it's a good starting point.
-const estimatedAttributesOfGettersCount = 5
-
 var timeNow = time.Now
 
 func recordSpanErrorDeferred(span trace.Span, opts SpanOptions, err *error) {
@@ -46,6 +40,7 @@ func recordSpanError(span trace.Span, opts SpanOptions, err error) {
 	if span == nil {
 		return
 	}
+
 	if opts.RecordError != nil && !opts.RecordError(err) {
 		return
 	}
@@ -88,7 +83,7 @@ func recordLegacyLatency(
 	instruments.legacyLatency.Record(
 		ctx,
 		float64(duration.Nanoseconds())/1e6,
-		metric.WithAttributes(attributes...),
+		metric.WithAttributeSet(attribute.NewSet(attributes...)),
 	)
 }
 
@@ -109,7 +104,7 @@ func recordDuration(
 	instruments.duration.Record(
 		ctx,
 		duration.Seconds(),
-		metric.WithAttributes(attributes...),
+		metric.WithAttributeSet(attribute.NewSet(attributes...)),
 	)
 }
 
@@ -127,36 +122,43 @@ func recordMetric(
 	return func(err error) {
 		duration := timeNow().Sub(startTime)
 
-		// number of attributes + estimated 5 from InstrumentAttributesGetter and
-		// InstrumentErrorAttributesGetter + estimated 2 from recordDuration.
+		var getterAttributes []attribute.KeyValue
+		if cfg.InstrumentAttributesGetter != nil {
+			getterAttributes = cfg.InstrumentAttributesGetter(ctx, method, query, args)
+		}
+
+		var errAttributes []attribute.KeyValue
+
+		if err != nil {
+			if cfg.InstrumentErrorAttributesGetter != nil {
+				errAttributes = cfg.InstrumentErrorAttributesGetter(err)
+			}
+		}
+
+		// number of attributes + InstrumentAttributesGetter + InstrumentErrorAttributesGetter + estimated 2 from recordDuration.
 		attributes := make(
 			[]attribute.KeyValue,
 			len(cfg.Attributes),
-			len(cfg.Attributes)+estimatedAttributesOfGettersCount+2,
+			len(cfg.Attributes)+len(getterAttributes)+len(errAttributes)+2,
 		)
 		copy(attributes, cfg.Attributes)
-
-		if cfg.InstrumentAttributesGetter != nil {
-			attributes = append(attributes, cfg.InstrumentAttributesGetter(ctx, method, query, args)...)
-		}
-		if err != nil {
-			if cfg.InstrumentErrorAttributesGetter != nil {
-				attributes = append(attributes, cfg.InstrumentErrorAttributesGetter(err)...)
-			}
-		}
+		attributes = append(attributes, getterAttributes...)
+		attributes = append(attributes, errAttributes...)
 
 		switch cfg.SemConvStabilityOptIn {
 		case internalsemconv.OTelSemConvStabilityOptInStable:
 			recordDuration(ctx, instruments, cfg, duration, attributes, method, err)
 		case internalsemconv.OTelSemConvStabilityOptInDup:
 			// Intentionally emit both legacy and new metrics for backward compatibility.
-			recordLegacyLatency(ctx, instruments, cfg, duration, attributes, method, err)
+			recordLegacyLatency(ctx, instruments, cfg, duration, slices.Clone(attributes), method, err)
 			recordDuration(ctx, instruments, cfg, duration, attributes, method, err)
 		case internalsemconv.OTelSemConvStabilityOptInNone:
 			recordLegacyLatency(ctx, instruments, cfg, duration, attributes, method, err)
 		}
 	}
 }
+
+var spanKindClientOption = trace.WithSpanKind(trace.SpanKindClient)
 
 func createSpan(
 	ctx context.Context,
@@ -166,25 +168,32 @@ func createSpan(
 	query string,
 	args []driver.NamedValue,
 ) (context.Context, trace.Span) {
-	// number of attributes + estimated 5 from AttributesGetter + estimated 2 from DBQueryTextAttributes.
-	attributes := make(
-		[]attribute.KeyValue,
-		len(cfg.Attributes),
-		len(cfg.Attributes)+estimatedAttributesOfGettersCount+2,
-	)
-	copy(attributes, cfg.Attributes)
+	spanCtx, span := cfg.Tracer.Start(ctx, cfg.SpanNameFormatter(ctx, method, query), spanKindClientOption)
+	if span.IsRecording() {
+		var dbStatementAttributes []attribute.KeyValue
+		if enableDBStatement && !cfg.SpanOptions.DisableQuery {
+			dbStatementAttributes = cfg.DBQueryTextAttributes(query)
+		}
 
-	if enableDBStatement && !cfg.SpanOptions.DisableQuery {
-		attributes = append(attributes, cfg.DBQueryTextAttributes(query)...)
-	}
-	if cfg.AttributesGetter != nil {
-		attributes = append(attributes, cfg.AttributesGetter(ctx, method, query, args)...)
+		var getterAttributes []attribute.KeyValue
+		if cfg.AttributesGetter != nil {
+			getterAttributes = cfg.AttributesGetter(ctx, method, query, args)
+		}
+
+		// Allocate attributes slice (Attributes + AttributesGetter + DBQueryTextAttributes).
+		attributes := make(
+			[]attribute.KeyValue,
+			len(cfg.Attributes),
+			len(cfg.Attributes)+len(getterAttributes)+len(dbStatementAttributes),
+		)
+		copy(attributes, cfg.Attributes)
+		attributes = append(attributes, dbStatementAttributes...)
+		attributes = append(attributes, getterAttributes...)
+
+		span.SetAttributes(attributes...)
 	}
 
-	return cfg.Tracer.Start(ctx, cfg.SpanNameFormatter(ctx, method, query),
-		trace.WithSpanKind(trace.SpanKindClient),
-		trace.WithAttributes(attributes...),
-	)
+	return spanCtx, span
 }
 
 func filterSpan(
@@ -200,11 +209,14 @@ func filterSpan(
 // Copied from stdlib database/sql package: src/database/sql/ctxutil.go.
 func namedValueToValue(named []driver.NamedValue) ([]driver.Value, error) {
 	dargs := make([]driver.Value, len(named))
+
 	for n, param := range named {
 		if len(param.Name) > 0 {
 			return nil, errors.New("sql: driver does not support the use of Named Parameters")
 		}
+
 		dargs[n] = param.Value
 	}
+
 	return dargs, nil
 }
