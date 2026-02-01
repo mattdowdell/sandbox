@@ -297,7 +297,7 @@ jobs:
       - name: Get trivy version
         id: trivy-version
         run: |
-          ./tools/docker-base-tag.sh Dockerfile.dev ghcr.io/aquasecurity/trivy >> $GITHUB_OUTPUT
+          ./tools/bingo-version.sh trivy >> $GITHUB_OUTPUT
 
       - name: Build
         uses: ./.github/actions/container-build
@@ -305,4 +305,4 @@ jobs:
           service: example-rpc
           repository: ghcr.io/mattdowdell/sandbox/example-rpc
           version: ${{ needs.tag.outputs.long }}
-          trivy-version: v${{ steps.trivy-version.outputs.tag }}
+          trivy-version: ${{ steps.trivy-version.outputs.version }}
