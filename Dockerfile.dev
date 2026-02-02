@@ -8,7 +8,6 @@
 # ------------
 
 FROM ghcr.io/gitleaks/gitleaks:v8.30.0@sha256:691af3c7c5a48b16f187ce3446d5f194838f91238f27270ed36eef6359a574d9 AS gitleaks
-FROM ghcr.io/aquasecurity/trivy:0.68.2@sha256:05d0126976bdedcd0782a0336f77832dbea1c81b9cc5e4b3a5ea5d2ec863aca7 AS trivy
 
 # -------------
 # Devenv target
@@ -42,9 +41,8 @@ RUN set -eux; \
     git config --global --add safe.directory /home/dev/ws;
 
 COPY --from=gitleaks /usr/bin/gitleaks /usr/bin/gitleaks
-COPY --from=trivy /usr/local/bin/trivy /usr/bin/trivy
 
-ARG ZIZMOR_VERSION=1.6.0
+ARG ZIZMOR_VERSION=1.16.3
 # TODO: add cache mounts?
 RUN set -eux; \
     pipx install zizmor==${ZIZMOR_VERSION};
