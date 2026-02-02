@@ -21,7 +21,7 @@ require (
 	github.com/creasty/defaults v1.8.0
 	github.com/cucumber/godog v0.15.1
 	github.com/fsnotify/fsnotify v1.9.0
-	github.com/go-jet/jet/v2 v2.14.0
+	github.com/go-jet/jet/v2 v2.14.1
 	github.com/gofrs/uuid/v5 v5.4.0
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/google/uuid v1.6.0
