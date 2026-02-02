@@ -23,11 +23,11 @@ GOHOSTARM    ?= $(shell $(GO) env GOHOSTARM)
 #	@echo "Running buf"
 #	@$(BUF) <flags/args..>
 #
-BUF := $(GOBIN)/buf-v1.63.0
+BUF := $(GOBIN)/buf-v1.64.0
 $(BUF): $(BINGO_DIR)/buf.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/buf-v1.63.0"
-	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=buf.mod -o=$(GOBIN)/buf-v1.63.0 "github.com/bufbuild/buf/cmd/buf"
+	@echo "(re)installing $(GOBIN)/buf-v1.64.0"
+	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=buf.mod -o=$(GOBIN)/buf-v1.64.0 "github.com/bufbuild/buf/cmd/buf"
 
 CTLPTL := $(GOBIN)/ctlptl-v0.9.0
 $(CTLPTL): $(BINGO_DIR)/ctlptl.mod
