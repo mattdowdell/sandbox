@@ -208,7 +208,7 @@ github.com/erikgeiser/coninput
 ## explicit; go 1.17
 github.com/fsnotify/fsnotify
 github.com/fsnotify/fsnotify/internal
-# github.com/go-jet/jet/v2 v2.14.0
+# github.com/go-jet/jet/v2 v2.14.1
 ## explicit; go 1.23.0
 github.com/go-jet/jet/v2/generator/metadata
 github.com/go-jet/jet/v2/generator/postgres
