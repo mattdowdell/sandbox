@@ -87,7 +87,7 @@ TRIVY := $(GOBIN)/trivy-v0.67.2
 $(TRIVY): $(BINGO_DIR)/trivy.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
 	@echo "(re)installing $(GOBIN)/trivy-v0.67.2"
-	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=trivy.mod -o=$(GOBIN)/trivy-v0.67.2 "github.com/aquasecurity/trivy/cmd/trivy"
+	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) GOEXPERIMENT=jsonv2 $(GO) build -mod=mod -modfile=trivy.mod -o=$(GOBIN)/trivy-v0.67.2 "github.com/aquasecurity/trivy/cmd/trivy"
 
 YAMLFMT := $(GOBIN)/yamlfmt-v0.21.0
 $(YAMLFMT): $(BINGO_DIR)/yamlfmt.mod
