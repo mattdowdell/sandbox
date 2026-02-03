@@ -5,7 +5,7 @@ import "go.opentelemetry.io/otel/attribute"
 const (
 	HerdTableNameKey     = attribute.Key("herd.table.name")
 	HerdVersionBeforeKey = attribute.Key("herd.version.before")
-	HerdVersionAfterKey  = attribute.Key("herd.version.before")
+	HerdVersionAfterKey  = attribute.Key("herd.version.after")
 )
 
 func HerdTableName(value string) attribute.KeyValue {
