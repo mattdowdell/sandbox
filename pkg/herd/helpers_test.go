@@ -25,7 +25,7 @@ func newMockDB(t *testing.T) (*sql.DB, sqlmock.Sqlmock) {
 	return db, mock
 }
 
-// ...
+// writeFile creates an empty file at the given path.
 func writeFile(t *testing.T, path string) {
 	t.Helper()
 
@@ -33,7 +33,7 @@ func writeFile(t *testing.T, path string) {
 	require.NoErrorf(t, err, "failed to create file: %s", path)
 }
 
-// ...
+// openRootFS creates a fs.FS for the given directory.
 func openRootFS(t *testing.T, dir string) fs.FS {
 	t.Helper()
 

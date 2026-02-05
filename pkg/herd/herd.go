@@ -5,6 +5,11 @@ import (
 	"database/sql"
 	"embed"
 	"fmt"
+
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
+
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
 )
 
 //go:embed internal/migrations/*.sql
@@ -17,6 +22,7 @@ var migrationFS embed.FS
 type Herd struct {
 	system *migrator
 	user   *migrator
+	tracer trace.Tracer
 }
 
 // New creates a new Herd instance with the given migrations.
@@ -52,18 +58,28 @@ func New(migrations []Migration, options ...Option) (*Herd, error) {
 	return &Herd{
 		system: system,
 		user:   user,
+		tracer: otelx.Tracer(),
 	}, nil
 }
 
 // Migrate migrates the database using the configured migrations.
 func (h *Herd) Migrate(ctx context.Context, db *sql.DB) (*Result, error) {
+	ctx, span := h.tracer.Start(ctx, "Apply Migrations")
+	defer span.End()
+
 	systemResult, err := h.system.Migrate(ctx, db, 0 /*herdVersion*/)
 	if err != nil {
+		span.SetStatus(codes.Error, "failed to apply system migrations")
+		span.RecordError(err)
+
 		return nil, fmt.Errorf("failed to execute system migrations: %w", err)
 	}
 
 	userResult, err := h.user.Migrate(ctx, db, systemResult.After)
 	if err != nil {
+		span.SetStatus(codes.Error, "failed to apply user migrations")
+		span.RecordError(err)
+
 		return nil, fmt.Errorf("failed to execute user migrations: %w", err)
 	}
 
