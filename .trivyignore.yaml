@@ -3,8 +3,8 @@
 # TODO: document ignore expectations
 
 licenses:
-  - id: Apache-2.0
-    statement: Permissive license.
+  # - id: Apache-2.0
+  #   statement: Permissive license.
 
   - id: BSD-3-Clause
     statement: Permissive license.
