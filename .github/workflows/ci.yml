@@ -172,10 +172,14 @@ jobs:
         with:
           scan-type: fs
           trivy-config: trivy.yaml
+          format: sarif
+          output: trivy-results.sarif
           version: ${{ steps.trivy-version.outputs.version }}
 
-      # TODO: publish to github for default branch builds?
-      # https://github.com/actions/starter-workflows/blob/main/code-scanning/trivy.yml
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@51f77329afa6477de8c49fc9c7046c15b9a4e79d # v3.29.5
+        with:
+          sarif_file: trivy-results.sarif
 
       - name: Run zizmor
         uses: zizmorcore/zizmor-action@135698455da5c3b3e55f73f4419e481ab68cdd95 # v0.4.1
