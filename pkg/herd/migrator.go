@@ -7,6 +7,13 @@ import (
 	"errors"
 	"fmt"
 	"slices"
+
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
+
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
+	"github.com/mattdowdell/sandbox/pkg/herd/internal/herdconv"
 )
 
 // Result contains the migration version before and after the pending migrations were applied.
@@ -24,6 +31,7 @@ type Result struct {
 type migrator struct {
 	migrations []Migration
 	recorder   *recorder
+	tracer     trace.Tracer
 }
 
 // newMigrator creates a new migrator.
@@ -46,6 +54,7 @@ func newMigrator(migrations []Migration, rec *recorder) (*migrator, error) {
 	return &migrator{
 		migrations: migrations,
 		recorder:   rec,
+		tracer:     otelx.Tracer(),
 	}, nil
 }
 
@@ -55,8 +64,16 @@ func (m *migrator) Migrate(
 	db *sql.DB,
 	herdVersion int64,
 ) (result *Result, err error) {
+	ctx, span := m.tracer.Start(ctx, migratorSpanName(m.recorder.TableName()), trace.WithAttributes(
+		migrateTypeAttr(m.recorder.TableName()),
+	))
+	defer span.End()
+
 	tx, err := db.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
+		span.SetStatus(codes.Error, "failed to begin transaction")
+		span.RecordError(err)
+
 		return nil, fmt.Errorf("failed to begin transaction: %w", err)
 	}
 
@@ -65,35 +82,40 @@ func (m *migrator) Migrate(
 	// regardless of whether Commit failed.
 	defer func() {
 		if err2 := tx.Rollback(); err2 != nil && !errors.Is(err2, sql.ErrTxDone) {
+			span.SetStatus(codes.Error, "failed to rollback transaction")
+			span.RecordError(err2)
+
 			err = errors.Join(err, fmt.Errorf("failed to rollback transaction: %w", err2))
 		}
 	}()
 
 	before, err := m.recorder.GetCurrentVersion(ctx, tx)
 	if err != nil {
+		span.SetStatus(codes.Error, "failed to get current version")
+		span.RecordError(err)
+
 		return nil, err
 	}
+
+	span.SetAttributes(herdconv.HerdVersionBefore(int(before)))
 
 	pending := slices.DeleteFunc(slices.Clone(m.migrations), func(m Migration) bool {
 		return m.Version() <= before
 	})
 
 	for _, migration := range pending {
-		if err := migration.Migrate(ctx, tx); err != nil {
-			return nil, fmt.Errorf("failed to apply migration %d: %w", migration.Version(), err)
-		}
+		if err := m.applyMigration(ctx, tx, migration, herdVersion); err != nil {
+			span.SetStatus(codes.Error, "failed to apply migration")
+			span.RecordError(err)
 
-		if err := m.recorder.RecordMigration(
-			ctx,
-			tx,
-			migration.Version(),
-			herdVersion,
-		); err != nil {
-			return nil, fmt.Errorf("failed to record migration %d: %w", migration.Version(), err)
+			return nil, err
 		}
 	}
 
 	if err := tx.Commit(); err != nil {
+		span.SetStatus(codes.Error, "failed to commit transaction")
+		span.RecordError(err)
+
 		return nil, fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
@@ -102,8 +124,96 @@ func (m *migrator) Migrate(
 		after = pending[len(pending)-1].Version()
 	}
 
+	span.SetAttributes(herdconv.HerdVersionAfter(int(after)))
+
 	return &Result{
 		Before: before,
 		After:  after,
 	}, nil
+}
+
+func (m *migrator) applyMigration(
+	ctx context.Context,
+	tx *sql.Tx,
+	migration Migration,
+	herdVersion int64,
+) error {
+	ctx, span := m.tracer.Start(
+		ctx,
+		fmt.Sprintf("Apply Migration %d", migration.Version()),
+		trace.WithAttributes(
+			migrateTypeAttr(m.recorder.TableName()),
+			herdconv.HerdVersionAfter(int(migration.Version())),
+		),
+	)
+	defer span.End()
+
+	// TODO: wrap in a method for its own span
+	if err := m.executeMigration(ctx, tx, migration); err != nil {
+		span.SetStatus(codes.Error, "failed to execute migration")
+		span.RecordError(err)
+
+		return err
+	}
+
+	if err := m.recorder.RecordMigration(
+		ctx,
+		tx,
+		migration.Version(),
+		herdVersion,
+	); err != nil {
+		span.SetStatus(codes.Error, "failed to record migration")
+		span.RecordError(err)
+
+		return fmt.Errorf("failed to record migration %d: %w", migration.Version(), err)
+	}
+
+	return nil
+}
+
+func (m *migrator) executeMigration(ctx context.Context, tx *sql.Tx, migration Migration) error {
+	ctx, span := m.tracer.Start(
+		ctx,
+		fmt.Sprintf("Execute Migration %d", migration.Version()),
+		trace.WithAttributes(
+			migrateTypeAttr(m.recorder.TableName()),
+			herdconv.HerdVersionAfter(int(migration.Version())),
+		),
+	)
+	defer span.End()
+
+	if err := migration.Migrate(ctx, tx); err != nil {
+		span.SetStatus(codes.Error, "failed to execute migration")
+		span.RecordError(err)
+
+		return fmt.Errorf("failed to execute migration %d: %w", migration.Version(), err)
+	}
+
+	return nil
+}
+
+func migratorSpanName(table string) string {
+	switch table {
+	case TableNameSystem:
+		return "Apply System Migrations"
+
+	case TableNameUser:
+		return "Apply User Migrations"
+
+	default:
+		panic("unknown table name: " + table)
+	}
+}
+
+func migrateTypeAttr(table string) attribute.KeyValue {
+	switch table {
+	case TableNameSystem:
+		return herdconv.HerdMigrationTypeSystem
+
+	case TableNameUser:
+		return herdconv.HerdMigrationTypeUser
+
+	default:
+		panic("unknown table name: " + table)
+	}
 }

@@ -122,18 +122,6 @@ func Test_recorder_GetCurrentVersion_Error(t *testing.T) {
 		db    func(*testing.T) *sql.DB
 		want  string
 	}{
-		"invalid table": {
-			table: "invalid",
-			db: func(t *testing.T) *sql.DB {
-				t.Helper()
-
-				db, mock := newMockDB(t)
-				mock.ExpectBegin()
-
-				return db
-			},
-			want: "internal error: unexpected table name: invalid",
-		},
 		"exists error": {
 			table: herd.TableNameSystem,
 			db: func(t *testing.T) *sql.DB {
@@ -247,18 +235,6 @@ func Test_recorder_RecordMigration_Error(t *testing.T) {
 		db    func(*testing.T) *sql.DB
 		want  string
 	}{
-		"invalid table": {
-			table: "invalid",
-			db: func(t *testing.T) *sql.DB {
-				t.Helper()
-
-				db, mock := newMockDB(t)
-				mock.ExpectBegin()
-
-				return db
-			},
-			want: "internal error: unexpected table name: invalid",
-		},
 		"exec error": {
 			table: herd.TableNameSystem,
 			db: func(t *testing.T) *sql.DB {
