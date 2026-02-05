@@ -69,7 +69,7 @@ func (r *recorder) TableName() string {
 // applied.
 func (r *recorder) GetCurrentVersion(ctx context.Context, tx *sql.Tx) (int64, error) {
 	ctx, span := r.tracer.Start(ctx, "Get Current Version", trace.WithAttributes(
-		herdconv.HerdTableName(r.tableName),
+		migrateTypeAttr(r.tableName),
 	))
 	defer span.End()
 
@@ -156,7 +156,7 @@ func (r *recorder) RecordMigration(
 		ctx,
 		fmt.Sprintf("Record Migration %d", migrationVersion),
 		trace.WithAttributes(
-			herdconv.HerdTableName(r.tableName),
+			migrateTypeAttr(r.tableName),
 			herdconv.HerdVersionAfter(int(migrationVersion)),
 		),
 	)

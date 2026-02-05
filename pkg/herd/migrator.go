@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"slices"
 
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 
@@ -64,7 +65,7 @@ func (m *migrator) Migrate(
 	herdVersion int64,
 ) (result *Result, err error) {
 	ctx, span := m.tracer.Start(ctx, migratorSpanName(m.recorder.TableName()), trace.WithAttributes(
-		herdconv.HerdTableName(m.recorder.TableName()),
+		migrateTypeAttr(m.recorder.TableName()),
 	))
 	defer span.End()
 
@@ -141,7 +142,7 @@ func (m *migrator) applyMigration(
 		ctx,
 		fmt.Sprintf("Apply Migration %d", migration.Version()),
 		trace.WithAttributes(
-			herdconv.HerdTableName(m.recorder.TableName()),
+			migrateTypeAttr(m.recorder.TableName()),
 			herdconv.HerdVersionAfter(int(migration.Version())),
 		),
 	)
@@ -177,6 +178,19 @@ func migratorSpanName(table string) string {
 
 	case TableNameUser:
 		return "Apply User Migrations"
+
+	default:
+		panic("unknown table name: " + table)
+	}
+}
+
+func migrateTypeAttr(table string) attribute.KeyValue {
+	switch table {
+	case TableNameSystem:
+		return herdconv.HerdMigrationTypeSystem
+
+	case TableNameUser:
+		return herdconv.HerdMigrationTypeUser
 
 	default:
 		panic("unknown table name: " + table)

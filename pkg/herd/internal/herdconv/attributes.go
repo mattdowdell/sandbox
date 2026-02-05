@@ -3,14 +3,15 @@ package herdconv
 import "go.opentelemetry.io/otel/attribute"
 
 const (
-	HerdTableNameKey     = attribute.Key("herd.table.name")
+	HerdMigrationTypeKey = attribute.Key("herd.migration.type")
 	HerdVersionBeforeKey = attribute.Key("herd.version.before")
 	HerdVersionAfterKey  = attribute.Key("herd.version.after")
 )
 
-func HerdTableName(value string) attribute.KeyValue {
-	return HerdTableNameKey.String(value)
-}
+var (
+	HerdMigrationTypeSystem = HerdMigrationTypeKey.String("system")
+	HerdMigrationTypeUser   = HerdMigrationTypeKey.String("user")
+)
 
 func HerdVersionBefore(value int) attribute.KeyValue {
 	return HerdVersionBeforeKey.Int(value)
