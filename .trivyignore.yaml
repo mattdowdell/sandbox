@@ -15,8 +15,8 @@ licenses:
   - id: ISC
     statement: Permissive license.
 
-  - id: MIT
-    statement: Permissive license.
+  # - id: MIT
+  #   statement: Permissive license.
 
   - id: PostgreSQL
     statement: Permissive license.
