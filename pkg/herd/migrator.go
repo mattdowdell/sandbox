@@ -149,11 +149,11 @@ func (m *migrator) applyMigration(
 	defer span.End()
 
 	// TODO: wrap in a method for its own span
-	if err := migration.Migrate(ctx, tx); err != nil {
+	if err := m.executeMigration(ctx, tx, migration); err != nil {
 		span.SetStatus(codes.Error, "failed to execute migration")
 		span.RecordError(err)
 
-		return fmt.Errorf("failed to execute migration %d: %w", migration.Version(), err)
+		return err
 	}
 
 	if err := m.recorder.RecordMigration(
@@ -166,6 +166,27 @@ func (m *migrator) applyMigration(
 		span.RecordError(err)
 
 		return fmt.Errorf("failed to record migration %d: %w", migration.Version(), err)
+	}
+
+	return nil
+}
+
+func (m *migrator) executeMigration(ctx context.Context, tx *sql.Tx, migration Migration) error {
+	ctx, span := m.tracer.Start(
+		ctx,
+		fmt.Sprintf("Execute Migration %d", migration.Version()),
+		trace.WithAttributes(
+			migrateTypeAttr(m.recorder.TableName()),
+			herdconv.HerdVersionAfter(int(migration.Version())),
+		),
+	)
+	defer span.End()
+
+	if err := migration.Migrate(ctx, tx); err != nil {
+		span.SetStatus(codes.Error, "failed to execute migration")
+		span.RecordError(err)
+
+		return fmt.Errorf("failed to execute migration %d: %w", migration.Version(), err)
 	}
 
 	return nil
