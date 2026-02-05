@@ -1,7 +1,7 @@
 ---
 # https://vektra.github.io/mockery/latest/configuration/
 
-dir: 'mocks/{{ trimPrefix "github.com/mattdowdell/sandbox/internal/" .SrcPackagePath | dir }}/mock{{ .SrcPackagePath | base }}'
+dir: "mocks/{{ trimPrefix \"github.com/mattdowdell/sandbox/internal/\" .SrcPackagePath | dir }}/mock{{ .SrcPackagePath | base }}"
 filename: "mocks.go"
 include-auto-generated: true
 structname: "{{ .InterfaceName }}"

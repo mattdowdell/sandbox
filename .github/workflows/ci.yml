@@ -23,14 +23,14 @@ jobs:
       pull-requests: write # for adding labels to PRs
     steps:
       - name: Checkout
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - name: Size
         id: size
-        uses: mattdowdell/pr-sizer@c5ee9ba36b7ef4b2bb4b6f016f06745e65e9567e # v0.3.1
+        uses: mattdowdell/pr-sizer@11604393fd14a158cebe567dac9ea866df917ea7 # v0.5.0
 
       - name: Outputs
         run: |
@@ -52,7 +52,7 @@ jobs:
       contents: read # for checkout
     steps:
       - name: Checkout
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
@@ -60,7 +60,7 @@ jobs:
         uses: ./.github/actions/setup-checks
 
       - name: Start database
-        uses: hoverkraft-tech/compose-action@248470ecc5ed40d8ed3d4480d8260d77179ef579 # v2.4.2
+        uses: hoverkraft-tech/compose-action@05da55b2bb8a5a759d1c4732095044bd9018c050 # v2.4.3
         with:
           compose-file: compose.yaml
           up-flags: --build --wait
@@ -79,25 +79,20 @@ jobs:
 
   lint:
     name: Lint
-    if: |
-      always() &&
-      github.event_name == 'pull_request' &&
-      (needs.checks.result == 'success' || needs.checks.result == 'skipped')
-    needs:
-      - checks
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read # for checkout
     steps:
       - name: Checkout
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
       - name: Install Go
-        uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6.1.0
+        uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
 
       - name: Get version
         id: version
@@ -119,24 +114,19 @@ jobs:
 
   unit:
     name: Unit test
-    if: |
-      always() &&
-      (needs.checks.result == 'success' || needs.checks.result == 'skipped')
-    needs:
-      - checks
     runs-on: ubuntu-latest
     permissions:
       contents: read # for checkout
     steps:
       - name: Checkout
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
       - name: Install Go
-        uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6.1.0
+        uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
 
       - name: Install Just
         uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff # v3.0.0
@@ -149,25 +139,20 @@ jobs:
 
   scan:
     name: Scan
-    if: |
-      always() &&
-      (needs.checks.result == 'success' || needs.checks.result == 'skipped')
-    needs:
-      - checks
     runs-on: ubuntu-latest
     permissions:
       contents: read # for checkout
       security-events: write # for uploading code scanning results
     steps:
       - name: Checkout
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
       - name: Install Go
-        uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6.1.0
+        uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
 
       - name: Install Just
         uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff # v3.0.0
@@ -180,20 +165,20 @@ jobs:
       - name: Get trivy version
         id: trivy-version
         run: |
-          ./tools/docker-base-tag.sh Dockerfile.dev ghcr.io/aquasecurity/trivy >> $GITHUB_OUTPUT
+          ./tools/bingo-version.sh trivy >> $GITHUB_OUTPUT
 
       - name: Run trivy
         uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
         with:
           scan-type: fs
           trivy-config: trivy.yaml
-          version: v${{ steps.trivy-version.outputs.tag }}
+          version: ${{ steps.trivy-version.outputs.version }}
 
       # TODO: publish to github for default branch builds?
       # https://github.com/actions/starter-workflows/blob/main/code-scanning/trivy.yml
 
       - name: Run zizmor
-        uses: zizmorcore/zizmor-action@e639db99335bc9038abc0e066dfcd72e23d26fb4 # v0.3.0
+        uses: zizmorcore/zizmor-action@135698455da5c3b3e55f73f4419e481ab68cdd95 # v0.4.1
         with:
           persona: pedantic
 
@@ -202,21 +187,12 @@ jobs:
 
   functional:
     name: Functional Tests
-    if: |
-      always() &&
-      (needs.lint.result == 'success' || needs.lint.result == 'skipped') &&
-      needs.unit.result == 'success' &&
-      needs.scan.result == 'success'
-    needs:
-      - lint
-      - unit
-      - scan
     runs-on: ubuntu-latest
     permissions:
       contents: read # for checkout
     steps:
       - name: Checkout
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
@@ -241,7 +217,7 @@ jobs:
             echo "Total coverage: `go tool cover -func=functional.out | tail -n 1 | awk '{print $3}'`"
 
       - name: Start
-        uses: hoverkraft-tech/compose-action@248470ecc5ed40d8ed3d4480d8260d77179ef579 # v2.4.2
+        uses: hoverkraft-tech/compose-action@05da55b2bb8a5a759d1c4732095044bd9018c050 # v2.4.3
         with:
           compose-file: compose.yaml
           up-flags: --build --wait
@@ -267,10 +243,9 @@ jobs:
 
   tag:
     name: Tag
-    if: |
-      always() &&
-      needs.functional.result == 'success'
     needs:
+      - unit
+      - scan
       - functional
     permissions:
       contents: write # for pushing tags (and checkout)
@@ -280,7 +255,7 @@ jobs:
       long: ${{ steps.tag.outputs.long }}
     steps:
       - name: Checkout
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
           persist-credentials: true
@@ -293,9 +268,6 @@ jobs:
 
   build:
     name: Build
-    if: |
-      always() &&
-      needs.tag.result == 'success'
     needs:
       - tag
     runs-on: ubuntu-latest
@@ -305,13 +277,12 @@ jobs:
       id-token: write # for keyless image signing
     steps:
       - name: Checkout
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
       - name: GHCR Login
-        if: github.ref_name == github.event.repository.default_branch
-        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -321,7 +292,12 @@ jobs:
         uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
 
       - name: Setup cosign
-        uses: sigstore/cosign-installer@7e8b541eb2e61bf99390e1afd4be13a184e9ebc5 # v3.10.1
+        uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad # v4.0.0
+
+      - name: Get trivy version
+        id: trivy-version
+        run: |
+          ./tools/bingo-version.sh trivy >> $GITHUB_OUTPUT
 
       - name: Build
         uses: ./.github/actions/container-build
@@ -329,4 +305,4 @@ jobs:
           service: example-rpc
           repository: ghcr.io/mattdowdell/sandbox/example-rpc
           version: ${{ needs.tag.outputs.long }}
-          push: ${{ github.ref_name == github.event.repository.default_branch }}
+          trivy-version: ${{ steps.trivy-version.outputs.version }}

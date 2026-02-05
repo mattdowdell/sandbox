@@ -2,13 +2,13 @@
 
 gopath := shell("go env GOPATH")
 
-buf := join(gopath, "bin", "buf-v1.62.1")
+buf := join(gopath, "bin", "buf-v1.64.0")
 
 [private]
 install-buf:
     {{ if path_exists(buf) == "true" { "" } else { "bingo get buf" } }}
 
-ctlptl := join(gopath, "bin", "ctlptl-v0.8.44")
+ctlptl := join(gopath, "bin", "ctlptl-v0.9.0")
 
 [private]
 install-ctlptl:
@@ -20,7 +20,7 @@ godog := join(gopath, "bin", "godog-v0.15.1")
 install-godog:
     {{ if path_exists(godog) == "true" { "" } else { "bingo get godog" } }}
 
-golangci-lint := join(gopath, "bin", "golangci-lint-v2.7.2")
+golangci-lint := join(gopath, "bin", "golangci-lint-v2.8.0")
 
 [private]
 install-golangci-lint:
@@ -44,7 +44,7 @@ kubeconform := join(gopath, "bin", "kubeconform-v0.7.0")
 install-kubeconform:
     {{ if path_exists(kubeconform) == "true" { "" } else { "bingo get kubeconform" } }}
 
-mockery := join(gopath, "bin", "mockery-v3.6.1")
+mockery := join(gopath, "bin", "mockery-v3.6.3")
 
 [private]
 install-mockery:
@@ -62,7 +62,13 @@ protoc-gen-go := join(gopath, "bin", "protoc-gen-go-v1.36.11")
 install-protoc-gen-go:
     {{ if path_exists(protoc-gen-go) == "true" { "" } else { "bingo get protoc-gen-go" } }}
 
-yamlfmt := join(gopath, "bin", "yamlfmt-v0.20.0")
+trivy := join(gopath, "bin", "trivy-v0.67.2")
+
+[private]
+install-trivy:
+    {{ if path_exists(trivy) == "true" { "" } else { "bingo get trivy" } }}
+
+yamlfmt := join(gopath, "bin", "yamlfmt-v0.21.0")
 
 [private]
 install-yamlfmt:
