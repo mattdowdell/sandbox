@@ -12,4 +12,7 @@ paths = [
 	'''\.cache/trivy/db/trivy\.db''',
 	# Ignore bingo go.sum files
 	'''\.bingo/\S+.sum''',
+	# Ignore test JWTs
+	'''internal\/drivers\/jwtx\/issuer_test\.go''',
+	'''internal\/drivers\/jwtx\/parser_test\.go''',
 ]

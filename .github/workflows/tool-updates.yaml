@@ -1,0 +1,85 @@
+---
+name: Tool Updates
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: Whether to run the update in dry-run mode.
+        type: boolean
+        required: false
+        default: true
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  collect:
+    name: Collect
+    permissions:
+      contents: read
+    runs-on: "ubuntu-latest"
+    outputs:
+      names: ${{ steps.collect.outputs.names }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install Go
+        uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
+        with:
+          go-version-file: "go.mod"
+
+      - name: Install bingo
+        uses: mattdowdell/go-installer@7af1f9ff5af1447fd122d6b144ddce2562b76e09 # v0.3.0
+        with:
+          package: github.com/bwplotka/bingo
+
+      - name: Collect
+        id: collect
+        run: |
+          echo "names=`bingo list | \
+            tail -n+3 | \
+            awk '{print $1}' | \
+            jq -ncR '[inputs]'`" >> "$GITHUB_OUTPUT"
+
+  update:
+    name: Update
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    needs: collect
+    strategy:
+      matrix:
+        name: ${{ fromJSON(needs.collect.outputs.names) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Update
+        id: update
+        uses: ./.github/actions/bingo-update
+        with:
+          name: ${{ matrix.name }}
+          dry-run: ${{ inputs.dry-run }}
+
+      - name: Output
+        run: |
+          echo name=${NAME}
+          echo updated=${UPDATED}
+          echo current=${CURRENT}
+          echo latest=${LATEST}
+        env:
+          NAME: ${{ matrix.name }}
+          UPDATED: ${{ steps.update.outputs.updated }}
+          CURRENT: ${{ steps.update.outputs.current }}
+          LATEST: ${{ steps.update.outputs.latest }}

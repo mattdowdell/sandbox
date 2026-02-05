@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package authn.v1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/mattdowdell/sandbox/gen/authn/v1;authnv1";
+
+// LoginRequest is used to obtain a token for use as authentication in subsequent requests.
+message LoginRequest {
+  // The identity to login with.
+  string id = 1 [(buf.validate.field).required = true];
+
+  // The secret for the given identity.
+  string secret = 2 [(buf.validate.field).required = true];
+}
+
+// LoginResponse is returned for successful Login requests. It is based on the OAuth2 access token
+// response.
+message LoginResponse {
+  // The token to use for authentication in subsequent requests.
+  string access_token = 1 [(buf.validate.field).required = true];
+
+  // The type of token.
+  string token_type = 2 [(buf.validate.field).required = true];
+
+  // The number of seconds until the token expires.
+  uint32 expires_in = 3 [(buf.validate.field).uint32.gt = 0];
+}
+
+// AuthenticationRequest is used to validate a token.
+message AuthenticateRequest {
+  // The token to use for authentication.
+  string token = 1 [(buf.validate.field).required = true];
+}
+
+// AuthenticateResponse is returned for successful Authenticate requests.
+message AuthenticateResponse {
+  // The `sub` claim from the token.
+  string subject = 1 [(buf.validate.field).required = true];
+}

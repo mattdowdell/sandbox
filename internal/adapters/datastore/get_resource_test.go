@@ -17,7 +17,7 @@ const (
 	getResourceSQL = `SELECT resources.id AS "resources.id", resources.name AS "resources.name", ` +
 		`resources.created_at AS "resources.created_at", ` +
 		`resources.updated_at AS "resources.updated_at" FROM public.resources ` +
-		`WHERE resources.id = $1;`
+		`WHERE resources.id = $1::uuid;`
 )
 
 var getResourceColumns = []string{

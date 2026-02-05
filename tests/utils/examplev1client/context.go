@@ -3,8 +3,6 @@ package examplev1client
 import (
 	"context"
 	"errors"
-
-	"github.com/cucumber/godog"
 )
 
 type ctxKey int
@@ -56,15 +54,4 @@ func RunCleanups(ctx context.Context) error {
 	}
 
 	return errors.Join(errs...)
-}
-
-// ...
-func ScenarioIntoContext(ctx context.Context, scen *godog.Scenario) context.Context {
-	return context.WithValue(ctx, scenarioCtxKey, scen.Name)
-}
-
-// ...
-func ScenarioFromContext(ctx context.Context) (string, bool) {
-	name, ok := ctx.Value(scenarioCtxKey).(string)
-	return name, ok
 }

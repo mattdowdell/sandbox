@@ -57,6 +57,24 @@ dev-down:
 [group('development environment')]
 dev-restart: dev-down dev-up
 
+# start the development environment.
+[group('development environment')]
+tilt-up:
+    tilt up
+
+# Stop the development environment.
+[group('development environment')]
+tilt-down:
+    tilt down
+
+[private]
+_kind-up: install-kind install-ctlptl
+    {{ ctlptl }} apply --filename ".ctlptl-config.yaml"
+
+[private]
+_kind-down: install-kind install-ctlptl
+    {{ ctlptl }} delete --filename ".ctlptl-config.yaml"
+
 # Run all automated code modifications.
 checks: tidy vendor gen fmt
 
@@ -110,7 +128,7 @@ fmt-yaml: install-yamlfmt
 
 # Run all code generators.
 [group('generators')]
-gen: gen-buf gen-go gen-just
+gen: gen-buf gen-go gen-tools
 
 # Run the Protobuf generator.
 [group('generators')]
@@ -119,7 +137,7 @@ gen-buf: install-buf install-protoc-gen-connect-go install-protoc-gen-go
 
 # Run the Go generators.
 [group('generators')]
-gen-go: gen-go-jet gen-go-mockery gen-go-wire
+gen-go: gen-go-jet gen-go-mockery
 
 # Run the Go jet generator
 [group('generators')]
@@ -137,15 +155,11 @@ gen-go-mockery: install-mockery
     rm -rf mocks/
     {{ mockery }}
 
-# Run the Go wire generator.
+# Run the tools generator.
 [group('generators')]
-gen-go-wire: install-wire
-    {{ wire }} gen ./cmd/...
-
-# Run the justfile generator.
-[group('generators')]
-gen-just:
+gen-tools:
     ./tools/regen-tools.sh > .tools.just
+    ./tools/regen-buf-gen.sh > buf.gen.yaml
 
 # Check for uncommitted changes.
 [private]
@@ -203,7 +217,8 @@ functional-cover:
 # Delete functional test coverage artifacts.
 [group('tests')]
 functional-cover-clean:
-    rm -f .covdata/cov*
+    @# after a certain number of files, rm cannot cope, so use find instead
+    find .covdata -name 'cov*' -delete
 
 # Scan the repository for issues.
 [group('scanners')]
@@ -216,8 +231,8 @@ scan-gitleaks:
 
 # Scan the repository for issues using Trivy.
 [group('scanners')]
-scan-trivy:
-    trivy fs .
+scan-trivy: install-trivy
+    {{ trivy }} fs .
 
 # Scan actions and workflows using Zizmor.
 [group('scanners')]
@@ -245,6 +260,7 @@ build:
 db-exec:
     PGPASSWORD={{ db_pass }} psql \
         --host {{ db_host }} \
+        --port {{ db_port }} \
         --username {{ db_user }}
 
 # Insert sample data into the database.
@@ -252,6 +268,7 @@ db-exec:
 db-seed:
     PGPASSWORD={{ db_pass }} psql \
         --host {{ db_host }} \
+        --port {{ db_port }} \
         --username {{ db_user }} \
         --echo-all \
         --file ./tools/seed.sql
@@ -285,8 +302,8 @@ container-scan: container-scan-rpc
 container-scan-rpc: (_container-scan "example-rpc")
 
 [private]
-_container-scan service:
-    trivy image \
+_container-scan service: install-trivy
+    {{ trivy }} image \
         --config trivy.yaml \
         --docker-host unix://{{ env('HOME') }}/.colima/default/docker.sock \
         {{ service }}:local

@@ -1,20 +1,13 @@
 package examplerpc
 
 import (
-	"errors"
-
 	"connectrpc.com/connect"
+
+	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/rpcerrors"
 )
 
-// ...
+// Common errors to be returned by handler methods.
 var (
-	ErrResourceNotFound      = newError(connect.CodeNotFound, "resource does not exist")
-	ErrResourceAlreadyExists = newError(connect.CodeAlreadyExists, "resource name already in use")
-	ErrInternal              = newError(connect.CodeInternal, "internal error")
-	ErrUnimplemented         = newError(connect.CodeUnimplemented, "unimplemented")
+	ErrResourceNotFound      = rpcerrors.New(connect.CodeNotFound, "resource does not exist")
+	ErrResourceAlreadyExists = rpcerrors.New(connect.CodeAlreadyExists, "resource name already in use")
 )
-
-// ...
-func newError(code connect.Code, msg string) *connect.Error {
-	return connect.NewError(code, errors.New(msg))
-}

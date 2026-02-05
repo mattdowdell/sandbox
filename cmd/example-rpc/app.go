@@ -7,7 +7,9 @@ import (
 
 	"go.opentelemetry.io/contrib/instrumentation/runtime"
 
-	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx/logx"
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx/metricx"
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx/tracex"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
@@ -20,25 +22,25 @@ type AppConfig struct {
 
 // ...
 type App struct {
-	conf            Config
+	conf            *Config
 	shutdownTimeout time.Duration
 	logger          *slog.Logger
 	server          *rpcserver.Server
-	tpShutdown      otelx.TracerProviderShutdown
-	mpShutdown      otelx.MeterProviderShutdown
-	lpShutdown      otelx.LoggerProviderShutdown
+	tpShutdown      tracex.ProviderShutdown
+	mpShutdown      metricx.ProviderShutdown
+	lpShutdown      logx.ProviderShutdown
 }
 
 // ...
 //
 //nolint:gocritic // config is large(ish), but this is called once
 func NewApp(
-	conf Config,
+	conf *Config,
 	logger *slog.Logger,
 	server *rpcserver.Server,
-	tpShutdown otelx.TracerProviderShutdown,
-	mpShutdown otelx.MeterProviderShutdown,
-	lpShutdown otelx.LoggerProviderShutdown,
+	tpShutdown tracex.ProviderShutdown,
+	mpShutdown metricx.ProviderShutdown,
+	lpShutdown logx.ProviderShutdown,
 ) *App {
 	return &App{
 		conf:            conf,

@@ -1,0 +1,79 @@
+---
+name: Bingo Update
+
+inputs:
+  name:
+    description: The name of the tool to check for updates.
+    required: true
+  dry-run:
+    description: Whether to run the update in dry-run mode.
+    required: true
+
+outputs:
+  current:
+    description: "The current version for the tool."
+    value: ${{ steps.package.outputs.version }}
+  updated:
+    description: "Whether the version was updated."
+    value: ${{ steps.updated.outputs.updated }}
+  latest:
+    description: "The latest available version for the tool."
+    value: ${{ steps.updated.outputs.version }}
+
+runs:
+  using: composite
+  steps:
+    - name: Install Go
+      uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
+      with:
+        go-version-file: "go.mod"
+
+    - name: Install bingo
+      uses: mattdowdell/go-installer@7af1f9ff5af1447fd122d6b144ddce2562b76e09 # v0.3.0
+      with:
+        package: github.com/bwplotka/bingo
+
+    - name: Get package
+      id: package
+      shell: bash
+      run: |
+        echo "url=`bingo list | \
+          tail -n+3 | \
+          grep "^${NAME}\b" | \
+          awk '{print $3}' | \
+          cut -d@ -f1`" >> "$GITHUB_OUTPUT"
+        echo "version=`bingo list | \
+          tail -n+3 | \
+          grep "^${NAME}\b" | \
+          awk '{print $3}' | \
+          cut -d@ -f2`" >> "$GITHUB_OUTPUT"
+      env:
+        NAME: ${{ inputs.name }}
+
+    - name: Get update
+      shell: bash
+      run: bingo get ${PACKAGE}@latest
+      env:
+        PACKAGE: ${{ steps.package.outputs.url }}
+
+    - name: Check for update
+      id: updated
+      shell: bash
+      run: |
+        # make sure new files are included in the diff
+        git add .
+
+        if git diff HEAD --quiet -- .
+        then
+          echo "updated=false" >> "$GITHUB_OUTPUT"
+        else
+          echo "updated=true" >> "$GITHUB_OUTPUT"
+        fi
+
+        echo "version=`bingo list | \
+          tail -n+3 | \
+          grep "^${NAME}\b" | \
+          awk '{print $3}' | \
+          cut -d@ -f2`" >> "$GITHUB_OUTPUT"
+      env:
+        NAME: ${{ inputs.name }}

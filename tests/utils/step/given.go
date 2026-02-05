@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/mattdowdell/sandbox/tests/utils/authnv1client"
 	"github.com/mattdowdell/sandbox/tests/utils/examplev1client"
 	"github.com/mattdowdell/sandbox/tests/utils/input"
 )
@@ -100,9 +101,33 @@ func NoAuthentication(ctx context.Context) context.Context {
 }
 
 // ...
-func ValidAuthentication(ctx context.Context) context.Context {
-	// TODO: get a real JWT
-	return input.AuthnIntoContext(ctx, "Bearer an.example.jwt")
+func ValidAuthentication(ctx context.Context) (context.Context, error) {
+	client, err := authnv1client.FromContext(ctx)
+	if err != nil {
+		return ctx, err
+	}
+
+	token, err := client.Login(ctx, "username", "password")
+	if err != nil {
+		return ctx, err
+	}
+
+	return input.AuthnIntoContext(ctx, "Bearer "+token), nil
+}
+
+// ...
+func NonExistingConfigKey(ctx context.Context) (context.Context, error) {
+	return input.ConfigKeyIntoContext(ctx, "does_not_exist"), nil
+}
+
+// ...
+func EmptyConfigKey(ctx context.Context) (context.Context, error) {
+	return input.ConfigKeyIntoContext(ctx, ""), nil
+}
+
+// ...
+func ExistingConfigKey(ctx context.Context, key string) (context.Context, error) {
+	return input.ConfigKeyIntoContext(ctx, key), nil
 }
 
 // printableASCII returns a set of printable ASCII characters for use with RandomString.

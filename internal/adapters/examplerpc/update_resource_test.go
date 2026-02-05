@@ -8,7 +8,6 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/gofrs/uuid/v5"
-	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -18,6 +17,7 @@ import (
 	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 	"github.com/mattdowdell/sandbox/mocks/adapters/mockexamplerpc"
+	"github.com/mattdowdell/sandbox/pkg/slogt"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
@@ -104,30 +104,26 @@ func Test_Handler_UpdateResource_InvalidID(t *testing.T) {
 }
 
 func Test_Handler_UpdateResource_UsecaseError(t *testing.T) {
-	testCases := []struct {
-		name string
+	tests := map[string]struct {
 		have error
 		want string
 	}{
-		{
-			name: "not found",
+		"not found": {
 			have: domain.ErrNotFound,
 			want: "not_found: resource does not exist",
 		},
-		{
-			name: "already exists",
+		"already exists": {
 			have: domain.ErrAlreadyExists,
 			want: "already_exists: resource name already in use",
 		},
-		{
-			name: "internal",
+		"internal": {
 			have: domain.ErrInternal,
 			want: "internal: internal error",
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			// arrange
 			ctx := slogx.IntoContext(t.Context(), slogt.New(t))
 			id := uuid.Must(uuid.NewV7())
@@ -140,7 +136,7 @@ func Test_Handler_UpdateResource_UsecaseError(t *testing.T) {
 					mock.AnythingOfType("*slog.Logger"),
 					mock.AnythingOfType("*entities.Resource"),
 				).
-				Return(nil, tc.have).
+				Return(nil, tt.have).
 				Once()
 
 			handler := examplerpc.New(
@@ -160,7 +156,7 @@ func Test_Handler_UpdateResource_UsecaseError(t *testing.T) {
 
 			// assert
 			assert.Nil(t, resp)
-			assert.EqualError(t, err, tc.want)
+			assert.EqualError(t, err, tt.want)
 		})
 	}
 }

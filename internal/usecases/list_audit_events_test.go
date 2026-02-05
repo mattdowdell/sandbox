@@ -5,13 +5,13 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 	"github.com/mattdowdell/sandbox/internal/usecases"
 	"github.com/mattdowdell/sandbox/mocks/domain/mockrepositories"
+	"github.com/mattdowdell/sandbox/pkg/slogt"
 )
 
 func Test_NewListAuditEvents(t *testing.T) {

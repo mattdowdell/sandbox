@@ -5,6 +5,10 @@ exclude:
   - vendor
 
 formatter:
+  eof_newline: true
+  force_quote_style: double
   include_document_start: true
-  retain_line_breaks: true
+  line_ending: lf
+  retain_line_breaks_single: true
   trim_trailing_whitespace: true
+

@@ -1,0 +1,59 @@
+package authn_test
+
+import (
+	"context"
+	"log/slog"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/mattdowdell/sandbox/internal/drivers/jwtx"
+	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/authn"
+	"github.com/mattdowdell/sandbox/pkg/slogx"
+)
+
+func Test_NewExtractor(t *testing.T) {
+	// arrange
+
+	// act
+	extractor := authn.NewExtractor()
+
+	// assert
+	assert.NotNil(t, extractor)
+}
+
+func Test_Extractor_Extract(t *testing.T) {
+	tests := map[string]struct {
+		have func(context.Context) context.Context
+		want []slog.Attr
+	}{
+		"present": {
+			have: func(ctx context.Context) context.Context {
+				return jwtx.SubjectIntoContext(ctx, "example")
+			},
+			want: []slog.Attr{
+				slogx.Subject("example"),
+			},
+		},
+		"not present": {
+			have: func(ctx context.Context) context.Context {
+				return ctx
+			},
+			want: nil,
+		},
+	}
+
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			extractor := authn.NewExtractor()
+			ctx := tt.have(t.Context())
+
+			// act
+			got := extractor.Extract(ctx)
+
+			// assert
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
