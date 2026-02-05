@@ -275,6 +275,7 @@ jobs:
       contents: read # for checkout
       packages: write # for container push
       id-token: write # for keyless image signing
+      security-events: write # for uploading code scanning results
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
