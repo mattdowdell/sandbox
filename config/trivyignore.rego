@@ -15,10 +15,10 @@ ignore {
     input.Name == "GPL-2.0-or-later"
 }
 
-# ignore {
-#     input.PkgName == "netbase"
-#     input.Name == "GPL-2.0-only"
-# }
+ignore {
+    input.PkgName == "netbase"
+    input.Name == "GPL-2.0-only"
+}
 
 ignore {
     input.PkgName == "tzdata"
