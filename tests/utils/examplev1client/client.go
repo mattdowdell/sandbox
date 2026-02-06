@@ -87,6 +87,21 @@ func (c *Client) GetResource(ctx context.Context, id string) (*examplev1.Resourc
 }
 
 // ...
+func (c *Client) ListResources(ctx context.Context, limit int32) ([]*examplev1.Resource, string, error) {
+	resp, err := c.inner.ListResources(
+		ctx,
+		connect.NewRequest(&examplev1.ListResourcesRequest{
+			Limit: limit,
+		}),
+	)
+	if err != nil {
+		return nil, "", err
+	}
+
+	return resp.Msg.GetItems(), resp.Msg.GetNext(), nil
+}
+
+// ...
 func (c *Client) UpdateResource(
 	ctx context.Context,
 	id string,

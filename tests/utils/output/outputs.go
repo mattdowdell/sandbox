@@ -12,6 +12,8 @@ type ctxKey int
 const (
 	emptyCtxKey ctxKey = iota + 1
 	resourceCtxKey
+	resourcesCtxKey
+	nextCtxKey
 	errCtxKey
 	configValueCtxKey
 )
@@ -41,7 +43,35 @@ func ResourceFromContext(ctx context.Context) (*examplev1.Resource, error) {
 		return r, nil
 	}
 
-	return nil, errors.New("empty not found in context")
+	return nil, errors.New("resource not found in context")
+}
+
+// ...
+func ResourcesIntoContext(ctx context.Context, r []*examplev1.Resource) context.Context {
+	return context.WithValue(ctx, resourcesCtxKey, r)
+}
+
+// ...
+func ResourcesFromContext(ctx context.Context) ([]*examplev1.Resource, error) {
+	if r, ok := ctx.Value(resourcesCtxKey).([]*examplev1.Resource); ok {
+		return r, nil
+	}
+
+	return nil, errors.New("resources not found in context")
+}
+
+// ...
+func NextIntoContext(ctx context.Context, n string) context.Context {
+	return context.WithValue(ctx, nextCtxKey, n)
+}
+
+// ...
+func NextFromContext(ctx context.Context) (string, error) {
+	if n, ok := ctx.Value(nextCtxKey).(string); ok {
+		return n, nil
+	}
+
+	return "", errors.New("next not found in context")
 }
 
 // ...
@@ -55,7 +85,7 @@ func ErrFromContext(ctx context.Context) (have, err error) {
 		return have, nil
 	}
 
-	return nil, errors.New("empty not found in context")
+	return nil, errors.New("err not found in context")
 }
 
 // ...

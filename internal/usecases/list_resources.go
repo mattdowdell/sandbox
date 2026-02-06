@@ -25,12 +25,13 @@ func (u *ListResources) Execute(
 	ctx context.Context,
 	logger *slog.Logger,
 	store repositories.Resource,
-) ([]*entities.Resource, error) {
-	resources, err := store.ListResources(ctx)
+	pager repositories.Pager,
+) (*repositories.Paged[*entities.Resource], error) {
+	paged, err := store.ListResources(ctx, pager)
 	if err != nil {
 		logger.ErrorContext(ctx, "failed to list resources", slogx.Err(err))
 		return nil, domain.ErrInternal
 	}
 
-	return resources, nil
+	return paged, nil
 }

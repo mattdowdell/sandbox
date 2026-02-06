@@ -28,7 +28,7 @@ type Resource interface {
 	//
 	// Any failure shall cause ErrInternal to be returned. This error must be wrapped with
 	// additional context to enable debugging.
-	ListResources(context.Context) ([]*entities.Resource, error)
+	ListResources(context.Context, Pager) (*Paged[*entities.Resource], error)
 
 	// UpdateResource updates a resource and returns the latest version. Only updates to the Name
 	// and UpdatedAt fields are permitted.

@@ -91,6 +91,16 @@ func ExistingID(ctx context.Context) (context.Context, error) {
 }
 
 // ...
+func ExistingResources(ctx context.Context, count int) (context.Context, error) {
+	return ctx, nil // TODO: implement
+}
+
+// ...
+func Limit(ctx context.Context, value int32) context.Context {
+	return input.LimitIntoContext(ctx, value)
+}
+
+// ...
 func InvalidAuthentication(ctx context.Context) context.Context {
 	return input.AuthnIntoContext(ctx, "Basic invalid")
 }

@@ -10,6 +10,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
+	"github.com/mattdowdell/sandbox/internal/domain/repositories"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -252,27 +253,27 @@ func (_c *ResourceFacade_Get_Call) RunAndReturn(run func(context1 context.Contex
 }
 
 // List provides a mock function for the type ResourceFacade
-func (_mock *ResourceFacade) List(context1 context.Context, logger *slog.Logger) ([]*entities.Resource, error) {
-	ret := _mock.Called(context1, logger)
+func (_mock *ResourceFacade) List(context1 context.Context, logger *slog.Logger, pager repositories.Pager) (*repositories.Paged[*entities.Resource], error) {
+	ret := _mock.Called(context1, logger, pager)
 
 	if len(ret) == 0 {
 		panic("no return value specified for List")
 	}
 
-	var r0 []*entities.Resource
+	var r0 *repositories.Paged[*entities.Resource]
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *slog.Logger) ([]*entities.Resource, error)); ok {
-		return returnFunc(context1, logger)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *slog.Logger, repositories.Pager) (*repositories.Paged[*entities.Resource], error)); ok {
+		return returnFunc(context1, logger, pager)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *slog.Logger) []*entities.Resource); ok {
-		r0 = returnFunc(context1, logger)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *slog.Logger, repositories.Pager) *repositories.Paged[*entities.Resource]); ok {
+		r0 = returnFunc(context1, logger, pager)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*entities.Resource)
+			r0 = ret.Get(0).(*repositories.Paged[*entities.Resource])
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *slog.Logger) error); ok {
-		r1 = returnFunc(context1, logger)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *slog.Logger, repositories.Pager) error); ok {
+		r1 = returnFunc(context1, logger, pager)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -287,11 +288,12 @@ type ResourceFacade_List_Call struct {
 // List is a helper method to define mock.On call
 //   - context1 context.Context
 //   - logger *slog.Logger
-func (_e *ResourceFacade_Expecter) List(context1 interface{}, logger interface{}) *ResourceFacade_List_Call {
-	return &ResourceFacade_List_Call{Call: _e.mock.On("List", context1, logger)}
+//   - pager repositories.Pager
+func (_e *ResourceFacade_Expecter) List(context1 interface{}, logger interface{}, pager interface{}) *ResourceFacade_List_Call {
+	return &ResourceFacade_List_Call{Call: _e.mock.On("List", context1, logger, pager)}
 }
 
-func (_c *ResourceFacade_List_Call) Run(run func(context1 context.Context, logger *slog.Logger)) *ResourceFacade_List_Call {
+func (_c *ResourceFacade_List_Call) Run(run func(context1 context.Context, logger *slog.Logger, pager repositories.Pager)) *ResourceFacade_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -301,20 +303,25 @@ func (_c *ResourceFacade_List_Call) Run(run func(context1 context.Context, logge
 		if args[1] != nil {
 			arg1 = args[1].(*slog.Logger)
 		}
+		var arg2 repositories.Pager
+		if args[2] != nil {
+			arg2 = args[2].(repositories.Pager)
+		}
 		run(
 			arg0,
 			arg1,
+			arg2,
 		)
 	})
 	return _c
 }
 
-func (_c *ResourceFacade_List_Call) Return(resources []*entities.Resource, err error) *ResourceFacade_List_Call {
-	_c.Call.Return(resources, err)
+func (_c *ResourceFacade_List_Call) Return(paged *repositories.Paged[*entities.Resource], err error) *ResourceFacade_List_Call {
+	_c.Call.Return(paged, err)
 	return _c
 }
 
-func (_c *ResourceFacade_List_Call) RunAndReturn(run func(context1 context.Context, logger *slog.Logger) ([]*entities.Resource, error)) *ResourceFacade_List_Call {
+func (_c *ResourceFacade_List_Call) RunAndReturn(run func(context1 context.Context, logger *slog.Logger, pager repositories.Pager) (*repositories.Paged[*entities.Resource], error)) *ResourceFacade_List_Call {
 	_c.Call.Return(run)
 	return _c
 }

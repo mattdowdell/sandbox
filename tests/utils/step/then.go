@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"slices"
 
 	"connectrpc.com/connect"
 
@@ -47,6 +48,27 @@ func CheckResource(ctx context.Context) error {
 	}
 
 	return errors.Join(errs...)
+}
+
+// ...
+func CheckResources(ctx context.Context, count int) error {
+	resources, err := output.ResourcesFromContext(ctx)
+	if err != nil {
+		return err
+	}
+
+	if len(resources) != count {
+		names := make([]string, 0, len(resources))
+		for _, resource := range resources {
+			names = append(names, resource.GetName())
+		}
+
+		slices.Sort(names)
+
+		return fmt.Errorf("expected %d resources, found: %d (%s)", count, len(resources), strings.Join(names, ", "))
+	}
+
+	return nil
 }
 
 // ...

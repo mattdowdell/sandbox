@@ -56,6 +56,11 @@ func (u *CreateResource) Execute(
 		return nil, domain.ErrInternal
 	}
 
-	logger.InfoContext(ctx, "created resource")
+	logger.InfoContext(
+		ctx,
+		"created resource",
+		slog.String("id", id.String()),
+		slog.String("name", resource.Name),
+	)
 	return resource, nil
 }
