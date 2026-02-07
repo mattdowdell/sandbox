@@ -29,13 +29,12 @@ func FromContext(ctx context.Context) (*Client, error) {
 }
 
 // ...
-func AppendCleanup(ctx context.Context, fn Cleanup) context.Context {
+func AppendCleanup(ctx context.Context, fn ...Cleanup) context.Context {
 	if cleanups, ok := ctx.Value(cleanupsCtxKey).([]Cleanup); ok {
-		_ = append(cleanups, fn)
-		return ctx
+		return context.WithValue(ctx, cleanupsCtxKey, append(cleanups, fn...))
 	}
 
-	return context.WithValue(ctx, cleanupsCtxKey, []Cleanup{fn})
+	return context.WithValue(ctx, cleanupsCtxKey, fn)
 }
 
 // ...

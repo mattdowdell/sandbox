@@ -26,6 +26,8 @@ func (h *Handler) GetResource(
 		return nil, rpcerrors.ErrInternal
 	}
 
+	logger = logger.With(slogx.ResourceID(id))
+
 	output, err := h.resource.Get(ctx, logger, id)
 	if err != nil {
 		logger.DebugContext(ctx, "failed to get resource", slogx.Err(err))

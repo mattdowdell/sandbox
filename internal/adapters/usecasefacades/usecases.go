@@ -34,7 +34,12 @@ type ResourceGetter interface {
 
 // ...
 type ResourceLister interface {
-	Execute(context.Context, *slog.Logger, repositories.Resource) ([]*entities.Resource, error)
+	Execute(
+		context.Context,
+		*slog.Logger,
+		repositories.Resource,
+		repositories.Pager,
+	) (*repositories.Paged[*entities.Resource], error)
 }
 
 // ...

@@ -8,6 +8,7 @@ import (
 
 	"github.com/mattdowdell/sandbox/internal/adapters/txn"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
+	"github.com/mattdowdell/sandbox/internal/domain/repositories"
 )
 
 // ...
@@ -63,8 +64,9 @@ func (r *Resource) Get(
 func (r *Resource) List(
 	ctx context.Context,
 	logger *slog.Logger,
-) ([]*entities.Resource, error) {
-	return r.lister.Execute(ctx, logger, r.provider.Datastore())
+	pager repositories.Pager,
+) (*repositories.Paged[*entities.Resource], error) {
+	return r.lister.Execute(ctx, logger, r.provider.Datastore(), pager)
 }
 
 // ...

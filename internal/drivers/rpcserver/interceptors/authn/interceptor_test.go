@@ -17,6 +17,8 @@ import (
 	"github.com/mattdowdell/sandbox/mocks/gen/authn/v1/mockauthnv1connect"
 )
 
+var mockCtx = mock.AnythingOfType("*context.valueCtx")
+
 // Request implements connect.AnyRequest, but delegates some methods to a generated mock.
 //
 // The generated mock cannot be used directly because connect.AnyRequest has private methods.
@@ -129,7 +131,7 @@ func Test_Interceptor_WrapUnary_Success(t *testing.T) {
 			next := NewUnaryFunc(t)
 			next.
 				EXPECT().
-				Execute(mock.AnythingOfType("*context.valueCtx"), req).
+				Execute(mockCtx, req).
 				Return(expected, nil).
 				Once()
 
@@ -291,7 +293,7 @@ func Test_Interceptor_WrapStreamingHandler_Success(t *testing.T) {
 	conn.EXPECT().RequestHeader().Return(headers).Once()
 
 	next := NewStreamingHandlerFunc(t)
-	next.EXPECT().Execute(mock.AnythingOfType("*context.valueCtx"), conn).Return(nil).Once()
+	next.EXPECT().Execute(mockCtx, conn).Return(nil).Once()
 
 	fn := interceptor.WrapStreamingHandler(next.Execute)
 

@@ -26,6 +26,8 @@ func (h *Handler) UpdateResource(
 		return nil, rpcerrors.ErrInternal
 	}
 
+	logger = logger.With(slogx.ResourceID(input.ID), slogx.ResourceName(input.Name))
+
 	output, err := h.resource.Update(ctx, logger, input)
 	if err != nil {
 		logger.DebugContext(ctx, "failed to update resource", slogx.Err(err))

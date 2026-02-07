@@ -30,6 +30,8 @@ func (h *Handler) DeleteResource(
 		return nil, rpcerrors.ErrInternal
 	}
 
+	logger = logger.With(slogx.ResourceID(id))
+
 	if err := h.resource.Delete(ctx, logger, id); err != nil {
 		logger.DebugContext(ctx, "failed to delete resource", slogx.Err(err))
 

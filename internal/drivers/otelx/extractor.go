@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 
+	"go.opentelemetry.io/otel/baggage"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/mattdowdell/sandbox/pkg/slogx"
@@ -18,6 +19,7 @@ type ExtractOption interface {
 type Extractor struct {
 	withSpanID  bool
 	withSampled bool
+	withBaggage bool
 }
 
 // NewExtractor creates a new Extractor.
@@ -51,10 +53,32 @@ func (e *Extractor) Extract(ctx context.Context) []slog.Attr {
 		attrs = append(attrs, slogx.Sampled(span))
 	}
 
+	if e.withBaggage {
+		attrs = append(
+			attrs,
+			membersToAttrs(baggage.FromContext(ctx).Members()),
+		)
+	}
+
 	return attrs
 }
 
-// WithSpanID causes Extractor.Extract to include the current span ID in the return log attributes.
+func membersToAttrs(members []baggage.Member) slog.Attr {
+	if len(members) == 0 {
+		return slog.Attr{}
+	}
+
+	attrs := make([]slog.Attr, 0, len(members))
+
+	for _, member := range members {
+		attrs = append(attrs, slog.String(member.Key(), member.Value()))
+	}
+
+	return slog.GroupAttrs("baggage", attrs...)
+}
+
+// WithSpanID causes Extractor.Extract to include the current span ID in the returned log
+// attributes.
 func WithSpanID(include bool) ExtractOption {
 	return spanIDOpt(include)
 }
@@ -65,7 +89,8 @@ func (o spanIDOpt) apply(e *Extractor) {
 	e.withSpanID = bool(o)
 }
 
-// WithSpanID causes Extractor.Extract to include the sampling status in the return log attributes.
+// WithSpanID causes Extractor.Extract to include the sampling status in the returned log
+// attributes.
 func WithSampled(include bool) ExtractOption {
 	return sampledOpt(include)
 }
@@ -74,4 +99,16 @@ type sampledOpt bool
 
 func (o sampledOpt) apply(e *Extractor) {
 	e.withSampled = bool(o)
+}
+
+// WithBaggage causes Extractor.Extract to include baggage as a group in the returned log
+// attributes.
+func WithBaggage(include bool) ExtractOption {
+	return baggageOpt(include)
+}
+
+type baggageOpt bool
+
+func (o baggageOpt) apply(e *Extractor) {
+	e.withBaggage = bool(o)
 }

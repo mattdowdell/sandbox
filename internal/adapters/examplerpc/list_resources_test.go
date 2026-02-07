@@ -7,16 +7,20 @@ import (
 	"connectrpc.com/connect"
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/mattdowdell/sandbox/gen/example/v1"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
 	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
+	"github.com/mattdowdell/sandbox/internal/domain/repositories"
 	"github.com/mattdowdell/sandbox/mocks/adapters/mockexamplerpc"
 	"github.com/mattdowdell/sandbox/pkg/slogt"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
+)
+
+const (
+	testLimit = 50
 )
 
 func Test_Handler_ListResources_Success(t *testing.T) {
@@ -26,17 +30,23 @@ func Test_Handler_ListResources_Success(t *testing.T) {
 	id := uuid.Must(uuid.NewV7())
 	now := time.Now()
 
+	pager := repositories.Pager{
+		Limit: testLimit,
+	}
+
 	facade := mockexamplerpc.NewResourceFacade(t)
 	facade.
 		EXPECT().
-		List(ctx, mock.AnythingOfType("*slog.Logger")).
+		List(ctx, mockLogger, pager).
 		Return(
-			[]*entities.Resource{
-				{
-					ID:        id,
-					Name:      testResourceName,
-					CreatedAt: now,
-					UpdatedAt: now,
+			&repositories.Paged[*entities.Resource]{
+				Items: []*entities.Resource{
+					{
+						ID:        id,
+						Name:      testResourceName,
+						CreatedAt: now,
+						UpdatedAt: now,
+					},
 				},
 			},
 			nil,
@@ -48,7 +58,9 @@ func Test_Handler_ListResources_Success(t *testing.T) {
 		mockexamplerpc.NewAuditEventFacade(t),
 	)
 
-	req := connect.NewRequest(&examplev1.ListResourcesRequest{})
+	req := connect.NewRequest(&examplev1.ListResourcesRequest{
+		Limit: testLimit,
+	})
 
 	// act
 	resp, err := handler.ListResources(ctx, req)
@@ -73,10 +85,14 @@ func Test_Handler_ListResources_Error(t *testing.T) {
 	// arrange
 	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
 
+	pager := repositories.Pager{
+		Limit: testLimit,
+	}
+
 	facade := mockexamplerpc.NewResourceFacade(t)
 	facade.
 		EXPECT().
-		List(ctx, mock.AnythingOfType("*slog.Logger")).
+		List(ctx, mockLogger, pager).
 		Return(nil, domain.ErrInternal).
 		Once()
 
@@ -85,7 +101,9 @@ func Test_Handler_ListResources_Error(t *testing.T) {
 		mockexamplerpc.NewAuditEventFacade(t),
 	)
 
-	req := connect.NewRequest(&examplev1.ListResourcesRequest{})
+	req := connect.NewRequest(&examplev1.ListResourcesRequest{
+		Limit: testLimit,
+	})
 
 	// act
 	resp, err := handler.ListResources(ctx, req)

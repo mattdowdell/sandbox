@@ -3,17 +3,32 @@ package input
 import (
 	"context"
 	"errors"
+
+	"github.com/cucumber/godog"
 )
 
 type ctxKey int
 
 const (
-	nameCtxKey ctxKey = iota + 1
+	scenarioCtxKey ctxKey = iota + 1
+	nameCtxKey
 	idCtxKey
 	newNameCtxKey
+	limitCtxKey
 	authnCtxKey
 	configKeyCtxKey
 )
+
+// ...
+func ScenarioIntoContext(ctx context.Context, scen *godog.Scenario) context.Context {
+	return context.WithValue(ctx, scenarioCtxKey, scen.Name)
+}
+
+// ...
+func ScenarioFromContext(ctx context.Context) (string, bool) {
+	name, ok := ctx.Value(scenarioCtxKey).(string)
+	return name, ok
+}
 
 // ...
 func NameIntoContext(ctx context.Context, name string) context.Context {
@@ -55,6 +70,20 @@ func IDFromContext(ctx context.Context) (string, error) {
 	}
 
 	return "", errors.New("id not found in context")
+}
+
+// ...
+func LimitIntoContext(ctx context.Context, limit int32) context.Context {
+	return context.WithValue(ctx, limitCtxKey, limit)
+}
+
+// ...
+func LimitFromContext(ctx context.Context) (int32, error) {
+	if limit, ok := ctx.Value(limitCtxKey).(int32); ok {
+		return limit, nil
+	}
+
+	return 0, errors.New("limit not found in context")
 }
 
 // ...
