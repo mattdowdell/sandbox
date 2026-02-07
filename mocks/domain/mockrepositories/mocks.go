@@ -10,6 +10,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
+	"github.com/mattdowdell/sandbox/internal/domain/repositories"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -243,12 +244,12 @@ func (_m *Clock) EXPECT() *Clock_Expecter {
 	return &Clock_Expecter{mock: &_m.Mock}
 }
 
-// LocalNow provides a mock function for the type Clock
-func (_mock *Clock) LocalNow() time.Time {
+// Now provides a mock function for the type Clock
+func (_mock *Clock) Now() time.Time {
 	ret := _mock.Called()
 
 	if len(ret) == 0 {
-		panic("no return value specified for LocalNow")
+		panic("no return value specified for Now")
 	}
 
 	var r0 time.Time
@@ -260,29 +261,29 @@ func (_mock *Clock) LocalNow() time.Time {
 	return r0
 }
 
-// Clock_LocalNow_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'LocalNow'
-type Clock_LocalNow_Call struct {
+// Clock_Now_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Now'
+type Clock_Now_Call struct {
 	*mock.Call
 }
 
-// LocalNow is a helper method to define mock.On call
-func (_e *Clock_Expecter) LocalNow() *Clock_LocalNow_Call {
-	return &Clock_LocalNow_Call{Call: _e.mock.On("LocalNow")}
+// Now is a helper method to define mock.On call
+func (_e *Clock_Expecter) Now() *Clock_Now_Call {
+	return &Clock_Now_Call{Call: _e.mock.On("Now")}
 }
 
-func (_c *Clock_LocalNow_Call) Run(run func()) *Clock_LocalNow_Call {
+func (_c *Clock_Now_Call) Run(run func()) *Clock_Now_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run()
 	})
 	return _c
 }
 
-func (_c *Clock_LocalNow_Call) Return(time1 time.Time) *Clock_LocalNow_Call {
+func (_c *Clock_Now_Call) Return(time1 time.Time) *Clock_Now_Call {
 	_c.Call.Return(time1)
 	return _c
 }
 
-func (_c *Clock_LocalNow_Call) RunAndReturn(run func() time.Time) *Clock_LocalNow_Call {
+func (_c *Clock_Now_Call) RunAndReturn(run func() time.Time) *Clock_Now_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -643,27 +644,27 @@ func (_c *Resource_GetResource_Call) RunAndReturn(run func(context1 context.Cont
 }
 
 // ListResources provides a mock function for the type Resource
-func (_mock *Resource) ListResources(context1 context.Context) ([]*entities.Resource, error) {
-	ret := _mock.Called(context1)
+func (_mock *Resource) ListResources(context1 context.Context, pager repositories.Pager) (*repositories.Paged[*entities.Resource], error) {
+	ret := _mock.Called(context1, pager)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ListResources")
 	}
 
-	var r0 []*entities.Resource
+	var r0 *repositories.Paged[*entities.Resource]
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context) ([]*entities.Resource, error)); ok {
-		return returnFunc(context1)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repositories.Pager) (*repositories.Paged[*entities.Resource], error)); ok {
+		return returnFunc(context1, pager)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context) []*entities.Resource); ok {
-		r0 = returnFunc(context1)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, repositories.Pager) *repositories.Paged[*entities.Resource]); ok {
+		r0 = returnFunc(context1, pager)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*entities.Resource)
+			r0 = ret.Get(0).(*repositories.Paged[*entities.Resource])
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = returnFunc(context1)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, repositories.Pager) error); ok {
+		r1 = returnFunc(context1, pager)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -677,29 +678,35 @@ type Resource_ListResources_Call struct {
 
 // ListResources is a helper method to define mock.On call
 //   - context1 context.Context
-func (_e *Resource_Expecter) ListResources(context1 interface{}) *Resource_ListResources_Call {
-	return &Resource_ListResources_Call{Call: _e.mock.On("ListResources", context1)}
+//   - pager repositories.Pager
+func (_e *Resource_Expecter) ListResources(context1 interface{}, pager interface{}) *Resource_ListResources_Call {
+	return &Resource_ListResources_Call{Call: _e.mock.On("ListResources", context1, pager)}
 }
 
-func (_c *Resource_ListResources_Call) Run(run func(context1 context.Context)) *Resource_ListResources_Call {
+func (_c *Resource_ListResources_Call) Run(run func(context1 context.Context, pager repositories.Pager)) *Resource_ListResources_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
+		var arg1 repositories.Pager
+		if args[1] != nil {
+			arg1 = args[1].(repositories.Pager)
+		}
 		run(
 			arg0,
+			arg1,
 		)
 	})
 	return _c
 }
 
-func (_c *Resource_ListResources_Call) Return(resources []*entities.Resource, err error) *Resource_ListResources_Call {
-	_c.Call.Return(resources, err)
+func (_c *Resource_ListResources_Call) Return(paged *repositories.Paged[*entities.Resource], err error) *Resource_ListResources_Call {
+	_c.Call.Return(paged, err)
 	return _c
 }
 
-func (_c *Resource_ListResources_Call) RunAndReturn(run func(context1 context.Context) ([]*entities.Resource, error)) *Resource_ListResources_Call {
+func (_c *Resource_ListResources_Call) RunAndReturn(run func(context1 context.Context, pager repositories.Pager) (*repositories.Paged[*entities.Resource], error)) *Resource_ListResources_Call {
 	_c.Call.Return(run)
 	return _c
 }

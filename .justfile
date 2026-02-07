@@ -237,7 +237,8 @@ functional-cover:
 # Delete functional test coverage artifacts.
 [group('tests')]
 functional-cover-clean:
-    rm -f .covdata/cov*
+    @# after a certain number of files, rm cannot cope, so use find instead
+    find .covdata -name 'cov*' -delete
 
 # Scan the repository for issues.
 [group('scanners')]
@@ -250,8 +251,8 @@ scan-gitleaks:
 
 # Scan the repository for issues using Trivy.
 [group('scanners')]
-scan-trivy:
-    trivy fs .
+scan-trivy: install-trivy
+    {{ trivy }} fs .
 
 # Scan actions and workflows using Zizmor.
 [group('scanners')]
@@ -321,8 +322,8 @@ container-scan: container-scan-rpc
 container-scan-rpc: (_container-scan "example-rpc")
 
 [private]
-_container-scan service:
-    trivy image \
+_container-scan service: install-trivy
+    {{ trivy }} image \
         --config trivy.yaml \
         --docker-host unix://{{ env('HOME') }}/.colima/default/docker.sock \
         {{ service }}:local

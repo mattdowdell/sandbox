@@ -61,38 +61,35 @@ func Test_NewIssuer_Success(t *testing.T) {
 }
 
 func Test_NewIssuer_Error(t *testing.T) {
-	testCases := []struct {
-		name     string
+	tests := map[string]struct {
 		issuer   string
 		audience string
 		want     string
 	}{
-		{
-			name:     "missing issuer",
+		"missing issuer": {
 			issuer:   "",
 			audience: testAudience,
 			want:     "issuer must not be empty for issuer",
 		},
-		{
-			name:     "missing audience",
+		"missing audience": {
 			issuer:   testIssuer,
 			audience: "",
 			want:     "audience must not be empty for issuer",
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			// arrange
 			clock := mockrepositories.NewClock(t)
 			generator := mockrepositories.NewUUIDGenerator(t)
 
 			// act
-			issuer, err := jwtx.NewIssuer(clock, generator, tc.issuer, tc.audience)
+			issuer, err := jwtx.NewIssuer(clock, generator, tt.issuer, tt.audience)
 
 			// assert
 			assert.Nil(t, issuer)
-			assert.EqualError(t, err, tc.want)
+			assert.EqualError(t, err, tt.want)
 		})
 	}
 }

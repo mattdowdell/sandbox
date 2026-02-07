@@ -23,13 +23,11 @@ func Test_NewExtractor(t *testing.T) {
 }
 
 func Test_Extractor_Extract(t *testing.T) {
-	testCases := []struct {
-		name string
+	tests := map[string]struct {
 		have func(context.Context) context.Context
 		want []slog.Attr
 	}{
-		{
-			name: "present",
+		"present": {
 			have: func(ctx context.Context) context.Context {
 				return jwtx.SubjectIntoContext(ctx, "example")
 			},
@@ -37,8 +35,7 @@ func Test_Extractor_Extract(t *testing.T) {
 				slogx.Subject("example"),
 			},
 		},
-		{
-			name: "not present",
+		"not present": {
 			have: func(ctx context.Context) context.Context {
 				return ctx
 			},
@@ -46,17 +43,17 @@ func Test_Extractor_Extract(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			// arrange
 			extractor := authn.NewExtractor()
-			ctx := tc.have(t.Context())
+			ctx := tt.have(t.Context())
 
 			// act
 			got := extractor.Extract(ctx)
 
 			// assert
-			assert.Equal(t, tc.want, got)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

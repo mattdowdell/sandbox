@@ -52,19 +52,16 @@ func Test_AuditEventsFromDomain(t *testing.T) {
 	assert.Equal(t, expected, output)
 }
 
-// ...
 func Test_AuditEventFromDomain(t *testing.T) {
 	eventID := uuid.Must(uuid.NewV7())
 	resourceID := uuid.Must(uuid.NewV7())
 	now := time.Now()
 
-	testCases := []struct {
-		name     string
+	tests := map[string]struct {
 		input    *entities.AuditEvent
 		expected *examplev1.AuditEvent
 	}{
-		{
-			name: "created resource",
+		"created resource": {
 			input: &entities.AuditEvent{
 				ID:           eventID,
 				Operation:    entities.OperationCreated,
@@ -82,8 +79,7 @@ func Test_AuditEventFromDomain(t *testing.T) {
 				ResourceType: "example.v1.Resource",
 			},
 		},
-		{
-			name: "modified resource",
+		"modified resource": {
 			input: &entities.AuditEvent{
 				ID:           eventID,
 				Operation:    entities.OperationModified,
@@ -101,8 +97,7 @@ func Test_AuditEventFromDomain(t *testing.T) {
 				ResourceType: "example.v1.Resource",
 			},
 		},
-		{
-			name: "deleted resource",
+		"deleted resource": {
 			input: &entities.AuditEvent{
 				ID:           eventID,
 				Operation:    entities.OperationDeleted,
@@ -120,8 +115,7 @@ func Test_AuditEventFromDomain(t *testing.T) {
 				ResourceType: "example.v1.Resource",
 			},
 		},
-		{
-			name: "unknown resource",
+		"unknown resource": {
 			input: &entities.AuditEvent{
 				ID:           eventID,
 				Operation:    0,
@@ -139,8 +133,7 @@ func Test_AuditEventFromDomain(t *testing.T) {
 				ResourceType: "example.v1.Resource",
 			},
 		},
-		{
-			name: "modified unknown",
+		"modified unknown": {
 			input: &entities.AuditEvent{
 				ID:           eventID,
 				Operation:    entities.OperationModified,
@@ -160,10 +153,10 @@ func Test_AuditEventFromDomain(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			output := models.AuditEventFromDomain(tc.input)
-			assert.Equal(t, tc.expected, output)
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			output := models.AuditEventFromDomain(tt.input)
+			assert.Equal(t, tt.expected, output)
 		})
 	}
 }

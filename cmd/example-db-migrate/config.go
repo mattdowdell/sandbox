@@ -2,14 +2,16 @@ package main
 
 import (
 	"github.com/mattdowdell/sandbox/internal/drivers/logging"
-	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx/logx"
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx/metricx"
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx/tracex"
 	"github.com/mattdowdell/sandbox/internal/drivers/pgsql"
 )
 
 type Config struct {
-	Logging        logging.Config             `koanf:"logging"`
-	Database       pgsql.Config               `koanf:"database"`
-	MeterProvider  otelx.MeterProviderConfig  `koanf:"meterprovider"`
-	TracerProvider otelx.TracerProviderConfig `koanf:"tracerprovider"`
-	LoggerProvider otelx.LoggerProviderConfig `koanf:"loggerprovider"`
+	Logging        logging.Config         `koanf:"logging"`
+	Database       pgsql.Config           `koanf:"database"`
+	MeterProvider  metricx.ProviderConfig `koanf:"meterprovider"`
+	TracerProvider tracex.ProviderConfig  `koanf:"tracerprovider"`
+	LoggerProvider logx.ProviderConfig    `koanf:"loggerprovider"`
 }

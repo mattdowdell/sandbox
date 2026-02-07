@@ -6,6 +6,7 @@ import (
 	"connectrpc.com/connect"
 
 	"github.com/mattdowdell/sandbox/gen/authn/v1"
+	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/rpcerrors"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
@@ -19,13 +20,13 @@ func (h *Handler) Authenticate(
 	claims, err := h.parser.Parse(req.Msg.GetToken())
 	if err != nil {
 		logger.InfoContext(ctx, "failed to parse token", slogx.Err(err))
-		return nil, ErrUnauthenticated
+		return nil, rpcerrors.ErrUnauthenticated
 	}
 
 	subject, err := claims.GetSubject()
 	if err != nil {
 		logger.ErrorContext(ctx, "failed to extract subject claim", slogx.Err(err))
-		return nil, ErrInternal
+		return nil, rpcerrors.ErrInternal
 	}
 
 	return connect.NewResponse(&authnv1.AuthenticateResponse{

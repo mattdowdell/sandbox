@@ -72,27 +72,24 @@ func Test_Provider_Datastore(t *testing.T) {
 }
 
 func Test_wrapRollback_Success(t *testing.T) {
-	testCases := []struct {
-		name string
+	tests := map[string]struct {
 		have error
 	}{
-		{
-			name: "no error",
+		"no error": {
 			have: nil,
 		},
-		{
-			name: "tx done",
+		"tx done": {
 			have: sql.ErrTxDone,
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			// arrange
 			db, mock := newMockDB(t)
 
 			mock.ExpectBegin()
-			mock.ExpectRollback().WillReturnError(tc.have)
+			mock.ExpectRollback().WillReturnError(tt.have)
 
 			provider := datastore.NewProvider(db)
 

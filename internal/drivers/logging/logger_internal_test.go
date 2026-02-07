@@ -8,25 +8,21 @@ import (
 )
 
 func Test_replaceAttr(t *testing.T) {
-	testCases := []struct {
-		name   string
+	tests := map[string]struct {
 		groups []string
 		attr   slog.Attr
 		want   slog.Attr
 	}{
-		{
-			name:   "with group",
+		"with group": {
 			groups: []string{"example"},
 			attr:   slog.Any(slog.LevelKey, slog.LevelInfo),
 			want:   slog.Any(slog.LevelKey, slog.LevelInfo),
 		},
-		{
-			name: "lowercase level",
+		"lowercase level": {
 			attr: slog.Any(slog.LevelKey, slog.LevelInfo),
 			want: slog.String(slog.LevelKey, "info"),
 		},
-		{
-			name: "format source",
+		"format source": {
 			attr: slog.Any(slog.SourceKey, &slog.Source{
 				File: "example.go",
 				Line: 1,
@@ -35,17 +31,17 @@ func Test_replaceAttr(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			// arrange
 			opts := defaultOptions()
 			fn := replaceAttr(opts)
 
 			// act
-			output := fn(tc.groups, tc.attr)
+			output := fn(tt.groups, tt.attr)
 
 			// assert
-			assert.Equal(t, tc.want, output)
+			assert.Equal(t, tt.want, output)
 		})
 	}
 }

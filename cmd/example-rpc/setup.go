@@ -12,7 +12,10 @@ import (
 	"go.opentelemetry.io/contrib/processors/baggagecopy"
 
 	"github.com/mattdowdell/sandbox/gen/authn/v1/authnv1connect"
+	"github.com/mattdowdell/sandbox/gen/config/v1/configv1connect"
+	"github.com/mattdowdell/sandbox/gen/example/v1/examplev1connect"
 	"github.com/mattdowdell/sandbox/internal/adapters/authnrpc"
+	"github.com/mattdowdell/sandbox/internal/adapters/configrpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
 	"github.com/mattdowdell/sandbox/internal/adapters/healthrpc"
@@ -24,21 +27,29 @@ import (
 	"github.com/mattdowdell/sandbox/internal/drivers/jwtx"
 	"github.com/mattdowdell/sandbox/internal/drivers/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx/logx"
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx/metricx"
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx/tracex"
 	"github.com/mattdowdell/sandbox/internal/drivers/pgsql"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/authn"
 	logginginterceptor "github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/otelconnectx"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/validatex"
-	"github.com/mattdowdell/sandbox/internal/drivers/tock"
 	"github.com/mattdowdell/sandbox/internal/usecases"
+	"github.com/mattdowdell/sandbox/pkg/timex"
 )
 
 func SetupApp(ctx context.Context) (*App, error) {
 	options := flagoptions.New()
 
-	conf, err := config.Load[Config](options)
+	loader, err := config.New(options)
 	if err != nil {
+		return nil, err
+	}
+
+	conf := new(Config)
+	if err := loader.Load(conf); err != nil {
 		return nil, err
 	}
 
@@ -47,7 +58,7 @@ func SetupApp(ctx context.Context) (*App, error) {
 		return nil, err
 	}
 
-	clock := tock.New()
+	clock := timex.NewClock()
 	uuidgen := uuid.NewGen()
 
 	resource, auditEvent, err := initFacades(ctx, conf, clock, uuidgen)
@@ -60,7 +71,7 @@ func SetupApp(ctx context.Context) (*App, error) {
 		return nil, err
 	}
 
-	handlers, err := initHandlers(conf, clock, uuidgen, resource, auditEvent)
+	handlers, err := initHandlers(conf, loader, clock, uuidgen, resource, auditEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -70,34 +81,39 @@ func SetupApp(ctx context.Context) (*App, error) {
 	return NewApp(conf, logger, server, tpShutdown, mpShutdown, lpShutdown), nil
 }
 
+//nolint:gocritic // result types are differentiated by package name.
 func initObservability(
 	ctx context.Context,
 	conf *Config,
 ) (
-	otelx.TracerProviderShutdown,
-	otelx.MeterProviderShutdown,
-	otelx.LoggerProviderShutdown,
+	tracex.ProviderShutdown,
+	metricx.ProviderShutdown,
+	logx.ProviderShutdown,
 	*slog.Logger,
 	error,
 ) {
 	filter := baggagecopy.AllowAllMembers
 
-	tpShutdown, err := otelx.SetupTracerProviderFromConfig(ctx, conf.TracerProvider, filter)
+	tpShutdown, err := tracex.SetupTracerProviderFromConfig(ctx, conf.TracerProvider, filter)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
 
-	mpShutdown, err := otelx.SetupMeterProviderFromConfig(ctx, conf.MeterProvider)
+	mpShutdown, err := metricx.SetupMeterProviderFromConfig(ctx, conf.MeterProvider)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
 
-	lpShutdown, err := otelx.SetupLoggerProviderFromConfig(ctx, conf.LoggerProvider, filter)
+	lpShutdown, err := logx.SetupLoggerProviderFromConfig(ctx, conf.LoggerProvider, filter)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
 
-	extractor := otelx.NewExtractor(otelx.WithSpanID(true), otelx.WithSampled(true))
+	extractor := otelx.NewExtractor(
+		otelx.WithSpanID(true),
+		otelx.WithSampled(true),
+		otelx.WithBaggage(true),
+	)
 	logger := logging.NewAsDefaultFromConfig(conf.Logging, logging.WithExtractors(extractor))
 
 	return tpShutdown, mpShutdown, lpShutdown, logger, nil
@@ -109,7 +125,7 @@ func initFacades(
 	clock repositories.Clock,
 	uuidgen repositories.UUIDGenerator,
 ) (*usecasefacades.Resource, *usecasefacades.AuditEvent, error) {
-	db, err := pgsql.NewFromConfig(ctx, conf.Database)
+	db, _, err := pgsql.NewFromConfig(ctx, conf.Database)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -140,6 +156,7 @@ func initFacades(
 
 func initHandlers(
 	conf *Config,
+	loader *config.Loader,
 	clock repositories.Clock,
 	uuidgen repositories.UUIDGenerator,
 	resource examplerpc.ResourceFacade,
@@ -158,8 +175,14 @@ func initHandlers(
 	return []rpcserver.Handler{
 		authnrpc.New(issuer, parser),
 		examplerpc.New(resource, auditEvent),
-		reflectrpc.New(),
+		reflectrpc.New([]string{
+			authnv1connect.AuthnServiceName,
+			configv1connect.ConfigServiceName,
+			examplev1connect.ExampleServiceName,
+			grpchealth.HealthV1ServiceName,
+		}),
 		healthrpc.New(),
+		configrpc.New[Config](loader),
 	}, nil
 }
 
@@ -169,11 +192,7 @@ func initHandlerOptions(conf *Config) ([]connect.HandlerOption, error) {
 		return nil, err
 	}
 
-	validateInterceptor, err := validatex.New()
-	if err != nil {
-		return nil, err
-	}
-
+	validateInterceptor := validatex.New()
 	loggingInterceptor := logginginterceptor.New()
 
 	client := authn.NewClientFromConfig(

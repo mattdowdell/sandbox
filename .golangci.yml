@@ -77,7 +77,7 @@ linters:
         - "^\\s*\\[.+?\\]:\\s+" # ignore markdown ref links
     mnd:
       ignored-functions:
-        - '^os\.OpenFile$'
+        - "^os\\.OpenFile$"
     sloglint:
       attr-only: true
       context: all
@@ -108,10 +108,11 @@ linters:
         linters:
           # allow less strict logging for tools
           - sloglint
-      # use sloglint for context checks in log/slog.
-      - text: '(slog|log)\.\w+'
+
+      - path: .*/example_test\.go$
         linters:
-          - noctx
+          # allow less strict logging for examples
+          - sloglint
 
 issues:
   max-issues-per-linter: 0

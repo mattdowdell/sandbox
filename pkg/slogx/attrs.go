@@ -21,6 +21,9 @@ const (
 	RPCSystemKey    = "rpc_system"
 	RPCServiceKey   = "rpc_service"
 	RPCMethodKey    = "rpc_method"
+
+	ResourceIDKey   = "resource_id"
+	ResourceNameKey = "resource_name"
 )
 
 // ...
@@ -83,4 +86,14 @@ func RPCService(service string) slog.Attr {
 // ...
 func RPCMethod(method string) slog.Attr {
 	return slog.String(RPCMethodKey, method)
+}
+
+// ...
+func ResourceID(id fmt.Stringer) slog.Attr {
+	return slog.String(ResourceIDKey, id.String())
+}
+
+// ...
+func ResourceName(name string) slog.Attr {
+	return slog.String(ResourceNameKey, name)
 }

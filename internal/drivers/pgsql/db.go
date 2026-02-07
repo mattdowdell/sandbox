@@ -4,6 +4,7 @@ package pgsql
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"net"
 	"strconv"
@@ -17,6 +18,8 @@ import (
 	"github.com/jackc/pgx/v5/stdlib"
 	"go.opentelemetry.io/otel/semconv/v1.26.0"
 )
+
+type Cleanup func() error
 
 // Config contains configuration for connecting to a PostgreSQL database. It is intended to be
 // populated by internal/drivers/config.Load.
@@ -85,7 +88,7 @@ func (c *Config) toOptions() []Option {
 // NewFromConfig creates a new [sql.DB] using the given configuration.
 //
 //nolint:gocritic // called once, little gain from passing Config by pointer
-func NewFromConfig(ctx context.Context, conf Config) (*sql.DB, error) {
+func NewFromConfig(ctx context.Context, conf Config) (*sql.DB, Cleanup, error) {
 	return New(
 		ctx,
 		conf.Hostname,
@@ -104,6 +107,10 @@ func NewFromConfig(ctx context.Context, conf Config) (*sql.DB, error) {
 //   - Built-in OpenTelemetry tracing and metrics.
 //   - Automatic closure of connections that observe a read-only transaction error to enable recovery
 //     when a primary server moves to standby.
+//
+// The returned cleanup function can be used to close the database and unregister metrics when the
+// databse is no longer needed. If the caller calls New once on application start and keep the
+// connection pool until exit, cleanup does not need to be called.
 func New(
 	ctx context.Context,
 	host string,
@@ -112,22 +119,22 @@ func New(
 	name string,
 	sslmode string,
 	options ...Option,
-) (*sql.DB, error) {
+) (*sql.DB, Cleanup, error) {
 	opts := defaultOptions()
 	for _, option := range options {
 		if err := option.apply(ctx, opts); err != nil {
-			return nil, fmt.Errorf("failed to create db: %w", err)
+			return nil, nil, fmt.Errorf("failed to create db: %w", err)
 		}
 	}
 
 	if err := opts.validate(); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	dsn := makeDSN(host, port, user, opts.password, name, sslmode)
 	conf, err := pgx.ParseConfig(dsn)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	conf.OnPgError = func(_ *pgconn.PgConn, err *pgconn.PgError) bool {
@@ -153,18 +160,21 @@ func New(
 		semconv.DBSystemPostgreSQL,
 	))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	opts.apply(db)
 
-	if err := otelsql.RegisterDBStatsMetrics(db, otelsql.WithAttributes(
+	reg, err := otelsql.RegisterDBStatsMetrics(db, otelsql.WithAttributes(
 		semconv.DBSystemPostgreSQL,
-	)); err != nil {
-		return nil, err
+	))
+	if err != nil {
+		return nil, db.Close, err
 	}
 
-	return db, nil
+	return db, func() error {
+		return errors.Join(db.Close(), reg.Unregister())
+	}, nil
 }
 
 func makeDSN(

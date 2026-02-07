@@ -40,7 +40,7 @@ func New(baseURL string) (*Client, error) {
 		connect.WithInterceptors(
 			connect.UnaryInterceptorFunc(interceptors.ValidateUnaryInterceptor),
 			connect.UnaryInterceptorFunc(interceptors.ScenarioUnaryInterceptor),
-			connect.UnaryInterceptorFunc(AuthnUnaryInterceptor),
+			connect.UnaryInterceptorFunc(interceptors.AuthnUnaryInterceptor),
 			otelInterceptor,
 		),
 	)
@@ -84,6 +84,21 @@ func (c *Client) GetResource(ctx context.Context, id string) (*examplev1.Resourc
 	}
 
 	return resp.Msg.GetResource(), nil
+}
+
+// ...
+func (c *Client) ListResources(ctx context.Context, limit int32) ([]*examplev1.Resource, string, error) {
+	resp, err := c.inner.ListResources(
+		ctx,
+		connect.NewRequest(&examplev1.ListResourcesRequest{
+			Limit: limit,
+		}),
+	)
+	if err != nil {
+		return nil, "", err
+	}
+
+	return resp.Msg.GetItems(), resp.Msg.GetNext(), nil
 }
 
 // ...

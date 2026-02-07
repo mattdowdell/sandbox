@@ -7,32 +7,29 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
+	"github.com/mattdowdell/sandbox/pkg/otelt"
 )
 
 func Test_Tracer(t *testing.T) {
-	provider, _ := otelx.TestTracerProvider()
+	provider, _ := otelt.NewTracerProvider()
 
-	testCases := []struct {
-		name    string
+	tests := map[string]struct {
 		options []otelx.TracerOption
 	}{
-		{
-			name: "no options",
-		},
-		{
-			name: "with provider",
+		"no options": {},
+		"with provider": {
 			options: []otelx.TracerOption{
 				otelx.WithTracerProvider(provider),
 			},
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			// arrange
 
 			// act
-			tracer := otelx.Tracer(tc.options...)
+			tracer := otelx.Tracer(tt.options...)
 
 			// assert
 			assert.NotNil(t, tracer)

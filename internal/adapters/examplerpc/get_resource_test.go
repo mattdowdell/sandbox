@@ -9,7 +9,6 @@ import (
 	"connectrpc.com/connect"
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/mattdowdell/sandbox/gen/example/v1"
@@ -31,7 +30,7 @@ func Test_Handler_GetResource_Success(t *testing.T) {
 	facade := mockexamplerpc.NewResourceFacade(t)
 	facade.
 		EXPECT().
-		Get(ctx, mock.AnythingOfType("*slog.Logger"), id).
+		Get(ctx, mockLogger, id).
 		RunAndReturn(func(
 			_ context.Context,
 			_ *slog.Logger,
@@ -94,25 +93,22 @@ func Test_Handler_GetResource_InvalidID(t *testing.T) {
 }
 
 func Test_Handler_GetResource_UsecaseError(t *testing.T) {
-	testCases := []struct {
-		name string
+	tests := map[string]struct {
 		have error
 		want string
 	}{
-		{
-			name: "not found",
+		"not found": {
 			have: domain.ErrNotFound,
 			want: "not_found: resource does not exist",
 		},
-		{
-			name: "internal",
+		"internal": {
 			have: domain.ErrInternal,
 			want: "internal: internal error",
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			// arrange
 			ctx := slogx.IntoContext(t.Context(), slogt.New(t))
 			id := uuid.Must(uuid.NewV7())
@@ -120,8 +116,8 @@ func Test_Handler_GetResource_UsecaseError(t *testing.T) {
 			facade := mockexamplerpc.NewResourceFacade(t)
 			facade.
 				EXPECT().
-				Get(ctx, mock.AnythingOfType("*slog.Logger"), id).
-				Return(nil, tc.have).
+				Get(ctx, mockLogger, id).
+				Return(nil, tt.have).
 				Once()
 
 			handler := examplerpc.New(
@@ -138,7 +134,7 @@ func Test_Handler_GetResource_UsecaseError(t *testing.T) {
 
 			// assert
 			assert.Nil(t, resp)
-			assert.EqualError(t, err, tc.want)
+			assert.EqualError(t, err, tt.want)
 		})
 	}
 }

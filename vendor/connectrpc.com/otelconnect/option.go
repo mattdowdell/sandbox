@@ -28,6 +28,15 @@ import (
 	tracenoop "go.opentelemetry.io/otel/trace/noop"
 )
 
+var (
+	// ConnectRPCSystem indicates that the semantic conventions for
+	// ConnectRPC should be used.
+	ConnectRPCSystem = connectRPCSystem{} //nolint:gochecknoglobals
+	// GRPCSystem indicates that the semantic conventions for gRPC
+	// should be used.
+	GRPCSystem = gRPCSystem{} //nolint:gochecknoglobals
+)
+
 // An Option configures the OpenTelemetry instrumentation.
 type Option interface {
 	apply(*config)
@@ -35,21 +44,21 @@ type Option interface {
 
 // WithPropagator configures the instrumentation to use the supplied propagator
 // when extracting and injecting trace context. By default, the instrumentation
-// uses otel.GetTextMapPropagator().
+// uses [otel.GetTextMapPropagator].
 func WithPropagator(propagator propagation.TextMapPropagator) Option {
 	return &propagatorOption{propagator}
 }
 
 // WithMeterProvider configures the instrumentation to use the supplied [metric.MeterProvider]
 // when extracting and injecting trace context. By default, the instrumentation
-// uses global.MeterProvider().
+// uses [otel.GetMeterProvider].
 func WithMeterProvider(provider metric.MeterProvider) Option {
 	return &meterProviderOption{provider: provider}
 }
 
 // WithTracerProvider configures the instrumentation to use the supplied
 // provider when creating a tracer. By default, the instrumentation
-// uses otel.GetTracerProvider().
+// uses [otel.GetTracerProvider].
 func WithTracerProvider(provider trace.TracerProvider) Option {
 	return &tracerProviderOption{provider}
 }
@@ -124,6 +133,43 @@ func WithTraceResponseHeader(keys ...string) Option {
 // by omitting per-message information like message size.
 func WithoutTraceEvents() Option {
 	return &omitTraceEventsOption{}
+}
+
+// WithPropagateResponseHeader enables injecting the traceparent header
+// into response headers for server-side interceptors. This allows clients
+// to correlate their requests with server-side traces.
+func WithPropagateResponseHeader() Option {
+	return &propagateResponseHeaderOption{}
+}
+
+// WithRPCSystem forces the use of the semantic conventions for the given
+// RPC system. By default, the conventions used vary based on the actual
+// protocol of a request: so requests that a client sends or a server
+// receives that use the gRPC or gRPC-Web protocols use the gRPC semantic
+// conventions; requests that use ConnectRPC use the ConnectRPC semantic
+// conventions.
+//
+// In a system where a server handles requests for the same service but
+// from clients that use multiple protocols, this causes the telemetry
+// data to be partitioned by the RPC system conventions. But it is often
+// desirable to instead emit uniform telemetry, to allow optics and
+// aggregation across RPC systems.
+//
+// So this option can be used to force uniform metrics and spans, using
+// the given RPC system conventions, regardless of the actual protocol.
+func WithRPCSystem(system RPCSystem) Option {
+	return &rpcSystemOption{system: system}
+}
+
+// RPCSystem represents an RPC system, like ConnectRPC or gRPC. Different
+// systems have different semantic conventions for how metrics and spans are
+// defined.
+//
+//	https://opentelemetry.io/docs/specs/semconv/rpc/
+//
+// Valid values currently are ConnectRPCSystem and GRPCSystem.
+type RPCSystem interface {
+	protocol() string
 }
 
 type attributeFilterOption struct {
@@ -211,3 +257,25 @@ type omitTraceEventsOption struct{}
 func (o *omitTraceEventsOption) apply(c *config) {
 	c.omitTraceEvents = true
 }
+
+type propagateResponseHeaderOption struct{}
+
+func (o *propagateResponseHeaderOption) apply(c *config) {
+	c.propagateResponseHeader = true
+}
+
+type rpcSystemOption struct {
+	system RPCSystem
+}
+
+func (o *rpcSystemOption) apply(c *config) {
+	c.rpcSystem = o.system
+}
+
+type connectRPCSystem struct{}
+
+func (connectRPCSystem) protocol() string { return connectProtocol }
+
+type gRPCSystem struct{}
+
+func (gRPCSystem) protocol() string { return grpcProtocol }

@@ -6,6 +6,6 @@ import (
 )
 
 // ...
-func New() (*validate.Interceptor, error) {
+func New() *validate.Interceptor {
 	return validate.NewInterceptor()
 }

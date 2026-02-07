@@ -25,6 +25,11 @@ const (
 	testResourceName = "example"
 )
 
+var (
+	mockLogger   = mock.AnythingOfType("*slog.Logger")
+	mockResource = mock.AnythingOfType("*entities.Resource")
+)
+
 func Test_Handler_CreateResource_Success(t *testing.T) {
 	// arrange
 	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
@@ -35,11 +40,7 @@ func Test_Handler_CreateResource_Success(t *testing.T) {
 	facade := mockexamplerpc.NewResourceFacade(t)
 	facade.
 		EXPECT().
-		Create(
-			ctx,
-			mock.AnythingOfType("*slog.Logger"),
-			mock.AnythingOfType("*entities.Resource"),
-		).
+		Create(ctx, mockLogger, mockResource).
 		RunAndReturn(func(
 			_ context.Context,
 			_ *slog.Logger,
@@ -83,37 +84,30 @@ func Test_Handler_CreateResource_Success(t *testing.T) {
 }
 
 func Test_Handler_CreateResource_AlreadyExists(t *testing.T) {
-	testCases := []struct {
-		name string
+	tests := map[string]struct {
 		have error
 		want string
 	}{
-		{
-			name: "already exists",
+		"already exists": {
 			have: domain.ErrAlreadyExists,
 			want: "already_exists: resource name already in use",
 		},
-		{
-			name: "internal",
+		"internal": {
 			have: domain.ErrInternal,
 			want: "internal: internal error",
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			// arrange
 			ctx := slogx.IntoContext(t.Context(), slogt.New(t))
 
 			facade := mockexamplerpc.NewResourceFacade(t)
 			facade.
 				EXPECT().
-				Create(
-					ctx,
-					mock.AnythingOfType("*slog.Logger"),
-					mock.AnythingOfType("*entities.Resource"),
-				).
-				Return(nil, tc.have).
+				Create(ctx, mockLogger, mockResource).
+				Return(nil, tt.have).
 				Once()
 
 			handler := examplerpc.New(
@@ -132,7 +126,7 @@ func Test_Handler_CreateResource_AlreadyExists(t *testing.T) {
 
 			// assert
 			assert.Nil(t, resp)
-			assert.EqualError(t, err, tc.want)
+			assert.EqualError(t, err, tt.want)
 		})
 	}
 }

@@ -91,22 +91,19 @@ func Test_CreateResource_IDFailed(t *testing.T) {
 }
 
 func Test_CreateResource_CreateFailed(t *testing.T) {
-	testCases := []struct {
-		name string
-		err  error
+	tests := map[string]struct {
+		err error
 	}{
-		{
-			name: "already exists",
-			err:  domain.ErrAlreadyExists,
+		"already exists": {
+			err: domain.ErrAlreadyExists,
 		},
-		{
-			name: "internal",
-			err:  domain.ErrInternal,
+		"internal": {
+			err: domain.ErrInternal,
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			// arrange
 			now := time.Now().UTC().Round(time.Second)
 			id := uuid.Must(uuid.NewV7())
@@ -131,7 +128,7 @@ func Test_CreateResource_CreateFailed(t *testing.T) {
 			store.
 				EXPECT().
 				CreateResource(t.Context(), expected).
-				Return(tc.err).
+				Return(tt.err).
 				Once()
 
 			input := &entities.Resource{
@@ -143,7 +140,7 @@ func Test_CreateResource_CreateFailed(t *testing.T) {
 
 			// assert
 			assert.Nil(t, output)
-			assert.ErrorIs(t, err, tc.err)
+			assert.ErrorIs(t, err, tt.err)
 		})
 	}
 }

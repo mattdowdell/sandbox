@@ -42,15 +42,28 @@ echo "{\"token\":\"${token>}\"}" | grpc-client-cli -a localhost:5000 -s AuthnSer
 
 # create: success
 echo '{"resource":{"name":"example"}}' | \
-	grpc-client-cli -a localhost:5000 -s ExampleService -m CreateResource -H "Authorization: Bearer $token"
+	grpc-client-cli \
+		-a localhost:5000 \
+		-s ExampleService \
+		-m CreateResource \
+		-H "Authorization: Bearer $token"
 
 # create: success (bulk)
 for i in {1..100}; do
 	echo "{\"resource\":{\"name\":\"example-$i\"}}" | \
-		grpc-client-cli -a localhost:5000 -s ExampleService -m CreateResource -H "Authorization: Bearer $token"
+		grpc-client-cli \
+		-a localhost:5000 \
+		-s ExampleService \
+		-m CreateResource \
+		-H "Authorization: Bearer $token"
 done
 
 # list: success
-echo '{}' | grpc-client-cli -a localhost:5000 -s ExampleService -m ListResources -H "Authorization: Bearer $token"
+echo '{"limit": 100}' | \
+	grpc-client-cli \
+		-a localhost:5000 \
+		-s ExampleService \
+		-m ListResources \
+		-H "Authorization: Bearer $token"
 
 ```

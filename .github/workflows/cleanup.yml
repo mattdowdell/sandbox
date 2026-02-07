@@ -6,13 +6,17 @@ on:
   schedule:
     - cron: "0 0 * * *"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions: {}
 
 jobs:
   packages:
     name: Packages
     permissions:
-      packages: write
+      packages: write # to delete stale packages
     runs-on: "ubuntu-latest"
     steps:
       - name: Cleanup old packages

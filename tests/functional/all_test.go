@@ -9,8 +9,9 @@ import (
 	"github.com/cucumber/godog"
 
 	"github.com/mattdowdell/sandbox/tests/utils/authnv1client"
+	"github.com/mattdowdell/sandbox/tests/utils/configv1client"
 	"github.com/mattdowdell/sandbox/tests/utils/examplev1client"
-	"github.com/mattdowdell/sandbox/tests/utils/interceptors"
+	"github.com/mattdowdell/sandbox/tests/utils/input"
 	"github.com/mattdowdell/sandbox/tests/utils/step"
 )
 
@@ -32,8 +33,14 @@ func Test_ExampleService(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	configClient, err := configv1client.New("http://localhost:5000")
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	ctx := examplev1client.IntoContext(t.Context(), exampleClient)
 	ctx = authnv1client.IntoContext(ctx, authnClient)
+	ctx = configv1client.IntoContext(ctx, configClient)
 
 	o := opts
 	o.TestingT = t
@@ -57,7 +64,7 @@ func Test_ExampleService(t *testing.T) {
 
 func InitializeScenario(sc *godog.ScenarioContext) {
 	sc.Before(func(ctx context.Context, scen *godog.Scenario) (context.Context, error) {
-		return interceptors.ScenarioIntoContext(ctx, scen), nil
+		return input.ScenarioIntoContext(ctx, scen), nil
 	})
 
 	sc.Given(`^a name of (\d+) printable ASCII characters$`, step.PrintableASCIIChars)
@@ -66,18 +73,27 @@ func InitializeScenario(sc *godog.ScenarioContext) {
 	sc.Given(`^a non-existent Resource ID$`, step.NilUUID)
 	sc.Given(`^an invalid Resource ID$`, step.InvalidUUID)
 	sc.Given(`^an existing Resource ID$`, step.ExistingID)
+	sc.Given(`^a limit of (-?\d+)$`, step.Limit)
+	sc.Given(`^(\d+) existing Resources$`, step.ExistingResources)
 	sc.Given(`^invalid authentication$`, step.InvalidAuthentication)
 	sc.Given(`^no authentication$`, step.NoAuthentication)
 	sc.Given(`^valid authentication$`, step.ValidAuthentication)
+	sc.Given(`^the configuration key ([\w\.]+)$`, step.ExistingConfigKey)
+	sc.Given(`^an empty configuration key$`, step.EmptyConfigKey)
+	sc.Given(`^a non-existent configuration key$`, step.NonExistingConfigKey)
 
 	sc.When(`^I create a Resource$`, step.CreateResource)
 	sc.When(`^I get the Resource$`, step.GetResource)
+	sc.When(`^I list Resources$`, step.ListResources)
 	sc.When(`^I update the Resource$`, step.UpdateResource)
 	sc.When(`^I delete the Resource$`, step.DeleteResource)
+	sc.When(`^I get the configuration key$`, step.GetConfigValue)
 
 	sc.Then(`^I should fail with code=(\w+), msg=(.+)$$`, step.FailWithCodeAndMsg)
 	sc.Then(`^I should receive the Resource$`, step.CheckResource)
+	sc.Then(`^I should receive (\d+) Resources$`, step.CheckResources)
 	sc.Then(`^I should succeed$`, step.CheckSuccess)
+	sc.Then(`^I should receive the configuration value ([\w\*]+)$`, step.CheckConfigValue)
 
 	sc.After(func(ctx context.Context, _ *godog.Scenario, err error) (context.Context, error) {
 		if err2 := examplev1client.RunCleanups(ctx); err2 != nil {

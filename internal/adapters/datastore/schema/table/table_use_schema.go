@@ -11,6 +11,5 @@ package table
 // this method only once at the beginning of the program.
 func UseSchema(schema string) {
 	AuditEvents = AuditEvents.FromSchema(schema)
-	GooseDbVersion = GooseDbVersion.FromSchema(schema)
 	Resources = Resources.FromSchema(schema)
 }

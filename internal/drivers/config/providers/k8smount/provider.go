@@ -1,3 +1,19 @@
+// Package k8smount contains a Koanf provider for loading configuration from Kubernetes volume
+// mounts, i.e. Secrets or ConfigMaps mounted into a Pod.
+//
+// This is most appropriate for key-value data, such as the following example ConfigMap.
+//
+//	apiVersion: v1
+//	kind: ConfigMap
+//	metadata:
+//	  name: example
+//	data:
+//	  foo: "true"
+//	  bar: "1"
+//	  baz: "value"
+//
+// If ConfigMap fields contains structured data, such as JSON or YAML, the file provider with the
+// appropriate parser should be used instead.
 package k8smount
 
 import (
@@ -15,10 +31,7 @@ import (
 	"github.com/knadh/koanf/v2"
 )
 
-var (
-	ErrUnexpectedEvent = errors.New("unexpected event")
-	ErrAlreadyWatched  = errors.New("mount is already being watched")
-)
+var ErrAlreadyWatched = errors.New("mount is already being watched")
 
 // Non-allocating compile-time check for interface implementation.
 var _ koanf.Provider = (*K8SMount)(nil)
@@ -36,8 +49,11 @@ type K8SMount struct {
 //
 // The given mount should be the mount point of the configmap or secret. The delimiter is used to
 // create a hierarchy of keys based on the mounted filename. For example, a configmap mounted at
-// "/mnt/config/" with a key of "log.level" set to "INFO" would result in {"log":{"level":"INFO"}}
-// being read as configuration.
+// "/mnt/config/" with a key of "log.level" set to "INFO" and a delimiter of "." would result in
+// {"log":{"level":"INFO"}} being read as configuration.
+//
+// Keys mounted in directories are always split. For example, if the above key was mounted at
+// "log/level" instead, it will always produce {"log":{"level":"INFO"}} as the result.
 func Provider(mount, delim string) *K8SMount {
 	return &K8SMount{
 		mount: filepath.Clean(mount),
@@ -132,7 +148,7 @@ func (k *K8SMount) walkDir(mountFS fs.FS, path string, d fs.DirEntry, err error)
 // If an error occurs, the function is called with the error before the watch is stopped. If the
 // function is called with a nil error value, a change was detected successfully and watching will
 // continue.
-func (k *K8SMount) Watch(fn func(err error)) error {
+func (k *K8SMount) Watch(fn func(error)) error {
 	if k.watching.Swap(true) {
 		return ErrAlreadyWatched
 	}
@@ -149,7 +165,7 @@ func (k *K8SMount) Watch(fn func(err error)) error {
 }
 
 //nolint:gocognit // short enough that the complaxity is acceptable
-func (k *K8SMount) watchDir(fn func(err error)) {
+func (k *K8SMount) watchDir(fn func(error)) {
 	defer k.watching.Store(false)
 
 	var (
@@ -173,17 +189,13 @@ func (k *K8SMount) watchDir(fn func(err error)) {
 			lastEvent = event.String()
 			lastEventTime = time.Now()
 
-			// mounts are only meant to be updated for the lifetime of the pod
-			// TODO: test what happens when we edit a configmap
-			if !event.Has(fsnotify.Write | fsnotify.Chmod) {
-				fn(fmt.Errorf("%w: %s", ErrUnexpectedEvent, event.String()))
+			// ignore chmod
+			if event.Has(fsnotify.Chmod) {
 				return
 			}
 
-			// ignore chmod
-			if !event.Has(fsnotify.Chmod) {
-				fn(nil)
-			}
+			// TODO: report which key was updated
+			fn(nil)
 
 		case err, ok := <-k.watcher.Errors:
 			if !ok {

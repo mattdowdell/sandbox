@@ -6,22 +6,10 @@ import (
 	"strings"
 
 	"connectrpc.com/connect"
-	"github.com/cucumber/godog"
 	"go.opentelemetry.io/otel/baggage"
+
+	"github.com/mattdowdell/sandbox/tests/utils/input"
 )
-
-type scenarioCtxKey struct{}
-
-// ...
-func ScenarioIntoContext(ctx context.Context, scen *godog.Scenario) context.Context {
-	return context.WithValue(ctx, scenarioCtxKey{}, scen.Name)
-}
-
-// ...
-func ScenarioFromContext(ctx context.Context) (string, bool) {
-	name, ok := ctx.Value(scenarioCtxKey{}).(string)
-	return name, ok
-}
 
 // ...
 func ScenarioUnaryInterceptor(next connect.UnaryFunc) connect.UnaryFunc {
@@ -29,7 +17,7 @@ func ScenarioUnaryInterceptor(next connect.UnaryFunc) connect.UnaryFunc {
 		ctx context.Context,
 		req connect.AnyRequest,
 	) (connect.AnyResponse, error) {
-		if scenario, ok := ScenarioFromContext(ctx); ok && scenario != "" {
+		if scenario, ok := input.ScenarioFromContext(ctx); ok && scenario != "" {
 			s, err := baggage.NewMember("scenario.name", strings.ReplaceAll(scenario, " ", "_"))
 			if err != nil {
 				return nil, connect.NewError(

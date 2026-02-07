@@ -256,27 +256,27 @@ func (_m *ResourceLister) EXPECT() *ResourceLister_Expecter {
 }
 
 // Execute provides a mock function for the type ResourceLister
-func (_mock *ResourceLister) Execute(context1 context.Context, logger *slog.Logger, resource repositories.Resource) ([]*entities.Resource, error) {
-	ret := _mock.Called(context1, logger, resource)
+func (_mock *ResourceLister) Execute(context1 context.Context, logger *slog.Logger, resource repositories.Resource, pager repositories.Pager) (*repositories.Paged[*entities.Resource], error) {
+	ret := _mock.Called(context1, logger, resource, pager)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Execute")
 	}
 
-	var r0 []*entities.Resource
+	var r0 *repositories.Paged[*entities.Resource]
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *slog.Logger, repositories.Resource) ([]*entities.Resource, error)); ok {
-		return returnFunc(context1, logger, resource)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *slog.Logger, repositories.Resource, repositories.Pager) (*repositories.Paged[*entities.Resource], error)); ok {
+		return returnFunc(context1, logger, resource, pager)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *slog.Logger, repositories.Resource) []*entities.Resource); ok {
-		r0 = returnFunc(context1, logger, resource)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *slog.Logger, repositories.Resource, repositories.Pager) *repositories.Paged[*entities.Resource]); ok {
+		r0 = returnFunc(context1, logger, resource, pager)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*entities.Resource)
+			r0 = ret.Get(0).(*repositories.Paged[*entities.Resource])
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *slog.Logger, repositories.Resource) error); ok {
-		r1 = returnFunc(context1, logger, resource)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *slog.Logger, repositories.Resource, repositories.Pager) error); ok {
+		r1 = returnFunc(context1, logger, resource, pager)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -292,11 +292,12 @@ type ResourceLister_Execute_Call struct {
 //   - context1 context.Context
 //   - logger *slog.Logger
 //   - resource repositories.Resource
-func (_e *ResourceLister_Expecter) Execute(context1 interface{}, logger interface{}, resource interface{}) *ResourceLister_Execute_Call {
-	return &ResourceLister_Execute_Call{Call: _e.mock.On("Execute", context1, logger, resource)}
+//   - pager repositories.Pager
+func (_e *ResourceLister_Expecter) Execute(context1 interface{}, logger interface{}, resource interface{}, pager interface{}) *ResourceLister_Execute_Call {
+	return &ResourceLister_Execute_Call{Call: _e.mock.On("Execute", context1, logger, resource, pager)}
 }
 
-func (_c *ResourceLister_Execute_Call) Run(run func(context1 context.Context, logger *slog.Logger, resource repositories.Resource)) *ResourceLister_Execute_Call {
+func (_c *ResourceLister_Execute_Call) Run(run func(context1 context.Context, logger *slog.Logger, resource repositories.Resource, pager repositories.Pager)) *ResourceLister_Execute_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -310,21 +311,26 @@ func (_c *ResourceLister_Execute_Call) Run(run func(context1 context.Context, lo
 		if args[2] != nil {
 			arg2 = args[2].(repositories.Resource)
 		}
+		var arg3 repositories.Pager
+		if args[3] != nil {
+			arg3 = args[3].(repositories.Pager)
+		}
 		run(
 			arg0,
 			arg1,
 			arg2,
+			arg3,
 		)
 	})
 	return _c
 }
 
-func (_c *ResourceLister_Execute_Call) Return(resources []*entities.Resource, err error) *ResourceLister_Execute_Call {
-	_c.Call.Return(resources, err)
+func (_c *ResourceLister_Execute_Call) Return(paged *repositories.Paged[*entities.Resource], err error) *ResourceLister_Execute_Call {
+	_c.Call.Return(paged, err)
 	return _c
 }
 
-func (_c *ResourceLister_Execute_Call) RunAndReturn(run func(context1 context.Context, logger *slog.Logger, resource repositories.Resource) ([]*entities.Resource, error)) *ResourceLister_Execute_Call {
+func (_c *ResourceLister_Execute_Call) RunAndReturn(run func(context1 context.Context, logger *slog.Logger, resource repositories.Resource, pager repositories.Pager) (*repositories.Paged[*entities.Resource], error)) *ResourceLister_Execute_Call {
 	_c.Call.Return(run)
 	return _c
 }

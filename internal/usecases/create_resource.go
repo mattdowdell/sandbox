@@ -44,6 +44,7 @@ func (u *CreateResource) Execute(
 		return nil, domain.ErrInternal
 	}
 
+	logger = logger.With(slogx.ResourceID(id))
 	resource.Init(id, u.clock.UTCNow())
 
 	if err := store.CreateResource(ctx, resource); err != nil {

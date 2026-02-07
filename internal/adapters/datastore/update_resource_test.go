@@ -17,7 +17,7 @@ import (
 
 const (
 	updateResourceSQL = `UPDATE public.resources SET (name, updated_at) = ($1, $2) ` +
-		`WHERE resources.id = $3 RETURNING resources.id AS "resources.id", ` +
+		`WHERE resources.id = $3::uuid RETURNING resources.id AS "resources.id", ` +
 		`resources.name AS "resources.name", resources.created_at AS "resources.created_at", ` +
 		`resources.updated_at AS "resources.updated_at";`
 )
@@ -101,13 +101,11 @@ func Test_Datastore_UpdateResource_NotFound(t *testing.T) {
 }
 
 func Test_Datastore_UpdateResource_QueryError(t *testing.T) {
-	testCases := []struct {
-		name string
+	tests := map[string]struct {
 		have error
 		want string
 	}{
-		{
-			name: "unique violation",
+		"unique violation": {
 			have: &pgconn.PgError{
 				Severity: "ERROR",
 				Code:     pgerrcode.UniqueViolation,
@@ -116,15 +114,14 @@ func Test_Datastore_UpdateResource_QueryError(t *testing.T) {
 			want: `already exists: jet: ERROR: duplicate key value violates unique constraint ` +
 				`"resources_name_key" (SQLSTATE 23505)`,
 		},
-		{
-			name: "other error",
+		"other error": {
 			have: errors.New("example"),
 			want: "internal error: jet: example",
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			// arrange
 			id := uuid.Must(uuid.NewV7())
 			now := time.Now()
@@ -134,7 +131,7 @@ func Test_Datastore_UpdateResource_QueryError(t *testing.T) {
 			mock.
 				ExpectQuery(updateResourceSQL).
 				WithArgs(testResourceName, now.Add(time.Hour), id).
-				WillReturnError(tc.have)
+				WillReturnError(tt.have)
 
 			store := datastore.NewDatastore(db)
 
@@ -149,7 +146,7 @@ func Test_Datastore_UpdateResource_QueryError(t *testing.T) {
 
 			// assert
 			assert.Nil(t, got)
-			assert.EqualError(t, err, tc.want)
+			assert.EqualError(t, err, tt.want)
 		})
 	}
 }

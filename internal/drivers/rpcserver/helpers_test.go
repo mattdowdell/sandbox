@@ -9,71 +9,64 @@ import (
 )
 
 func Test_SplitProcedure(t *testing.T) {
-	testCases := []struct {
-		name    string
+	tests := map[string]struct {
 		have    string
 		service string
 		method  string
 	}{
-		{
-			name:    "service with method",
+		"service with method": {
 			have:    "/acme.foo.v1.FooService/Bar",
 			service: "acme.foo.v1.FooService",
 			method:  "Bar",
 		},
-		{
-			name:   "method only",
+		"method only": {
 			have:   "/Bar",
 			method: "Bar",
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			// arrange
 
 			// act
-			service, method := rpcserver.SplitProcedure(tc.have)
+			service, method := rpcserver.SplitProcedure(tt.have)
 
 			// assert
-			assert.Equal(t, tc.service, service)
-			assert.Equal(t, tc.method, method)
+			assert.Equal(t, tt.service, service)
+			assert.Equal(t, tt.method, method)
 		})
 	}
 }
 
 func Test_ProtocolToSystem(t *testing.T) {
-	testCases := []struct {
-		name string
+	tests := map[string]struct {
 		have string
 		want string
 	}{
-		{
-			name: "grpcweb",
+		"grpcweb": {
 			have: "grpcweb",
 			want: "grpc_web",
 		},
-		{
-			name: "connectrpc",
+		"connectrpc": {
 			have: "connect",
 			want: "connect_rpc",
 		},
-		{
-			name: "grpc",
+		"grpc": {
 			have: "grpc",
 			want: "grpc",
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			// arrange
 
 			// act
-			got := rpcserver.ProtocolToSystem(tc.have)
+			got := rpcserver.ProtocolToSystem(tt.have)
 
 			// assert
-			assert.Equal(t, tc.want, got)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

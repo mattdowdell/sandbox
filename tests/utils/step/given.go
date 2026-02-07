@@ -91,6 +91,38 @@ func ExistingID(ctx context.Context) (context.Context, error) {
 }
 
 // ...
+func ExistingResources(ctx context.Context, count int) (context.Context, error) {
+	client, err := examplev1client.FromContext(ctx)
+	if err != nil {
+		return ctx, err
+	}
+
+	cleanups := make([]examplev1client.Cleanup, 0, count)
+
+	for range count {
+		//nolint:mnd // arbitrary length chosen
+		name, err := randomString(printableASCII(), 20 /*length*/)
+		if err != nil {
+			return ctx, err
+		}
+
+		_, cleanup, err := client.CreateResource(ctx, name)
+		if err != nil {
+			return ctx, err
+		}
+
+		cleanups = append(cleanups, cleanup)
+	}
+
+	return examplev1client.AppendCleanup(ctx, cleanups...), nil
+}
+
+// ...
+func Limit(ctx context.Context, value int32) context.Context {
+	return input.LimitIntoContext(ctx, value)
+}
+
+// ...
 func InvalidAuthentication(ctx context.Context) context.Context {
 	return input.AuthnIntoContext(ctx, "Basic invalid")
 }
@@ -113,6 +145,21 @@ func ValidAuthentication(ctx context.Context) (context.Context, error) {
 	}
 
 	return input.AuthnIntoContext(ctx, "Bearer "+token), nil
+}
+
+// ...
+func NonExistingConfigKey(ctx context.Context) (context.Context, error) {
+	return input.ConfigKeyIntoContext(ctx, "does_not_exist"), nil
+}
+
+// ...
+func EmptyConfigKey(ctx context.Context) (context.Context, error) {
+	return input.ConfigKeyIntoContext(ctx, ""), nil
+}
+
+// ...
+func ExistingConfigKey(ctx context.Context, key string) (context.Context, error) {
+	return input.ConfigKeyIntoContext(ctx, key), nil
 }
 
 // printableASCII returns a set of printable ASCII characters for use with RandomString.

@@ -9,6 +9,7 @@ import (
 	"github.com/mattdowdell/sandbox/gen/example/v1"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc/models"
 	"github.com/mattdowdell/sandbox/internal/domain"
+	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/rpcerrors"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
@@ -22,8 +23,10 @@ func (h *Handler) UpdateResource(
 	input, err := models.ResourceUpdateToDomain(req.Msg.GetResource())
 	if err != nil {
 		logger.ErrorContext(ctx, "failed to parse id", slogx.Err(err))
-		return nil, ErrInternal
+		return nil, rpcerrors.ErrInternal
 	}
+
+	logger = logger.With(slogx.ResourceID(input.ID), slogx.ResourceName(input.Name))
 
 	output, err := h.resource.Update(ctx, logger, input)
 	if err != nil {
@@ -37,7 +40,7 @@ func (h *Handler) UpdateResource(
 			return nil, ErrResourceAlreadyExists
 
 		default:
-			return nil, ErrInternal
+			return nil, rpcerrors.ErrInternal
 		}
 	}
 

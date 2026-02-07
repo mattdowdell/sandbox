@@ -1,8 +1,9 @@
 ---
 # https://vektra.github.io/mockery/latest/configuration/
 
-dir: 'mocks/{{ trimPrefix "github.com/mattdowdell/sandbox/internal/" .SrcPackagePath | dir }}/mock{{ .SrcPackagePath | base }}'
+dir: "mocks/{{ trimPrefix \"github.com/mattdowdell/sandbox/internal/\" .SrcPackagePath | dir }}/mock{{ .SrcPackagePath | base }}"
 filename: "mocks.go"
+include-auto-generated: true
 structname: "{{ .InterfaceName }}"
 pkgname: "mock{{ .SrcPackageName }}"
 template: "testify"
@@ -17,6 +18,9 @@ packages:
     interfaces:
       AuthnServiceClient: {}
   github.com/mattdowdell/sandbox/internal/adapters/authnrpc:
+    config:
+      all: true
+  github.com/mattdowdell/sandbox/internal/adapters/configrpc:
     config:
       all: true
   github.com/mattdowdell/sandbox/internal/adapters/examplerpc:

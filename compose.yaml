@@ -13,28 +13,28 @@ services:
     entrypoint: ["/example-rpc"]
     environment:
       GOCOVERDIR: "/covdata"
-      APP_AUTHN_ADDRESS: "http://localhost:5000"
-      APP_DATABASE_HOSTNAME: "postgres"
-      APP_DATABASE_USERNAME: "postgres"
-      APP_DATABASE_PASSWORD: "secret"
-      APP_DATABASE_NAME: "postgres"
-      APP_DATABASE_SSLMODE: "disable"
-      APP_ISSUER_AUDIENCE: "example"
-      APP_ISSUER_ISSUER: "example"
-      APP_LOGGING_LEVEL: "debug"
-      APP_PARSER_AUDIENCE: "example"
-      APP_PARSER_ISSUER: "example"
-      APP_PARSER_METHODS: "HS256"
-      APP_RPCSERVER_HOST: "0.0.0.0"
-      APP_RPCSERVER_ENABLEPPROF: "true"
-      APP_METERPROVIDER_INSECURE: "true"
-      APP_METERPROVIDER_ENDPOINT: "victoria-metrics:8428"
-      APP_METERPROVIDER_PATH: "/opentelemetry/v1/metrics"
-      APP_TRACERPROVIDER_INSECURE: "true"
-      APP_TRACERPROVIDER_ENDPOINT: "jaeger:4318"
-      APP_LOGGERPROVIDER_INSECURE: "true"
-      APP_LOGGERPROVIDER_ENDPOINT: "victoria-logs:9428"
-      APP_LOGGERPROVIDER_PATH: "/insert/opentelemetry/v1/logs"
+      AUTHN_ADDRESS: "http://localhost:5000"
+      DATABASE_HOSTNAME: "postgres"
+      DATABASE_USERNAME: "postgres"
+      DATABASE_PASSWORD: "secret"
+      DATABASE_NAME: "postgres"
+      DATABASE_SSLMODE: "disable"
+      ISSUER_AUDIENCE: "example"
+      ISSUER_ISSUER: "example"
+      LOGGING_LEVEL: "debug"
+      PARSER_AUDIENCE: "example"
+      PARSER_ISSUER: "example"
+      PARSER_METHODS: "HS256"
+      RPCSERVER_HOST: "0.0.0.0"
+      RPCSERVER_ENABLEPPROF: "true"
+      METERPROVIDER_INSECURE: "true"
+      METERPROVIDER_ENDPOINT: "victoria-metrics:8428"
+      METERPROVIDER_PATH: "/opentelemetry/v1/metrics"
+      TRACERPROVIDER_INSECURE: "true"
+      TRACERPROVIDER_ENDPOINT: "jaeger:4318"
+      LOGGERPROVIDER_INSECURE: "true"
+      LOGGERPROVIDER_ENDPOINT: "victoria-logs:9428"
+      LOGGERPROVIDER_PATH: "/insert/opentelemetry/v1/logs"
       OTEL_SEMCONV_STABILITY_OPT_IN: "database"
     ports:
       - "127.0.0.1:5000:5000"
@@ -66,20 +66,20 @@ services:
     entrypoint: ["/example-db-migrate"]
     environment:
       GOCOVERDIR: "/covdata"
-      APP_DATABASE_HOSTNAME: "postgres"
-      APP_DATABASE_USERNAME: "postgres"
-      APP_DATABASE_PASSWORD: "secret"
-      APP_DATABASE_NAME: "postgres"
-      APP_DATABASE_SSLMODE: "disable"
-      APP_LOGGING_LEVEL: "debug"
-      APP_METERPROVIDER_INSECURE: "true"
-      APP_METERPROVIDER_ENDPOINT: "victoria-metrics:8428"
-      APP_METERPROVIDER_PATH: "/opentelemetry/v1/metrics"
-      APP_TRACERPROVIDER_INSECURE: "true"
-      APP_TRACERPROVIDER_ENDPOINT: "jaeger:4318"
-      APP_LOGGERPROVIDER_INSECURE: "true"
-      APP_LOGGERPROVIDER_ENDPOINT: "victoria-logs:9428"
-      APP_LOGGERPROVIDER_PATH: "/insert/opentelemetry/v1/logs"
+      DATABASE_HOSTNAME: "postgres"
+      DATABASE_USERNAME: "postgres"
+      DATABASE_PASSWORD: "secret"
+      DATABASE_NAME: "postgres"
+      DATABASE_SSLMODE: "disable"
+      LOGGING_LEVEL: "debug"
+      METERPROVIDER_INSECURE: "true"
+      METERPROVIDER_ENDPOINT: "victoria-metrics:8428"
+      METERPROVIDER_PATH: "/opentelemetry/v1/metrics"
+      TRACERPROVIDER_INSECURE: "true"
+      TRACERPROVIDER_ENDPOINT: "jaeger:4318"
+      LOGGERPROVIDER_INSECURE: "true"
+      LOGGERPROVIDER_ENDPOINT: "victoria-logs:9428"
+      LOGGERPROVIDER_PATH: "/insert/opentelemetry/v1/logs"
     volumes:
       - "./.covdata:/covdata"
     depends_on:
@@ -87,7 +87,7 @@ services:
         condition: service_healthy
 
   postgres:
-    image: "mirror.gcr.io/postgres:17"
+    image: "mirror.gcr.io/postgres:18"
     pull_policy: "always"
     environment:
       POSTGRES_USER: "postgres"
@@ -101,7 +101,7 @@ services:
     restart: always
 
   jaeger:
-    image: "mirror.gcr.io/jaegertracing/jaeger:2.9.0"
+    image: "mirror.gcr.io/jaegertracing/jaeger:2.14.1"
     pull_policy: "always"
     ports:
       - "127.0.0.1:16686:16686"
@@ -112,7 +112,7 @@ services:
     restart: always
 
   victoria-metrics:
-    image: "mirror.gcr.io/victoriametrics/victoria-metrics:v1.125.1"
+    image: "mirror.gcr.io/victoriametrics/victoria-metrics:v1.135.0"
     pull_policy: "always"
     ports:
       - "127.0.0.1:8428:8428"
@@ -134,7 +134,7 @@ services:
     restart: always
 
   grafana:
-    image: "mirror.gcr.io/grafana/grafana:12.1.1"
+    image: "mirror.gcr.io/grafana/grafana:12.3.2"
     pull_policy: "always"
     environment:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
@@ -154,5 +154,4 @@ services:
       start_period: "30s"
       start_interval: "1s"
     restart: always
-
 
