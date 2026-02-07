@@ -177,7 +177,7 @@ jobs:
           version: ${{ steps.trivy-version.outputs.version }}
 
       - name: Upload Trivy scan results
-        uses: github/codeql-action/upload-sarif@51f77329afa6477de8c49fc9c7046c15b9a4e79d # v3.29.5
+        uses: github/codeql-action/upload-sarif@b5ebac6f4c00c8ccddb7cdcd45fdb248329f808a # v3.32.2
         with:
           sarif_file: trivy-results.sarif
 
