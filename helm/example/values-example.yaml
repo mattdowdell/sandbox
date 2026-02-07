@@ -1,6 +1,6 @@
 ---
 
-nameOverride: example
+nameOverride: "example"
 
 config:
   # TODO: labels

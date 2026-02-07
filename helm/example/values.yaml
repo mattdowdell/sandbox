@@ -10,10 +10,10 @@ fullnameOverride: ""
 config: {}
 
 # TODO
-deployments: []
+deployments: {}
 
 # TODO
-jobs: []
+jobs: {}
 
 # TODO
 securityContext:

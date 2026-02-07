@@ -28,9 +28,9 @@ spec:
         - name: {{ $name }}
           image: {{ .image.repository }}:{{ .image.tag | default $.Chart.AppVersion }}
           imagePullPolicy: {{ .image.pullPolicy | default "Always" }}
-          command: ["/{{ .name }}"]
+          command: ["/{{ $name }}"]
           securityContext: {{- toYaml $.Values.securityContext | nindent 12 }}
-          serviceAccountName: {{ include "helper."}}
+{{/*          serviceAccountName: { include "helper.serviceAccountName" . } */}}
           {{- if .env }}
           env:
             {{- range $name, $value := .env }}

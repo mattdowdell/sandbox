@@ -17,50 +17,40 @@ load("ext://helm_remote", "helm_remote")
 # Local services
 # --------------
 
-# docker_build(
-#     ref="example-dev:local",
-#     context=".",
-#     dockerfile="Dockerfile.dev",
-#     target="dev",
-#     pull=True,
-#     # TODO: filter to just Dockerfile.dev
-# )
+# Tilt's docker_build excludes .git per https://github.com/tilt-dev/tilt/issues/2169
+# but we need that for db migrations and otel resource attributes
+def custom_docker_build(name):
+    custom_build(
+        ref=name,
+        command="docker buildx build --pull --target runtime --build-arg SERVICE={name} -t $EXPECTED_REF .".format(
+            name=name,
+        ),
+        deps=[
+            os.path.join(config.main_dir, "Dockerfile"),
+            os.path.join(config.main_dir, "cmd"),
+            os.path.join(config.main_dir, "internal"),
+            os.path.join(config.main_dir, "pkg"),
+        ],
+    )
 
-docker_build(
-    ref="example-rpc",
-    context=".",
-    target="runtime",
-    pull=True,
-    build_args={
-        "SERVICE": "example-rpc",
-        "GO_BUILD_ARGS": "", # TODO: pass from env
-    },
-    # TODO: filter to just go files + Dockerfile
-)
-
-docker_build(
-    ref="example-db-migrate",
-    context=".",
-    target="runtime",
-    pull=True,
-    build_args={
-        "SERVICE": "example-db-migrate",
-        "GO_BUILD_ARGS": "", # TODO: pass from env
-    },
-    # TODO: filter to just go files + Dockerfile
-)
+custom_docker_build("example-rpc")
+custom_docker_build("example-db-migrate")
 
 k8s_yaml(helm(
     "helm/example",
-    values=["helm/example/values-dev.yaml"],
+    name="example",
+    values=[
+        "helm/example/values-example.yaml",
+        "helm/example/values-dev.yaml",
+    ],
 ))
 
 k8s_resource(
     "example-rpc",
     objects=[
         "example:configmap",
-        "chart-example:service",
-        "chart-example:serviceaccount",
+        "example:service",
+        "example:serviceaccount",
     ],
     labels=["services"],
     port_forwards=["127.0.0.1:5000:5000"],

@@ -11,7 +11,7 @@ deployments:
     # TODO: annotations
     replicas: 2
     containers:
-      - name: example-rpc
+      example-rpc:
         # TODO: labels
         # TODO: annotations
         image:
@@ -61,6 +61,10 @@ jobs:
             path: database_username
           - key: dbname
             path: database_name
+
+serviceAccount:
+  create: true
+  automount: true
 
 # TODO: services
 # TODO: ingress
