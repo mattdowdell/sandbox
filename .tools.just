@@ -2,7 +2,7 @@
 
 gopath := shell("go env GOPATH")
 
-buf := join(gopath, "bin", "buf-v1.64.0")
+buf := join(gopath, "bin", "buf-v1.65.0")
 
 [private]
 install-buf:
