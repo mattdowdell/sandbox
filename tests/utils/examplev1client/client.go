@@ -40,7 +40,7 @@ func New(baseURL string) (*Client, error) {
 		connect.WithInterceptors(
 			connect.UnaryInterceptorFunc(interceptors.ValidateUnaryInterceptor),
 			connect.UnaryInterceptorFunc(interceptors.ScenarioUnaryInterceptor),
-			connect.UnaryInterceptorFunc(AuthnUnaryInterceptor),
+			connect.UnaryInterceptorFunc(interceptors.AuthnUnaryInterceptor),
 			otelInterceptor,
 		),
 	)

@@ -7,7 +7,6 @@ import (
 	"connectrpc.com/connect"
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/mattdowdell/sandbox/gen/example/v1"
@@ -38,7 +37,7 @@ func Test_Handler_ListResources_Success(t *testing.T) {
 	facade := mockexamplerpc.NewResourceFacade(t)
 	facade.
 		EXPECT().
-		List(ctx, mock.AnythingOfType("*slog.Logger"), pager).
+		List(ctx, mockLogger, pager).
 		Return(
 			&repositories.Paged[*entities.Resource]{
 				Items: []*entities.Resource{
@@ -93,7 +92,7 @@ func Test_Handler_ListResources_Error(t *testing.T) {
 	facade := mockexamplerpc.NewResourceFacade(t)
 	facade.
 		EXPECT().
-		List(ctx, mock.AnythingOfType("*slog.Logger"), pager).
+		List(ctx, mockLogger, pager).
 		Return(nil, domain.ErrInternal).
 		Once()
 

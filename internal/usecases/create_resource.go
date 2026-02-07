@@ -44,6 +44,7 @@ func (u *CreateResource) Execute(
 		return nil, domain.ErrInternal
 	}
 
+	logger = logger.With(slogx.ResourceID(id))
 	resource.Init(id, u.clock.UTCNow())
 
 	if err := store.CreateResource(ctx, resource); err != nil {
@@ -56,11 +57,6 @@ func (u *CreateResource) Execute(
 		return nil, domain.ErrInternal
 	}
 
-	logger.InfoContext(
-		ctx,
-		"created resource",
-		slog.String("id", id.String()),
-		slog.String("name", resource.Name),
-	)
+	logger.InfoContext(ctx, "created resource")
 	return resource, nil
 }

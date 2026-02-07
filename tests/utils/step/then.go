@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
 	"slices"
+	"strings"
 
 	"connectrpc.com/connect"
 

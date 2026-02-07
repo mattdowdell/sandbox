@@ -18,9 +18,8 @@ func (h *Handler) CreateResource(
 	ctx context.Context,
 	req *connect.Request[examplev1.CreateResourceRequest],
 ) (*connect.Response[examplev1.CreateResourceResponse], error) {
-	logger := slogx.FromContext(ctx)
-
 	input := models.ResourceCreateToDomain(req.Msg.GetResource())
+	logger := slogx.FromContext(ctx).With(slogx.ResourceName(input.Name))
 
 	output, err := h.resource.Create(ctx, logger, input)
 	if err != nil {

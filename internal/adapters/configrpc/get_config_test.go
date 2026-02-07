@@ -7,7 +7,6 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 
 	"github.com/mattdowdell/sandbox/gen/config/v1"
 	"github.com/mattdowdell/sandbox/internal/adapters/configrpc"
@@ -23,7 +22,7 @@ func Test_Handler_GetConfig_Success(t *testing.T) {
 	loader := mockconfigrpc.NewLoader(t)
 	loader.
 		EXPECT().
-		Load(mock.AnythingOfType("*configrpc_test.TestConfig")).
+		Load(mockConfig).
 		RunAndReturn(func(target any) error {
 			tgt, ok := target.(*TestConfig)
 			if !ok {
@@ -60,7 +59,7 @@ func Test_Handler_GetConfig_LoadError(t *testing.T) {
 	loader := mockconfigrpc.NewLoader(t)
 	loader.
 		EXPECT().
-		Load(mock.AnythingOfType("*configrpc_test.TestConfig")).
+		Load(mockConfig).
 		Return(errors.New("example")).
 		Once()
 

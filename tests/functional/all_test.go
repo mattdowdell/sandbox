@@ -11,8 +11,8 @@ import (
 	"github.com/mattdowdell/sandbox/tests/utils/authnv1client"
 	"github.com/mattdowdell/sandbox/tests/utils/configv1client"
 	"github.com/mattdowdell/sandbox/tests/utils/examplev1client"
-	"github.com/mattdowdell/sandbox/tests/utils/step"
 	"github.com/mattdowdell/sandbox/tests/utils/input"
+	"github.com/mattdowdell/sandbox/tests/utils/step"
 )
 
 var opts godog.Options
@@ -74,7 +74,7 @@ func InitializeScenario(sc *godog.ScenarioContext) {
 	sc.Given(`^an invalid Resource ID$`, step.InvalidUUID)
 	sc.Given(`^an existing Resource ID$`, step.ExistingID)
 	sc.Given(`^a limit of (-?\d+)$`, step.Limit)
-    sc.Given(`^(\d+) existing Resources$`, step.ExistingResources)
+	sc.Given(`^(\d+) existing Resources$`, step.ExistingResources)
 	sc.Given(`^invalid authentication$`, step.InvalidAuthentication)
 	sc.Given(`^no authentication$`, step.NoAuthentication)
 	sc.Given(`^valid authentication$`, step.ValidAuthentication)
@@ -91,7 +91,7 @@ func InitializeScenario(sc *godog.ScenarioContext) {
 
 	sc.Then(`^I should fail with code=(\w+), msg=(.+)$$`, step.FailWithCodeAndMsg)
 	sc.Then(`^I should receive the Resource$`, step.CheckResource)
-    sc.Then(`^I should receive (\d+) Resources$`, step.CheckResources)
+	sc.Then(`^I should receive (\d+) Resources$`, step.CheckResources)
 	sc.Then(`^I should succeed$`, step.CheckSuccess)
 	sc.Then(`^I should receive the configuration value ([\w\*]+)$`, step.CheckConfigValue)
 

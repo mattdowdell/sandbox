@@ -25,6 +25,11 @@ const (
 	testResourceName = "example"
 )
 
+var (
+	mockLogger   = mock.AnythingOfType("*slog.Logger")
+	mockResource = mock.AnythingOfType("*entities.Resource")
+)
+
 func Test_Handler_CreateResource_Success(t *testing.T) {
 	// arrange
 	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
@@ -35,11 +40,7 @@ func Test_Handler_CreateResource_Success(t *testing.T) {
 	facade := mockexamplerpc.NewResourceFacade(t)
 	facade.
 		EXPECT().
-		Create(
-			ctx,
-			mock.AnythingOfType("*slog.Logger"),
-			mock.AnythingOfType("*entities.Resource"),
-		).
+		Create(ctx, mockLogger, mockResource).
 		RunAndReturn(func(
 			_ context.Context,
 			_ *slog.Logger,
@@ -105,11 +106,7 @@ func Test_Handler_CreateResource_AlreadyExists(t *testing.T) {
 			facade := mockexamplerpc.NewResourceFacade(t)
 			facade.
 				EXPECT().
-				Create(
-					ctx,
-					mock.AnythingOfType("*slog.Logger"),
-					mock.AnythingOfType("*entities.Resource"),
-				).
+				Create(ctx, mockLogger, mockResource).
 				Return(nil, tt.have).
 				Once()
 

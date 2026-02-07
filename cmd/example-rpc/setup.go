@@ -109,7 +109,11 @@ func initObservability(
 		return nil, nil, nil, nil, err
 	}
 
-	extractor := otelx.NewExtractor(otelx.WithSpanID(true), otelx.WithSampled(true))
+	extractor := otelx.NewExtractor(
+		otelx.WithSpanID(true),
+		otelx.WithSampled(true),
+		otelx.WithBaggage(true),
+	)
 	logger := logging.NewAsDefaultFromConfig(conf.Logging, logging.WithExtractors(extractor))
 
 	return tpShutdown, mpShutdown, lpShutdown, logger, nil
@@ -203,7 +207,6 @@ func initHandlerOptions(conf *Config) ([]connect.HandlerOption, error) {
 		grpcreflect.ReflectV1ServiceName,
 		grpcreflect.ReflectV1AlphaServiceName,
 		authnv1connect.AuthnServiceName,
-		configv1connect.ConfigServiceName, // TODO: remove
 	))
 
 	recoverer, err := rpcserver.NewRecoverer()

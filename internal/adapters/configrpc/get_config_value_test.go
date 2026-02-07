@@ -16,6 +16,8 @@ import (
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
+var mockConfig = mock.AnythingOfType("*configrpc_test.TestConfig")
+
 func Test_Handler_GetConfigValue_Success(t *testing.T) {
 	// arrange
 	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
@@ -23,7 +25,7 @@ func Test_Handler_GetConfigValue_Success(t *testing.T) {
 	loader := mockconfigrpc.NewLoader(t)
 	loader.
 		EXPECT().
-		Load(mock.AnythingOfType("*configrpc_test.TestConfig")).
+		Load(mockConfig).
 		RunAndReturn(func(target any) error {
 			tgt, ok := target.(*TestConfig)
 			if !ok {
@@ -60,7 +62,7 @@ func Test_Handler_GetConfigValue_LoadError(t *testing.T) {
 	loader := mockconfigrpc.NewLoader(t)
 	loader.
 		EXPECT().
-		Load(mock.AnythingOfType("*configrpc_test.TestConfig")).
+		Load(mockConfig).
 		Return(errors.New("example")).
 		Once()
 
@@ -105,7 +107,7 @@ func Test_Handler_GetConfigValue_NotFound(t *testing.T) {
 	loader := mockconfigrpc.NewLoader(t)
 	loader.
 		EXPECT().
-		Load(mock.AnythingOfType("*configrpc_test.TestConfig")).
+		Load(mockConfig).
 		RunAndReturn(func(target any) error {
 			tgt, ok := target.(*TestConfig)
 			if !ok {

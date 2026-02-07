@@ -6,7 +6,6 @@ import (
 	"connectrpc.com/connect"
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 
 	"github.com/mattdowdell/sandbox/gen/example/v1"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
@@ -24,7 +23,7 @@ func Test_Handler_DeleteResource_Success(t *testing.T) {
 	facade := mockexamplerpc.NewResourceFacade(t)
 	facade.
 		EXPECT().
-		Delete(ctx, mock.AnythingOfType("*slog.Logger"), id).
+		Delete(ctx, mockLogger, id).
 		Return(nil).
 		Once()
 
@@ -92,7 +91,7 @@ func Test_Handler_DeleteResource_UsecaseError(t *testing.T) {
 			facade := mockexamplerpc.NewResourceFacade(t)
 			facade.
 				EXPECT().
-				Delete(ctx, mock.AnythingOfType("*slog.Logger"), id).
+				Delete(ctx, mockLogger, id).
 				Return(tt.have).
 				Once()
 

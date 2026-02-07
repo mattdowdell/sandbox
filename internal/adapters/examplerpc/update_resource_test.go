@@ -9,7 +9,6 @@ import (
 	"connectrpc.com/connect"
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/mattdowdell/sandbox/gen/example/v1"
@@ -31,11 +30,7 @@ func Test_Handler_UpdateResource_Success(t *testing.T) {
 	facade := mockexamplerpc.NewResourceFacade(t)
 	facade.
 		EXPECT().
-		Update(
-			ctx,
-			mock.AnythingOfType("*slog.Logger"),
-			mock.AnythingOfType("*entities.Resource"),
-		).
+		Update(ctx, mockLogger, mockResource).
 		RunAndReturn(func(
 			_ context.Context,
 			_ *slog.Logger,
@@ -131,11 +126,7 @@ func Test_Handler_UpdateResource_UsecaseError(t *testing.T) {
 			facade := mockexamplerpc.NewResourceFacade(t)
 			facade.
 				EXPECT().
-				Update(
-					ctx,
-					mock.AnythingOfType("*slog.Logger"),
-					mock.AnythingOfType("*entities.Resource"),
-				).
+				Update(ctx, mockLogger, mockResource).
 				Return(nil, tt.have).
 				Once()
 
