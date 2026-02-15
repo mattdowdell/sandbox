@@ -20,7 +20,7 @@ godog := join(gopath, "bin", "godog-v0.15.1")
 install-godog:
     {{ if path_exists(godog) == "true" { "" } else { "bingo get godog" } }}
 
-golangci-lint := join(gopath, "bin", "golangci-lint-v2.8.0")
+golangci-lint := join(gopath, "bin", "golangci-lint-v2.9.0")
 
 [private]
 install-golangci-lint:
