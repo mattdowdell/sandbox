@@ -6,7 +6,7 @@ require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.11-20251209175733-2a1774d88802.1
 	buf.build/gen/go/grpc/grpc/connectrpc/go v1.19.1-20260203201457-e126be52bace.2
 	buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.11-20260203201457-e126be52bace.1
-	buf.build/go/protovalidate v1.1.0
+	buf.build/go/protovalidate v1.1.1
 	connectrpc.com/connect v1.19.1
 	connectrpc.com/grpchealth v1.4.0
 	connectrpc.com/grpcreflect v1.3.0
