@@ -21,8 +21,8 @@ const (
 var ErrNotStruct = errors.New("non-struct found")
 
 var (
-	textMarshaler = reflect.TypeOf(new(encoding.TextMarshaler)).Elem()
-	jsonMarshaler = reflect.TypeOf(new(json.Marshaler)).Elem()
+	textMarshaler = reflect.TypeFor[*encoding.TextMarshaler]().Elem()
+	jsonMarshaler = reflect.TypeFor[*json.Marshaler]().Elem()
 )
 
 // Encode converts a configuration struct to a flattened map using the given delimiter for nested
