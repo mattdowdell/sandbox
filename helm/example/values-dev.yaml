@@ -62,10 +62,6 @@ jobs:
           - key: dbname
             path: database_name
 
-serviceAccount:
-  create: true
-  automount: true
-
 # TODO: services
 # TODO: ingress
 

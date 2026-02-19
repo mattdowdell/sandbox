@@ -4,7 +4,7 @@ kind: Ingress
 metadata:
   name: {{ include "example-rpc.fullname" . }}
   labels:
-    {{- include "example-rpc.labels" . | nindent 4 }}
+    {{- include "helper.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}

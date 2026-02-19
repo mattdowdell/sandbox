@@ -1,6 +1,7 @@
 ---
 
 nameOverride: "example"
+fullnameOverride: ""
 
 config:
   # TODO: labels
@@ -25,6 +26,10 @@ config:
   loggerprovider_insecure: "true"
   loggerprovider_endpoint: "victoria-logs-single-server.default.svc.cluster.local:9428"
   loggerprovider_path: "/insert/opentelemetry/v1/logs"
+
+serviceAccount:
+  create: true
+  automount: true
 
 # TODO: service account
 # TODO: role

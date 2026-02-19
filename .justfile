@@ -301,6 +301,14 @@ container-build go_build_args="": (container-build-rpc go_build_args)
 [group('builds')]
 container-build-rpc go_build_args="": (_container-build "example-rpc" go_build_args)
 
+# Render the example Helm chart.
+render-helm:
+    helm template example ./helm/example \
+        -f ./helm/example/values.yaml \
+        -f ./helm/example/values-example.yaml \
+        -f ./helm/example/values-dev.yaml \
+        --debug
+
 [private]
 _container-build service go_build_args="":
     SOURCE_DATE_EPOCH=0 docker buildx build \

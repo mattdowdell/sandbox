@@ -3,10 +3,7 @@ kind: Service
 metadata:
   name: {{ include "helper.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "helper.fullname" . }}
-    app.kubernetes.io/version: {{ .Chart.AppVersion }}
-    app.kubernetes.io/part-of: {{ include "helper.fullname" . }}
-    helm.sh/chart: {{ include "helper.chart" . }}
+    {{- include "helper.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:

@@ -11,7 +11,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 If release name contains chart name it will be used as a full name.
 */}}
 {{- define "helper.fullname" -}}
-{{- if.Values.fullnameOverride }}
+{{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
 {{- $name := default .Chart.Name .Values.nameOverride }}
@@ -29,6 +29,34 @@ Create chart name and version as used by the chart label.
 {{- define "helper.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
+
+{{/*
+Common labels
+*/}}
+{{- define "helper.labels" -}}
+app: {{ include "helper.fullname" . }}
+app.kubernetes.io/name: {{ include "helper.fullname" . }}
+{{- if .Chart.AppVersion }}
+version: {{ .Chart.AppVersion | quote }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/part-of: {{ include "helper.fullname" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+helm.sh/chart: {{ include "helper.chart" . }}
+{{- end }}
+
+{{/*
+Create the name of the service account to use
+*/}}
+{{- define "helper.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "helper.fullname" .) .Values.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{/* ---------------------------- */}}
 
 {{/*
 Expand the name of the chart.
@@ -80,15 +108,4 @@ Selector labels
 {{- define "example-rpc.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "example-rpc.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end }}
-
-{{/*
-Create the name of the service account to use
-*/}}
-{{- define "helper.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "helper.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
 {{- end }}

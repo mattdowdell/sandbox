@@ -5,19 +5,13 @@ kind: Job
 metadata:
   name: {{ $name }}
   labels:
-    app: {{ $name }}
-    app.kubernetes.io/name: {{ $name }}
-    app.kubernetes.io/version: {{ $.Chart.AppVersion }}
-    app.kubernetes.io/part-of: {{ $.Chart.Name }}
+    {{- include "helper.labels" $ | nindent 4 }}
 spec:
   backoffLimit: 3
   template:
     metadata:
       labels:
-        app: {{ .name }}
-        app.kubernetes.io/name: {{ .name }}
-        app.kubernetes.io/version: {{ $.Chart.AppVersion }}
-        app.kubernetes.io/part-of: {{ $.Chart.Name }}
+        {{- include "helper.labels" $ | nindent 8 }}
     spec:
       containers:
         {{- range .containers }}
