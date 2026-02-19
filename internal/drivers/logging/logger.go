@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"strings"
 
-	"github.com/samber/slog-multi"
 	"go.opentelemetry.io/contrib/bridges/otelslog"
 )
 
@@ -67,7 +66,7 @@ func New(level slog.Leveler, options ...Option) *slog.Logger {
 		ReplaceAttr: replaceAttr(opts),
 	})
 
-	handler := slogmulti.Fanout(
+	handler := slog.NewMultiHandler(
 		Wrap(otelHandler, opts.extractors),
 		Wrap(jsonHandler, opts.extractors),
 	)
