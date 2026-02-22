@@ -7,7 +7,7 @@ nameOverride: ""
 fullnameOverride: ""
 
 # TODO
-config: {}
+configmaps: {}
 
 # TODO
 deployments: {}

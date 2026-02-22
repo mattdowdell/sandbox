@@ -9,7 +9,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ $name }}
+      app.kubernetes.io/name: {{ $name }} # TODO: template
   replicas: {{ .replicas | default 2 }}
   template:
     metadata:
@@ -23,7 +23,7 @@ spec:
           imagePullPolicy: {{ .image.pullPolicy | default "Always" }}
           command: ["/{{ $name }}"]
           securityContext: {{- toYaml $.Values.securityContext | nindent 12 }}
-{{/*          serviceAccountName: { include "helper.serviceAccountName" . } */}}
+          serviceAccountName: {{ include "helper.serviceAccountName" $ }}
           {{- if .env }}
           env:
             {{- range $name, $value := .env }}

@@ -187,13 +187,19 @@ lint-helm: lint-helm-kubeconform lint-helm-kubescore
 # Run the Kubeconform Helm linter.
 [group('linters')]
 lint-helm-kubeconform: install-kubeconform
-    helm template example ./helm/base -f ./helm/base/values-dev.yaml | \
+    helm template example ./helm/example \
+        -f ./helm/example/values.yaml \
+        -f ./helm/example/values-example.yaml \
+        -f ./helm/example/values-dev.yaml | \
         {{ kubeconform }} -verbose -strict -summary
 
 # Run the Kube-score Helm linter.
 [group('linters')]
 lint-helm-kubescore: install-kube-score
-    helm template example ./helm/base -f ./helm/base/values-dev.yaml | \
+    helm template example ./helm/example \
+        -f ./helm/example/values.yaml \
+        -f ./helm/example/values-example.yaml \
+        -f ./helm/example/values-dev.yaml | \
         {{ kube-score }} score - \
             --ignore-test container-resources \
             --ignore-test container-image-tag \
