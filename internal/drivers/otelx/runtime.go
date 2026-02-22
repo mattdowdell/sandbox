@@ -18,15 +18,8 @@ func packageName(skip int) string {
 	pc, _, _, _ := runtime.Caller(1 + skip)
 	fn := runtime.FuncForPC(pc).Name()
 
-	i := strings.LastIndexByte(fn, '/')
-	if i < 0 {
-		i = 0
-	}
-
-	j := strings.IndexByte(fn[i:], '.')
-	if j < 0 {
-		j = 0
-	}
+	i := max(0, strings.LastIndexByte(fn, '/'))
+	j := max(0, strings.IndexByte(fn[i:], '.'))
 
 	return fn[:i+j]
 }

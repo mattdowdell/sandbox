@@ -20,7 +20,7 @@ godog := join(gopath, "bin", "godog-v0.15.1")
 install-godog:
     {{ if path_exists(godog) == "true" { "" } else { "bingo get godog" } }}
 
-golangci-lint := join(gopath, "bin", "golangci-lint-v2.8.0")
+golangci-lint := join(gopath, "bin", "golangci-lint-v2.9.0")
 
 [private]
 install-golangci-lint:
@@ -44,7 +44,7 @@ kubeconform := join(gopath, "bin", "kubeconform-v0.7.0")
 install-kubeconform:
     {{ if path_exists(kubeconform) == "true" { "" } else { "bingo get kubeconform" } }}
 
-mockery := join(gopath, "bin", "mockery-v3.6.3")
+mockery := join(gopath, "bin", "mockery-v3.6.4")
 
 [private]
 install-mockery:
