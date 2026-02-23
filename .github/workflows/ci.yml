@@ -129,7 +129,7 @@ jobs:
           go-version-file: "go.mod"
 
       - name: Install Just
-        uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff # v3.0.0
+        uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3.1.0
 
       - name: Unit test
         run: just unit
@@ -155,7 +155,7 @@ jobs:
           go-version-file: "go.mod"
 
       - name: Install Just
-        uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff # v3.0.0
+        uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3.1.0
 
       # required for trivy to find licenses
       # see https://trivy.dev/latest/docs/coverage/language/golang/#license
@@ -201,7 +201,7 @@ jobs:
           persist-credentials: false
 
       - name: Install Just
-        uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff # v3.0.0
+        uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3.1.0
 
       - name: Setup coverage
         uses: gacts/run-and-post-run@81b6ce503cde93862cec047c54652e45c5dca991 # v1.4.3
