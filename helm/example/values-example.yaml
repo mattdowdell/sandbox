@@ -51,10 +51,9 @@ serviceAccount:
 # TODO: role binding
 
 deployments:
-  example-rpc:
+  rpc:
     # TODO: labels
     # TODO: annotations
-    replicas: 2
     containers:
       example-rpc:
         # TODO: labels
@@ -65,13 +64,13 @@ deployments:
         env:
           # GOCOVERDIR: "/covdata"
           OTEL_GO_X_DEPRECATED_RUNTIME_METRICS: "false"
-          CONFIG_MOUNTS: "/etc/example:/etc/postgresql"
+          CONFIG_MOUNTS: "/mnt/example:/mnt/postgresql"
     configmaps:
       - name: example
-        mountPath: /etc/example
+        mountPath: /mnt/example
     secrets:
       - name: cluster-postgresql-app
-        mountPath: /etc/postgresql
+        mountPath: /mnt/postgresql
         items:
           - key: password
             path: database_password
@@ -81,7 +80,7 @@ deployments:
             path: database_name
 
 jobs:
-  example-db-migrate:
+  db-migrate:
     # TODO: labels
     # TODO: annotations
     containers:

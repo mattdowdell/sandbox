@@ -1,27 +1,22 @@
-{{- range $name, $d := .Values.deployments }}
+{{- range $name, $deployment := .Values.deployments }}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "helpers.fullname" (dict "name" $name "context" $) }}
-  namespace: {{ $.Release.Namespace }}
+  name: {{ $name }}
   labels:
-    {{- include "helpers.labels" $ | nindent 4 }}
-    {{- include "helpers.selectorLabels" (dict "name" $name "context" $) | nindent 4 }}
+    {{- include "helper.labels" (dict "name" $name "context" $) | nindent 4 }}
 spec:
-  replicas:  {{ .replicas | default 2 }}
-  {{- /* TODO: strategy: */}}
-  progressDeadlineSeconds: {{ .progressDeadlineSeconds | default 600 }}
+  replicas: {{ .replicas | default 2 }}
   selector:
     matchLabels:
-      {{- include "helpers.selectorLabels" (dict "name" $name "context" $) | nindent 6 }}
+      {{- include "helper.selectorLabels" $ | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "helpers.selectorLabels" (dict "name" $name "context" $) | nindent 8 }}
+        {{- include "helper.labels" $ | nindent 8 }}
     spec:
-      serviceAccountName: {{ include "helpers.serviceAccountName" $ }}
-      {{- if .containers }}
+      serviceAccountName: {{ include "helper.serviceAccountName" $ }}
       containers:
         {{- range $name, $container := .containers }}
         - name: {{ $name }}
@@ -36,29 +31,28 @@ spec:
               value: {{ $value | quote }}
             {{- end}}
           {{- end }}
-          {{- if or $d.configmaps $d.secrets }}
+          {{- if or $deployment.configmaps $deployment.secrets }}
           volumeMounts:
-            {{- range $d.configmaps }}
+            {{- range $deployment.configmaps }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
               readOnly: true
             {{- end }}
-            {{- range $d.secrets }}
+            {{- range $deployment.secrets }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
               readOnly: true
             {{- end }}
           {{- end }}
         {{- end }}
-      {{- end }}
-      {{- if or $d.configmaps $d.secrets }}
+      {{- if or $deployment.configmaps $deployment.secrets }}
       volumes:
-        {{- range $d.configmaps }}
+        {{- range .configmaps }}
         - name: {{ .name }}
           configMap:
             name: {{ .name }}
         {{- end }}
-        {{- range $d.secrets }}
+        {{- range .secrets }}
         - name: {{ .name }}
           secret:
             secretName: {{ .name }}

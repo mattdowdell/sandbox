@@ -23,35 +23,34 @@ configmaps:
       tracerprovider_insecure: "true"
       tracerprovider_endpoint: "tempo.default.svc.cluster.local:4318"
 
-deployments:
-  example-rpc:
-    # TODO: labels
-    # TODO: annotations
-    replicas: 2
-    containers:
-      example-rpc:
-        # TODO: labels
-        # TODO: annotations
-        image:
-          repository: example-rpc
-          # tag: latest
-        env:
-          # GOCOVERDIR: "/covdata"
-          OTEL_GO_X_DEPRECATED_RUNTIME_METRICS: "false"
-          CONFIG_MOUNTS: "/etc/example:/etc/postgresql"
-    configmaps:
-      - name: example
-        mountPath: /etc/example
-    secrets:
-      - name: cluster-postgresql-app
-        mountPath: /etc/postgresql
-        items:
-          - key: password
-            path: database_password
-          - key: username
-            path: database_username
-          - key: dbname
-            path: database_name
+# deployments: {}
+  # rpc:
+  #   # TODO: labels
+  #   # TODO: annotations
+  #   containers:
+  #     example-rpc:
+  #       # TODO: labels
+  #       # TODO: annotations
+  #       image:
+  #         repository: example-rpc
+  #         # tag: latest
+  #       env:
+  #         # GOCOVERDIR: "/covdata"
+  #         OTEL_GO_X_DEPRECATED_RUNTIME_METRICS: "false"
+  #         CONFIG_MOUNTS: "/etc/example:/etc/postgresql"
+  #   configmaps:
+  #     - name: example
+  #       mountPath: /etc/example
+  #   secrets:
+  #     - name: cluster-postgresql-app
+  #       mountPath: /etc/postgresql
+  #       items:
+  #         - key: password
+  #           path: database_password
+  #         - key: username
+  #           path: database_username
+  #         - key: dbname
+  #           path: database_name
 
 jobs:
   example-db-migrate:
