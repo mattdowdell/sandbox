@@ -1,6 +1,6 @@
 ---
 name: Container Build
-description: TODO
+description: Build, push, scan and sign a container.
 
 inputs:
   service:

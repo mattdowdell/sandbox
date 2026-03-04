@@ -115,7 +115,6 @@ jobs:
       - name: Lint Actions
         uses: reviewdog/action-actionlint@0d952c597ef8459f634d7145b0b044a9699e5e43 # v1.71.0
 
-
   unit:
     name: Unit test
     runs-on: ubuntu-latest

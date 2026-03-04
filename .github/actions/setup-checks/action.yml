@@ -1,6 +1,6 @@
 ---
 name: "Setup Checks"
-description: TODO
+description: Setup a runner for running 'just checks'.
 
 runs:
   using: "composite"

@@ -1,6 +1,6 @@
 ---
 name: Bingo Update
-description: TODO
+description: Update a tool managed by Bingo.
 
 inputs:
   name:
