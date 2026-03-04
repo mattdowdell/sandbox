@@ -1,5 +1,6 @@
 ---
 name: "Setup Checks"
+description: TODO
 
 runs:
   using: "composite"

@@ -94,7 +94,15 @@ jobs:
         with:
           go-version-file: "go.mod"
 
-      - name: Get version
+      - name: Install Just
+        uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3.1.0
+
+      - name: Install bingo
+        uses: mattdowdell/go-installer@7af1f9ff5af1447fd122d6b144ddce2562b76e09 # v0.3.0
+        with:
+          package: github.com/bwplotka/bingo
+
+      - name: Get golangci-lint version
         id: version
         run: |
           ./tools/bingo-version.sh golangci-lint >> $GITHUB_OUTPUT
@@ -111,6 +119,11 @@ jobs:
           pr_comment: false
           format: false
           breaking: false
+
+      - name: Lint Actions
+        run: |
+          just lint-actions
+
 
   unit:
     name: Unit test

@@ -2,6 +2,12 @@
 
 gopath := shell("go env GOPATH")
 
+actionlint := join(gopath, "bin", "actionlint-v1.7.11")
+
+[private]
+install-actionlint:
+    {{ if path_exists(actionlint) == "true" { "" } else { "bingo get actionlint" } }}
+
 buf := join(gopath, "bin", "buf-v1.65.0")
 
 [private]

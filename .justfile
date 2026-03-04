@@ -168,7 +168,7 @@ dirty:
 
 # Run all linters.
 [group('linters')]
-lint: lint-buf lint-go
+lint: lint-buf lint-go lint-actions
 
 # Run the Protobuf linter.
 [group('linters')]
@@ -179,6 +179,11 @@ lint-buf: install-buf
 [group('linters')]
 lint-go: install-golangci-lint
     {{ golangci-lint }} run
+
+# Run the actions linter.
+[group('linters')]
+lint-actions: install-actionlint
+    {{ actionlint }}
 
 # Run all linter fixers.
 [group('linters')]
