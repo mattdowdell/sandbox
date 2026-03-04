@@ -94,14 +94,6 @@ jobs:
         with:
           go-version-file: "go.mod"
 
-      - name: Install Just
-        uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3.1.0
-
-      - name: Install bingo
-        uses: mattdowdell/go-installer@7af1f9ff5af1447fd122d6b144ddce2562b76e09 # v0.3.0
-        with:
-          package: github.com/bwplotka/bingo
-
       - name: Get golangci-lint version
         id: version
         run: |
@@ -121,8 +113,7 @@ jobs:
           breaking: false
 
       - name: Lint Actions
-        run: |
-          just lint-actions
+        uses: reviewdog/action-actionlint@0d952c597ef8459f634d7145b0b044a9699e5e43 # v1.71.0
 
 
   unit:
