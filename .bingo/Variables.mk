@@ -13,16 +13,22 @@ GOHOSTARM    ?= $(shell $(GO) env GOHOSTARM)
 
 # Below generated variables ensure that every time a tool under each variable is invoked, the correct version
 # will be used; reinstalling only if needed.
-# For example for buf variable:
+# For example for actionlint variable:
 #
 # In your main Makefile (for non array binaries):
 #
 #include .bingo/Variables.mk # Assuming -dir was set to .bingo .
 #
-#command: $(BUF)
-#	@echo "Running buf"
-#	@$(BUF) <flags/args..>
+#command: $(ACTIONLINT)
+#	@echo "Running actionlint"
+#	@$(ACTIONLINT) <flags/args..>
 #
+ACTIONLINT := $(GOBIN)/actionlint-v1.7.11
+$(ACTIONLINT): $(BINGO_DIR)/actionlint.mod
+	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
+	@echo "(re)installing $(GOBIN)/actionlint-v1.7.11"
+	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=actionlint.mod -o=$(GOBIN)/actionlint-v1.7.11 "github.com/rhysd/actionlint/cmd/actionlint"
+
 BUF := $(GOBIN)/buf-v1.65.0
 $(BUF): $(BINGO_DIR)/buf.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.

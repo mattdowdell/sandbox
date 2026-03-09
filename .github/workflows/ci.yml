@@ -94,7 +94,7 @@ jobs:
         with:
           go-version-file: "go.mod"
 
-      - name: Get version
+      - name: Get golangci-lint version
         id: version
         run: |
           ./tools/bingo-version.sh golangci-lint >> $GITHUB_OUTPUT
@@ -111,6 +111,9 @@ jobs:
           pr_comment: false
           format: false
           breaking: false
+
+      - name: Lint Actions
+        uses: reviewdog/action-actionlint@0d952c597ef8459f634d7145b0b044a9699e5e43 # v1.71.0
 
   unit:
     name: Unit test

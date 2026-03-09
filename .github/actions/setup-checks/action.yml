@@ -1,5 +1,6 @@
 ---
 name: "Setup Checks"
+description: Setup a runner for running 'just checks'.
 
 runs:
   using: "composite"
