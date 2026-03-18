@@ -113,7 +113,7 @@ jobs:
       - name: Report failure
         if: failure()
         run: |
-          url=`gh run --repo "${GITHUB_REPOSITORY}" view "${GITHUB_RUN_ID}" --json jobs --jq '.jobs[].url'`
+          url=$(gh run --repo "${GITHUB_REPOSITORY}" view "${GITHUB_RUN_ID}" --json jobs --jq '.jobs[].url')
 
           gh pr comment "${ISSUE_NUMBER}" \
             --repo "${GITHUB_REPOSITORY}" \
