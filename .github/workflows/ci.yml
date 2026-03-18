@@ -34,10 +34,10 @@ jobs:
 
       - name: Outputs
         run: |
-          echo size=${SIZE}
-          echo includes=${INCLUDES}
-          echo excludes=${EXCLUDES}
-          echo ignores=${IGNORES}
+          echo "size=${SIZE}"
+          echo "includes=${INCLUDES}"
+          echo "excludes=${EXCLUDES}"
+          echo "ignores=${IGNORES}"
         env:
           SIZE: ${{ steps.size.outputs.size }}
           INCLUDES: ${{ steps.size.outputs.includes }}
@@ -97,7 +97,7 @@ jobs:
       - name: Get golangci-lint version
         id: version
         run: |
-          ./tools/bingo-version.sh golangci-lint >> $GITHUB_OUTPUT
+          ./tools/bingo-version.sh golangci-lint >> "$GITHUB_OUTPUT"
 
       - name: Lint Go
         uses: golangci/golangci-lint-action@1e7e51e771db61008b38414a730f564565cf7c20 # v9.2.0
@@ -171,7 +171,7 @@ jobs:
       - name: Get trivy version
         id: trivy-version
         run: |
-          ./tools/bingo-version.sh trivy >> $GITHUB_OUTPUT
+          ./tools/bingo-version.sh trivy >> "$GITHUB_OUTPUT"
 
       - name: Run trivy
         uses: aquasecurity/trivy-action@e368e328979b113139d6f9068e03accaed98a518 # 0.34.1
@@ -308,7 +308,7 @@ jobs:
       - name: Get trivy version
         id: trivy-version
         run: |
-          ./tools/bingo-version.sh trivy >> $GITHUB_OUTPUT
+          ./tools/bingo-version.sh trivy >> "$GITHUB_OUTPUT"
 
       - name: Build
         uses: ./.github/actions/container-build
