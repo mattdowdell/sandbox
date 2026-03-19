@@ -17,6 +17,11 @@ import (
 	"github.com/mattdowdell/sandbox/mocks/gen/authn/v1/mockauthnv1connect"
 )
 
+const (
+	testToken      = "an.example.jwt" //#nosec:G101 // not a hardcoded credential
+	testAuthHeader = "Bearer " + testToken
+)
+
 var mockCtx = mock.AnythingOfType("*context.valueCtx")
 
 // Request implements connect.AnyRequest, but delegates some methods to a generated mock.
@@ -76,13 +81,13 @@ func Test_Interceptor_WrapUnary_Success(t *testing.T) {
 		options  []authn.Option
 	}{
 		"uppercase bearer scheme": {
-			authn: "BEARER an.example.jwt",
+			authn: "BEARER " + testToken,
 		},
 		"lowercase bearer scheme": {
-			authn: "bearer an.example.jwt",
+			authn: "bearer " + testToken,
 		},
 		"capitalised bearer scheme": {
-			authn: "Bearer an.example.jwt",
+			authn: testAuthHeader,
 		},
 		"no authorization with ignore": {
 			options: []authn.Option{authn.WithIgnoreService("grpc.health.v1.Health")},
@@ -98,7 +103,7 @@ func Test_Interceptor_WrapUnary_Success(t *testing.T) {
 				Authenticate(
 					t.Context(),
 					connect.NewRequest(&authnv1.AuthenticateRequest{
-						Token: "an.example.jwt",
+						Token: testToken,
 					}),
 				).
 				Return(
@@ -161,7 +166,7 @@ func Test_Interceptor_WrapUnary_Error(t *testing.T) {
 			want: "unauthenticated: invalid or missing authorization",
 		},
 		"incorrect authorization scheme": {
-			authn: "Basic an.example.jwt",
+			authn: "Basic " + testToken,
 			client: func(t *testing.T) authnv1connect.AuthnServiceClient {
 				t.Helper()
 				return mockauthnv1connect.NewAuthnServiceClient(t)
@@ -169,7 +174,7 @@ func Test_Interceptor_WrapUnary_Error(t *testing.T) {
 			want: "unauthenticated: invalid or missing authorization",
 		},
 		"unauthenticated": {
-			authn: "Bearer an.example.jwt",
+			authn: testAuthHeader,
 			client: func(t *testing.T) authnv1connect.AuthnServiceClient {
 				t.Helper()
 
@@ -179,7 +184,7 @@ func Test_Interceptor_WrapUnary_Error(t *testing.T) {
 					Authenticate(
 						t.Context(),
 						connect.NewRequest(&authnv1.AuthenticateRequest{
-							Token: "an.example.jwt",
+							Token: testToken,
 						}),
 					).
 					Return(
@@ -193,7 +198,7 @@ func Test_Interceptor_WrapUnary_Error(t *testing.T) {
 			want: "unauthenticated: example",
 		},
 		"unavailable": {
-			authn: "Bearer an.example.jwt",
+			authn: testAuthHeader,
 			client: func(t *testing.T) authnv1connect.AuthnServiceClient {
 				t.Helper()
 
@@ -203,7 +208,7 @@ func Test_Interceptor_WrapUnary_Error(t *testing.T) {
 					Authenticate(
 						t.Context(),
 						connect.NewRequest(&authnv1.AuthenticateRequest{
-							Token: "an.example.jwt",
+							Token: testToken,
 						}),
 					).
 					Return(
@@ -217,7 +222,7 @@ func Test_Interceptor_WrapUnary_Error(t *testing.T) {
 			want: "unavailable: service unavailable",
 		},
 		"internal": {
-			authn: "Bearer an.example.jwt",
+			authn: testAuthHeader,
 			client: func(t *testing.T) authnv1connect.AuthnServiceClient {
 				t.Helper()
 
@@ -227,7 +232,7 @@ func Test_Interceptor_WrapUnary_Error(t *testing.T) {
 					Authenticate(
 						t.Context(),
 						connect.NewRequest(&authnv1.AuthenticateRequest{
-							Token: "an.example.jwt",
+							Token: testToken,
 						}),
 					).
 					Return(
@@ -272,7 +277,7 @@ func Test_Interceptor_WrapStreamingHandler_Success(t *testing.T) {
 		Authenticate(
 			t.Context(),
 			connect.NewRequest(&authnv1.AuthenticateRequest{
-				Token: "an.example.jwt",
+				Token: testToken,
 			}),
 		).
 		Return(
@@ -286,7 +291,7 @@ func Test_Interceptor_WrapStreamingHandler_Success(t *testing.T) {
 	interceptor := authn.New(client)
 
 	headers := http.Header{}
-	headers.Set("Authorization", "Bearer an.example.jwt")
+	headers.Set("Authorization", testAuthHeader)
 
 	conn := mockconnect.NewStreamingHandlerConn(t)
 	conn.EXPECT().Spec().Return(connect.Spec{}).Once()
@@ -318,7 +323,7 @@ func Test_Interceptor_WrapStreamingHandler_Error(t *testing.T) {
 			want: "unauthenticated: invalid or missing authorization",
 		},
 		"auth failed": {
-			authn: "Bearer an.example.jwt",
+			authn: testAuthHeader,
 			client: func(t *testing.T) authnv1connect.AuthnServiceClient {
 				t.Helper()
 
@@ -328,7 +333,7 @@ func Test_Interceptor_WrapStreamingHandler_Error(t *testing.T) {
 					Authenticate(
 						t.Context(),
 						connect.NewRequest(&authnv1.AuthenticateRequest{
-							Token: "an.example.jwt",
+							Token: testToken,
 						}),
 					).
 					Return(
