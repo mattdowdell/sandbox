@@ -50,7 +50,7 @@ kubeconform := join(gopath, "bin", "kubeconform-v0.7.0")
 install-kubeconform:
     {{ if path_exists(kubeconform) == "true" { "" } else { "bingo get kubeconform" } }}
 
-mockery := join(gopath, "bin", "mockery-v3.6.4")
+mockery := join(gopath, "bin", "mockery-v3.7.0")
 
 [private]
 install-mockery:
