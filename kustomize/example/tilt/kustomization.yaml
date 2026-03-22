@@ -1,0 +1,14 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../base
+patches:
+  - path: configmap.yaml
+images:
+  - name: "ghcr.io/mattdowdell/sandbox/example-rpc"
+    newName: "example-rpc"
+    newTag: "latest"
+  - name: "ghcr.io/mattdowdell/sandbox/example-db-migrate"
+    newName: "example-db-migrate"
+    newTag: "latest"

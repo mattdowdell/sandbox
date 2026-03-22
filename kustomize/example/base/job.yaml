@@ -1,0 +1,53 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: example-db-migrate
+spec:
+  completions: 1
+  backoffLimit: 3
+  template:
+    spec:
+      containers:
+        - name: example-db-migrate
+          image: "ghcr.io/mattdowdell/sandbox/example-db-migrate"
+          imagePullPolicy: Always
+          command: ["/example-db-migrate"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsUser: 65532 # distroless nonroot
+            runAsGroup: 65532  # distroless nonroot
+            capabilities:
+              drop:
+                - "ALL"
+          env:
+            - name: CONFIG_MOUNTS
+              value: "/mnt/example:/mnt/postgresql"
+            - name: OTEL_SEMCONV_STABILITY_OPT_IN
+              value: "database"
+            - name: GOCOVERDIR
+              value: "/covdata"
+          volumeMounts:
+            - name: example
+              mountPath: /mnt/example
+              readOnly: true
+            - name: postgresql
+              mountPath: /mnt/postgresql
+              readOnly: true
+      volumes:
+        - name: example
+          configMap:
+            name: example
+        - name: postgresql
+          secret:
+            secretName: cluster-postgresql-app
+            items:
+              - key: password
+                path: database_password
+              - key: username
+                path: database_username
+              - key: dbname
+                path: database_name
+      restartPolicy: Never
+      serviceAccountName: example

@@ -7,6 +7,7 @@ import (
 
 	"go.opentelemetry.io/contrib/instrumentation/runtime"
 
+	"github.com/mattdowdell/sandbox/internal/drivers/config"
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx/logx"
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx/metricx"
@@ -56,7 +57,15 @@ func (a *App) Run(ctx context.Context) error {
 	ctx, span := otelx.Tracer().Start(ctx, "DB Migrate")
 	defer span.End()
 
-	a.logger.InfoContext(ctx, "starting", slogx.Config(a.conf))
+	encoded, err := config.Encode(a.conf, "_")
+	if err != nil {
+		span.RecordError(err)
+		a.logger.ErrorContext(ctx, "failed to encode config")
+
+		return err
+	}
+
+	a.logger.InfoContext(ctx, "starting", slogx.Config(encoded))
 
 	if err := runtime.Start(); err != nil {
 		span.RecordError(err)

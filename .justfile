@@ -185,6 +185,29 @@ lint-go: install-golangci-lint
 lint-actions: install-actionlint
     {{ actionlint }}
 
+# Run the K8S linters.
+[group('linters')]
+lint-k8s: lint-k8s-kubeconform lint-k8s-kubescore
+
+# Run the Kubeconform linter.
+[group('linters')]
+lint-k8s-kubeconform: install-kustomize install-kubeconform
+    {{ kustomize }} build ./kustomize/example/base/ | {{ kubeconform }}
+
+[group('linters')]
+lint-k8s-kubescore: install-kustomize install-kube-score
+    @# ignore anti-affinity in favour of topology spread constraints
+    @# https://github.com/zegl/kube-score/issues/613
+    @#
+    @# ignore ephemeral storage, use a readonly filesystem instead
+    @#
+    @# ignore network policy, revisit if/when we setup ingress
+    {{ kustomize }} build ./kustomize/example/base/ | {{ kube-score }} score - \
+        --ignore-test deployment-has-host-podantiaffinity \
+        --ignore-test container-ephemeral-storage-request-and-limit \
+        --ignore-test pod-networkpolicy \
+        --enable-optional-test container-ports-check
+
 # Run all linter fixers.
 [group('linters')]
 lint-fix:
@@ -312,3 +335,7 @@ _container-scan service: install-trivy
         --config trivy.yaml \
         --docker-host unix://{{ env('HOME') }}/.colima/default/docker.sock \
         {{ service }}:local
+
+render-k8s: install-kustomize
+    {{ kustomize }} build ./kustomize/example/base/
+

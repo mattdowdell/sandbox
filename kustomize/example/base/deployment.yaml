@@ -1,0 +1,78 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-rpc
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: example
+  replicas: 3
+  template:
+    spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: example
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - command: ["/example-rpc"]
+          image: "ghcr.io/mattdowdell/sandbox/example-rpc"
+          name: "example-rpc"
+          ports:
+            - name: http-rpc
+              containerPort: 5000
+              protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsUser: 65532 # distroless nonroot
+            runAsGroup: 65532  # distroless nonroot
+            capabilities:
+              drop:
+                - "ALL"
+          readinessProbe:
+            grpc:
+              port: 5000
+          env:
+            - name: CONFIG_MOUNTS
+              value: "/mnt/example:/mnt/postgresql"
+            - name: OTEL_SEMCONV_STABILITY_OPT_IN
+              value: "database"
+            - name: GOCOVERDIR
+              value: "/covdata"
+          volumeMounts:
+            - name: example
+              mountPath: /mnt/example
+              readOnly: true
+            - name: postgresql
+              mountPath: /mnt/postgresql
+              readOnly: true
+              items:
+                - key: password
+                  path: database_password
+                - key: username
+                  path: database_username
+                - key: dbname
+                  path: database_name
+      volumes:
+        - name: example
+          configMap:
+            name: example
+        - name: postgresql
+          secret:
+            secretName: cluster-postgresql-app
+            items:
+              - key: password
+                path: database_password
+              - key: username
+                path: database_username
+              - key: dbname
+                path: database_name
+      serviceAccountName: example
