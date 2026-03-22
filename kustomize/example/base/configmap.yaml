@@ -7,7 +7,6 @@ data:
   authn_address: ""
   database_hostname: ""
   database_port: "5432"
-  database_username: ""
   database_name: ""
   database_sslmode: "verify-full"
   database_maxidletime: "5m"

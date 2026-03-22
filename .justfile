@@ -189,11 +189,12 @@ lint-actions: install-actionlint
 [group('linters')]
 lint-k8s: lint-k8s-kubeconform lint-k8s-kubescore
 
-# Run the Kubeconform linter.
+# Run the kubeconform linter.
 [group('linters')]
 lint-k8s-kubeconform: install-kustomize install-kubeconform
     {{ kustomize }} build ./kustomize/example/base/ | {{ kubeconform }}
 
+# Run the kube-score linter.
 [group('linters')]
 lint-k8s-kubescore: install-kustomize install-kube-score
     @# ignore anti-affinity in favour of topology spread constraints
@@ -335,7 +336,3 @@ _container-scan service: install-trivy
         --config trivy.yaml \
         --docker-host unix://{{ env('HOME') }}/.colima/default/docker.sock \
         {{ service }}:local
-
-render-k8s: install-kustomize
-    {{ kustomize }} build ./kustomize/example/base/
-
