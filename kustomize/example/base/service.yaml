@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: example-rpc
+spec:
+  ports:
+    - name: http-rpc
+      port: 5000
+      protocol: TCP
+      appProtocol: http
+  selector:
+    app.kubernetes.io/name: example

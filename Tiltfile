@@ -17,7 +17,54 @@ load("ext://helm_remote", "helm_remote")
 # Local services
 # --------------
 
-# TODO
+# Tilt's docker_build excludes .git per https://github.com/tilt-dev/tilt/issues/2169
+# but we need that for db migrations and otel resource attributes
+def custom_docker_build(name):
+    custom_build(
+        ref=name,
+        command="docker buildx build --pull --target runtime --build-arg SERVICE={name} -t $EXPECTED_REF .".format(
+            name=name,
+        ),
+        deps=[
+            os.path.join(config.main_dir, "Dockerfile"),
+            os.path.join(config.main_dir, "cmd"),
+            os.path.join(config.main_dir, "internal"),
+            os.path.join(config.main_dir, "pkg"),
+        ],
+    )
+
+custom_docker_build("example-rpc")
+custom_docker_build("example-db-migrate")
+
+k8s_yaml(kustomize("kustomize/example/tilt"))
+
+k8s_resource(
+    "example-rpc",
+    objects=[
+        "example:configmap",
+        "example:serviceaccount",
+        "example-rpc:poddisruptionbudget",
+    ],
+    labels=["services"],
+    port_forwards=["127.0.0.1:5000:5000"],
+    resource_deps=[
+        "postgresql",
+        "tempo",
+        "victoria-metrics-single-server",
+        "victoria-logs-single-server",
+    ],
+)
+
+k8s_resource(
+    "example-db-migrate",
+    labels=["services"],
+    resource_deps=[
+        "postgresql",
+        "tempo",
+        "victoria-metrics-single-server",
+        "victoria-logs-single-server",
+    ],
+)
 
 # --------
 # Database
@@ -75,6 +122,9 @@ helm_remote(
 k8s_resource(
     "cluster-postgresql",
     new_name="postgresql",
+    objects=[
+        "cluster-postgresql-monitoring-logical-replication:configmap"
+    ],
     labels="postgresql",
     resource_deps=["cloudnative-pg"],
     port_forwards=["127.0.0.1:5432:5432"],

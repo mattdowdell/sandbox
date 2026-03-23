@@ -71,6 +71,12 @@ $(KUBECONFORM): $(BINGO_DIR)/kubeconform.mod
 	@echo "(re)installing $(GOBIN)/kubeconform-v0.7.0"
 	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=kubeconform.mod -o=$(GOBIN)/kubeconform-v0.7.0 "github.com/yannh/kubeconform/cmd/kubeconform"
 
+KUSTOMIZE := $(GOBIN)/kustomize-v5.8.1
+$(KUSTOMIZE): $(BINGO_DIR)/kustomize.mod
+	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
+	@echo "(re)installing $(GOBIN)/kustomize-v5.8.1"
+	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=kustomize.mod -o=$(GOBIN)/kustomize-v5.8.1 "sigs.k8s.io/kustomize/kustomize/v5"
+
 MOCKERY := $(GOBIN)/mockery-v3.7.0
 $(MOCKERY): $(BINGO_DIR)/mockery.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
