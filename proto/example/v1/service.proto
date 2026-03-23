@@ -12,10 +12,14 @@ service ExampleService {
   rpc CreateResource(CreateResourceRequest) returns (CreateResourceResponse) {}
 
   // ...
-  rpc GetResource(GetResourceRequest) returns (GetResourceResponse) {}
+  rpc GetResource(GetResourceRequest) returns (GetResourceResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // ...
-  rpc ListResources(ListResourcesRequest) returns (ListResourcesResponse) {}
+  rpc ListResources(ListResourcesRequest) returns (ListResourcesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // ...
   rpc UpdateResource(UpdateResourceRequest) returns (UpdateResourceResponse) {}
@@ -24,7 +28,9 @@ service ExampleService {
   rpc DeleteResource(DeleteResourceRequest) returns (DeleteResourceResponse) {}
 
   // ...
-  rpc ListAuditEvents(ListAuditEventsRequest) returns (ListAuditEventsResponse) {}
+  rpc ListAuditEvents(ListAuditEventsRequest) returns (ListAuditEventsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // ...
   rpc WatchAuditEvents(WatchAuditEventsRequest) returns (stream WatchAuditEventsResponse) {}

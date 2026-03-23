@@ -17,9 +17,13 @@ const (
 	TraceIDKey      = "trace_id"
 	SpanIDKey       = "span_id"
 	SampledKey      = "sampled"
+	SubjectKey      = "subject"
 	RPCSystemKey    = "rpc_system"
 	RPCServiceKey   = "rpc_service"
 	RPCMethodKey    = "rpc_method"
+
+	ResourceIDKey   = "resource_id"
+	ResourceNameKey = "resource_name"
 )
 
 // ...
@@ -65,6 +69,11 @@ func Sampled(span trace.Span) slog.Attr {
 }
 
 // ...
+func Subject(subject string) slog.Attr {
+	return slog.String(SubjectKey, subject)
+}
+
+// ...
 func RPCSystem(system string) slog.Attr {
 	return slog.String(RPCSystemKey, system)
 }
@@ -77,4 +86,14 @@ func RPCService(service string) slog.Attr {
 // ...
 func RPCMethod(method string) slog.Attr {
 	return slog.String(RPCMethodKey, method)
+}
+
+// ...
+func ResourceID(id fmt.Stringer) slog.Attr {
+	return slog.String(ResourceIDKey, id.String())
+}
+
+// ...
+func ResourceName(name string) slog.Attr {
+	return slog.String(ResourceNameKey, name)
 }

@@ -12,6 +12,7 @@ import (
 
 	"github.com/mattdowdell/sandbox/gen/example/v1"
 	"github.com/mattdowdell/sandbox/gen/example/v1/examplev1connect"
+	"github.com/mattdowdell/sandbox/tests/utils/interceptors"
 )
 
 // ...
@@ -37,9 +38,9 @@ func New(baseURL string) (*Client, error) {
 		http.DefaultClient,
 		baseURL,
 		connect.WithInterceptors(
-			connect.UnaryInterceptorFunc(ValidateUnaryInterceptor),
-			connect.UnaryInterceptorFunc(ScenarioUnaryInterceptor),
-			connect.UnaryInterceptorFunc(AuthnUnaryInterceptor),
+			connect.UnaryInterceptorFunc(interceptors.ValidateUnaryInterceptor),
+			connect.UnaryInterceptorFunc(interceptors.ScenarioUnaryInterceptor),
+			connect.UnaryInterceptorFunc(interceptors.AuthnUnaryInterceptor),
 			otelInterceptor,
 		),
 	)
@@ -50,7 +51,10 @@ func New(baseURL string) (*Client, error) {
 }
 
 // ...
-func (c *Client) CreateResource(ctx context.Context, name string) (*examplev1.Resource, Cleanup, error) {
+func (c *Client) CreateResource(
+	ctx context.Context,
+	name string,
+) (*examplev1.Resource, Cleanup, error) {
 	resp, err := c.inner.CreateResource(
 		ctx,
 		connect.NewRequest(&examplev1.CreateResourceRequest{
@@ -83,7 +87,26 @@ func (c *Client) GetResource(ctx context.Context, id string) (*examplev1.Resourc
 }
 
 // ...
-func (c *Client) UpdateResource(ctx context.Context, id, name string) (*examplev1.Resource, error) {
+func (c *Client) ListResources(ctx context.Context, limit int32) ([]*examplev1.Resource, string, error) {
+	resp, err := c.inner.ListResources(
+		ctx,
+		connect.NewRequest(&examplev1.ListResourcesRequest{
+			Limit: limit,
+		}),
+	)
+	if err != nil {
+		return nil, "", err
+	}
+
+	return resp.Msg.GetItems(), resp.Msg.GetNext(), nil
+}
+
+// ...
+func (c *Client) UpdateResource(
+	ctx context.Context,
+	id string,
+	name string,
+) (*examplev1.Resource, error) {
 	resp, err := c.inner.UpdateResource(
 		ctx,
 		connect.NewRequest(&examplev1.UpdateResourceRequest{

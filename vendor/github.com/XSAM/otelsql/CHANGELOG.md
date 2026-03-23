@@ -8,6 +8,48 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [0.41.0] - 2025-12-16
+
+### ⚠️ Notice ⚠️
+
+This release contains breaking changes:
+
+- `RegisterDBStatsMetrics` now returns `(metric.Registration, error)` (previously returned only `error`) so callers can `Unregister()` the callback and avoid memory leaks.
+  - If you need to unregister: `reg, err := RegisterDBStatsMetrics(...)` + `defer reg.Unregister()`.
+  - If you do not need to unregister: `_, err := RegisterDBStatsMetrics(...)`.
+- `WithAttributes` now appends attributes when specified multiple times (previously overwrote existing attributes).
+  - If you relied on overwriting: consolidate your attributes into a single `WithAttributes(...)` call.
+
+### Added
+
+- `WithTextMapPropagator` allows customization of the OTel text map propagator used by SQLCommenter. (#540)
+  This is an experimental feature and may be changed or removed in a later release.
+
+### Removed
+
+- Drop support for [Go 1.23]. (#533)
+
+### Changed
+
+- Reduce allocations and improve performance when creating spans. (#549)
+- Reduce allocations when recording metrics. (#550)
+- `RegisterDBStatsMetrics` now returns a `metric.Registration` so callbacks can be unregistered. (#580)
+- `WithAttributes` now accumulates attributes across multiple calls instead of overwriting. (#576)
+- Upgrade OTel to `v1.39.0`. (#583)
+
+## [0.40.0] - 2025-09-08
+
+This release is the last to support [Go 1.23].
+The next release will require at least [Go 1.24].
+
+### Added
+
+- Support testing of [Go 1.25]. (#517)
+
+### Changed
+
+- Upgrade OTel to `v1.38.0/v0.60.0`. (#510)
+
 ## [0.39.0] - 2025-06-05
 
 > [!WARNING]
@@ -458,7 +500,13 @@ It contains instrumentation for trace and depends on OTel `v0.18.0`.
 - Example code for a basic usage.
 - Apache-2.0 license.
 
-[Unreleased]: https://github.com/XSAM/otelsql/compare/v0.39.0...HEAD
+[Go 1.25]: https://go.dev/doc/go1.25
+[Go 1.24]: https://go.dev/doc/go1.24
+[Go 1.23]: https://go.dev/doc/go1.23
+
+[Unreleased]: https://github.com/XSAM/otelsql/compare/v0.41.0...HEAD
+[0.41.0]: https://github.com/XSAM/otelsql/releases/tag/v0.41.0
+[0.40.0]: https://github.com/XSAM/otelsql/releases/tag/v0.40.0
 [0.39.0]: https://github.com/XSAM/otelsql/releases/tag/v0.39.0
 [0.38.0]: https://github.com/XSAM/otelsql/releases/tag/v0.38.0
 [0.37.0]: https://github.com/XSAM/otelsql/releases/tag/v0.37.0

@@ -40,3 +40,39 @@ misconfigurations:
   # https://avd.aquasec.com/misconfig/dockerfile/general/avd-ds-0026/
   - id: AVD-DS-0026
     statement: Healthchecks defined outside Dockerfiles.
+
+  # https://avd.aquasec.com/misconfig/avd-ksv-01010
+  - id: AVD-KSV-01010
+    statement: |
+      Flagging ports as sensitive, probably a false positive.
+      Also flagging parser_methods as false positive, not sure if that's correct.
+
+      TODO: investigate how this works in practice.
+
+  # https://avd.aquasec.com/misconfig/ksv011
+  - id: KSV011
+    statement: CPU limits will be added later.
+
+  # https://avd.aquasec.com/misconfig/ksv013
+  - id: KSV013
+    statement: Image tags are managed via kustomize.
+
+  # https://avd.aquasec.com/misconfig/ksv015
+  - id: KSV015
+    statement: CPU requests will be added later.
+
+  # https://avd.aquasec.com/misconfig/ksv016
+  - id: KSV016
+    statement: Memory requests will be added later.
+
+  # https://avd.aquasec.com/misconfig/ksv018
+  - id: KSV018
+    statement: Memory limits will be added later.
+
+  # https://avd.aquasec.com/misconfig/ksv110
+  - id: KSV110
+    statement: Namespaces are managed via kustomize, and 'default' is acceptable anyway
+
+  # https://avd.aquasec.com/misconfig/ksv0125
+  - id: KSV0125
+    statement: Image registry issues are false positives at present.

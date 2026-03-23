@@ -25,25 +25,29 @@ import (
 )
 
 const (
-	version             = "0.6.0-dev"
+	version             = "0.9.0"
 	semanticVersion     = "semver:" + version
 	instrumentationName = "connectrpc.com/otelconnect"
-	grpcProtocol        = "grpc"
-	grpcwebString       = "grpcweb"
-	grpcwebProtocol     = "grpc_web"
-	connectString       = "connect"
-	connectProtocol     = "connect_rpc"
+
+	grpcString    = "grpc"
+	grpcwebString = "grpcweb"
+	connectString = "connect"
+
+	grpcProtocol    = "grpc"
+	connectProtocol = "connect_rpc"
 )
 
 type config struct {
-	filter             func(context.Context, connect.Spec) bool
-	filterAttribute    AttributeFilter
-	meter              metric.Meter
-	tracer             trace.Tracer
-	propagator         propagation.TextMapPropagator
-	now                func() time.Time
-	trustRemote        bool
-	requestHeaderKeys  []string
-	responseHeaderKeys []string
-	omitTraceEvents    bool
+	filter                  func(context.Context, connect.Spec) bool
+	filterAttribute         AttributeFilter
+	meter                   metric.Meter
+	tracer                  trace.Tracer
+	propagator              propagation.TextMapPropagator
+	now                     func() time.Time
+	trustRemote             bool
+	requestHeaderKeys       []string
+	responseHeaderKeys      []string
+	omitTraceEvents         bool
+	propagateResponseHeader bool
+	rpcSystem               RPCSystem
 }

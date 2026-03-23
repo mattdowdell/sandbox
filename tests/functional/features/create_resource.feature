@@ -33,19 +33,19 @@ Feature: Create Resource
       Given a name of 10 printable non-ASCII characters
       And valid authentication
       When I create a Resource
-      Then I should fail with code=invalid_argument, msg=validation error: - resource.name: value does not match regex pattern `^[ -~]+$` [string.pattern]
+      Then I should fail with code=invalid_argument, msg=validation error: resource.name: value does not match regex pattern `^[ -~]+$`
 
     Scenario: Create resource with a too short name
      Given a name of 2 printable ASCII characters
      And valid authentication
      When I create a Resource
-     Then I should fail with code=invalid_argument, msg=validation error: - resource.name: value length must be at least 3 characters [string.min_len]
+     Then I should fail with code=invalid_argument, msg=validation error: resource.name: value length must be at least 3 characters
 
     Scenario: Create resource with a too long name
      Given a name of 101 printable ASCII characters
      And valid authentication
      When I create a Resource
-     Then I should fail with code=invalid_argument, msg=validation error: - resource.name: value length must be at most 100 characters [string.max_len]
+     Then I should fail with code=invalid_argument, msg=validation error: resource.name: value length must be at most 100 characters
 
   Rule: Names must not be duplicated
 

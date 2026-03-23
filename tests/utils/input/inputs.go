@@ -3,16 +3,32 @@ package input
 import (
 	"context"
 	"errors"
+
+	"github.com/cucumber/godog"
 )
 
 type ctxKey int
 
 const (
-	nameCtxKey ctxKey = iota + 1
+	scenarioCtxKey ctxKey = iota + 1
+	nameCtxKey
 	idCtxKey
 	newNameCtxKey
+	limitCtxKey
 	authnCtxKey
+	configKeyCtxKey
 )
+
+// ...
+func ScenarioIntoContext(ctx context.Context, scen *godog.Scenario) context.Context {
+	return context.WithValue(ctx, scenarioCtxKey, scen.Name)
+}
+
+// ...
+func ScenarioFromContext(ctx context.Context) (string, bool) {
+	name, ok := ctx.Value(scenarioCtxKey).(string)
+	return name, ok
+}
 
 // ...
 func NameIntoContext(ctx context.Context, name string) context.Context {
@@ -57,6 +73,20 @@ func IDFromContext(ctx context.Context) (string, error) {
 }
 
 // ...
+func LimitIntoContext(ctx context.Context, limit int32) context.Context {
+	return context.WithValue(ctx, limitCtxKey, limit)
+}
+
+// ...
+func LimitFromContext(ctx context.Context) (int32, error) {
+	if limit, ok := ctx.Value(limitCtxKey).(int32); ok {
+		return limit, nil
+	}
+
+	return 0, errors.New("limit not found in context")
+}
+
+// ...
 func AuthnIntoContext(ctx context.Context, value string) context.Context {
 	return context.WithValue(ctx, authnCtxKey, value)
 }
@@ -65,4 +95,18 @@ func AuthnIntoContext(ctx context.Context, value string) context.Context {
 func AuthnFromContext(ctx context.Context) (string, bool) {
 	val, ok := ctx.Value(authnCtxKey).(string)
 	return val, ok
+}
+
+// ...
+func ConfigKeyIntoContext(ctx context.Context, value string) context.Context {
+	return context.WithValue(ctx, configKeyCtxKey, value)
+}
+
+// ...
+func ConfigKeyFromContext(ctx context.Context) (string, error) {
+	if key, ok := ctx.Value(configKeyCtxKey).(string); ok {
+		return key, nil
+	}
+
+	return "", errors.New("config key not found in context")
 }

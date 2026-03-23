@@ -14,7 +14,7 @@ func Test_New(t *testing.T) {
 	// arrange
 
 	// act
-	handler := reflectrpc.New()
+	handler := reflectrpc.New(nil /*services*/)
 
 	// assert
 	assert.NotNil(t, handler)
@@ -22,7 +22,7 @@ func Test_New(t *testing.T) {
 
 func Test_Handler_Register(t *testing.T) {
 	// arrange
-	handler := reflectrpc.New()
+	handler := reflectrpc.New(nil /*services*/)
 	mux := http.NewServeMux()
 
 	// act

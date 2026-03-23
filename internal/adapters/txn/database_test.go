@@ -4,11 +4,11 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/txn"
 	"github.com/mattdowdell/sandbox/mocks/adapters/mocktxn"
+	"github.com/mattdowdell/sandbox/pkg/slogt"
 )
 
 func Test_Func(t *testing.T) {
@@ -67,22 +67,19 @@ func Test_Value(t *testing.T) {
 }
 
 func Test_Values_Success(t *testing.T) {
-	testCases := []struct {
-		name        string
+	tests := map[string]struct {
 		rollbackErr error
 	}{
-		{
-			name:        "no error",
+		"no error": {
 			rollbackErr: nil,
 		},
-		{
-			name:        "rollback error",
+		"rollback error": {
 			rollbackErr: errors.New("example"),
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			// arrange
 			logger := slogt.New(t)
 			datastore := mocktxn.NewDatastore(t)
@@ -91,7 +88,7 @@ func Test_Values_Success(t *testing.T) {
 			commit.EXPECT().Execute().Return(nil).Once()
 
 			rollback := NewRollbackFn(t)
-			rollback.EXPECT().Execute().Return(tc.rollbackErr).Once()
+			rollback.EXPECT().Execute().Return(tt.rollbackErr).Once()
 
 			provider := mocktxn.NewProvider(t)
 			provider.
@@ -119,14 +116,12 @@ func Test_Values_Success(t *testing.T) {
 }
 
 func Test_Values_Error(t *testing.T) {
-	testCases := []struct {
-		name     string
+	tests := map[string]struct {
 		provider func(*testing.T) txn.Provider
 		fn       func(txn.Datastore) (bool, bool, error)
 		want     string
 	}{
-		{
-			name: "begin error",
+		"begin error": {
 			provider: func(t *testing.T) txn.Provider {
 				t.Helper()
 
@@ -142,8 +137,7 @@ func Test_Values_Error(t *testing.T) {
 			fn:   nil,
 			want: "failed to begin transaction: example",
 		},
-		{
-			name: "fn error",
+		"fn error": {
 			provider: func(t *testing.T) txn.Provider {
 				t.Helper()
 
@@ -167,8 +161,7 @@ func Test_Values_Error(t *testing.T) {
 			},
 			want: "example",
 		},
-		{
-			name: "commit error",
+		"commit error": {
 			provider: func(t *testing.T) txn.Provider {
 				t.Helper()
 
@@ -196,19 +189,19 @@ func Test_Values_Error(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			// arrange
 			logger := slogt.New(t)
-			provider := tc.provider(t)
+			provider := tt.provider(t)
 
 			// act
-			val1, val2, err := txn.Values(t.Context(), logger, provider, tc.fn)
+			val1, val2, err := txn.Values(t.Context(), logger, provider, tt.fn)
 
 			// assert
 			assert.False(t, val1)
 			assert.False(t, val2)
-			assert.EqualError(t, err, tc.want)
+			assert.EqualError(t, err, tt.want)
 		})
 	}
 }

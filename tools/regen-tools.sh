@@ -9,14 +9,28 @@ echo
 echo 'gopath := shell("go env GOPATH")'
 echo
 
+# install kind without version as it's called by ctlptl
 for tool in $tools
 do
-	filename=`bingo list | grep "^$tool\b" | awk '{print $2}'`
+	if [[ "$tool" == "kind" ]]
+	then
+		filename=`bingo list | grep "^$tool\b" | awk '{print $1}'`
+		echo "${tool} := join(gopath, \"bin\", \"$filename\")"
+	else
+		filename=`bingo list | grep "^$tool\b" | awk '{print $2}'`
+		echo "${tool} := join(gopath, \"bin\", \"$filename\")"
+	fi
 
-	echo "${tool} := join(gopath, \"bin\", \"$filename\")"
 	echo
 	echo "[private]"
 	echo "install-${tool}:"
-	echo "    {{ if path_exists(${tool}) == \"true\" { \"\" } else { \"bingo get ${tool}\" } }}"
+
+	if [[ "$tool" == "kind" ]]
+	then
+		echo "    {{ if path_exists(${tool}) == \"true\" { \"\" } else { \"bingo get ${tool} -l\" } }}"
+	else
+		echo "    {{ if path_exists(${tool}) == \"true\" { \"\" } else { \"bingo get ${tool}\" } }}"
+	fi
+
 	echo
 done

@@ -5,13 +5,18 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
+	"github.com/mattdowdell/sandbox/internal/domain/repositories"
 	"github.com/mattdowdell/sandbox/internal/usecases"
 	"github.com/mattdowdell/sandbox/mocks/domain/mockrepositories"
+	"github.com/mattdowdell/sandbox/pkg/slogt"
+)
+
+const (
+	testLimit = 50
 )
 
 func Test_NewListResources(t *testing.T) {
@@ -31,21 +36,26 @@ func Test_ListResources_Success(t *testing.T) {
 
 	usecase := usecases.NewListResources()
 	logger := slogt.New(t)
+	pager := repositories.Pager{
+		Limit: testLimit,
+	}
 
-	expected := []*entities.Resource{
-		{
-			ID:        id,
-			Name:      testResourceName,
-			CreatedAt: now,
-			UpdatedAt: now,
+	expected := &repositories.Paged[*entities.Resource]{
+		Items: []*entities.Resource{
+			{
+				ID:        id,
+				Name:      testResourceName,
+				CreatedAt: now,
+				UpdatedAt: now,
+			},
 		},
 	}
 
 	store := mockrepositories.NewResource(t)
-	store.EXPECT().ListResources(t.Context()).Return(expected, nil).Once()
+	store.EXPECT().ListResources(t.Context(), pager).Return(expected, nil).Once()
 
 	// act
-	resources, err := usecase.Execute(t.Context(), logger, store)
+	resources, err := usecase.Execute(t.Context(), logger, store, pager)
 
 	// assert
 	assert.Equal(t, expected, resources)
@@ -56,12 +66,15 @@ func Test_ListResources_Error(t *testing.T) {
 	// arrange
 	usecase := usecases.NewListResources()
 	logger := slogt.New(t)
+	pager := repositories.Pager{
+		Limit: testLimit,
+	}
 
 	store := mockrepositories.NewResource(t)
-	store.EXPECT().ListResources(t.Context()).Return(nil, domain.ErrInternal).Once()
+	store.EXPECT().ListResources(t.Context(), pager).Return(nil, domain.ErrInternal).Once()
 
 	// act
-	resources, err := usecase.Execute(t.Context(), logger, store)
+	resources, err := usecase.Execute(t.Context(), logger, store, pager)
 
 	// assert
 	assert.Empty(t, resources)

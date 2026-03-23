@@ -2,11 +2,23 @@
 
 gopath := shell("go env GOPATH")
 
-buf := join(gopath, "bin", "buf-v1.56.0")
+actionlint := join(gopath, "bin", "actionlint-v1.7.11")
+
+[private]
+install-actionlint:
+    {{ if path_exists(actionlint) == "true" { "" } else { "bingo get actionlint" } }}
+
+buf := join(gopath, "bin", "buf-v1.66.1")
 
 [private]
 install-buf:
     {{ if path_exists(buf) == "true" { "" } else { "bingo get buf" } }}
+
+ctlptl := join(gopath, "bin", "ctlptl-v0.9.0")
+
+[private]
+install-ctlptl:
+    {{ if path_exists(ctlptl) == "true" { "" } else { "bingo get ctlptl" } }}
 
 godog := join(gopath, "bin", "godog-v0.15.1")
 
@@ -14,37 +26,61 @@ godog := join(gopath, "bin", "godog-v0.15.1")
 install-godog:
     {{ if path_exists(godog) == "true" { "" } else { "bingo get godog" } }}
 
-golangci-lint := join(gopath, "bin", "golangci-lint-v2.4.0")
+golangci-lint := join(gopath, "bin", "golangci-lint-v2.11.3")
 
 [private]
 install-golangci-lint:
     {{ if path_exists(golangci-lint) == "true" { "" } else { "bingo get golangci-lint" } }}
 
-mockery := join(gopath, "bin", "mockery-v3.5.2")
+kind := join(gopath, "bin", "kind")
+
+[private]
+install-kind:
+    {{ if path_exists(kind) == "true" { "" } else { "bingo get kind -l" } }}
+
+kube-score := join(gopath, "bin", "kube-score-v1.20.0")
+
+[private]
+install-kube-score:
+    {{ if path_exists(kube-score) == "true" { "" } else { "bingo get kube-score" } }}
+
+kubeconform := join(gopath, "bin", "kubeconform-v0.7.0")
+
+[private]
+install-kubeconform:
+    {{ if path_exists(kubeconform) == "true" { "" } else { "bingo get kubeconform" } }}
+
+kustomize := join(gopath, "bin", "kustomize-v5.8.1")
+
+[private]
+install-kustomize:
+    {{ if path_exists(kustomize) == "true" { "" } else { "bingo get kustomize" } }}
+
+mockery := join(gopath, "bin", "mockery-v3.7.0")
 
 [private]
 install-mockery:
     {{ if path_exists(mockery) == "true" { "" } else { "bingo get mockery" } }}
 
-protoc-gen-connect-go := join(gopath, "bin", "protoc-gen-connect-go-v1.18.1")
+protoc-gen-connect-go := join(gopath, "bin", "protoc-gen-connect-go-v1.19.1")
 
 [private]
 install-protoc-gen-connect-go:
     {{ if path_exists(protoc-gen-connect-go) == "true" { "" } else { "bingo get protoc-gen-connect-go" } }}
 
-protoc-gen-go := join(gopath, "bin", "protoc-gen-go-v1.36.7")
+protoc-gen-go := join(gopath, "bin", "protoc-gen-go-v1.36.11")
 
 [private]
 install-protoc-gen-go:
     {{ if path_exists(protoc-gen-go) == "true" { "" } else { "bingo get protoc-gen-go" } }}
 
-wire := join(gopath, "bin", "wire-v0.6.0")
+trivy := join(gopath, "bin", "trivy-v0.67.2")
 
 [private]
-install-wire:
-    {{ if path_exists(wire) == "true" { "" } else { "bingo get wire" } }}
+install-trivy:
+    {{ if path_exists(trivy) == "true" { "" } else { "bingo get trivy" } }}
 
-yamlfmt := join(gopath, "bin", "yamlfmt-v0.17.2")
+yamlfmt := join(gopath, "bin", "yamlfmt-v0.21.0")
 
 [private]
 install-yamlfmt:

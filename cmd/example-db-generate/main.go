@@ -45,7 +45,7 @@ func run(ctx context.Context) int {
 
 	logger := logging.New(slog.LevelInfo)
 
-	db, err := pgsql.NewFromConfig(ctx, pgsql.Config{
+	db, _, err := pgsql.NewFromConfig(ctx, pgsql.Config{
 		Hostname: *host,
 		Port:     *port,
 		Username: *username,

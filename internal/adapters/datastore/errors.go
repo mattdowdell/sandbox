@@ -12,10 +12,6 @@ import (
 //
 // [pgerrcode]: github.com/jackc/pgerrcode
 func isPgErr(err error, code string) bool {
-	var pgErr *pgconn.PgError
-	if errors.As(err, &pgErr) {
-		return pgErr.Code == code
-	}
-
-	return false
+	pgErr, ok := errors.AsType[*pgconn.PgError](err)
+	return ok && pgErr.Code == code
 }

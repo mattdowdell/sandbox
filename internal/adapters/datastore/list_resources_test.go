@@ -11,13 +11,16 @@ import (
 
 	"github.com/mattdowdell/sandbox/internal/adapters/datastore"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
+	"github.com/mattdowdell/sandbox/internal/domain/repositories"
 )
 
 const (
 	listResourcesSQL = `SELECT resources.id AS "resources.id", resources.name AS "resources.name", ` +
 		`resources.created_at AS "resources.created_at", ` +
 		`resources.updated_at AS "resources.updated_at" FROM public.resources ` +
-		` ORDER BY resources.id ASC;`
+		` ORDER BY resources.id ASC LIMIT $1;`
+
+	testLimit = 50
 )
 
 var listResourcesColumns = []string{
@@ -36,6 +39,7 @@ func Test_Datastore_ListResources_Success(t *testing.T) {
 
 	mock.
 		ExpectQuery(listResourcesSQL).
+		WithArgs(testLimit).
 		WillReturnRows(
 			sqlmock.NewRows(listResourcesColumns).
 				AddRow(
@@ -47,17 +51,22 @@ func Test_Datastore_ListResources_Success(t *testing.T) {
 		)
 
 	store := datastore.NewDatastore(db)
+	pager := repositories.Pager{
+		Limit: testLimit,
+	}
 
 	// act
-	got, err := store.ListResources(t.Context())
+	got, err := store.ListResources(t.Context(), pager)
 
 	// assert
-	want := []*entities.Resource{
-		{
-			ID:        id,
-			Name:      testResourceName,
-			CreatedAt: now,
-			UpdatedAt: now.Add(time.Hour),
+	want := &repositories.Paged[*entities.Resource]{
+		Items: []*entities.Resource{
+			{
+				ID:        id,
+				Name:      testResourceName,
+				CreatedAt: now,
+				UpdatedAt: now.Add(time.Hour),
+			},
 		},
 	}
 
@@ -74,9 +83,12 @@ func Test_Datastore_ListResources_Error(t *testing.T) {
 		WillReturnError(errors.New("example"))
 
 	store := datastore.NewDatastore(db)
+	pager := repositories.Pager{
+		Limit: testLimit,
+	}
 
 	// act
-	got, err := store.ListResources(t.Context())
+	got, err := store.ListResources(t.Context(), pager)
 
 	// assert
 	assert.Empty(t, got)

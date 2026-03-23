@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 
 	"connectrpc.com/connect"
@@ -50,8 +51,43 @@ func CheckResource(ctx context.Context) error {
 }
 
 // ...
+func CheckResources(ctx context.Context, count int) error {
+	resources, err := output.ResourcesFromContext(ctx)
+	if err != nil {
+		return err
+	}
+
+	if len(resources) != count {
+		names := make([]string, 0, len(resources))
+		for _, resource := range resources {
+			names = append(names, resource.GetName())
+		}
+
+		slices.Sort(names)
+
+		return fmt.Errorf("expected %d resources, found: %d (%s)", count, len(resources), strings.Join(names, ", "))
+	}
+
+	return nil
+}
+
+// ...
 func CheckSuccess(ctx context.Context) error {
 	return output.EmptyFromContext(ctx)
+}
+
+// ...
+func CheckConfigValue(ctx context.Context, value string) error {
+	have, err := output.ConfigValueFromContext(ctx)
+	if err != nil {
+		return err
+	}
+
+	if have != value {
+		return fmt.Errorf("unexpected config value: want: %q, have: %q", value, have)
+	}
+
+	return nil
 }
 
 // ...

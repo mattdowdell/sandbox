@@ -1,0 +1,36 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: example
+data:
+  authn_address: ""
+  database_hostname: ""
+  database_port: "5432"
+  database_name: ""
+  database_sslmode: "verify-full"
+  database_maxidletime: "5m"
+  database_maxlifetime: "5m"
+  database_maxidleconns: "0"
+  database_maxopenconns: "0"
+  issuer_issuer: ""
+  issuer_audience: ""
+  loggerprovider_insecure: "false"
+  loggerprovider_endpoint: ""
+  loggerprovider_path: "/v1/logs"
+  logging_level: "info"
+  logging_legacylevel: "debug"
+  meterprovider_insecure: "false"
+  meterprovider_endpoint: ""
+  meterprovider_path: "/v1/metrics"
+  otelconnect_trustremote: "false"
+  parser_audience: ""
+  parser_issuer: ""
+  parser_methods: ""
+  rpcserver_host: "localhost"
+  rpcserver_port: "5000"
+  rpcserver_enablepprof: "false"
+  shutdowntimeout: "30s"
+  tracerprovider_insecure: "false"
+  tracerprovider_endpoint: ""
+  tracerprovider_path: "/v1/traces"

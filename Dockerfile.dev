@@ -7,14 +7,13 @@
 # Dependencies
 # ------------
 
-FROM ghcr.io/gitleaks/gitleaks:v8.28.0@sha256:cdbb7c955abce02001a9f6c9f602fb195b7fadc1e812065883f695d1eeaba854 AS gitleaks
-FROM ghcr.io/aquasecurity/trivy:0.65.0@sha256:a22415a38938a56c379387a8163fcb0ce38b10ace73e593475d3658d578b2436 AS trivy
+FROM ghcr.io/gitleaks/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f AS gitleaks
 
 # -------------
 # Devenv target
 # -------------
 
-FROM mirror.gcr.io/golang:1.25-bookworm@sha256:74908ad827a5849c557eeca81d46263acf788ead606102d83466f499f83e35b1 AS dev
+FROM mirror.gcr.io/golang:1.26-bookworm@sha256:8e8aa801e8417ef0b5c42b504dd34db3db911bb73dba933bd8bde75ed815fdbb AS dev
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -42,9 +41,8 @@ RUN set -eux; \
     git config --global --add safe.directory /home/dev/ws;
 
 COPY --from=gitleaks /usr/bin/gitleaks /usr/bin/gitleaks
-COPY --from=trivy /usr/local/bin/trivy /usr/bin/trivy
 
-ARG ZIZMOR_VERSION=1.6.0
+ARG ZIZMOR_VERSION=1.23.1
 # TODO: add cache mounts?
 RUN set -eux; \
     pipx install zizmor==${ZIZMOR_VERSION};

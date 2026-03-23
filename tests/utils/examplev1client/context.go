@@ -3,8 +3,6 @@ package examplev1client
 import (
 	"context"
 	"errors"
-
-	"github.com/cucumber/godog"
 )
 
 type ctxKey int
@@ -31,13 +29,12 @@ func FromContext(ctx context.Context) (*Client, error) {
 }
 
 // ...
-func AppendCleanup(ctx context.Context, fn Cleanup) context.Context {
+func AppendCleanup(ctx context.Context, fn ...Cleanup) context.Context {
 	if cleanups, ok := ctx.Value(cleanupsCtxKey).([]Cleanup); ok {
-		_ = append(cleanups, fn)
-		return ctx
+		return context.WithValue(ctx, cleanupsCtxKey, append(cleanups, fn...))
 	}
 
-	return context.WithValue(ctx, cleanupsCtxKey, []Cleanup{fn})
+	return context.WithValue(ctx, cleanupsCtxKey, fn)
 }
 
 // ...
@@ -56,15 +53,4 @@ func RunCleanups(ctx context.Context) error {
 	}
 
 	return errors.Join(errs...)
-}
-
-// ...
-func ScenarioIntoContext(ctx context.Context, scen *godog.Scenario) context.Context {
-	return context.WithValue(ctx, scenarioCtxKey, scen.Name)
-}
-
-// ...
-func ScenarioFromContext(ctx context.Context) (string, bool) {
-	name, ok := ctx.Value(scenarioCtxKey).(string)
-	return name, ok
 }

@@ -7,7 +7,10 @@ import (
 
 	"go.opentelemetry.io/contrib/instrumentation/runtime"
 
-	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
+	"github.com/mattdowdell/sandbox/internal/drivers/config"
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx/logx"
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx/metricx"
+	"github.com/mattdowdell/sandbox/internal/drivers/otelx/tracex"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
@@ -20,25 +23,25 @@ type AppConfig struct {
 
 // ...
 type App struct {
-	conf            Config
+	conf            *Config
 	shutdownTimeout time.Duration
 	logger          *slog.Logger
 	server          *rpcserver.Server
-	tpShutdown      otelx.TracerProviderShutdown
-	mpShutdown      otelx.MeterProviderShutdown
-	lpShutdown      otelx.LoggerProviderShutdown
+	tpShutdown      tracex.ProviderShutdown
+	mpShutdown      metricx.ProviderShutdown
+	lpShutdown      logx.ProviderShutdown
 }
 
 // ...
 //
 //nolint:gocritic // config is large(ish), but this is called once
 func NewApp(
-	conf Config,
+	conf *Config,
 	logger *slog.Logger,
 	server *rpcserver.Server,
-	tpShutdown otelx.TracerProviderShutdown,
-	mpShutdown otelx.MeterProviderShutdown,
-	lpShutdown otelx.LoggerProviderShutdown,
+	tpShutdown tracex.ProviderShutdown,
+	mpShutdown metricx.ProviderShutdown,
+	lpShutdown logx.ProviderShutdown,
 ) *App {
 	return &App{
 		conf:            conf,
@@ -53,7 +56,15 @@ func NewApp(
 
 // ...
 func (a *App) Start(ctx context.Context, stop context.CancelFunc) {
-	a.logger.InfoContext(ctx, "starting", slogx.Config(a.conf))
+	encoded, err := config.Encode(a.conf, "_")
+	if err != nil {
+		a.logger.ErrorContext(ctx, "failed to encode config")
+		stop()
+
+		return
+	}
+
+	a.logger.InfoContext(ctx, "starting", slogx.Config(encoded))
 
 	if err := runtime.Start(); err != nil {
 		a.logger.ErrorContext(ctx, "failed to start runtime metrics", slogx.Err(err))

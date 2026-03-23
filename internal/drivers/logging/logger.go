@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"strings"
 
-	"github.com/samber/slog-multi"
 	"go.opentelemetry.io/contrib/bridges/otelslog"
 )
 
@@ -21,7 +20,7 @@ type Config struct {
 
 	// LegacyLevel sets the level for logs from the "log" package. This is only applied if using
 	// NewAsDefaultFromConfig.
-	LegacyLevel slog.Level `koanf:"level" default:"debug"`
+	LegacyLevel slog.Level `koanf:"legacylevel" default:"debug"`
 }
 
 // NewAsDefaultFromConfig calls NewAsDefault with the given configuration.
@@ -67,7 +66,7 @@ func New(level slog.Leveler, options ...Option) *slog.Logger {
 		ReplaceAttr: replaceAttr(opts),
 	})
 
-	handler := slogmulti.Fanout(
+	handler := slog.NewMultiHandler(
 		Wrap(otelHandler, opts.extractors),
 		Wrap(jsonHandler, opts.extractors),
 	)

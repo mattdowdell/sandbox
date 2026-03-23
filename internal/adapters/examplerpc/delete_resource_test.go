@@ -5,14 +5,13 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/gofrs/uuid/v5"
-	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 
 	"github.com/mattdowdell/sandbox/gen/example/v1"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
 	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/mocks/adapters/mockexamplerpc"
+	"github.com/mattdowdell/sandbox/pkg/slogt"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
@@ -24,7 +23,7 @@ func Test_Handler_DeleteResource_Success(t *testing.T) {
 	facade := mockexamplerpc.NewResourceFacade(t)
 	facade.
 		EXPECT().
-		Delete(ctx, mock.AnythingOfType("*slog.Logger"), id).
+		Delete(ctx, mockLogger, id).
 		Return(nil).
 		Once()
 
@@ -69,25 +68,22 @@ func Test_Handler_DeleteResource_InvalidID(t *testing.T) {
 }
 
 func Test_Handler_DeleteResource_UsecaseError(t *testing.T) {
-	testCases := []struct {
-		name string
+	tests := map[string]struct {
 		have error
 		want string
 	}{
-		{
-			name: "not found",
+		"not found": {
 			have: domain.ErrNotFound,
 			want: "not_found: resource does not exist",
 		},
-		{
-			name: "internal",
+		"internal": {
 			have: domain.ErrInternal,
 			want: "internal: internal error",
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			// arrange
 			ctx := slogx.IntoContext(t.Context(), slogt.New(t))
 			id := uuid.Must(uuid.NewV7())
@@ -95,8 +91,8 @@ func Test_Handler_DeleteResource_UsecaseError(t *testing.T) {
 			facade := mockexamplerpc.NewResourceFacade(t)
 			facade.
 				EXPECT().
-				Delete(ctx, mock.AnythingOfType("*slog.Logger"), id).
-				Return(tc.have).
+				Delete(ctx, mockLogger, id).
+				Return(tt.have).
 				Once()
 
 			handler := examplerpc.New(
@@ -113,7 +109,7 @@ func Test_Handler_DeleteResource_UsecaseError(t *testing.T) {
 
 			// assert
 			assert.Nil(t, resp)
-			assert.EqualError(t, err, tc.want)
+			assert.EqualError(t, err, tt.want)
 		})
 	}
 }

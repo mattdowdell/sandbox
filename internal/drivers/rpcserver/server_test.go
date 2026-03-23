@@ -13,6 +13,8 @@ import (
 	"github.com/mattdowdell/sandbox/mocks/drivers/mockrpcserver"
 )
 
+var mockServeMux = mock.AnythingOfType("*http.ServeMux")
+
 func Test_NewFromConfig(t *testing.T) {
 	// arrange
 	conf := rpcserver.Config{
@@ -24,10 +26,7 @@ func Test_NewFromConfig(t *testing.T) {
 	var opts []connect.HandlerOption
 
 	handler := mockrpcserver.NewHandler(t)
-	handler.
-		EXPECT().
-		Register(mock.AnythingOfType("*http.ServeMux"), opts).
-		Once()
+	handler.EXPECT().Register(mockServeMux, opts).Once()
 
 	handlers := []rpcserver.Handler{
 		handler,
@@ -45,10 +44,7 @@ func Test_New(t *testing.T) {
 	var opts []connect.HandlerOption
 
 	handler := mockrpcserver.NewHandler(t)
-	handler.
-		EXPECT().
-		Register(mock.AnythingOfType("*http.ServeMux"), opts).
-		Once()
+	handler.EXPECT().Register(mockServeMux, opts).Once()
 
 	handlers := []rpcserver.Handler{
 		handler,

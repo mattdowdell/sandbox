@@ -6,7 +6,8 @@
   "schedule": ["* 0-6 * * 1"],
   "timezone": "Europe/London",
   "gomod": {
-    "managerFilePatterns": [".bingo/*.mod"]
+    "managerFilePatterns": [".bingo/*.mod"],
+    "ignorePaths": ["go.mod"]
   },
   "packageRules": [
     {
@@ -18,5 +19,16 @@
       "groupName": "X-Repositories"
     }
   ],
-  "postUpdateOptions": ["gomodTidy", "goModVendor", "gomodUpdateImportPaths"]
+  "postUpdateOptions": ["gomodTidy", "goModVendor", "gomodUpdateImportPaths"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^Tiltfile$/",
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>.+?) packageName=(?<packageName>.+?) registryUrl=(?<registryUrl>.+?)\\s+version=['\"](?<currentValue>.+?)['\"]"
+      ]
+    },
+  ]
 }

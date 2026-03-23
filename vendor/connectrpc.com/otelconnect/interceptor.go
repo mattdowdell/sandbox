@@ -80,14 +80,6 @@ func NewInterceptor(options ...Option) (*Interceptor, error) {
 	}, nil
 }
 
-// getInstruments returns the correct instrumentation for the interceptor.
-func (i *Interceptor) getInstruments(isClient bool) *instruments {
-	if isClient {
-		return &i.clientInstruments
-	}
-	return &i.serverInstruments
-}
-
 // WrapUnary implements otel tracing and metrics for unary handlers.
 func (i *Interceptor) WrapUnary(next connect.UnaryFunc) connect.UnaryFunc {
 	return func(ctx context.Context, request connect.AnyRequest) (connect.AnyResponse, error) {
@@ -100,16 +92,16 @@ func (i *Interceptor) WrapUnary(next connect.UnaryFunc) connect.UnaryFunc {
 		attributeFilter := i.config.filterAttribute.filter
 		isClient := request.Spec().IsClient
 		name := strings.TrimLeft(request.Spec().Procedure, "/")
-		protocol := protocolToSemConv(request.Peer().Protocol)
+		protocol := protocolToSemConv(request.Peer().Protocol, i.config.rpcSystem)
 		attributes := make([]attribute.KeyValue, 0, 6+len(i.config.requestHeaderKeys)) // 5 max request attrs + status code attr + headers
-		attributes = attributeFilter(request.Spec(), addRequestAttributes(attributes, request.Spec(), request.Peer())...)
+		attributes = attributeFilter(request.Spec(), addRequestAttributes(protocol, attributes, request.Spec(), request.Peer())...)
 		instrumentation := i.getInstruments(isClient)
 		carrier := propagation.HeaderCarrier(request.Header())
 		spanKind := trace.SpanKindClient
 		requestSpan, responseSpan := semconv.MessageTypeSent, semconv.MessageTypeReceived
-		attributes = addHeaderAttributes(attributes, protocol, requestKey, request.Header(), i.config.requestHeaderKeys)
+		attributesTrace := addHeaderAttributes(attributes, protocol, requestKey, request.Header(), i.config.requestHeaderKeys)
 		traceOpts := make([]trace.SpanStartOption, 0, 4)
-		traceOpts = append(traceOpts, trace.WithAttributes(attributes...))
+		traceOpts = append(traceOpts, trace.WithAttributes(attributesTrace...))
 		if !isClient {
 			spanKind = trace.SpanKindServer
 			requestSpan, responseSpan = semconv.MessageTypeReceived, semconv.MessageTypeSent
@@ -141,7 +133,7 @@ func (i *Interceptor) WrapUnary(next connect.UnaryFunc) connect.UnaryFunc {
 				requestSize = proto.Size(msg)
 			}
 		}
-		if !i.config.omitTraceEvents {
+		if !i.config.omitTraceEvents && span.IsRecording() {
 			span.AddEvent(messageKey,
 				trace.WithAttributes(
 					requestSpan,
@@ -159,9 +151,15 @@ func (i *Interceptor) WrapUnary(next connect.UnaryFunc) connect.UnaryFunc {
 			if msg, ok := response.Any().(proto.Message); ok {
 				responseSize = proto.Size(msg)
 			}
-			span.SetAttributes(headerAttributes(protocol, responseKey, response.Header(), i.config.responseHeaderKeys)...)
+			if span.IsRecording() {
+				span.SetAttributes(headerAttributes(protocol, responseKey, response.Header(), i.config.responseHeaderKeys)...)
+			}
+			if !isClient && i.config.propagateResponseHeader {
+				responseCarrier := propagation.HeaderCarrier(response.Header())
+				i.config.propagator.Inject(ctx, responseCarrier)
+			}
 		}
-		if !i.config.omitTraceEvents {
+		if !i.config.omitTraceEvents && span.IsRecording() {
 			span.AddEvent(messageKey,
 				trace.WithAttributes(
 					responseSpan,
@@ -208,7 +206,9 @@ func (i *Interceptor) WrapStreamingClient(next connect.StreamingClientFunc) conn
 		// inject the newly created span into the carrier
 		carrier := propagation.HeaderCarrier(conn.RequestHeader())
 		i.config.propagator.Inject(ctx, carrier)
+		protocol := protocolToSemConv(conn.Peer().Protocol, i.config.rpcSystem)
 		state := newStreamingState(
+			protocol,
 			spec,
 			conn.Peer(),
 			i.config.filterAttribute,
@@ -216,17 +216,18 @@ func (i *Interceptor) WrapStreamingClient(next connect.StreamingClientFunc) conn
 			instrumentation.responseSize,
 			instrumentation.requestSize,
 		)
-		protocol := protocolToSemConv(conn.Peer().Protocol)
 		var requestOnce sync.Once
 		setRequestAttributes := func() {
-			span.SetAttributes(
-				headerAttributes(
-					protocol,
-					requestKey,
-					conn.RequestHeader(),
-					i.config.requestHeaderKeys,
-				)...,
-			)
+			if span.IsRecording() {
+				span.SetAttributes(
+					headerAttributes(
+						protocol,
+						requestKey,
+						conn.RequestHeader(),
+						i.config.requestHeaderKeys,
+					)...,
+				)
+			}
 		}
 		closeSpan := func() {
 			requestOnce.Do(setRequestAttributes)
@@ -239,8 +240,10 @@ func (i *Interceptor) WrapStreamingClient(next connect.StreamingClientFunc) conn
 			if statusCode, ok := statusCodeAttribute(protocol, state.error); ok {
 				state.addAttributes(statusCode)
 			}
-			span.SetAttributes(state.attributes...)
-			span.SetAttributes(headerAttributes(protocol, responseKey, conn.ResponseHeader(), i.config.responseHeaderKeys)...)
+			if span.IsRecording() {
+				span.SetAttributes(state.attributes...)
+				span.SetAttributes(headerAttributes(protocol, responseKey, conn.ResponseHeader(), i.config.responseHeaderKeys)...)
+			}
 			span.SetStatus(clientSpanStatus(protocol, state.error))
 			span.End()
 			attributeSet := attribute.NewSet(state.attributes...)
@@ -280,8 +283,9 @@ func (i *Interceptor) WrapStreamingHandler(next connect.StreamingHandlerFunc) co
 			}
 		}
 		name := strings.TrimLeft(conn.Spec().Procedure, "/")
-		protocol := protocolToSemConv(conn.Peer().Protocol)
+		protocol := protocolToSemConv(conn.Peer().Protocol, i.config.rpcSystem)
 		state := newStreamingState(
+			protocol,
 			conn.Spec(),
 			conn.Peer(),
 			i.config.filterAttribute,
@@ -313,6 +317,13 @@ func (i *Interceptor) WrapStreamingHandler(next connect.StreamingHandlerFunc) co
 			traceOpts...,
 		)
 		defer span.End()
+
+		// Inject traceparent into response headers if enabled
+		if i.config.propagateResponseHeader {
+			responseCarrier := propagation.HeaderCarrier(conn.ResponseHeader())
+			i.config.propagator.Inject(ctx, responseCarrier)
+		}
+
 		streamingHandler := &streamingHandlerInterceptor{
 			StreamingHandlerConn: conn,
 			receive: func(msg any, conn connect.StreamingHandlerConn) error {
@@ -326,8 +337,10 @@ func (i *Interceptor) WrapStreamingHandler(next connect.StreamingHandlerFunc) co
 		if statusCode, ok := statusCodeAttribute(protocol, err); ok {
 			state.addAttributes(statusCode)
 		}
-		span.SetAttributes(state.attributes...)
-		span.SetAttributes(headerAttributes(protocol, responseKey, conn.ResponseHeader(), i.config.responseHeaderKeys)...)
+		if span.IsRecording() {
+			span.SetAttributes(state.attributes...)
+			span.SetAttributes(headerAttributes(protocol, responseKey, conn.ResponseHeader(), i.config.responseHeaderKeys)...)
+		}
 		span.SetStatus(serverSpanStatus(protocol, err))
 		attributeSet := attribute.NewSet(state.attributes...)
 		instrumentation.requestsPerRPC.Record(ctx, state.receivedCounter, metric.WithAttributeSet(attributeSet))
@@ -338,12 +351,22 @@ func (i *Interceptor) WrapStreamingHandler(next connect.StreamingHandlerFunc) co
 	}
 }
 
+// getInstruments returns the correct instrumentation for the interceptor.
+func (i *Interceptor) getInstruments(isClient bool) *instruments {
+	if isClient {
+		return &i.clientInstruments
+	}
+	return &i.serverInstruments
+}
+
 // protocolToSemConv converts the protocol string to the OpenTelemetry format.
-func protocolToSemConv(protocol string) string {
+func protocolToSemConv(protocol string, system RPCSystem) string {
+	if system != nil {
+		// If an explicit system was configured, that overrides the wire protocol.
+		return system.protocol()
+	}
 	switch protocol {
-	case grpcwebString:
-		return grpcwebProtocol
-	case grpcProtocol:
+	case grpcwebString, grpcString:
 		return grpcProtocol
 	case connectString:
 		return connectProtocol

@@ -9,6 +9,7 @@ import (
 	"github.com/mattdowdell/sandbox/gen/example/v1"
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc/models"
 	"github.com/mattdowdell/sandbox/internal/domain"
+	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/rpcerrors"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
@@ -17,9 +18,8 @@ func (h *Handler) CreateResource(
 	ctx context.Context,
 	req *connect.Request[examplev1.CreateResourceRequest],
 ) (*connect.Response[examplev1.CreateResourceResponse], error) {
-	logger := slogx.FromContext(ctx)
-
 	input := models.ResourceCreateToDomain(req.Msg.GetResource())
+	logger := slogx.FromContext(ctx).With(slogx.ResourceName(input.Name))
 
 	output, err := h.resource.Create(ctx, logger, input)
 	if err != nil {
@@ -29,7 +29,7 @@ func (h *Handler) CreateResource(
 			return nil, ErrResourceAlreadyExists
 		}
 
-		return nil, ErrInternal
+		return nil, rpcerrors.ErrInternal
 	}
 
 	return connect.NewResponse(&examplev1.CreateResourceResponse{

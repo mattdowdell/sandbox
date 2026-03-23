@@ -1,21 +1,22 @@
 ---
 name: "Setup Checks"
+description: Setup a runner for running 'just checks'.
 
 runs:
   using: "composite"
   steps:
     - name: Install Go
-      uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+      uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
       with:
         go-version-file: "go.mod"
 
     - name: Install Buf
-      uses: bufbuild/buf-action@c231a1aa9281e5db706c970f468f0744a37561fd # v1.2.0
+      uses: bufbuild/buf-action@fd21066df7214747548607aaa45548ba2b9bc1ff # v1.4.0
       with:
         setup_only: true
 
     - name: Install Just
-      uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff # v3.0.0
+      uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3.1.0
 
     - name: Install bingo
       uses: mattdowdell/go-installer@7af1f9ff5af1447fd122d6b144ddce2562b76e09 # v0.3.0

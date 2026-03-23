@@ -32,19 +32,18 @@ func main() {
 
 func run(ctx context.Context) int {
 	options := flagoptions.New()
-	conf := config.New(options)
 
-	c, err := config.Load[Config](conf)
+	conf, err := config.Load[Config](options)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to load configuration", slogx.Err(err))
 		return exit.Failure
 	}
 
-	logger := logging.New(c.Logging.Level)
+	logger := logging.New(conf.Logging.Level)
 
 	client := healthv1connect.NewHealthClient(
 		http.DefaultClient,
-		fmt.Sprintf("http://localhost:%d", c.RPCServer.Port),
+		fmt.Sprintf("http://localhost:%d", conf.RPCServer.Port),
 	)
 
 	resp, err := client.Check(ctx, connect.NewRequest(&healthv1.HealthCheckRequest{}))

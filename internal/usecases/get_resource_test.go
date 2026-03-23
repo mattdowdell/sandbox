@@ -5,13 +5,13 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 	"github.com/mattdowdell/sandbox/internal/usecases"
 	"github.com/mattdowdell/sandbox/mocks/domain/mockrepositories"
+	"github.com/mattdowdell/sandbox/pkg/slogt"
 )
 
 func Test_NewGetResource(t *testing.T) {
@@ -51,22 +51,19 @@ func Test_GetResource_Success(t *testing.T) {
 }
 
 func Test_GetResource_Error(t *testing.T) {
-	testCases := []struct {
-		name string
-		err  error
+	tests := map[string]struct {
+		err error
 	}{
-		{
-			name: "not found",
-			err:  domain.ErrNotFound,
+		"not found": {
+			err: domain.ErrNotFound,
 		},
-		{
-			name: "internal",
-			err:  domain.ErrInternal,
+		"internal": {
+			err: domain.ErrInternal,
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			// arrange
 			id := uuid.Must(uuid.NewV7())
 
@@ -74,14 +71,14 @@ func Test_GetResource_Error(t *testing.T) {
 			logger := slogt.New(t)
 
 			store := mockrepositories.NewResource(t)
-			store.EXPECT().GetResource(t.Context(), id).Return(nil, tc.err).Once()
+			store.EXPECT().GetResource(t.Context(), id).Return(nil, tt.err).Once()
 
 			// act
 			resource, err := usecase.Execute(t.Context(), logger, store, id)
 
 			// assert
 			assert.Nil(t, resource)
-			assert.ErrorIs(t, err, tc.err)
+			assert.ErrorIs(t, err, tt.err)
 		})
 	}
 }

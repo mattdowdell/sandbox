@@ -2,7 +2,6 @@ package jwtx_test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -23,6 +22,10 @@ const (
 	testTokenMissingSubject = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJpc3N1ZXIiLCJhdWQiO" +
 		"lsiYXVkaWVuY2UiXSwiZXhwIjoxNzU2NDcyNDAwLCJpYXQiOjE3NTY0Njg4MDAsImp0aSI6IjdhZGZhNGZkLWViN" +
 		"WUtNGEzMS1iY2U5LTY3Y2UyN2I3NGIwZiJ9.AC1w2ia17qXPazGbyXRmeISh_CiEM0wyFxZJ8RCQj0Q"
+	testTokenInvalidSubject = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJpc3N1ZXIiLCJzdWIiO" +
+		"jEyMzQ1LCJhdWQiOlsiYXVkaWVuY2UiXSwiZXhwIjoxNzU2NDcyNDAwLCJpYXQiOjE3NTY0Njg4MDAsImp0aSI6I" +
+		"jdhZGZhNGZkLWViNWUtNGEzMS1iY2U5LTY3Y2UyN2I3NGIwZiJ9.hXYzEXSmXIROYKQB9VevXwnUHsEbVS-qXVu9" +
+		"7npGhAQ"
 	testTokenMissingExpiresAt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJpc3N1ZXIiLCJzdWI" +
 		"iOiJzdWJqZWN0IiwiYXVkIjpbImF1ZGllbmNlIl0sImlhdCI6MTc1NjQ2ODgwMCwianRpIjoiN2FkZmE0ZmQtZWI" +
 		"1ZS00YTMxLWJjZTktNjdjZTI3Yjc0YjBmIn0.CNfCmx1ew-i_ALuVNfbduyEIsPL8xhRQ-shXkeZ5XCI"
@@ -66,43 +69,37 @@ func Test_NewParser_Success(t *testing.T) {
 }
 
 func Test_NewParser_Error(t *testing.T) {
-	testCases := []struct {
-		name     string
+	tests := map[string]struct {
 		audience []string
 		issuer   string
 		methods  []string
 		want     string
 	}{
-		{
-			name:     "empty audience",
+		"empty audience": {
 			audience: []string{},
 			issuer:   testIssuer,
 			methods:  []string{testMethod},
 			want:     "audience must not be empty for parser",
 		},
-		{
-			name:     "empty audience value",
+		"empty audience value": {
 			audience: []string{""},
 			issuer:   testIssuer,
 			methods:  []string{testMethod},
 			want:     "audience[0] must not be empty for parser",
 		},
-		{
-			name:     "empty issuer",
+		"empty issuer": {
 			audience: []string{testAudience},
 			issuer:   "",
 			methods:  []string{testMethod},
 			want:     "issuer must not be empty for parser",
 		},
-		{
-			name:     "empty methods",
+		"empty methods": {
 			audience: []string{testAudience},
 			issuer:   testIssuer,
 			methods:  []string{},
 			want:     "methods must not be empty for parser",
 		},
-		{
-			name:     "empty methods value",
+		"empty methods value": {
 			audience: []string{testAudience},
 			issuer:   testIssuer,
 			methods:  []string{""},
@@ -110,27 +107,25 @@ func Test_NewParser_Error(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			// arrange
 			clock := mockrepositories.NewClock(t)
 
 			// act
-			parser, err := jwtx.NewParser(clock, tc.audience, tc.issuer, tc.methods)
+			parser, err := jwtx.NewParser(clock, tt.audience, tt.issuer, tt.methods)
 
 			// assert
 			assert.Nil(t, parser)
-			assert.EqualError(t, err, tc.want)
+			assert.EqualError(t, err, tt.want)
 		})
 	}
 }
 
 func Test_Parser_Parse_Success(t *testing.T) {
 	// arrange
-	now := time.Now().UTC()
-
 	clock := mockrepositories.NewClock(t)
-	clock.EXPECT().UTCNow().Return(now).Once()
+	clock.EXPECT().UTCNow().Return(testIssuedAt).Once()
 
 	parser, err := jwtx.NewParser(clock, []string{testAudience}, testIssuer, []string{testMethod})
 	require.NoError(t, err)
@@ -150,82 +145,73 @@ func Test_Parser_Parse_Success(t *testing.T) {
 }
 
 func Test_Parser_Parse_Error(t *testing.T) {
-	testCases := []struct {
+	tests := map[string]struct {
 		name     string
 		audience []string
 		issuer   string
 		input    string
 		want     string
 	}{
-		{
-			name:     "invalid token",
+		"invalid token": {
 			audience: []string{testAudience},
 			issuer:   testIssuer,
 			input:    "invalid",
 			want:     "failed to parse token: token is malformed: token contains an invalid number of segments",
 		},
-		{
-			name:     "wrong audience",
+		"wrong audience": {
 			audience: []string{"other"},
 			issuer:   testIssuer,
 			input:    testToken,
 			want:     "failed to parse token: token has invalid claims: token has invalid audience",
 		},
-		{
-			name:     "wrong audience",
-			audience: []string{"other"},
-			issuer:   testIssuer,
-			input:    testToken,
-			want:     "failed to parse token: token has invalid claims: token has invalid audience",
-		},
-		{
-			name:     "missing audience",
+		"missing audience": {
 			audience: []string{testAudience},
 			issuer:   testIssuer,
 			input:    testTokenMissingAudience,
 			want: "failed to parse token: token has invalid claims: " +
 				"token is missing required claim: aud claim is required",
 		},
-		{
-			name:     "wrong issuer",
+		"wrong issuer": {
 			audience: []string{testAudience},
 			issuer:   "other",
 			input:    testToken,
 			want: "failed to parse token: token has invalid claims: " +
 				"token has invalid issuer",
 		},
-		{
-			name:     "missing issuer",
+		"missing issuer": {
 			audience: []string{testAudience},
 			issuer:   testIssuer,
 			input:    testTokenMissingIssuer,
 			want: "failed to parse token: token has invalid claims: " +
 				"token is missing required claim: iss claim is required",
 		},
-		{
-			name:     "missing subject",
+		"missing subject": {
 			audience: []string{testAudience},
 			issuer:   testIssuer,
 			input:    testTokenMissingSubject,
 			want:     "failed to parse token: missing sub claim",
 		},
-		{
-			name:     "missing expires at",
+		"invalid subject": {
+			audience: []string{testAudience},
+			issuer:   testIssuer,
+			input:    testTokenInvalidSubject,
+			want: "failed to parse token: invalid sub claim: invalid type for claim: " +
+				"sub is invalid",
+		},
+		"missing expires at": {
 			audience: []string{testAudience},
 			issuer:   testIssuer,
 			input:    testTokenMissingExpiresAt,
 			want: "failed to parse token: token has invalid claims: " +
 				"token is missing required claim: exp claim is required",
 		},
-		{
-			name:     "expired",
+		"expired": {
 			audience: []string{testAudience},
 			issuer:   testIssuer,
 			input:    testTokenExpired,
 			want:     "failed to parse token: token has invalid claims: token is expired",
 		},
-		{
-			name:     "unexpected signing method",
+		"unexpected signing method": {
 			audience: []string{testAudience},
 			issuer:   testIssuer,
 			input:    testTokenUnexpectedMethod,
@@ -234,21 +220,21 @@ func Test_Parser_Parse_Error(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			// arrange
 			clock := mockrepositories.NewClock(t)
 			clock.EXPECT().UTCNow().Return(testIssuedAt).Maybe()
 
-			parser, err := jwtx.NewParser(clock, tc.audience, tc.issuer, []string{testMethod})
+			parser, err := jwtx.NewParser(clock, tt.audience, tt.issuer, []string{testMethod})
 			require.NoError(t, err)
 
 			// act
-			claims, err := parser.Parse(tc.input)
+			claims, err := parser.Parse(tt.input)
 
 			// assert
 			assert.Nil(t, claims)
-			assert.EqualError(t, err, tc.want)
+			assert.EqualError(t, err, tt.want)
 		})
 	}
 }

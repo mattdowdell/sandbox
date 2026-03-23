@@ -9,8 +9,13 @@ import (
 
 	"github.com/mattdowdell/sandbox/internal/adapters/usecasefacades"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
+	"github.com/mattdowdell/sandbox/internal/domain/repositories"
 	"github.com/mattdowdell/sandbox/mocks/adapters/mocktxn"
 	"github.com/mattdowdell/sandbox/mocks/adapters/mockusecasefacades"
+)
+
+const (
+	testLimit = 50
 )
 
 func Test_Resource_Create(t *testing.T) {
@@ -94,14 +99,18 @@ func Test_Resource_List(t *testing.T) {
 	logger := slog.New(slog.DiscardHandler)
 	datastore := mocktxn.NewDatastore(t)
 
+	pager := repositories.Pager{
+		Limit: testLimit,
+	}
+
 	provider := mocktxn.NewProvider(t)
 	provider.EXPECT().Datastore().Return(datastore).Once()
 
 	usecase := mockusecasefacades.NewResourceLister(t)
 	usecase.
 		EXPECT().
-		Execute(t.Context(), logger, datastore).
-		Return(nil, nil).
+		Execute(t.Context(), logger, datastore, pager).
+		Return(&repositories.Paged[*entities.Resource]{}, nil).
 		Once()
 
 	facade := usecasefacades.NewResource(
@@ -114,7 +123,7 @@ func Test_Resource_List(t *testing.T) {
 	)
 
 	// act
-	output, err := facade.List(t.Context(), logger)
+	output, err := facade.List(t.Context(), logger, pager)
 
 	// assert
 	assert.Empty(t, output)

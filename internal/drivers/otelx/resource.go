@@ -10,7 +10,8 @@ import (
 	"go.opentelemetry.io/otel/semconv/v1.26.0"
 )
 
-func newResource() (*resource.Resource, error) {
+// ...
+func NewResource() (*resource.Resource, error) {
 	exec, err := os.Executable()
 	if err != nil {
 		return nil, fmt.Errorf("failed to read executable path: %w", err)

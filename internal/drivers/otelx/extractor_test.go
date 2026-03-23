@@ -7,6 +7,12 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
+	"github.com/mattdowdell/sandbox/pkg/otelt"
+)
+
+const (
+	testTraceID = "0123456789abcdef0123456789abcdef"
+	testSpanID  = "0123456789abcdef"
 )
 
 func Test_Extractor_Extract_Valid(t *testing.T) {
@@ -16,7 +22,7 @@ func Test_Extractor_Extract_Valid(t *testing.T) {
 		otelx.WithSampled(true),
 	)
 
-	ctx := otelx.MustSpan(t.Context(), testTraceID, testSpanID, true /*sampled*/)
+	ctx := otelt.MustSpan(t.Context(), testTraceID, testSpanID, true /*sampled*/)
 
 	// act
 	got := extractor.Extract(ctx)
