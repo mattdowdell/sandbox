@@ -36,21 +36,14 @@ def custom_docker_build(name):
 custom_docker_build("example-rpc")
 custom_docker_build("example-db-migrate")
 
-k8s_yaml(helm(
-    "helm/example",
-    name="example",
-    values=[
-        "helm/example/values-example.yaml",
-        "helm/example/values-dev.yaml",
-    ],
-))
+k8s_yaml(kustomize("kustomize/example/tilt"))
 
 k8s_resource(
     "example-rpc",
     objects=[
         "example:configmap",
-        "example:service",
         "example:serviceaccount",
+        "example-rpc:poddisruptionbudget",
     ],
     labels=["services"],
     port_forwards=["127.0.0.1:5000:5000"],
@@ -122,13 +115,16 @@ helm_remote(
     repo_url="https://cloudnative-pg.github.io/charts",
     namespace="default",
     # renovate: datasource=helm depName=cluster packageName=cluster registryUrl=https://cloudnative-pg.github.io/charts
-    version="0.5.0",
+    version="0.6.0",
     values=[".tilt/postgresql/values.yaml"],
 )
 
 k8s_resource(
     "cluster-postgresql",
     new_name="postgresql",
+    objects=[
+        "cluster-postgresql-monitoring-logical-replication:configmap"
+    ],
     labels="postgresql",
     resource_deps=["cloudnative-pg"],
     port_forwards=["127.0.0.1:5432:5432"],
@@ -160,7 +156,7 @@ helm_remote(
     repo_name="vm",
     repo_url="https://victoriametrics.github.io/helm-charts",
     # renovate: datasource=helm depName=victoria-metrics-single packageName=victoria-metrics-single registryUrl=https://victoriametrics.github.io/helm-charts
-    version="0.30.0",
+    version="0.33.0",
 )
 
 k8s_resource(
@@ -175,7 +171,7 @@ helm_remote(
     repo_name="vm",
     repo_url="https://victoriametrics.github.io/helm-charts",
     # renovate: datasource=helm depName=victoria-logs-single packageName=victoria-logs-single registryUrl=https://victoriametrics.github.io/helm-charts
-    version="0.11.26",
+    version="0.11.30",
 )
 
 k8s_resource(

@@ -13,7 +13,7 @@ FROM ghcr.io/gitleaks/gitleaks:v8.30.0@sha256:691af3c7c5a48b16f187ce3446d5f19483
 # Devenv target
 # -------------
 
-FROM mirror.gcr.io/golang:1.26-bookworm@sha256:eae3cdfa040d0786510a5959d36a836978724d03b34a166ba2e0e198baac9196 AS dev
+FROM mirror.gcr.io/golang:1.26-bookworm@sha256:8e8aa801e8417ef0b5c42b504dd34db3db911bb73dba933bd8bde75ed815fdbb AS dev
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -42,7 +42,7 @@ RUN set -eux; \
 
 COPY --from=gitleaks /usr/bin/gitleaks /usr/bin/gitleaks
 
-ARG ZIZMOR_VERSION=1.16.3
+ARG ZIZMOR_VERSION=1.23.1
 # TODO: add cache mounts?
 RUN set -eux; \
     pipx install zizmor==${ZIZMOR_VERSION};

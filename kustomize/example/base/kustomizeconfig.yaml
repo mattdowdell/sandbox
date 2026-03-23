@@ -1,0 +1,8 @@
+---
+# Configure kustomize to be able to correctly set/update common labels when it doesn't appear in the
+# resource's metadata.
+labels:
+  - group: apps
+    kind: Deployment
+    path: spec/template/metadata/labels
+    create: true

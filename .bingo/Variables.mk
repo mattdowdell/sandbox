@@ -13,21 +13,27 @@ GOHOSTARM    ?= $(shell $(GO) env GOHOSTARM)
 
 # Below generated variables ensure that every time a tool under each variable is invoked, the correct version
 # will be used; reinstalling only if needed.
-# For example for buf variable:
+# For example for actionlint variable:
 #
 # In your main Makefile (for non array binaries):
 #
 #include .bingo/Variables.mk # Assuming -dir was set to .bingo .
 #
-#command: $(BUF)
-#	@echo "Running buf"
-#	@$(BUF) <flags/args..>
+#command: $(ACTIONLINT)
+#	@echo "Running actionlint"
+#	@$(ACTIONLINT) <flags/args..>
 #
-BUF := $(GOBIN)/buf-v1.65.0
+ACTIONLINT := $(GOBIN)/actionlint-v1.7.11
+$(ACTIONLINT): $(BINGO_DIR)/actionlint.mod
+	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
+	@echo "(re)installing $(GOBIN)/actionlint-v1.7.11"
+	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=actionlint.mod -o=$(GOBIN)/actionlint-v1.7.11 "github.com/rhysd/actionlint/cmd/actionlint"
+
+BUF := $(GOBIN)/buf-v1.66.1
 $(BUF): $(BINGO_DIR)/buf.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/buf-v1.65.0"
-	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=buf.mod -o=$(GOBIN)/buf-v1.65.0 "github.com/bufbuild/buf/cmd/buf"
+	@echo "(re)installing $(GOBIN)/buf-v1.66.1"
+	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=buf.mod -o=$(GOBIN)/buf-v1.66.1 "github.com/bufbuild/buf/cmd/buf"
 
 CTLPTL := $(GOBIN)/ctlptl-v0.9.0
 $(CTLPTL): $(BINGO_DIR)/ctlptl.mod
@@ -41,11 +47,11 @@ $(GODOG): $(BINGO_DIR)/godog.mod
 	@echo "(re)installing $(GOBIN)/godog-v0.15.1"
 	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=godog.mod -o=$(GOBIN)/godog-v0.15.1 "github.com/cucumber/godog/cmd/godog"
 
-GOLANGCI_LINT := $(GOBIN)/golangci-lint-v2.9.0
+GOLANGCI_LINT := $(GOBIN)/golangci-lint-v2.11.3
 $(GOLANGCI_LINT): $(BINGO_DIR)/golangci-lint.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/golangci-lint-v2.9.0"
-	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=golangci-lint.mod -o=$(GOBIN)/golangci-lint-v2.9.0 "github.com/golangci/golangci-lint/v2/cmd/golangci-lint"
+	@echo "(re)installing $(GOBIN)/golangci-lint-v2.11.3"
+	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=golangci-lint.mod -o=$(GOBIN)/golangci-lint-v2.11.3 "github.com/golangci/golangci-lint/v2/cmd/golangci-lint"
 
 KIND := $(GOBIN)/kind-v0.31.0
 $(KIND): $(BINGO_DIR)/kind.mod
@@ -65,11 +71,17 @@ $(KUBECONFORM): $(BINGO_DIR)/kubeconform.mod
 	@echo "(re)installing $(GOBIN)/kubeconform-v0.7.0"
 	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=kubeconform.mod -o=$(GOBIN)/kubeconform-v0.7.0 "github.com/yannh/kubeconform/cmd/kubeconform"
 
-MOCKERY := $(GOBIN)/mockery-v3.6.4
+KUSTOMIZE := $(GOBIN)/kustomize-v5.8.1
+$(KUSTOMIZE): $(BINGO_DIR)/kustomize.mod
+	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
+	@echo "(re)installing $(GOBIN)/kustomize-v5.8.1"
+	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=kustomize.mod -o=$(GOBIN)/kustomize-v5.8.1 "sigs.k8s.io/kustomize/kustomize/v5"
+
+MOCKERY := $(GOBIN)/mockery-v3.7.0
 $(MOCKERY): $(BINGO_DIR)/mockery.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/mockery-v3.6.4"
-	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=mockery.mod -o=$(GOBIN)/mockery-v3.6.4 "github.com/vektra/mockery/v3"
+	@echo "(re)installing $(GOBIN)/mockery-v3.7.0"
+	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=mockery.mod -o=$(GOBIN)/mockery-v3.7.0 "github.com/vektra/mockery/v3"
 
 PROTOC_GEN_CONNECT_GO := $(GOBIN)/protoc-gen-connect-go-v1.19.1
 $(PROTOC_GEN_CONNECT_GO): $(BINGO_DIR)/protoc-gen-connect-go.mod

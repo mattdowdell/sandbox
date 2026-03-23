@@ -168,7 +168,7 @@ dirty:
 
 # Run all linters.
 [group('linters')]
-lint: lint-buf lint-go
+lint: lint-buf lint-go lint-actions
 
 # Run the Protobuf linter.
 [group('linters')]
@@ -180,31 +180,39 @@ lint-buf: install-buf
 lint-go: install-golangci-lint
     {{ golangci-lint }} run
 
-# Run the Helm linters.
+# Run the actions linter.
 [group('linters')]
-lint-helm: lint-helm-kubeconform lint-helm-kubescore
+lint-actions: install-actionlint
+    {{ actionlint }}
 
-# Run the Kubeconform Helm linter.
+# Run the K8S linters.
 [group('linters')]
-lint-helm-kubeconform: install-kubeconform
-    helm template example ./helm/example \
-        -f ./helm/example/values.yaml \
-        -f ./helm/example/values-example.yaml \
-        -f ./helm/example/values-dev.yaml | \
-        {{ kubeconform }} -verbose -strict -summary
+lint-k8s: lint-k8s-kubeconform lint-k8s-kubescore
 
-# Run the Kube-score Helm linter.
+# Run the kubeconform linter.
 [group('linters')]
-lint-helm-kubescore: install-kube-score
-    helm template example ./helm/example \
-        -f ./helm/example/values.yaml \
-        -f ./helm/example/values-example.yaml \
-        -f ./helm/example/values-dev.yaml | \
-        {{ kube-score }} score - \
-            --ignore-test container-resources \
-            --ignore-test container-image-tag \
-            --ignore-test pod-networkpolicy \
-            --ignore-test container-ephemeral-storage-request-and-limit
+lint-k8s-kubeconform: install-kustomize install-kubeconform
+    {{ kustomize }} build ./kustomize/example/base/ | {{ kubeconform }} \
+        -verbose \
+        -strict \
+        -summary
+
+# Run the kube-score linter.
+[group('linters')]
+lint-k8s-kubescore: install-kustomize install-kube-score
+    @# ignore anti-affinity in favour of topology spread constraints
+    @# https://github.com/zegl/kube-score/issues/613
+    @#
+    @# ignore ephemeral storage, use a readonly filesystem instead
+    @#
+    @# ignore network policy, revisit if/when we setup ingress
+    {{ kustomize }} build ./kustomize/example/base/ | {{ kube-score }} score - \
+        --ignore-test container-ephemeral-storage-request-and-limit \
+        --ignore-test container-image-tag \
+        --ignore-test container-resources \
+        --ignore-test deployment-has-host-podantiaffinity \
+        --ignore-test pod-networkpolicy \
+        --enable-optional-test container-ports-check
 
 # Run all linter fixers.
 [group('linters')]

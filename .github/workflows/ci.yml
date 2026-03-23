@@ -30,14 +30,14 @@ jobs:
 
       - name: Size
         id: size
-        uses: mattdowdell/pr-sizer@0dae752c3a2a3bbba738230d857a303a3798cf6e # v0.5.1
+        uses: mattdowdell/pr-sizer@ee8ce3fa199d4fb213b010253e362216d26463c4 # v0.5.2
 
       - name: Outputs
         run: |
-          echo size=${SIZE}
-          echo includes=${INCLUDES}
-          echo excludes=${EXCLUDES}
-          echo ignores=${IGNORES}
+          echo "size=${SIZE}"
+          echo "includes=${INCLUDES}"
+          echo "excludes=${EXCLUDES}"
+          echo "ignores=${IGNORES}"
         env:
           SIZE: ${{ steps.size.outputs.size }}
           INCLUDES: ${{ steps.size.outputs.includes }}
@@ -90,14 +90,14 @@ jobs:
           persist-credentials: false
 
       - name: Install Go
-        uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
+        uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
         with:
           go-version-file: "go.mod"
 
-      - name: Get version
+      - name: Get golangci-lint version
         id: version
         run: |
-          ./tools/bingo-version.sh golangci-lint >> $GITHUB_OUTPUT
+          ./tools/bingo-version.sh golangci-lint >> "$GITHUB_OUTPUT"
 
       - name: Lint Go
         uses: golangci/golangci-lint-action@1e7e51e771db61008b38414a730f564565cf7c20 # v9.2.0
@@ -106,11 +106,16 @@ jobs:
           args: --timeout=10m
 
       - name: Lint Protobuf
-        uses: bufbuild/buf-action@8f4a1456a0ab6a1eb80ba68e53832e6fcfacc16c # v1.3.0
+        uses: bufbuild/buf-action@fd21066df7214747548607aaa45548ba2b9bc1ff # v1.4.0
         with:
           pr_comment: false
           format: false
           breaking: false
+
+      - name: Lint Actions
+        uses: reviewdog/action-actionlint@0d952c597ef8459f634d7145b0b044a9699e5e43 # v1.71.0
+        with:
+          fail_level: any
 
   unit:
     name: Unit test
@@ -124,12 +129,12 @@ jobs:
           persist-credentials: false
 
       - name: Install Go
-        uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
+        uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
         with:
           go-version-file: "go.mod"
 
       - name: Install Just
-        uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff # v3.0.0
+        uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3.1.0
 
       - name: Unit test
         run: just unit
@@ -150,12 +155,12 @@ jobs:
           persist-credentials: false
 
       - name: Install Go
-        uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
+        uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
         with:
           go-version-file: "go.mod"
 
       - name: Install Just
-        uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff # v3.0.0
+        uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3.1.0
 
       # required for trivy to find licenses
       # see https://trivy.dev/latest/docs/coverage/language/golang/#license
@@ -165,10 +170,10 @@ jobs:
       - name: Get trivy version
         id: trivy-version
         run: |
-          ./tools/bingo-version.sh trivy >> $GITHUB_OUTPUT
+          ./tools/bingo-version.sh trivy >> "$GITHUB_OUTPUT"
 
       - name: Run trivy
-        uses: aquasecurity/trivy-action@c1824fd6edce30d7ab345a9989de00bbd46ef284 # 0.34.0
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # 0.35.0
         with:
           scan-type: fs
           trivy-config: trivy.yaml
@@ -177,12 +182,12 @@ jobs:
           version: ${{ steps.trivy-version.outputs.version }}
 
       - name: Upload Trivy scan results
-        uses: github/codeql-action/upload-sarif@9e907b5e64f6b83e7804b09294d44122997950d6 # v4.32.3
+        uses: github/codeql-action/upload-sarif@b1bff81932f5cdfc8695c7752dcee935dcd061c8 # v4.33.0
         with:
           sarif_file: trivy-results.sarif
 
       - name: Run zizmor
-        uses: zizmorcore/zizmor-action@0dce2577a4760a2749d8cfb7a84b7d5585ebcb7d # v0.5.0
+        uses: zizmorcore/zizmor-action@71321a20a9ded102f6e9ce5718a2fcec2c4f70d8 # v0.5.2
         with:
           persona: pedantic
 
@@ -201,7 +206,7 @@ jobs:
           persist-credentials: false
 
       - name: Install Just
-        uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff # v3.0.0
+        uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3.1.0
 
       - name: Setup coverage
         uses: gacts/run-and-post-run@81b6ce503cde93862cec047c54652e45c5dca991 # v1.4.3
@@ -287,22 +292,22 @@ jobs:
           persist-credentials: false
 
       - name: GHCR Login
-        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4.0.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Buildx
-        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
 
       - name: Setup cosign
-        uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad # v4.0.0
+        uses: sigstore/cosign-installer@ba7bc0a3fef59531c69a25acd34668d6d3fe6f22 # v4.1.0
 
       - name: Get trivy version
         id: trivy-version
         run: |
-          ./tools/bingo-version.sh trivy >> $GITHUB_OUTPUT
+          ./tools/bingo-version.sh trivy >> "$GITHUB_OUTPUT"
 
       - name: Build
         uses: ./.github/actions/container-build

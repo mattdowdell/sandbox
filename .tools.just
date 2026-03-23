@@ -2,7 +2,13 @@
 
 gopath := shell("go env GOPATH")
 
-buf := join(gopath, "bin", "buf-v1.65.0")
+actionlint := join(gopath, "bin", "actionlint-v1.7.11")
+
+[private]
+install-actionlint:
+    {{ if path_exists(actionlint) == "true" { "" } else { "bingo get actionlint" } }}
+
+buf := join(gopath, "bin", "buf-v1.66.1")
 
 [private]
 install-buf:
@@ -20,7 +26,7 @@ godog := join(gopath, "bin", "godog-v0.15.1")
 install-godog:
     {{ if path_exists(godog) == "true" { "" } else { "bingo get godog" } }}
 
-golangci-lint := join(gopath, "bin", "golangci-lint-v2.9.0")
+golangci-lint := join(gopath, "bin", "golangci-lint-v2.11.3")
 
 [private]
 install-golangci-lint:
@@ -44,7 +50,13 @@ kubeconform := join(gopath, "bin", "kubeconform-v0.7.0")
 install-kubeconform:
     {{ if path_exists(kubeconform) == "true" { "" } else { "bingo get kubeconform" } }}
 
-mockery := join(gopath, "bin", "mockery-v3.6.4")
+kustomize := join(gopath, "bin", "kustomize-v5.8.1")
+
+[private]
+install-kustomize:
+    {{ if path_exists(kustomize) == "true" { "" } else { "bingo get kustomize" } }}
+
+mockery := join(gopath, "bin", "mockery-v3.7.0")
 
 [private]
 install-mockery:

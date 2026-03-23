@@ -17,6 +17,7 @@ package protovalidate
 import (
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/types"
+	"github.com/google/cel-go/common/types/pb"
 	"github.com/google/cel-go/common/types/ref"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
@@ -45,12 +46,18 @@ type registry struct {
 	knownFiles map[protoreflect.FileDescriptor]struct{}
 }
 
-// newRegistry creates a new root registry with an empty local store.
-func newRegistry() *registry {
+// newRegistry creates a new root registry seeded with the core CEL types
+// (string, int, bool, etc.). Copy should be used to create child registries,
+// which use an empty local store and delegate to the parent.
+func newRegistry() (*registry, error) {
+	local, err := types.NewRegistry()
+	if err != nil {
+		return nil, err
+	}
 	return &registry{
 		parent: nil,
-		local:  types.NewEmptyRegistry(),
-	}
+		local:  local,
+	}, nil
 }
 
 // Copy creates a child registry that delegates to this registry.
@@ -137,6 +144,11 @@ func (r *registry) NativeToValue(value any) ref.Val {
 		// we need to use this registry as the adapter, not the local
 		// types.Registry for cascading to work.
 		return types.NewProtoList(r, val)
+	case *pb.Map:
+		// Same as protoreflect.List above: use the full registry chain
+		// as adapter so map value lookups can resolve types registered
+		// in ancestor registries.
+		return types.NewProtoMap(r, val)
 	default:
 		result := r.local.NativeToValue(value)
 		if r.parent != nil && types.IsError(result) {
