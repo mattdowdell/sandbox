@@ -21,7 +21,7 @@ spec:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
             runAsUser: 65532 # distroless nonroot
-            runAsGroup: 65532  # distroless nonroot
+            runAsGroup: 65532 # distroless nonroot
             capabilities:
               drop:
                 - "ALL"
