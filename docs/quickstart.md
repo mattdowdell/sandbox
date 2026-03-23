@@ -42,7 +42,7 @@ colima start
 docker context ls
 ```
 
-_TODO: Go, bingo, helm, tilt_
+_TODO: Go, bingo, tilt_
 
 ## Environment
 

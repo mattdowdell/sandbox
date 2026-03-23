@@ -2,7 +2,6 @@
 # https://github.com/google/yamlfmt/blob/main/docs/config-file.md
 
 exclude:
-  - helm/example
   - vendor
 
 formatter:
