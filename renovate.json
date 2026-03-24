@@ -19,7 +19,6 @@
       "groupName": "X-Repositories"
     }
   ],
-  "postUpdateOptions": ["gomodTidy", "goModVendor", "gomodUpdateImportPaths"],
   "customManagers": [
     {
       "customType": "regex",
