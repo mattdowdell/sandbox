@@ -19,11 +19,12 @@ load("ext://helm_remote", "helm_remote")
 
 # Tilt's docker_build excludes .git per https://github.com/tilt-dev/tilt/issues/2169
 # but we need that for db migrations and otel resource attributes
-def custom_docker_build(name):
+def custom_docker_build(name, target="runtime"):
     custom_build(
         ref=name,
-        command="docker buildx build --pull --target runtime --build-arg SERVICE={name} -t $EXPECTED_REF .".format(
+        command="docker buildx build --pull --target {target} --build-arg SERVICE={name} -t $EXPECTED_REF .".format(
             name=name,
+            target=target,
         ),
         deps=[
             os.path.join(config.main_dir, "Dockerfile"),
@@ -33,7 +34,7 @@ def custom_docker_build(name):
         ],
     )
 
-custom_docker_build("example-rpc")
+custom_docker_build("example-rpc", target="debug")
 custom_docker_build("example-db-migrate")
 
 k8s_yaml(kustomize("kustomize/example/tilt"))
@@ -149,6 +150,20 @@ k8s_resource(
         "tempo:configmap",
     ],
     labels=["observability"],
+)
+
+helm_remote(
+    "victoria-traces-single",
+    repo_name="vm",
+    repo_url="https://victoriametrics.github.io/helm-charts",
+    # renovate: datasource=helm depName=victoria-traces-single packageName=victoria-traces-single registryUrl=https://victoriametrics.github.io/helm-charts
+    version="0.0.7",
+)
+
+k8s_resource(
+    "victoria-traces-single-vt-single-server",
+    labels=["observability"],
+    port_forwards=["127.0.0.1:10428:10428"],
 )
 
 helm_remote(

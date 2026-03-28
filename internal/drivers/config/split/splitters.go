@@ -1,6 +1,6 @@
-// Package splitter provides unmarshalers for Koanf config structs to convert strings to string
-// slices using a particular delimiter.
-package splitter
+// Package split provides unmarshalers for Koanf config structs to convert strings to string slices
+// using a particular delimiter.
+package split
 
 import (
 	"encoding"

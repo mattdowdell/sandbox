@@ -29,6 +29,15 @@ datasources:
         isDefault: false
         editable: false
 
+      - name: "VictoriaTraces"
+        type: "jaeger"
+        uid: "victoriatraces"
+        url: "http://victoria-traces-single-vt-single-server.default.svc.cluster.local:10428/select/jaeger/"
+        access: "proxy"
+        basicAuth: false
+        isDefault: false
+        editable: false
+
       - name: "Tempo"
         type: "tempo"
         uid: "tempo"

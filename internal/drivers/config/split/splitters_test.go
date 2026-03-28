@@ -1,11 +1,11 @@
-package splitter_test
+package split_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mattdowdell/sandbox/internal/drivers/config/splitter"
+	"github.com/mattdowdell/sandbox/internal/drivers/config/split"
 )
 
 func Test_Comma_UnmarshalText(t *testing.T) {
@@ -26,7 +26,7 @@ func Test_Comma_UnmarshalText(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			c := splitter.Comma{}
+			c := split.Comma{}
 
 			// act
 			err := c.UnmarshalText([]byte(tt.have))
@@ -40,19 +40,19 @@ func Test_Comma_UnmarshalText(t *testing.T) {
 
 func Test_Comma_MarshalText(t *testing.T) {
 	tests := map[string]struct {
-		have splitter.Comma
+		have split.Comma
 		want string
 	}{
 		"nil": {
-			have: splitter.Comma{},
+			have: split.Comma{},
 			want: "",
 		},
 		"empty": {
-			have: splitter.Comma{},
+			have: split.Comma{},
 			want: "",
 		},
 		"non-empty": {
-			have: splitter.Comma{"foo", "bar", "baz"},
+			have: split.Comma{"foo", "bar", "baz"},
 			want: "foo,bar,baz",
 		},
 	}
@@ -89,7 +89,7 @@ func Test_Space_UnmarshalText(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			s := splitter.Space{}
+			s := split.Space{}
 
 			// act
 			err := s.UnmarshalText([]byte(tt.have))
@@ -103,19 +103,19 @@ func Test_Space_UnmarshalText(t *testing.T) {
 
 func Test_Space_MarshalText(t *testing.T) {
 	tests := map[string]struct {
-		have splitter.Space
+		have split.Space
 		want string
 	}{
 		"nil": {
-			have: splitter.Space{},
+			have: split.Space{},
 			want: "",
 		},
 		"empty": {
-			have: splitter.Space{},
+			have: split.Space{},
 			want: "",
 		},
 		"non-empty": {
-			have: splitter.Space{"foo", "bar", "baz"},
+			have: split.Space{"foo", "bar", "baz"},
 			want: "foo bar baz",
 		},
 	}

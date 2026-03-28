@@ -22,4 +22,5 @@ data:
   rpcserver_host: "0.0.0.0"
   rpcserver_enablepprof: "true"
   tracerprovider_insecure: "true"
-  tracerprovider_endpoint: "tempo.default.svc.cluster.local:4318"
+  tracerprovider_endpoint: "victoria-traces-single-vt-single-server.default.svc.cluster.local:10428"
+  tracerprovider_path: "/insert/opentelemetry/v1/traces"

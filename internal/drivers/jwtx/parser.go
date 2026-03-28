@@ -7,21 +7,21 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 
 	"github.com/mattdowdell/sandbox/internal/domain/repositories"
-	"github.com/mattdowdell/sandbox/internal/drivers/config/splitter"
+	"github.com/mattdowdell/sandbox/internal/drivers/config/split"
 )
 
 // ParserConfig contains configuration for creating a Parser.
 type ParserConfig struct {
 	// The expected values of the `aud` claim to validate when parsing a JWT. Any of the provided
 	// values will be accepted. Configuration values should be space delimited strings.
-	Audience splitter.Space `koanf:"audience"`
+	Audience split.Space `koanf:"audience"`
 
 	// The expected value of the `iss` claim to validate when parsing a JWT.
 	Issuer string `koanf:"issuer"`
 
 	// The signing algorithm methods accepted by the parser. Configuration values should be space
 	// delimited strings.
-	Methods splitter.Space `koanf:"methods"`
+	Methods split.Space `koanf:"methods"`
 }
 
 // Parser is used to validate and parse JWTs based on given configuration.

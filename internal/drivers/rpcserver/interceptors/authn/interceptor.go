@@ -114,7 +114,6 @@ func (i *Interceptor) authenticate(
 
 	if _, ok := i.ignores[service]; ok {
 		span.AddEvent("authentication skipped")
-		logger.DebugContext(ctx, "authentication skipped")
 
 		return "", nil
 	}

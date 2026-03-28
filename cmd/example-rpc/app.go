@@ -26,6 +26,7 @@ type App struct {
 	conf            *Config
 	shutdownTimeout time.Duration
 	logger          *slog.Logger
+	loader *config.Loader
 	server          *rpcserver.Server
 	tpShutdown      tracex.ProviderShutdown
 	mpShutdown      metricx.ProviderShutdown
@@ -38,6 +39,7 @@ type App struct {
 func NewApp(
 	conf *Config,
 	logger *slog.Logger,
+	loader *config.Loader,
 	server *rpcserver.Server,
 	tpShutdown tracex.ProviderShutdown,
 	mpShutdown metricx.ProviderShutdown,
@@ -47,6 +49,7 @@ func NewApp(
 		conf:            conf,
 		shutdownTimeout: conf.App.ShutdownTimeout,
 		logger:          logger,
+		loader: loader,
 		server:          server,
 		tpShutdown:      tpShutdown,
 		mpShutdown:      mpShutdown,
@@ -80,6 +83,24 @@ func (a *App) Start(ctx context.Context, stop context.CancelFunc) {
 
 		stop()
 	}()
+
+	if err := a.loader.Watch(func(err error) {
+		if err != nil {
+			a.logger.ErrorContext(ctx, "error during config watch", slogx.Err(err))
+			stop()
+		}
+
+		reloaded := new(Config)
+		if err := a.loader.Load(reloaded); err != nil {
+			a.logger.ErrorContext(ctx, "config reload failed", slogx.Err(err))
+			return
+		}
+
+		a.logger.InfoContext(ctx, "config reloaded", slogx.Config(reloaded))
+	}); err != nil {
+		a.logger.ErrorContext(ctx, "failed to start config watcher", slogx.Err(err))
+		stop()
+	}
 }
 
 // ...

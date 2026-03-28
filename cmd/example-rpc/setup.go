@@ -78,7 +78,7 @@ func SetupApp(ctx context.Context) (*App, error) {
 
 	server := rpcserver.NewFromConfig(conf.RPCServer, handlers, handlerOpts)
 
-	return NewApp(conf, logger, server, tpShutdown, mpShutdown, lpShutdown), nil
+	return NewApp(conf, logger, loader, server, tpShutdown, mpShutdown, lpShutdown), nil
 }
 
 //nolint:gocritic // result types are differentiated by package name.

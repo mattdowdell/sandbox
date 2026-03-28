@@ -221,7 +221,7 @@ lint-fix-go: install-golangci-lint
 # Run the Go unit tests.
 [group('tests')]
 unit timeout="30s":
-    go test -timeout={{ timeout }} -count=1 -cover -coverprofile=cover.out ./internal/... ./pkg/...
+    go test -race -timeout={{ timeout }} -count=1 -coverprofile=cover.out ./internal/... ./pkg/...
     @go run ./tools/filter-coverage/ -output=unit.out cover.out
     @echo "Total coverage: `go tool cover -func=unit.out | tail -n 1 | awk '{print $3}'`"
     go tool cover -html unit.out -o unit.html

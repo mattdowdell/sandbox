@@ -20,26 +20,23 @@ const (
 	delimiter = "."
 )
 
-// provider is a pairing of a provider and parser to save work when reloading configuration.
-type provider struct {
+// providerParser is a pairing of a provider and parser to save work when reloading configuration.
+type providerParser struct {
 	provider koanf.Provider
 	parser   koanf.Parser
 }
 
-func envProvider(prefix string) *provider {
-	return newProvider(
-		env.Provider(delimiter, env.Opt{
-			Prefix: prefix,
-			TransformFunc: func(k, v string) (string, any) {
-				return transformKey(k, prefix), v
-			},
-		}),
-		nil, /*parser*/
-	)
+func envProvider(prefix string) *env.Env {
+	return env.Provider(delimiter, env.Opt{
+		Prefix: prefix,
+		TransformFunc: func(k, v string) (string, any) {
+			return transformKey(k, prefix), v
+		},
+	})
 }
 
-func fileProviders(paths []string) ([]*provider, error) {
-	providers := make([]*provider, 0, len(paths))
+func fileProviders(paths []string) ([]*providerParser, error) {
+	providers := make([]*providerParser, 0, len(paths))
 
 	for _, path := range paths {
 		p, err := fileProvider(path)
@@ -53,17 +50,20 @@ func fileProviders(paths []string) ([]*provider, error) {
 	return providers, nil
 }
 
-func fileProvider(path string) (*provider, error) {
+func fileProvider(path string) (*providerParser, error) {
 	parser, err := fileParser(path)
 	if err != nil {
 		return nil, err
 	}
 
-	return newProvider(file.Provider(path), parser), nil
+	return &providerParser{
+		provider: file.Provider(path),
+		parser: parser,
+	}, nil
 }
 
-func mountProviders(paths []string) []*provider {
-	providers := make([]*provider, 0, len(paths))
+func mountProviders(paths []string) []*k8smount.K8SMount {
+	providers := make([]*k8smount.K8SMount, 0, len(paths))
 
 	for _, path := range paths {
 		providers = append(providers, mountProvider(path))
@@ -72,19 +72,8 @@ func mountProviders(paths []string) []*provider {
 	return providers
 }
 
-func mountProvider(path string) *provider {
-	return newProvider(k8smount.Provider(path, "_" /*delimiter*/), nil)
-}
-
-func newProvider(prov koanf.Provider, parser koanf.Parser) *provider {
-	return &provider{
-		provider: prov,
-		parser:   parser,
-	}
-}
-
-func (p *provider) load(k *koanf.Koanf) error {
-	return k.Load(p.provider, p.parser)
+func mountProvider(path string) *k8smount.K8SMount {
+	return k8smount.Provider(path, "_" /*delimiter*/)
 }
 
 func transformKey(key, prefix string) string {

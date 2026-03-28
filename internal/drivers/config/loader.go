@@ -14,6 +14,9 @@ package config
 import (
 	"github.com/creasty/defaults"
 	"github.com/knadh/koanf/v2"
+	"github.com/knadh/koanf/providers/env/v2"
+
+	"github.com/mattdowdell/sandbox/internal/drivers/config/providers/k8smount"
 )
 
 // Options provides the values to bootstrap configuration loading.
@@ -50,9 +53,9 @@ type Options struct {
 type Loader struct {
 	inner  *koanf.Koanf
 	opts   *Options
-	env    *provider
-	files  []*provider
-	mounts []*provider
+	env    *env.Env
+	files  []*providerParser
+	mounts []*k8smount.K8SMount
 }
 
 // New creates a new Loader instance.
@@ -126,18 +129,18 @@ func Load[T any](opts *Options) (*T, error) {
 // [defaults]: https://pkg.go.dev/github.com/creasty/defaults
 // [defaults.Setter]: https://pkg.go.dev/github.com/creasty/defaults#Setter
 func (l *Loader) Load(target any) error {
-	if err := l.env.load(l.inner); err != nil {
+	if err := l.inner.Load(l.env, nil /*parser*/); err != nil {
 		return err
 	}
 
 	for _, file := range l.files {
-		if err := file.load(l.inner); err != nil {
+		if err := l.inner.Load(file.provider, file.parser); err != nil {
 			return err
 		}
 	}
 
 	for _, mount := range l.mounts {
-		if err := mount.load(l.inner); err != nil {
+		if err := l.inner.Load(mount, nil /*parser*/); err != nil {
 			return err
 		}
 	}
@@ -148,6 +151,18 @@ func (l *Loader) Load(target any) error {
 
 	if err := l.inner.Unmarshal("", target); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (l *Loader) Watch(fn func(error)) error {
+	// TODO: files
+
+	for _, mount := range l.mounts {
+		if err := mount.Watch(fn); err != nil {
+			return err
+		}
 	}
 
 	return nil

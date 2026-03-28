@@ -1,16 +1,16 @@
-package splitter_test
+package split_test
 
 import (
 	"fmt"
 	"os"
 
 	"github.com/mattdowdell/sandbox/internal/drivers/config"
-	"github.com/mattdowdell/sandbox/internal/drivers/config/splitter"
+	"github.com/mattdowdell/sandbox/internal/drivers/config/split"
 )
 
 type ExampleConfig struct {
-	Comma splitter.Comma `koanf:"foo"`
-	Space splitter.Space `koanf:"bar"`
+	Comma split.Comma `koanf:"foo"`
+	Space split.Space `koanf:"bar"`
 }
 
 func Example() {

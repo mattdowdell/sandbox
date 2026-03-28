@@ -24,6 +24,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync/atomic"
+	"syscall"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
@@ -108,7 +109,10 @@ func (k *K8SMount) walkDir(mountFS fs.FS, path string, d fs.DirEntry, err error)
 
 	for d.Type()&os.ModeSymlink != 0 {
 		p, err := fs.ReadLink(mountFS, resolved)
-		if err != nil {
+		// If a value is deleted from a configmap, the symlink for the value remains, but the
+		// underlying file is removed. If this occurs, ignore it, and let the caller either provide
+		// a default or fail due to the missing value.
+		if err != nil && !errors.Is(err, syscall.ENOENT) {
 			return "", "", err
 		}
 
@@ -194,7 +198,6 @@ func (k *K8SMount) watchDir(fn func(error)) {
 				return
 			}
 
-			// TODO: report which key was updated
 			fn(nil)
 
 		case err, ok := <-k.watcher.Errors:
