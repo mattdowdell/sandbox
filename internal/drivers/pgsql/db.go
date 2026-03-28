@@ -50,9 +50,18 @@ type Config struct {
 
 	// The maximum time a database connection can be idle before being closed. Defaults to 5
 	// minutes. Set to 0 to disable.
+	//
+	// This value should be less than or equal to than MaxLifetime, as it otherwise has no effect.
+	// It should also be less than any external idle timeouts. This notably includes the idle
+	// timeout implemented by Istio, which defaults to 60 minutes.
 	MaxIdleTime time.Duration `koanf:"maxidletime" default:"5m"`
 
 	// The maximum lifetime for a database connection. Defaults to 5 minutes. Set to 0 to disable.
+	//
+	// Setting lower values improves availability when server updates occur, such as DNS updates and
+	// failovers. However, opening a new connection is somewhat expensive. Therefore, closing it
+	// prematurely can increase latency during large, sudden bursts of requests, especially if those
+	// bursts occur less frequently than the specified max lifetime.
 	MaxLifetime time.Duration `koanf:"maxlifetime" default:"5m"`
 
 	// The maximum number of idle connections in the database connection pool. Defaults to no limit.
