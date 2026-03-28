@@ -58,7 +58,7 @@ func fileProvider(path string) (*providerParser, error) {
 
 	return &providerParser{
 		provider: file.Provider(path),
-		parser: parser,
+		parser:   parser,
 	}, nil
 }
 

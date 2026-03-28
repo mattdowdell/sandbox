@@ -136,23 +136,6 @@ k8s_resource(
 # -------------
 
 helm_remote(
-    "tempo",
-    repo_name="grafana",
-    repo_url="https://grafana.github.io/helm-charts",
-    # renovate: datasource=helm depName=tempo packageName=tempo registryUrl=https://grafana.github.io/helm-charts
-    version="1.24.4",
-)
-
-k8s_resource(
-    "tempo",
-    objects=[
-        "tempo:serviceaccount",
-        "tempo:configmap",
-    ],
-    labels=["observability"],
-)
-
-helm_remote(
     "victoria-traces-single",
     repo_name="vm",
     repo_url="https://victoriametrics.github.io/helm-charts",

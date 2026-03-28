@@ -26,7 +26,7 @@ type App struct {
 	conf            *Config
 	shutdownTimeout time.Duration
 	logger          *slog.Logger
-	loader *config.Loader
+	loader          *config.Loader
 	server          *rpcserver.Server
 	tpShutdown      tracex.ProviderShutdown
 	mpShutdown      metricx.ProviderShutdown
@@ -49,7 +49,7 @@ func NewApp(
 		conf:            conf,
 		shutdownTimeout: conf.App.ShutdownTimeout,
 		logger:          logger,
-		loader: loader,
+		loader:          loader,
 		server:          server,
 		tpShutdown:      tpShutdown,
 		mpShutdown:      mpShutdown,

@@ -13,8 +13,8 @@ package config
 
 import (
 	"github.com/creasty/defaults"
-	"github.com/knadh/koanf/v2"
 	"github.com/knadh/koanf/providers/env/v2"
+	"github.com/knadh/koanf/v2"
 
 	"github.com/mattdowdell/sandbox/internal/drivers/config/providers/k8smount"
 )
