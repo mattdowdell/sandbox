@@ -3,7 +3,6 @@ package k8smount_test
 import (
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"sync/atomic"
 	"testing"
@@ -198,12 +197,6 @@ func Test_K8SMount_Read_MissingDir(t *testing.T) {
 }
 
 func Test_K8SMount_Watch_Success(t *testing.T) {
-	// fsnotify seems to miss events in darwin
-	// potentially related to https://github.com/fsnotify/fsnotify/pull/718
-	if runtime.GOOS == "darwin" {
-		t.Skip("skipping test")
-	}
-
 	// arrange
 	dir := t.TempDir()
 
