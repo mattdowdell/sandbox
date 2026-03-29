@@ -306,7 +306,9 @@ jobs:
     name: Tag
     needs:
       - unit
-      - scan
+      - scan-gitleaks
+      - scan-trivy
+      - scan-zizmor
       - functional
     permissions:
       contents: write # for pushing tags (and checkout)
