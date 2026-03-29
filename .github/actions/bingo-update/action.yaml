@@ -30,7 +30,7 @@ runs:
         go-version-file: "go.mod"
 
     - name: Install bingo
-      uses: mattdowdell/go-installer@7af1f9ff5af1447fd122d6b144ddce2562b76e09 # v0.3.0
+      uses: mattdowdell/go-installer@de5d072ade9fc895652cd6a93ac4bde11e105bc6 # v0.4.0
       with:
         package: github.com/bwplotka/bingo
 
