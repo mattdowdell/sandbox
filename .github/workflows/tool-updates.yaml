@@ -44,10 +44,10 @@ jobs:
       - name: Collect
         id: collect
         run: |
-          echo "names=`bingo list | \
+          echo "names=$(bingo list | \
             tail -n+3 | \
             awk '{print $1}' | \
-            jq -ncR '[inputs]'`" >> "$GITHUB_OUTPUT"
+            jq -ncR '[inputs]')" >> "$GITHUB_OUTPUT"
 
   update:
     name: Update
@@ -74,10 +74,10 @@ jobs:
 
       - name: Output
         run: |
-          echo name=${NAME}
-          echo updated=${UPDATED}
-          echo current=${CURRENT}
-          echo latest=${LATEST}
+          echo "name=${NAME}"
+          echo "updated=${UPDATED}"
+          echo "current=${CURRENT}"
+          echo "latest=${LATEST}"
         env:
           NAME: ${{ matrix.name }}
           UPDATED: ${{ steps.update.outputs.updated }}
