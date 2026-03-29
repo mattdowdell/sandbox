@@ -21,6 +21,16 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
     go build ${GO_BUILD_ARGS} -trimpath -ldflags="-buildid= -s -w" -o /go/bin/ ./cmd/...; \
     touch --date=@${SOURCE_DATE_EPOCH} /go/bin/*;
 
+# ------------
+# Debug target
+# ------------
+
+FROM gcr.io/distroless/static-debian12:debug-nonroot@sha256:afead1275cad5ec9662cdc09ce7fe5961a41467555fc30cd46a60247bf8bbdfd AS debug
+
+ARG SERVICE
+COPY --from=build /go/bin/${SERVICE} /${SERVICE}
+COPY --from=build /go/bin/example-health /example-health
+
 # --------------
 # Runtime target
 # --------------

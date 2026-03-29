@@ -1,8 +1,10 @@
 package k8smount_test
 
 import (
+	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -13,12 +15,14 @@ import (
 	"github.com/mattdowdell/sandbox/internal/drivers/config/providers/k8smount"
 )
 
+const testDelim = "."
+
 func Test_New(t *testing.T) {
 	// arrange
 	dir := t.TempDir()
 
 	// act
-	provider := k8smount.Provider(dir, "." /*delim*/)
+	provider := k8smount.Provider(dir, testDelim, k8smount.Opt{})
 
 	// assert
 	assert.NotNil(t, provider)
@@ -27,7 +31,7 @@ func Test_New(t *testing.T) {
 func Test_K8SMount_ReadBytes(t *testing.T) {
 	// arrange
 	dir := t.TempDir()
-	provider := k8smount.Provider(dir, "." /*delim*/)
+	provider := k8smount.Provider(dir, testDelim, k8smount.Opt{})
 
 	// act
 	content, err := provider.ReadBytes()
@@ -40,7 +44,7 @@ func Test_K8SMount_ReadBytes(t *testing.T) {
 func Test_K8SMount_Read_Empty(t *testing.T) {
 	// arrange
 	dir := t.TempDir()
-	provider := k8smount.Provider(dir, "." /*delim*/)
+	provider := k8smount.Provider(dir, testDelim, k8smount.Opt{})
 
 	// act
 	values, err := provider.Read()
@@ -59,7 +63,7 @@ func Test_K8SMount_Read_WithFiles(t *testing.T) {
 	require.NoError(t, writeFile(t, filepath.Join(dir, "d.e.f"), "f"))
 	require.NoError(t, writeFile(t, filepath.Join(dir, "g", "h"), "h"))
 
-	provider := k8smount.Provider(dir, "." /*delim*/)
+	provider := k8smount.Provider(dir, testDelim, k8smount.Opt{})
 
 	// act
 	got, err := provider.Read()
@@ -85,75 +89,101 @@ func Test_K8SMount_Read_WithFiles(t *testing.T) {
 }
 
 func Test_K8SMount_Read_WithVolumeMount(t *testing.T) {
-	// arrange
-	dir := t.TempDir()
-
-	require.NoError(t, writeVolumeMount(t, dir, map[string]string{
-		"a.foo": "foo-value",
-		"b.bar": "bar-value",
-		"b.baz": "baz-value",
-	}))
-
-	provider := k8smount.Provider(dir, "." /*delim*/)
-
-	// act
-	got, err := provider.Read()
-
-	// assert
-	want := map[string]any{
-		"a": map[string]any{
-			"foo": "foo-value",
+	tests := map[string]struct {
+		have          map[string]string
+		transformFunc func(k, v string) (string, any)
+		want          map[string]any
+	}{
+		"no transform func": {
+			have: map[string]string{
+				"a_foo": "foo-value",
+				"b_bar": "bar-value",
+				"b_baz": "baz-value",
+			},
+			want: map[string]any{
+				"a_foo": "foo-value",
+				"b_bar": "bar-value",
+				"b_baz": "baz-value",
+			},
 		},
-		"b": map[string]any{
-			"bar": "bar-value",
-			"baz": "baz-value",
+		"with transform func replace+lowercase": {
+			have: map[string]string{
+				"a_foo": "foo-value",
+				"b_bar": "bar-value",
+				"b_baz": "baz-value",
+			},
+			transformFunc: func(k, v string) (string, any) {
+				return strings.ToLower(strings.ReplaceAll(k, "_", testDelim)), v
+			},
+			want: map[string]any{
+				"a": map[string]any{
+					"foo": "foo-value",
+				},
+				"b": map[string]any{
+					"bar": "bar-value",
+					"baz": "baz-value",
+				},
+			},
+		},
+		"with transform func empty string": {
+			have: map[string]string{
+				"a_foo": "foo-value",
+				"b_bar": "bar-value",
+				"b_baz": "baz-value",
+			},
+			transformFunc: func(_, v string) (string, any) {
+				return "", v
+			},
+			want: map[string]any{},
 		},
 	}
 
-	assert.Equal(t, want, got)
-	assert.NoError(t, err)
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			dir := t.TempDir()
+			require.NoError(t, writeVolumeMount(t, dir, tt.have))
+
+			provider := k8smount.Provider(dir, "." /*delim*/, k8smount.Opt{
+				TransformFunc: tt.transformFunc,
+			})
+
+			// act
+			got, err := provider.Read()
+
+			// assert
+			assert.Equal(t, tt.want, got)
+			assert.NoError(t, err)
+		})
+	}
 }
 
-func Test_K8SMount_Read_WithVolumeMount_Changing(t *testing.T) {
+func Test_K8SMount_Read_MissingLink(t *testing.T) {
 	// arrange
 	now := time.Now()
+
 	dir := t.TempDir()
-
-	require.NoError(t, writeVolumeMountAtTime(t, now.Add(time.Hour*1), dir, map[string]string{
-		"a.foo": "old-foo-value",
-		"b.bar": "old-bar-value",
-		"b.baz": "oldbaz-value",
+	require.NoError(t, writeVolumeMountAt(t, now, dir, map[string]string{
+		"foo": "foo-value",
 	}))
 
-	require.NoError(t, writeVolumeMountAtTime(t, now, dir, map[string]string{
-		"a.foo": "foo-value",
-		"b.bar": "bar-value",
-		"b.baz": "baz-value",
-	}))
+	name := now.UTC().Format(mountTimeFmt)
+	file := filepath.Join(dir, name, "foo")
+	require.NoError(t, os.Remove(file))
 
-	provider := k8smount.Provider(dir, "." /*delim*/)
+	provider := k8smount.Provider(dir, "." /*delim*/, k8smount.Opt{})
 
 	// act
 	got, err := provider.Read()
 
 	// assert
-	want := map[string]any{
-		"a": map[string]any{
-			"foo": "foo-value",
-		},
-		"b": map[string]any{
-			"bar": "bar-value",
-			"baz": "baz-value",
-		},
-	}
-
-	assert.Equal(t, want, got)
+	assert.Empty(t, got)
 	assert.NoError(t, err)
 }
 
 func Test_K8SMount_Read_MissingDir(t *testing.T) {
 	// arrange
-	provider := k8smount.Provider("/does/not/exist" /*dir*/, "." /*delim*/)
+	provider := k8smount.Provider("/does/not/exist" /*dir*/, "." /*delim*/, k8smount.Opt{})
 
 	// act
 	values, err := provider.Read()
@@ -168,7 +198,8 @@ func Test_K8SMount_Read_MissingDir(t *testing.T) {
 }
 
 func Test_K8SMount_Watch_Success(t *testing.T) {
-	// TODO: figure out why this always fails
+	// fsnotify seems to miss events in darwin
+	// potentially related to https://github.com/fsnotify/fsnotify/pull/718
 	if runtime.GOOS == "darwin" {
 		t.Skip("skipping test")
 	}
@@ -178,7 +209,7 @@ func Test_K8SMount_Watch_Success(t *testing.T) {
 
 	require.NoError(t, writeFile(t, filepath.Join(dir, "a"), "a"))
 
-	provider := k8smount.Provider(dir, "." /*delim*/)
+	provider := k8smount.Provider(dir, "." /*delim*/, k8smount.Opt{})
 
 	_, err := provider.Read()
 	require.NoError(t, err)
@@ -211,7 +242,7 @@ func Test_K8SMount_Watch_Success(t *testing.T) {
 func Test_K8SMount_Watch_AlreadyWatching(t *testing.T) {
 	// arrange
 	dir := t.TempDir()
-	provider := k8smount.Provider(dir, "." /*delim*/)
+	provider := k8smount.Provider(dir, "." /*delim*/, k8smount.Opt{})
 
 	require.NoError(t, provider.Watch(func(err error) {
 		assert.NoError(t, err)
@@ -232,7 +263,7 @@ func Test_K8SMount_Watch_AlreadyWatching(t *testing.T) {
 func Test_K8SMount_Unwatch(t *testing.T) {
 	// arrange
 	dir := t.TempDir()
-	provider := k8smount.Provider(dir, "." /*delim*/)
+	provider := k8smount.Provider(dir, "." /*delim*/, k8smount.Opt{})
 
 	// act
 	err := provider.Unwatch()

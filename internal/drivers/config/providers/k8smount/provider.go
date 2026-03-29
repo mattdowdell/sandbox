@@ -1,4 +1,4 @@
-// Package k8smount contains a Koanf provider for loading configuration from Kubernetes volume
+// Package k8smount contains a [koanf.Provider] for loading configuration from Kubernetes volume
 // mounts, i.e. Secrets or ConfigMaps mounted into a Pod.
 //
 // This is most appropriate for key-value data, such as the following example ConfigMap.
@@ -12,8 +12,11 @@
 //	  bar: "1"
 //	  baz: "value"
 //
-// If ConfigMap fields contains structured data, such as JSON or YAML, the file provider with the
-// appropriate parser should be used instead.
+// If values contains structured data, such as JSON or YAML, the [file.File] provider is recommended
+// instead, along with the appropriate parser.
+//
+// [koanf.Provider]: https://pkg.go.dev/github.com/knadh/koanf/v2#Provider
+// [file.File]: https://pkg.go.dev/github.com/knadh/koanf/providers/file#File
 package k8smount
 
 import (
@@ -24,6 +27,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync/atomic"
+	"syscall"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
@@ -31,17 +35,28 @@ import (
 	"github.com/knadh/koanf/v2"
 )
 
+// Errors returned by the provider.
 var ErrAlreadyWatched = errors.New("mount is already being watched")
 
 // Non-allocating compile-time check for interface implementation.
 var _ koanf.Provider = (*K8SMount)(nil)
 
-// K8SMount implements a Kubernetes pod mount provider.
+// Opt represents optional configuration passed to the provider.
+type Opt struct {
+	// TransformFunc is an optional callback that takes a volume mount field's name and value, runs
+	// arbitrary transformations on them and returns a transformed string key and value of any type.
+	// Common usecase are lowercasing keys, replacing _ with . etc. For example, DB_HOST -> db.host.
+	// If the returned key is an empty string (""), it is ignored altogether.
+	TransformFunc func(k, v string) (string, any)
+}
+
+// K8SMount implements a koanf.Provider for Kubernetes volume mounts.
 type K8SMount struct {
-	mount    string
-	delim    string
-	watching atomic.Bool
-	watcher  *fsnotify.Watcher
+	mount         string
+	delim         string
+	transformFunc func(k, v string) (string, any)
+	watching      atomic.Bool
+	watcher       *fsnotify.Watcher
 }
 
 // Provider creates a new K8SMount provider capable of reading in mounted secrets and configmaps in
@@ -49,15 +64,16 @@ type K8SMount struct {
 //
 // The given mount should be the mount point of the configmap or secret. The delimiter is used to
 // create a hierarchy of keys based on the mounted filename. For example, a configmap mounted at
-// "/mnt/config/" with a key of "log.level" set to "INFO" and a delimiter of "." would result in
+// "/mnt/config/" with a key of "log_level" set to "INFO" and a delimiter of "_" would result in
 // {"log":{"level":"INFO"}} being read as configuration.
 //
 // Keys mounted in directories are always split. For example, if the above key was mounted at
 // "log/level" instead, it will always produce {"log":{"level":"INFO"}} as the result.
-func Provider(mount, delim string) *K8SMount {
+func Provider(mount, delim string, o Opt) *K8SMount {
 	return &K8SMount{
-		mount: filepath.Clean(mount),
-		delim: delim,
+		mount:         filepath.Clean(mount),
+		delim:         delim,
+		transformFunc: o.TransformFunc,
 	}
 }
 
@@ -77,13 +93,22 @@ func (k *K8SMount) Read() (map[string]any, error) {
 	mountFS := root.FS()
 
 	if err := fs.WalkDir(mountFS, ".", func(path string, d fs.DirEntry, err error) error {
-		key, content, err := k.walkDir(mountFS, path, d, err)
+		key, value, err := k.walkDir(mountFS, path, d, err)
 		if err != nil {
 			return err
 		}
 
+		var val any
+
+		key = strings.ReplaceAll(key, string(filepath.Separator), k.delim)
+		if k.transformFunc != nil {
+			key, val = k.transformFunc(key, value)
+		} else {
+			val = value
+		}
+
 		if key != "" {
-			data[key] = content
+			data[key] = val
 		}
 
 		return nil
@@ -91,10 +116,10 @@ func (k *K8SMount) Read() (map[string]any, error) {
 		return nil, fmt.Errorf("failed to read configuration from mount: %q: %w", k.mount, err)
 	}
 
-	return maps.Unflatten(maps.Unflatten(data, k.delim), "/"), nil
+	return maps.Unflatten(data, k.delim), nil
 }
 
-//nolint:gocritic // named return vars don't make code much more readable
+//nolint:gocritic,gocognit // named return vars don't make code much more readable
 func (k *K8SMount) walkDir(mountFS fs.FS, path string, d fs.DirEntry, err error) (string, string, error) {
 	if err != nil {
 		return "", "", err
@@ -108,12 +133,23 @@ func (k *K8SMount) walkDir(mountFS fs.FS, path string, d fs.DirEntry, err error)
 
 	for d.Type()&os.ModeSymlink != 0 {
 		p, err := fs.ReadLink(mountFS, resolved)
+		// If a value is deleted from a configmap, the symlink for the value remains, but the
+		// underlying file is removed. If this occurs, ignore it, and let the caller either provide
+		// a default or fail due to the missing value.
 		if err != nil {
+			if errors.Is(err, syscall.ENOENT) {
+				return "", "", nil
+			}
+
 			return "", "", err
 		}
 
 		info, err := fs.Lstat(mountFS, p)
 		if err != nil {
+			if errors.Is(err, syscall.ENOENT) {
+				return "", "", nil
+			}
+
 			return "", "", err
 		}
 
@@ -194,7 +230,6 @@ func (k *K8SMount) watchDir(fn func(error)) {
 				return
 			}
 
-			// TODO: report which key was updated
 			fn(nil)
 
 		case err, ok := <-k.watcher.Errors:

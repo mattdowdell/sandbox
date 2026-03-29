@@ -20,9 +20,9 @@ const (
 // likely when the ConfigMap or Secret was last modified.
 //
 //	..2025_06_28_09_28_32.3151791122/
-//	├── database.hostname
-//	├── database.name
-//	└── database.port
+//	├── database_hostname
+//	├── database_name
+//	└── database_port
 //
 // A symlink is then created for "..data" to the directory containing the data:
 //
@@ -30,13 +30,13 @@ const (
 //
 // Finally, symlinks are created for the data files, via the "..data" symlink:
 //
-//	database.hostname -> ..data/database.hostname
-//	database.name -> ..data/database.name
-//	database.port -> ..data/database.port
+//	database_hostname -> ..data/database_hostname
+//	database_name -> ..data/database_name
+//	database_port -> ..data/database_port
 func writeVolumeMount(tb testing.TB, mount string, data map[string]string) error {
 	tb.Helper()
 
-	return writeVolumeMountAtTime(tb, time.Now(), mount, data)
+	return writeVolumeMountAt(tb, time.Now(), mount, data)
 }
 
 // writeVolumeMountAtTime creates a file structure that matches how a ConfigMap or Secret will be
@@ -45,7 +45,7 @@ func writeVolumeMount(tb testing.TB, mount string, data map[string]string) error
 //
 // This function can be called multiple times with different times, with the most recent call taking
 // precedence if any conflicts occur.
-func writeVolumeMountAtTime(tb testing.TB, t time.Time, mount string, data map[string]string) error {
+func writeVolumeMountAt(tb testing.TB, t time.Time, mount string, data map[string]string) error {
 	tb.Helper()
 
 	dir := t.UTC().Format(mountTimeFmt)

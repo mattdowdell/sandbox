@@ -12,9 +12,7 @@ import (
 )
 
 const (
-	koanfTag      = "koanf"
-	jsonTag       = "json"
-	redactedValue = "********"
+	koanfTag = "koanf"
 )
 
 // Sentinel errors that can be returned by Encode.
@@ -28,12 +26,6 @@ var (
 // Encode converts a configuration struct to a flattened map using the given delimiter for nested
 // keys and all values as strings. It is intended for debugging only and is not guaranteed to
 // produce an entirely accurate representation of the original configuration.
-//
-// Values can be redacted with a JSON struct tag set to "-". For example:
-//
-//	type Example struct {
-//		Password string `koanf:"password" json:"-"`
-//	}
 //
 // Encoding all primitive types is supported natively. If a type implements [encoding.TextMarshaler]
 // or [encoding/json.Marshaler], that result will be returned instead. Arrays, slices and maps
@@ -94,11 +86,6 @@ func encodeStruct(value reflect.Value, prefix, delim string) (map[string]string,
 			key = fmt.Sprintf("%s%s%s", prefix, delim, key)
 		}
 
-		if isRedacted(&field) {
-			result[key] = redactedValue
-			continue
-		}
-
 		encoded, err := encodeFieldValue(val)
 		if err != nil {
 			return nil, err
@@ -121,13 +108,6 @@ func fieldName(field *reflect.StructField) string {
 	}
 
 	return name
-}
-
-func isRedacted(field *reflect.StructField) bool {
-	tag := field.Tag.Get(jsonTag)
-
-	n, _, _ := strings.Cut(tag, ",")
-	return n == "-"
 }
 
 func marshalFieldValue(value reflect.Value) (val string, ok bool, err error) {

@@ -17,6 +17,8 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/stdlib"
 	"go.opentelemetry.io/otel/semconv/v1.26.0"
+
+	"github.com/mattdowdell/sandbox/internal/drivers/config/secret"
 )
 
 type Cleanup func() error
@@ -34,7 +36,7 @@ type Config struct {
 	Username string `koanf:"username"`
 
 	// The password to authenticate with. This should be omitted when UseIAMAuth is set to true.
-	Password string `koanf:"password" json:"-"`
+	Password secret.String `koanf:"password"`
 
 	// Enables the use of IAM authentication. For use in AWS environments only.
 	UseIAMAuth bool `koanf:"useiamauth"`
@@ -83,7 +85,7 @@ func (c *Config) toOptions() []Option {
 	}
 
 	if c.Password != "" {
-		options = append(options, WithPassword(c.Password))
+		options = append(options, WithPassword(c.Password.String()))
 	}
 
 	if c.UseIAMAuth {
