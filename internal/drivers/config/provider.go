@@ -73,7 +73,11 @@ func mountProviders(paths []string) []*k8smount.K8SMount {
 }
 
 func mountProvider(path string) *k8smount.K8SMount {
-	return k8smount.Provider(path, "_" /*delimiter*/)
+	return k8smount.Provider(path, delimiter, k8smount.Opt{
+		TransformFunc: func(k, v string) (string, any) {
+			return transformKey(k, "" /*prefix*/), v
+		},
+	})
 }
 
 func transformKey(key, prefix string) string {

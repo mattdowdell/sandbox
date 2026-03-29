@@ -50,7 +50,7 @@ k8s_resource(
     port_forwards=["127.0.0.1:5000:5000"],
     resource_deps=[
         "postgresql",
-        "tempo",
+        "victoria-traces-single-vt-single-server",
         "victoria-metrics-single-server",
         "victoria-logs-single-server",
     ],
@@ -61,7 +61,7 @@ k8s_resource(
     labels=["services"],
     resource_deps=[
         "postgresql",
-        "tempo",
+        "victoria-traces-single-vt-single-server",
         "victoria-metrics-single-server",
         "victoria-logs-single-server",
     ],
@@ -201,7 +201,7 @@ k8s_resource(
     labels=["observability"],
     port_forwards=["127.0.0.1:3000:3000"],
     resource_deps=[
-        "tempo",
+        "victoria-traces-single-vt-single-server",
         "victoria-metrics-single-server",
         "victoria-logs-single-server",
     ],

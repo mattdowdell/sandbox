@@ -11,7 +11,7 @@ import (
 
 func ExampleK8SMount_Read() {
 	k := koanf.New(".")
-	provider := k8smount.Provider("/path/to/mount/", "." /*delimiter*/)
+	provider := k8smount.Provider("/path/to/mount/", "." /*delimiter*/, k8smount.Opt{})
 
 	if err := k.Load(provider, nil /*parser*/); err != nil {
 		log.Fatal("config load failed:", err)
@@ -23,7 +23,7 @@ func ExampleK8SMount_Read() {
 
 func ExampleK8SMount_Watch() {
 	k := koanf.New(".")
-	provider := k8smount.Provider("/path/to/mount/", "." /*delimiter*/)
+	provider := k8smount.Provider("/path/to/mount/", "." /*delimiter*/, k8smount.Opt{})
 
 	if err := k.Load(provider, nil /*parser*/); err != nil {
 		log.Fatal("config load failed:", err)
