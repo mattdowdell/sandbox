@@ -225,11 +225,6 @@ func (k *K8SMount) watchDir(fn func(error)) {
 			lastEvent = event.String()
 			lastEventTime = time.Now()
 
-			// ignore chmod
-			if event.Has(fsnotify.Chmod) {
-				return
-			}
-
 			fn(nil)
 
 		case err, ok := <-k.watcher.Errors:

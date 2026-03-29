@@ -37,17 +37,17 @@ jobs:
           go-version-file: "go.mod"
 
       - name: Install bingo
-        uses: mattdowdell/go-installer@7af1f9ff5af1447fd122d6b144ddce2562b76e09 # v0.3.0
+        uses: mattdowdell/go-installer@de5d072ade9fc895652cd6a93ac4bde11e105bc6 # v0.4.0
         with:
           package: github.com/bwplotka/bingo
 
       - name: Collect
         id: collect
         run: |
-          echo "names=`bingo list | \
+          echo "names=$(bingo list | \
             tail -n+3 | \
             awk '{print $1}' | \
-            jq -ncR '[inputs]'`" >> "$GITHUB_OUTPUT"
+            jq -ncR '[inputs]')" >> "$GITHUB_OUTPUT"
 
   update:
     name: Update
@@ -74,10 +74,10 @@ jobs:
 
       - name: Output
         run: |
-          echo name=${NAME}
-          echo updated=${UPDATED}
-          echo current=${CURRENT}
-          echo latest=${LATEST}
+          echo "name=${NAME}"
+          echo "updated=${UPDATED}"
+          echo "current=${CURRENT}"
+          echo "latest=${LATEST}"
         env:
           NAME: ${{ matrix.name }}
           UPDATED: ${{ steps.update.outputs.updated }}
