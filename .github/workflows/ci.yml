@@ -77,8 +77,8 @@ jobs:
         run: |
           just checks dirty
 
-  lint:
-    name: Lint
+  lint-go:
+    name: Lint Go
     if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     permissions:
@@ -105,12 +105,36 @@ jobs:
           version: ${{ steps.version.outputs.version }}
           args: --timeout=10m
 
+  lint-proto:
+    name: Lint Proto
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # for checkout
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
       - name: Lint Protobuf
         uses: bufbuild/buf-action@fd21066df7214747548607aaa45548ba2b9bc1ff # v1.4.0
         with:
           pr_comment: false
           format: false
           breaking: false
+
+  lint-actions:
+    name: Lint Actions
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # for checkout
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Lint Actions
         uses: reviewdog/action-actionlint@0d952c597ef8459f634d7145b0b044a9699e5e43 # v1.71.0
@@ -142,8 +166,8 @@ jobs:
     # TODO: report coverage to PR
     # maybe gwatts/go-coverage-action?
 
-  scan:
-    name: Scan
+  scan-trivy:
+    name: Scan Trivy
     runs-on: ubuntu-latest
     permissions:
       contents: read # for checkout
@@ -159,13 +183,10 @@ jobs:
         with:
           go-version-file: "go.mod"
 
-      - name: Install Just
-        uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3.1.0
-
       # required for trivy to find licenses
       # see https://trivy.dev/latest/docs/coverage/language/golang/#license
       - name: Populate Go mod cache
-        run: just tidy-go
+        run: go mod tidy
 
       - name: Get trivy version
         id: trivy-version
@@ -181,18 +202,49 @@ jobs:
           output: trivy-results.sarif
           version: ${{ steps.trivy-version.outputs.version }}
 
+      # TODO: always run
       - name: Upload Trivy scan results
         uses: github/codeql-action/upload-sarif@38697555549f1db7851b81482ff19f1fa5c4fedc # v4.34.1
         with:
           sarif_file: trivy-results.sarif
+
+  scan-zizmor:
+    name: Scan Zizmor
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # for checkout
+      security-events: write # for uploading code scanning results
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Run zizmor
         uses: zizmorcore/zizmor-action@71321a20a9ded102f6e9ce5718a2fcec2c4f70d8 # v0.5.2
         with:
           persona: pedantic
 
+  scan-gitleaks:
+    name: Scan Gitleaks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # for checkout
+      security-events: write # for uploading code scanning results
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
       - name: Run gitleaks
         uses: ./.github/actions/gitleaks
+
+      # TODO: always run
+      - name: Upload Gitleaks scan results
+        uses: github/codeql-action/upload-sarif@38697555549f1db7851b81482ff19f1fa5c4fedc # v4.34.1
+        with:
+          sarif_file: gitleaks.sarif
 
   functional:
     name: Functional Tests

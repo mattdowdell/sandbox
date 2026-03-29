@@ -2,9 +2,25 @@
 name: Gitleaks
 description: Scan git repositories for secrets
 
+inputs:
+  command:
+    description: the gitleaks command to execute.
+    required: false
+    default: "dir"
+  report-format:
+    description: The format to use for the report.
+    required: false
+    default: "sarif"
+  report-path:
+    description: The filepath to output results to.
+    required: false
+    default: "gitleaks.sarif"
+
 runs:
   using: "docker"
   image: "Dockerfile"
   args:
-    - "dir"
+    - "${{ inputs.command }}"
     - "--verbose"
+    - "--report-format=${{ inputs.report-format }}"
+    - "--report-path=${{ inputs.report-path }}"
