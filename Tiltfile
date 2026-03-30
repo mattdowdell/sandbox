@@ -5,7 +5,7 @@
 # -----
 
 # Prevent tilt from accessing other clusters
-allow_k8s_contexts("kind-kind")
+allow_k8s_contexts("kind-example")
 
 # ----------
 # Extensions
@@ -19,13 +19,21 @@ load("ext://helm_remote", "helm_remote")
 
 # Tilt's docker_build excludes .git per https://github.com/tilt-dev/tilt/issues/2169
 # but we need that for db migrations and otel resource attributes
-def custom_docker_build(name, target="runtime"):
-    custom_build(
-        ref=name,
-        command="docker buildx build --pull --target {target} --build-arg SERVICE={name} -t $EXPECTED_REF .".format(
+def custom_docker_build(name, target="runtime", go_build_args=""):
+    command = "docker buildx build --pull \
+        --target {target} \
+        --build-arg SERVICE={name} \
+        --build-arg GO_BUILD_ARGS={go_build_args} \
+        -t $EXPECTED_REF ." \
+        .format(
             name=name,
             target=target,
-        ),
+            go_build_args=go_build_args,
+        )
+
+    custom_build(
+        ref=name,
+        command=command,
         deps=[
             os.path.join(config.main_dir, "Dockerfile"),
             os.path.join(config.main_dir, "cmd"),
@@ -34,8 +42,9 @@ def custom_docker_build(name, target="runtime"):
         ],
     )
 
-custom_docker_build("example-rpc", target="debug")
-custom_docker_build("example-db-migrate")
+go_build_args = os.getenv("GO_BUILD_ARGS")
+custom_docker_build("example-rpc", target="debug", go_build_args=go_build_args)
+custom_docker_build("example-db-migrate", go_build_args=go_build_args)
 
 k8s_yaml(kustomize(os.path.join(config.main_dir, "k8s/kustomize/example/tilt")))
 
