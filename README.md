@@ -1,5 +1,10 @@
 # sandbox
 
+[![Documentation](https://godoc.org/github.com/mattdowdell/sandbox?status.svg)](http://godoc.org/github.com/mattdowdell/sandbox)
+[![License](https://img.shields.io/github/license/mattdowdell/sandbox)](https://github.com/mattdowdell/sandbox?tab=MIT-1-ov-file#readme)
+[![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/mattdowdell/sandbox?label=version)](https://github.com/mattdowdell/sandbox/tags)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/mattdowdell/sandbox/ci.yml)](https://github.com/mattdowdell/sandbox/actions/workflows/ci.yml)
+
 A toy Go microservice intended for use as reference material.
 
 ## Features
@@ -17,12 +22,12 @@ A toy Go microservice intended for use as reference material.
 - Dependency updates from Dependabot.
 - Packaged using Docker containers, developed with Docker Compose.
 
-[ConnectRPC]: #todo
-[protovalidate]: #todo
-[Buf]: #todo
-[Jet]: #todo
-[OpenTelemetry]: #todo
-[Koanf]: #todo
+[ConnectRPC]: https://github.com/connectrpc/connect-go
+[protovalidate]: https://github.com/bufbuild/protovalidate
+[Buf]: https://github.com/bufbuild/buf
+[Jet]: https://pkg.go.dev/github.com/go-jet/jet/v2
+[OpenTelemetry]: https://opentelemetry.io
+[Koanf]: https://pkg.go.dev/github.com/knadh/koanf/v2
 
 ## Sanity tests
 
