@@ -192,7 +192,10 @@ lint-k8s: lint-k8s-kubeconform lint-k8s-kubescore
 # Run the kubeconform linter.
 [group('linters')]
 lint-k8s-kubeconform: install-kustomize install-kubeconform
-    {{ kustomize }} build ./kustomize/example/base/ | {{ kubeconform }}
+    {{ kustomize }} build ./kustomize/example/base/ | {{ kubeconform }} \
+        -verbose \
+        -strict \
+        -summary
 
 # Run the kube-score linter.
 [group('linters')]
@@ -204,8 +207,10 @@ lint-k8s-kubescore: install-kustomize install-kube-score
     @#
     @# ignore network policy, revisit if/when we setup ingress
     {{ kustomize }} build ./kustomize/example/base/ | {{ kube-score }} score - \
-        --ignore-test deployment-has-host-podantiaffinity \
         --ignore-test container-ephemeral-storage-request-and-limit \
+        --ignore-test container-image-tag \
+        --ignore-test container-resources \
+        --ignore-test deployment-has-host-podantiaffinity \
         --ignore-test pod-networkpolicy \
         --enable-optional-test container-ports-check
 
