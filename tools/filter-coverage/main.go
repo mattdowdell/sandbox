@@ -16,7 +16,7 @@ import (
 
 	"golang.org/x/mod/modfile"
 
-	"github.com/mattdowdell/sandbox/internal/drivers/exit"
+	"github.com/mattdowdell/sandbox/pkg/exit"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 

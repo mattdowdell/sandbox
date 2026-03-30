@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/mattdowdell/sandbox/internal/drivers/exit"
+	"github.com/mattdowdell/sandbox/pkg/exit"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
