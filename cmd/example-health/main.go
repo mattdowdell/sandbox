@@ -13,7 +13,7 @@ import (
 
 	"github.com/mattdowdell/sandbox/internal/drivers/config"
 	"github.com/mattdowdell/sandbox/internal/drivers/config/flagoptions"
-	"github.com/mattdowdell/sandbox/internal/drivers/exit"
+	"github.com/mattdowdell/sandbox/pkg/exit"
 	"github.com/mattdowdell/sandbox/internal/drivers/logging"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )

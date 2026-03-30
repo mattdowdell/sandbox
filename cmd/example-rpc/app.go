@@ -84,7 +84,7 @@ func (a *App) Start(ctx context.Context, stop context.CancelFunc) {
 		stop()
 	}()
 
-	if err := a.loader.Watch(func(err error) {
+	if err := a.loader.Watch(func(_ any, err error) {
 		if err != nil {
 			a.logger.ErrorContext(ctx, "error during config watch", slogx.Err(err))
 			stop()

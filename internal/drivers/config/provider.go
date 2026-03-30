@@ -20,9 +20,10 @@ const (
 	delimiter = "."
 )
 
-// providerParser is a pairing of a provider and parser to save work when reloading configuration.
-type providerParser struct {
-	provider koanf.Provider
+// fileWithParser is a pairing of a file provider and parser to save work when reloading
+// configuration.
+type fileWithParser struct {
+	provider *file.File
 	parser   koanf.Parser
 }
 
@@ -35,8 +36,8 @@ func envProvider(prefix string) *env.Env {
 	})
 }
 
-func fileProviders(paths []string) ([]*providerParser, error) {
-	providers := make([]*providerParser, 0, len(paths))
+func fileProviders(paths []string) ([]*fileWithParser, error) {
+	providers := make([]*fileWithParser, 0, len(paths))
 
 	for _, path := range paths {
 		p, err := fileProvider(path)
@@ -50,13 +51,13 @@ func fileProviders(paths []string) ([]*providerParser, error) {
 	return providers, nil
 }
 
-func fileProvider(path string) (*providerParser, error) {
+func fileProvider(path string) (*fileWithParser, error) {
 	parser, err := fileParser(path)
 	if err != nil {
 		return nil, err
 	}
 
-	return &providerParser{
+	return &fileWithParser{
 		provider: file.Provider(path),
 		parser:   parser,
 	}, nil
