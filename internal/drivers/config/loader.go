@@ -54,7 +54,7 @@ type Loader struct {
 	inner  *koanf.Koanf
 	opts   *Options
 	env    *env.Env
-	files  []*providerParser
+	files  []*fileWithParser
 	mounts []*k8smount.K8SMount
 }
 
@@ -156,8 +156,12 @@ func (l *Loader) Load(target any) error {
 	return nil
 }
 
-func (l *Loader) Watch(fn func(error)) error {
-	// TODO: files
+func (l *Loader) Watch(fn func(any, error)) error {
+	for _, file := range l.files {
+		if err := file.provider.Watch(fn); err != nil {
+			return err
+		}
+	}
 
 	for _, mount := range l.mounts {
 		if err := mount.Watch(fn); err != nil {

@@ -10,9 +10,9 @@ import (
 	"github.com/go-jet/jet/v2/generator/postgres"
 
 	"github.com/mattdowdell/sandbox/internal/drivers/config/secret"
-	"github.com/mattdowdell/sandbox/internal/drivers/exit"
 	"github.com/mattdowdell/sandbox/internal/drivers/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/pgsql"
+	"github.com/mattdowdell/sandbox/pkg/exit"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 

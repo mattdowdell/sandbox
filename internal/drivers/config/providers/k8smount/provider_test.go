@@ -210,7 +210,7 @@ func Test_K8SMount_Watch_Success(t *testing.T) {
 	var watched atomic.Bool
 
 	// act
-	require.NoError(t, provider.Watch(func(err error) {
+	require.NoError(t, provider.Watch(func(_ any, err error) {
 		assert.NoError(t, err)
 		watched.Store(true)
 	}))
@@ -237,7 +237,7 @@ func Test_K8SMount_Watch_AlreadyWatching(t *testing.T) {
 	dir := t.TempDir()
 	provider := k8smount.Provider(dir, "." /*delim*/, k8smount.Opt{})
 
-	require.NoError(t, provider.Watch(func(err error) {
+	require.NoError(t, provider.Watch(func(_ any, err error) {
 		assert.NoError(t, err)
 	}))
 	defer func() {
@@ -245,7 +245,7 @@ func Test_K8SMount_Watch_AlreadyWatching(t *testing.T) {
 	}()
 
 	// act
-	err := provider.Watch(func(err error) {
+	err := provider.Watch(func(_ any, err error) {
 		assert.NoError(t, err)
 	})
 

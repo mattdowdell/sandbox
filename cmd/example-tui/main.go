@@ -7,8 +7,8 @@ import (
 
 	"github.com/charmbracelet/bubbletea"
 
-	"github.com/mattdowdell/sandbox/internal/drivers/exit"
 	"github.com/mattdowdell/sandbox/internal/drivers/logging"
+	"github.com/mattdowdell/sandbox/pkg/exit"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
 
