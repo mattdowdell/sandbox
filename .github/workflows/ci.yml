@@ -168,9 +168,6 @@ jobs:
 
       - name: Lint K8S
         run: |
-          ls -alph ~/go/bin/
-          echo $PATH
-          which bingo
           just lint-k8s
 
   unit:
