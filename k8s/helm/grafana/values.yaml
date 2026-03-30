@@ -49,8 +49,8 @@ datasources:
 
 dashboardProviders:
   dashboardproviders.yaml:
-     apiVersion: 1
-     providers:
+    apiVersion: 1
+    providers:
       - name: dashboards
         type: file
         updateIntervalSeconds: 30
