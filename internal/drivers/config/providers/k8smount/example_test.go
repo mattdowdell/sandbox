@@ -35,7 +35,7 @@ func ExampleK8SMount_Watch() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	if err := provider.Watch(func(err error) {
+	if err := provider.Watch(func(_ any, err error) {
 		if err != nil {
 			log.Println("watch stopping:", err)
 			cancel()
