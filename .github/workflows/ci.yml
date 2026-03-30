@@ -156,6 +156,11 @@ jobs:
       - name: Install Just
         uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3.1.0
 
+      - name: Install bingo
+        uses: mattdowdell/go-installer@de5d072ade9fc895652cd6a93ac4bde11e105bc6 # v0.4.0
+        with:
+          package: github.com/bwplotka/bingo
+
       - name: Lint K8S
         run: |
           just lint-k8s
