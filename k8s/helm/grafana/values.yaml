@@ -46,3 +46,17 @@ datasources:
         basicAuth: false
         isDefault: false
         editable: false
+
+dashboardProviders:
+  dashboardproviders.yaml:
+     apiVersion: 1
+     providers:
+      - name: dashboards
+        type: file
+        updateIntervalSeconds: 30
+        options:
+          path: /var/lib/grafana/dashboards/example
+          foldersFromFilesStructure: true
+
+dashboardsConfigMaps:
+  example: grafana-dashboards
