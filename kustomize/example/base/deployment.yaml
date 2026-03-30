@@ -54,13 +54,6 @@ spec:
             - name: postgresql
               mountPath: /mnt/postgresql
               readOnly: true
-              items:
-                - key: password
-                  path: database_password
-                - key: username
-                  path: database_username
-                - key: dbname
-                  path: database_name
       volumes:
         - name: example
           configMap:

@@ -141,6 +141,25 @@ jobs:
         with:
           fail_level: any
 
+  link-k8s:
+    name: Lint K8S
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # for checkout
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Install Just
+        uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3.1.0
+
+      - name: Lint K8S
+        run: |
+          just lint-k8s
+
   unit:
     name: Unit test
     runs-on: ubuntu-latest
