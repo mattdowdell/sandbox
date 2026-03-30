@@ -42,8 +42,9 @@ def custom_docker_build(name, target="runtime", go_build_args=""):
         ],
     )
 
-custom_docker_build("example-rpc", target="debug")
-custom_docker_build("example-db-migrate")
+go_build_args = os.getenv("GO_BUILD_ARGS")
+custom_docker_build("example-rpc", target="debug", go_build_args=go_build_args)
+custom_docker_build("example-db-migrate", go_build_args=go_build_args)
 
 k8s_yaml(kustomize("kustomize/example/tilt"))
 
