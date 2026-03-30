@@ -37,7 +37,7 @@ def custom_docker_build(name, target="runtime"):
 custom_docker_build("example-rpc", target="debug")
 custom_docker_build("example-db-migrate")
 
-k8s_yaml(kustomize("kustomize/example/tilt"))
+k8s_yaml(kustomize(os.path.join(config.main_dir, "k8s/kustomize/example/tilt")))
 
 k8s_resource(
     "example-rpc",
@@ -50,9 +50,9 @@ k8s_resource(
     port_forwards=["127.0.0.1:5000:5000"],
     resource_deps=[
         "postgresql",
-        "victoria-traces-single-vt-single-server",
-        "victoria-metrics-single-server",
-        "victoria-logs-single-server",
+        "victoria-traces",
+        "victoria-metrics",
+        "victoria-logs",
     ],
 )
 
@@ -61,9 +61,9 @@ k8s_resource(
     labels=["services"],
     resource_deps=[
         "postgresql",
-        "victoria-traces-single-vt-single-server",
-        "victoria-metrics-single-server",
-        "victoria-logs-single-server",
+        "victoria-traces",
+        "victoria-metrics",
+        "victoria-logs",
     ],
 )
 
@@ -117,7 +117,7 @@ helm_remote(
     namespace="default",
     # renovate: datasource=helm depName=cluster packageName=cluster registryUrl=https://cloudnative-pg.github.io/charts
     version="0.6.0",
-    values=[".tilt/postgresql/values.yaml"],
+    values=["k8s/helm/postgresql/values.yaml"],
 )
 
 k8s_resource(
@@ -145,6 +145,7 @@ helm_remote(
 
 k8s_resource(
     "victoria-traces-single-vt-single-server",
+    new_name="victoria-traces",
     labels=["observability"],
     port_forwards=["127.0.0.1:10428:10428"],
 )
@@ -159,6 +160,7 @@ helm_remote(
 
 k8s_resource(
     "victoria-metrics-single-server",
+    new_name="victoria-metrics",
     objects=["victoria-metrics-single-server:serviceaccount"],
     labels=["observability"],
     port_forwards=["127.0.0.1:8428:8428"],
@@ -174,17 +176,20 @@ helm_remote(
 
 k8s_resource(
     "victoria-logs-single-server",
+    new_name="victoria-logs",
     labels=["observability"],
     port_forwards=["127.0.0.1:9428:9428"],
 )
 
+k8s_yaml(kustomize(os.path.join(config.main_dir, "k8s/kustomize/grafana/base")))
+
 helm_remote(
     "grafana",
-    repo_name="grafana",
-    repo_url="https://grafana.github.io/helm-charts",
+    repo_name="grafana-community",
+    repo_url="https://grafana-community.github.io/helm-charts",
     # renovate: datasource=helm depName=grafana packageName=grafana registryUrl=https://grafana.github.io/helm-charts
     version="10.5.15",
-    values=[".tilt/grafana/values.yaml"],
+    values=["k8s/helm/grafana/values.yaml"],
 )
 
 k8s_resource(
@@ -197,12 +202,13 @@ k8s_resource(
         "grafana-clusterrolebinding:clusterrolebinding",
         "grafana:configmap",
         "grafana:secret",
+        "grafana-dashboards:configmap",
     ],
     labels=["observability"],
     port_forwards=["127.0.0.1:3000:3000"],
     resource_deps=[
-        "victoria-traces-single-vt-single-server",
-        "victoria-metrics-single-server",
-        "victoria-logs-single-server",
+        "victoria-traces",
+        "victoria-metrics",
+        "victoria-logs",
     ],
 )
