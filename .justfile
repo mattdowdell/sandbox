@@ -192,7 +192,7 @@ lint-k8s: lint-k8s-kubeconform lint-k8s-kubescore
 # Run the kubeconform linter.
 [group('linters')]
 lint-k8s-kubeconform: install-kustomize install-kubeconform
-    {{ kustomize }} build ./kustomize/example/base/ | {{ kubeconform }} \
+    {{ kustomize }} build ./k8s/kustomize/example/base/ | {{ kubeconform }} \
         -verbose \
         -strict \
         -summary
@@ -206,7 +206,7 @@ lint-k8s-kubescore: install-kustomize install-kube-score
     @# ignore ephemeral storage, use a readonly filesystem instead
     @#
     @# ignore network policy, revisit if/when we setup ingress
-    {{ kustomize }} build ./kustomize/example/base/ | {{ kube-score }} score - \
+    {{ kustomize }} build ./k8s/kustomize/example/base/ | {{ kube-score }} score - \
         --ignore-test container-ephemeral-storage-request-and-limit \
         --ignore-test container-image-tag \
         --ignore-test container-resources \
