@@ -289,22 +289,13 @@ jobs:
       - name: Install Just
         uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3.1.0
 
-      - name: Setup coverage
-        uses: gacts/run-and-post-run@81b6ce503cde93862cec047c54652e45c5dca991 # v1.4.3
-        with:
-          run: |
-            # hack to let container's user create coverage files
-            sudo chown 65532:65532 .covdata
+      - name: Enable coverage
+        run: |
+          # hack to let container's user create coverage files
+          sudo chown 65532:65532 .covdata
 
-            # enable coverage builds
-            echo GO_BUILD_ARGS=-cover > .env
-          post: |
-            # TODO: publish this somewhere
-            go tool covdata percent -i=.covdata
-
-            go tool covdata textfmt -i=.covdata -o cover.out
-            go run ./tools/filter-coverage/ -output=functional.out cover.out
-            echo "Total coverage: `go tool cover -func=functional.out | tail -n 1 | awk '{print $3}'`"
+          # enable coverage builds
+          echo "GO_BUILD_ARGS=-cover -covermode=atomic" > .env
 
       - name: Start
         uses: hoverkraft-tech/compose-action@4894d2492015c1774ee5a13a95b1072093087ec3 # v2.5.0
@@ -315,6 +306,17 @@ jobs:
 
       - name: Functional test
         run: just functional
+
+      - name: Collect coverage
+        run: |
+          curl -X POST http://localhost:5000/coverage -v
+
+          # TODO: publish this somewhere
+          go tool covdata percent -i=.covdata
+          go tool covdata textfmt -i=.covdata -o cover.out
+
+          go run ./tools/filter-coverage/ -output=functional.out cover.out
+          echo "Total coverage: `go tool cover -func=functional.out | tail -n 1 | awk '{print $3}'`"
 
       - name: Collect logs
         if: always()

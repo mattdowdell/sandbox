@@ -253,6 +253,7 @@ functional-cover:
 functional-cover-clean:
     @# after a certain number of files, rm cannot cope, so use find instead
     find .covdata -name 'cov*' -delete
+    find .covdata -name 'tmp.*' -delete
 
 # Scan the repository for issues.
 [group('scanners')]
