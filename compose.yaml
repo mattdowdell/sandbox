@@ -27,6 +27,7 @@ services:
       PARSER_METHODS: "HS256"
       RPCSERVER_HOST: "0.0.0.0"
       RPCSERVER_ENABLEPPROF: "true"
+      RPCSERVER_ENABLECOVERAGE: "true"
       METERPROVIDER_INSECURE: "true"
       METERPROVIDER_ENDPOINT: "victoria-metrics:8428"
       METERPROVIDER_PATH: "/opentelemetry/v1/metrics"

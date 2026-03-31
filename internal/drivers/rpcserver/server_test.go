@@ -55,6 +55,7 @@ func Test_New(t *testing.T) {
 		"127.0.0.1", /*host*/
 		0,           /*port*/
 		true,        /*enablePprof*/
+		true,        /*enableCoverage*/
 		handlers,
 		opts,
 	)
@@ -69,6 +70,7 @@ func Test_Server_Start(t *testing.T) {
 		"127.0.0.1", /*host*/
 		0,           /*port*/
 		true,        /*enablePprof*/
+		true,        /*enableCoverage*/
 		nil,         /*handlers*/
 		nil,         /*opts*/
 	)

@@ -12,6 +12,8 @@ import (
 	"connectrpc.com/connect"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
+
+	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/coverage"
 )
 
 const (
@@ -20,9 +22,10 @@ const (
 
 // Config contains the configuration for creating a Server instance.
 type Config struct {
-	Host        string `koanf:"host" default:"localhost"`
-	Port        uint16 `koanf:"port" default:"5000"`
-	EnablePprof bool   `koanf:"enablepprof"`
+	Host           string `koanf:"host" default:"localhost"`
+	Port           uint16 `koanf:"port" default:"5000"`
+	EnablePprof    bool   `koanf:"enablepprof"`
+	EnableCoverage bool   `koanf:"enablecoverage"`
 }
 
 // Handler implementations can register themselves to be hosted by the server.
@@ -39,7 +42,7 @@ type Server struct {
 
 // New creates a new Server instance from the given configuration.
 func NewFromConfig(config Config, handlers []Handler, opts []connect.HandlerOption) *Server {
-	return New(config.Host, config.Port, config.EnablePprof, handlers, opts)
+	return New(config.Host, config.Port, config.EnablePprof, config.EnableCoverage, handlers, opts)
 }
 
 // New creates a new Server instance.
@@ -47,6 +50,7 @@ func New(
 	host string,
 	port uint16,
 	enablePprof bool,
+	enableCoverage bool,
 	handlers []Handler,
 	opts []connect.HandlerOption,
 ) *Server {
@@ -62,6 +66,10 @@ func New(
 		mux.HandleFunc("GET /debug/pprof/profile", pprof.Profile)
 		mux.HandleFunc("GET /debug/pprof/symbol", pprof.Symbol)
 		mux.HandleFunc("GET /debug/pprof/trace", pprof.Trace)
+	}
+
+	if enableCoverage {
+		mux.HandleFunc("POST /coverage", coverage.Collect)
 	}
 
 	return &Server{
