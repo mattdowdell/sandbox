@@ -7,7 +7,7 @@ configMapGenerator:
     options:
       disableNameSuffixHash: true
     files:
-      - connectrpc.json
-      - database.json
-      - go_runtime.json
-      - grpc.json
+      - connectrpc.json=dashboards/connectrpc.json
+      - database.json=dashboards/database.json
+      - go_runtime.json=dashboards/go_runtime.json
+      - grpc.json=dashboards/grpc.json

@@ -18,7 +18,6 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 3,
   "links": [],
   "panels": [
     {
@@ -57,6 +56,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -71,7 +71,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -83,7 +84,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 12,
         "w": 12,
         "x": 0,
         "y": 0
@@ -102,7 +103,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.0.0",
+      "pluginVersion": "12.4.2",
       "targets": [
         {
           "datasource": {
@@ -111,7 +112,8 @@
           },
           "editorMode": "code",
           "expr": "avg by(service.name,service.instance.id) (go.goroutine.count{service.name=~\"$service_name\",service.instance.id=~\"$service_instance_id\"})",
-          "legendFormat": "{{service.name}} goroutines ({{service.instance.id}}",
+          "format": "time_series",
+          "legendFormat": "{{service.name}} goroutines ({{service.instance.id}})",
           "range": true,
           "refId": "A"
         },
@@ -122,7 +124,7 @@
           },
           "editorMode": "code",
           "expr": "avg by(service.name,service.instance.id) (go.processor.limit{service.name=~\"$service_name\",service.instance.id=~\"$service_instance_id\"})",
-          "hide": false,
+          "format": "time_series",
           "legendFormat": "{{service.name}} processor limit ({{service.instance.id}})",
           "range": true,
           "refId": "B"
@@ -166,6 +168,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -180,7 +183,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -193,7 +197,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 12,
         "w": 12,
         "x": 12,
         "y": 0
@@ -212,7 +216,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.0.0",
+      "pluginVersion": "12.4.2",
       "targets": [
         {
           "datasource": {
@@ -221,7 +225,6 @@
           },
           "editorMode": "code",
           "expr": "avg by(service.name,service.instance.id,go.memory.type) (go.memory.used{service.name=~\"$service_name\",service.instance.id=~\"$service_instance_id\"})",
-          "hide": false,
           "legendFormat": "{{service.name}} {{go.memory.type}} ({{service.instance.id}})",
           "range": true,
           "refId": "B"
@@ -232,16 +235,19 @@
     }
   ],
   "preload": false,
-  "schemaVersion": 41,
+  "schemaVersion": 42,
   "tags": [],
   "templating": {
     "list": [
       {
-        "allValue": "",
         "allowCustomValue": false,
         "current": {
           "text": "All",
           "value": "$__all"
+        },
+        "datasource": {
+          "type": "victoriametrics-metrics-datasource",
+          "uid": "victoriametrics"
         },
         "definition": "label_values(go.goroutine.count,service.name)",
         "description": "Filter by service name",
@@ -256,6 +262,7 @@
         },
         "refresh": 1,
         "regex": "",
+        "regexApplyTo": "value",
         "type": "query"
       },
       {
@@ -264,19 +271,24 @@
           "text": "All",
           "value": "$__all"
         },
-        "definition": "label_values(go.goroutine.count{service.name=\"$service_name\"},service.instance.id)",
-        "description": "Filter by service instance",
+        "datasource": {
+          "type": "victoriametrics-metrics-datasource",
+          "uid": "victoriametrics"
+        },
+        "definition": "label_values(go.goroutine.count{service.name=~\"$service_name\"},service.instance.id)",
+        "description": "Filter by service instance ID.",
         "includeAll": true,
-        "label": "Service Instance",
+        "label": "Service Instance ID",
         "name": "service_instance_id",
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(go.goroutine.count{service.name=\"$service_name\"},service.instance.id)",
+          "query": "label_values(go.goroutine.count{service.name=~\"$service_name\"},service.instance.id)",
           "refId": "VariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
         "regex": "",
+        "regexApplyTo": "value",
         "sort": 1,
         "type": "query"
       }
@@ -290,5 +302,6 @@
   "timezone": "browser",
   "title": "Go Runtime",
   "uid": "ae9uxps6dea68b",
-  "version": 1
+  "version": 1,
+  "weekStart": ""
 }
