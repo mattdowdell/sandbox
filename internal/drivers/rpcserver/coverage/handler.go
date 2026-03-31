@@ -5,8 +5,8 @@ package coverage
 import (
 	"log/slog"
 	"net/http"
-	"runtime/coverage"
 	"os"
+	"runtime/coverage"
 
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )

@@ -316,7 +316,7 @@ jobs:
           go tool covdata textfmt -i=.covdata -o cover.out
 
           go run ./tools/filter-coverage/ -output=functional.out cover.out
-          echo "Total coverage: `go tool cover -func=functional.out | tail -n 1 | awk '{print $3}'`"
+          echo "Total coverage: $(go tool cover -func=functional.out | tail -n 1 | awk '{print $3}')"
 
       - name: Collect logs
         if: always()
