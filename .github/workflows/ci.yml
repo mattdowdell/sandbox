@@ -358,6 +358,12 @@ jobs:
         with:
           package: github.com/bwplotka/bingo
 
+      - name: Install Tilt
+        run: |
+          gh release download --repo tilt-dev/tilt v0.37.0 --pattern '*.linux.x86_64.tar.gz'
+          tar -xvzf *.linux.x86_64.tar.gz tilt -C /usr/local/bin/
+          which tilt
+
       - name: Setup
         run: |
           just _kind-up
