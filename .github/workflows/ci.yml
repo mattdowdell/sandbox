@@ -275,8 +275,8 @@ jobs:
         with:
           sarif_file: gitleaks.sarif
 
-  functional:
-    name: Functional Tests
+  functional-compose:
+    name: Functional Tests (Compose)
     runs-on: ubuntu-latest
     permissions:
       contents: read # for checkout
@@ -335,7 +335,7 @@ jobs:
 
   # TODO: rename to 'functional'
   functional-tilt:
-    name: Functional (Tilt)
+    name: Functional Tests (Tilt)
     runs-on: ubuntu-latest
     permissions:
       contents: read # for checkout
@@ -361,8 +361,8 @@ jobs:
       - name: Install Tilt
         run: |
           gh release download --repo tilt-dev/tilt v0.37.0 --pattern '*.linux.x86_64.tar.gz'
-          tar -xvzf ./*.linux.x86_64.tar.gz tilt -C /usr/local/bin/
-          ls -alph /usr/local/bin/
+          tar -xvzf ./*.linux.x86_64.tar.gz tilt
+          ls -alph
           echo "$PATH"
           which tilt
         env:
@@ -371,7 +371,7 @@ jobs:
       - name: Setup
         run: |
           just _kind-up
-          tilt ci
+          ./tilt ci
 
       - name: Test
         run: just functional
@@ -389,7 +389,7 @@ jobs:
       - scan-gitleaks
       - scan-trivy
       - scan-zizmor
-      - functional
+      - functional-compose
       - functional-tilt
     permissions:
       contents: write # for pushing tags (and checkout)
