@@ -363,6 +363,8 @@ jobs:
           gh release download --repo tilt-dev/tilt v0.37.0 --pattern '*.linux.x86_64.tar.gz'
           tar -xvzf *.linux.x86_64.tar.gz tilt -C /usr/local/bin/
           which tilt
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Setup
         run: |
