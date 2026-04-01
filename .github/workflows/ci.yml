@@ -374,8 +374,11 @@ jobs:
       - name: Test
         run: just functional
 
-      # TODO: gather coverage
-      # TODO: always collect logs
+      - name: Collect coverage
+        run: echo "Not implemented"
+
+      - name: Collect logs
+        run: echo "Not implemented"
 
   tag:
     name: Tag
