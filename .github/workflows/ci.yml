@@ -364,7 +364,6 @@ jobs:
           tar -xvzf ./*.linux.x86_64.tar.gz tilt
           ls -alph
           echo "$PATH"
-          which tilt
         env:
           GH_TOKEN: ${{ github.token }}
 
