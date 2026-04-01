@@ -364,6 +364,7 @@ jobs:
           tar -xvzf ./*.linux.x86_64.tar.gz tilt
           ls -alph
           echo "$PATH"
+          whoami
         env:
           GH_TOKEN: ${{ github.token }}
 
