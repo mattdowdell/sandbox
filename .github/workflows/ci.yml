@@ -361,10 +361,11 @@ jobs:
       - name: Install Tilt
         run: |
           gh release download --repo tilt-dev/tilt v0.37.0 --pattern '*.linux.x86_64.tar.gz'
-          tar -xvzf ./*.linux.x86_64.tar.gz tilt
+          tar -xvzf ./*.linux.x86_64.tar.gz tilt -C "$HOME/go/bin/"
           ls -alph
           echo "$PATH"
           whoami
+          which tilt
         env:
           GH_TOKEN: ${{ github.token }}
 
