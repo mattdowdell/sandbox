@@ -159,7 +159,9 @@ jobs:
           go-version-file: "go.mod"
 
       - name: Install Just
-        uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3.1.0
+        uses: taiki-e/install-action@0cccd59f03b32c54f0db097c518c320bfc8c73b3 # v2.71.1
+        with:
+          tool: just
 
       - name: Install bingo
         uses: mattdowdell/go-installer@de5d072ade9fc895652cd6a93ac4bde11e105bc6 # v0.4.0
@@ -187,7 +189,9 @@ jobs:
           go-version-file: "go.mod"
 
       - name: Install Just
-        uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3.1.0
+        uses: taiki-e/install-action@0cccd59f03b32c54f0db097c518c320bfc8c73b3 # v2.71.1
+        with:
+          tool: just
 
       - name: Unit test
         run: just unit
@@ -287,7 +291,9 @@ jobs:
           persist-credentials: false
 
       - name: Install Just
-        uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3.1.0
+        uses: taiki-e/install-action@0cccd59f03b32c54f0db097c518c320bfc8c73b3 # v2.71.1
+        with:
+          tool: just
 
       - name: Enable coverage
         run: |
