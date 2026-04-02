@@ -357,12 +357,20 @@ jobs:
         with:
           package: github.com/bwplotka/bingo
 
+      - name: Install Kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+          echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+          install -m 0755 kubectl "$HOME/.local/bin/"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
       - name: Install Tilt
         run: |
           gh release download --repo tilt-dev/tilt v0.37.0 --pattern '*.linux.x86_64.tar.gz'
           tar -xvzf ./*.linux.x86_64.tar.gz tilt
-          mv ./tilt "$HOME/go/bin/"
-          which tilt
+          install -m 0755 tilt "$HOME/.local/bin/"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
         env:
           GH_TOKEN: ${{ github.token }}
 
@@ -370,6 +378,11 @@ jobs:
         run: |
           just _kind-up
           tilt ci
+
+      - name: Pre-test check
+        run: |
+          kubectl get deployments
+          kubectl get pods
 
       - name: Test
         run: just functional
