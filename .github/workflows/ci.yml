@@ -386,6 +386,10 @@ jobs:
           kubectl get deployments
           kubectl get pods
 
+      - name: Port-forward
+        run: |
+          kubectl port-forward svc/example-rpc 5000:5000 &
+
       - name: Test
         run: just functional
 
