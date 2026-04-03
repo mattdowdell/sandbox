@@ -1,3 +1,8 @@
+// Package timex provides [time] functions via a struct.
+//
+// This is intended to be paired with an interface for the used methods of the struct to be used in
+// dependency injection. From there, a mock can be created for the interface, ensuring unit tests
+// can use predictable times as needed.
 package timex
 
 import (
