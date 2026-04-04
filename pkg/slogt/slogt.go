@@ -1,6 +1,6 @@
 // Package slogt integrates [testing] and [log/slog] together.
 //
-// Use of this package means that structured logs produced either by a test of the code under test
+// Use of this package means that structured logs produced either by a test or the code under test
 // can be emitted to the test's output. This improves debuggability, as the log output is now
 // attached to the test that caused it to be emitted.
 package slogt

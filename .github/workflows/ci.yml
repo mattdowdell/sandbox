@@ -427,7 +427,7 @@ jobs:
         run: |
           for name in $(kubectl get po -lapp=example -ojsonpath='{.items[*].metadata.name}'); do
             echo "::group::kubectl logs $name"
-            kubectl logs $name
+            kubectl logs "$name"
             echo "::endgroup::"
           done
 
