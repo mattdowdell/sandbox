@@ -398,7 +398,7 @@ jobs:
 
       - name: Collect coverage
         run: |
-          pods=$(kubectl get po -lapp=example -ojsonpath='{.items[*].metadata.name})
+          pods=$(kubectl get po -lapp=example -ojsonpath='{.items[*].metadata.name}')
 
           for i in "${!pods[@]}"; do
             kubectl port-forward "pod/$pods[$i]" "600$i:5000" &
@@ -419,7 +419,7 @@ jobs:
       - name: Collect logs
         if: always()
         run: |
-          for name in $(kubectl get po -lapp=example -ojsonpath='{.items[*].metadata.name}); do
+          for name in $(kubectl get po -lapp=example -ojsonpath='{.items[*].metadata.name}'); do
             echo "::group::kubectl logs $name"
             kubectl logs $name
             echo "::endgroup::"
