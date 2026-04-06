@@ -23,11 +23,11 @@ GOHOSTARM    ?= $(shell $(GO) env GOHOSTARM)
 #	@echo "Running actionlint"
 #	@$(ACTIONLINT) <flags/args..>
 #
-ACTIONLINT := $(GOBIN)/actionlint-v1.7.11
+ACTIONLINT := $(GOBIN)/actionlint-v1.7.12
 $(ACTIONLINT): $(BINGO_DIR)/actionlint.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/actionlint-v1.7.11"
-	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=actionlint.mod -o=$(GOBIN)/actionlint-v1.7.11 "github.com/rhysd/actionlint/cmd/actionlint"
+	@echo "(re)installing $(GOBIN)/actionlint-v1.7.12"
+	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=actionlint.mod -o=$(GOBIN)/actionlint-v1.7.12 "github.com/rhysd/actionlint/cmd/actionlint"
 
 BUF := $(GOBIN)/buf-v1.66.1
 $(BUF): $(BINGO_DIR)/buf.mod

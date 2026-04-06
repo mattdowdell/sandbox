@@ -2,7 +2,7 @@
 
 gopath := shell("go env GOPATH")
 
-actionlint := join(gopath, "bin", "actionlint-v1.7.11")
+actionlint := join(gopath, "bin", "actionlint-v1.7.12")
 
 [private]
 install-actionlint:
