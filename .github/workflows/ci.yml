@@ -404,14 +404,14 @@ jobs:
 
       - name: Collect coverage
         run: |
-          pods=$(kubectl get po -lapp=example -ojsonpath='{.items[*].metadata.name}')
-
-          for i in "${!pods[@]}"; do
-            kubectl port-forward "pod/${pods[i]}" "600$i:5000" &
+          i=0
+          for name in $(kubectl get po -lapp=example -ojsonpath='{.items[*].metadata.name}'); do
+            kubectl port-forward "pod/$name" "600$i:5000" &
             sleep 3
             curl -X POST "http://localhost:600$i/coverage" -v
-            kubectl cp ./.covdata/ "${pods[i]}:/covdata/*"
+            kubectl cp ./.covdata/ "$name:/covdata/*"
             kill %1
+            ((i++))
           done
 
           ls -alph ./.covdata/
