@@ -87,7 +87,7 @@ helm_remote(
     namespace="cnpg-system",
     create_namespace=True,
     # renovate: datasource=helm depName=cloudnative-pg packageName=cloudnative-pg registryUrl=https://cloudnative-pg.github.io/charts
-    version="0.27.1",
+    version="0.28.0",
 )
 
 k8s_resource(
