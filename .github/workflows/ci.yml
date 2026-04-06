@@ -404,6 +404,7 @@ jobs:
 
       - name: Collect coverage
         run: |
+          set -x
           i=0
           for name in $(kubectl get po -lapp=example -ojsonpath='{.items[*].metadata.name}'); do
             kubectl port-forward "pod/$name" "600$i:5000" &
