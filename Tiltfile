@@ -87,7 +87,7 @@ helm_remote(
     namespace="cnpg-system",
     create_namespace=True,
     # renovate: datasource=helm depName=cloudnative-pg packageName=cloudnative-pg registryUrl=https://cloudnative-pg.github.io/charts
-    version="0.27.1",
+    version="0.28.0",
 )
 
 k8s_resource(
@@ -164,7 +164,7 @@ helm_remote(
     repo_name="vm",
     repo_url="https://victoriametrics.github.io/helm-charts",
     # renovate: datasource=helm depName=victoria-metrics-single packageName=victoria-metrics-single registryUrl=https://victoriametrics.github.io/helm-charts
-    version="0.33.0",
+    version="0.34.0",
 )
 
 k8s_resource(
@@ -180,7 +180,7 @@ helm_remote(
     repo_name="vm",
     repo_url="https://victoriametrics.github.io/helm-charts",
     # renovate: datasource=helm depName=victoria-logs-single packageName=victoria-logs-single registryUrl=https://victoriametrics.github.io/helm-charts
-    version="0.11.30",
+    version="0.11.31",
 )
 
 k8s_resource(

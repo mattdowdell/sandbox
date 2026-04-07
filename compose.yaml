@@ -102,7 +102,7 @@ services:
     restart: always
 
   jaeger:
-    image: "mirror.gcr.io/jaegertracing/jaeger:2.16.0"
+    image: "mirror.gcr.io/jaegertracing/jaeger:2.17.0"
     pull_policy: "always"
     ports:
       - "127.0.0.1:16686:16686"
@@ -113,7 +113,7 @@ services:
     restart: always
 
   victoria-metrics:
-    image: "mirror.gcr.io/victoriametrics/victoria-metrics:v1.138.0"
+    image: "mirror.gcr.io/victoriametrics/victoria-metrics:v1.139.0"
     pull_policy: "always"
     ports:
       - "127.0.0.1:8428:8428"

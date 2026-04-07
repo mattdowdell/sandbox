@@ -2,19 +2,19 @@
 
 gopath := shell("go env GOPATH")
 
-actionlint := join(gopath, "bin", "actionlint-v1.7.11")
+actionlint := join(gopath, "bin", "actionlint-v1.7.12")
 
 [private]
 install-actionlint:
     {{ if path_exists(actionlint) == "true" { "" } else { "bingo get actionlint" } }}
 
-buf := join(gopath, "bin", "buf-v1.66.1")
+buf := join(gopath, "bin", "buf-v1.67.0")
 
 [private]
 install-buf:
     {{ if path_exists(buf) == "true" { "" } else { "bingo get buf" } }}
 
-ctlptl := join(gopath, "bin", "ctlptl-v0.9.0")
+ctlptl := join(gopath, "bin", "ctlptl-v0.9.2")
 
 [private]
 install-ctlptl:
