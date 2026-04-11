@@ -13,7 +13,7 @@ require (
 	connectrpc.com/otelconnect v0.9.0
 	connectrpc.com/validate v0.6.0
 	github.com/DATA-DOG/go-sqlmock v1.5.2
-	github.com/XSAM/otelsql v0.41.0
+	github.com/XSAM/otelsql v0.42.0
 	github.com/aws/aws-sdk-go-v2/config v1.32.14
 	github.com/aws/aws-sdk-go-v2/feature/rds/auth v1.6.21
 	github.com/charmbracelet/bubbletea v1.3.10
