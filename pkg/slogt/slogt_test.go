@@ -5,8 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mattdowdell/sandbox/pkg/slogt"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/mattdowdell/sandbox/pkg/slogt"
 )
 
 func Test_New(t *testing.T) {

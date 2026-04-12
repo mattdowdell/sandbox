@@ -6,8 +6,8 @@
 package slogt
 
 import (
-	"log/slog"
 	"io"
+	"log/slog"
 )
 
 // TB is a selection of the methods provided by [testing.TB].
