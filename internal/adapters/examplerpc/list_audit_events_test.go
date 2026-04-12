@@ -13,7 +13,6 @@ import (
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
 	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
-	"github.com/mattdowdell/sandbox/mocks/adapters/mockexamplerpc"
 	"github.com/mattdowdell/sandbox/pkg/slogt"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
@@ -26,7 +25,7 @@ func Test_Handler_ListAuditEvents_Success(t *testing.T) {
 	now := time.Now()
 	resourceID := uuid.Must(uuid.NewV7())
 
-	facade := mockexamplerpc.NewAuditEventFacade(t)
+	facade := examplerpc.NewMockAuditEventFacade(t)
 	facade.
 		EXPECT().
 		List(ctx, mockLogger).
@@ -46,7 +45,7 @@ func Test_Handler_ListAuditEvents_Success(t *testing.T) {
 		Once()
 
 	handler := examplerpc.New(
-		mockexamplerpc.NewResourceFacade(t),
+		examplerpc.NewMockResourceFacade(t),
 		facade,
 	)
 
@@ -77,7 +76,7 @@ func Test_Handler_ListAuditEvents_Error(t *testing.T) {
 	// arrange
 	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
 
-	facade := mockexamplerpc.NewAuditEventFacade(t)
+	facade := examplerpc.NewMockAuditEventFacade(t)
 	facade.
 		EXPECT().
 		List(ctx, mockLogger).
@@ -85,7 +84,7 @@ func Test_Handler_ListAuditEvents_Error(t *testing.T) {
 		Once()
 
 	handler := examplerpc.New(
-		mockexamplerpc.NewResourceFacade(t),
+		examplerpc.NewMockResourceFacade(t),
 		facade,
 	)
 

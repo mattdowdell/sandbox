@@ -15,7 +15,6 @@ import (
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
 	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
-	"github.com/mattdowdell/sandbox/mocks/adapters/mockexamplerpc"
 	"github.com/mattdowdell/sandbox/pkg/slogt"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
@@ -27,7 +26,7 @@ func Test_Handler_GetResource_Success(t *testing.T) {
 	id := uuid.Must(uuid.NewV7())
 	now := time.Now()
 
-	facade := mockexamplerpc.NewResourceFacade(t)
+	facade := examplerpc.NewMockResourceFacade(t)
 	facade.
 		EXPECT().
 		Get(ctx, mockLogger, id).
@@ -47,7 +46,7 @@ func Test_Handler_GetResource_Success(t *testing.T) {
 
 	handler := examplerpc.New(
 		facade,
-		mockexamplerpc.NewAuditEventFacade(t),
+		examplerpc.NewMockAuditEventFacade(t),
 	)
 
 	req := connect.NewRequest(&examplev1.GetResourceRequest{
@@ -76,8 +75,8 @@ func Test_Handler_GetResource_InvalidID(t *testing.T) {
 	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
 
 	handler := examplerpc.New(
-		mockexamplerpc.NewResourceFacade(t),
-		mockexamplerpc.NewAuditEventFacade(t),
+		examplerpc.NewMockResourceFacade(t),
+		examplerpc.NewMockAuditEventFacade(t),
 	)
 
 	req := connect.NewRequest(&examplev1.GetResourceRequest{
@@ -113,7 +112,7 @@ func Test_Handler_GetResource_UsecaseError(t *testing.T) {
 			ctx := slogx.IntoContext(t.Context(), slogt.New(t))
 			id := uuid.Must(uuid.NewV7())
 
-			facade := mockexamplerpc.NewResourceFacade(t)
+			facade := examplerpc.NewMockResourceFacade(t)
 			facade.
 				EXPECT().
 				Get(ctx, mockLogger, id).
@@ -122,7 +121,7 @@ func Test_Handler_GetResource_UsecaseError(t *testing.T) {
 
 			handler := examplerpc.New(
 				facade,
-				mockexamplerpc.NewAuditEventFacade(t),
+				examplerpc.NewMockAuditEventFacade(t),
 			)
 
 			req := connect.NewRequest(&examplev1.GetResourceRequest{

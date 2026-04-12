@@ -32,10 +32,11 @@ type migrator struct {
 	migrations []Migration
 	recorder   *recorder
 	tracer     trace.Tracer
+	target     int64
 }
 
 // newMigrator creates a new migrator.
-func newMigrator(migrations []Migration, rec *recorder) (*migrator, error) {
+func newMigrator(migrations []Migration, rec *recorder, target int64) (*migrator, error) {
 	slices.SortFunc(migrations, func(a, b Migration) int {
 		return cmp.Compare(a.Version(), b.Version())
 	})
@@ -55,6 +56,7 @@ func newMigrator(migrations []Migration, rec *recorder) (*migrator, error) {
 		migrations: migrations,
 		recorder:   rec,
 		tracer:     otelx.Tracer(),
+		target:     target,
 	}, nil
 }
 
@@ -99,8 +101,8 @@ func (m *migrator) Migrate(
 
 	span.SetAttributes(herdconv.HerdVersionBefore(int(before)))
 
-	pending := slices.DeleteFunc(slices.Clone(m.migrations), func(m Migration) bool {
-		return m.Version() <= before
+	pending := slices.DeleteFunc(slices.Clone(m.migrations), func(mg Migration) bool {
+		return mg.Version() <= before || (m.target > 0 && mg.Version() > m.target)
 	})
 
 	for _, migration := range pending {

@@ -14,7 +14,6 @@ import (
 	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 	"github.com/mattdowdell/sandbox/internal/domain/repositories"
-	"github.com/mattdowdell/sandbox/mocks/adapters/mockexamplerpc"
 	"github.com/mattdowdell/sandbox/pkg/slogt"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
@@ -34,7 +33,7 @@ func Test_Handler_ListResources_Success(t *testing.T) {
 		Limit: testLimit,
 	}
 
-	facade := mockexamplerpc.NewResourceFacade(t)
+	facade := examplerpc.NewMockResourceFacade(t)
 	facade.
 		EXPECT().
 		List(ctx, mockLogger, pager).
@@ -55,7 +54,7 @@ func Test_Handler_ListResources_Success(t *testing.T) {
 
 	handler := examplerpc.New(
 		facade,
-		mockexamplerpc.NewAuditEventFacade(t),
+		examplerpc.NewMockAuditEventFacade(t),
 	)
 
 	req := connect.NewRequest(&examplev1.ListResourcesRequest{
@@ -89,7 +88,7 @@ func Test_Handler_ListResources_Error(t *testing.T) {
 		Limit: testLimit,
 	}
 
-	facade := mockexamplerpc.NewResourceFacade(t)
+	facade := examplerpc.NewMockResourceFacade(t)
 	facade.
 		EXPECT().
 		List(ctx, mockLogger, pager).
@@ -98,7 +97,7 @@ func Test_Handler_ListResources_Error(t *testing.T) {
 
 	handler := examplerpc.New(
 		facade,
-		mockexamplerpc.NewAuditEventFacade(t),
+		examplerpc.NewMockAuditEventFacade(t),
 	)
 
 	req := connect.NewRequest(&examplev1.ListResourcesRequest{

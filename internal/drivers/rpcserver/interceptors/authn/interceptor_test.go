@@ -12,9 +12,9 @@ import (
 
 	authnv1 "github.com/mattdowdell/sandbox/gen/authn/v1"
 	"github.com/mattdowdell/sandbox/gen/authn/v1/authnv1connect"
+	"github.com/mattdowdell/sandbox/gen/authn/v1/authnv1connect/mockauthnv1connect"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/authn"
-	"github.com/mattdowdell/sandbox/mocks/external/connectrpc.com/mockconnect"
-	"github.com/mattdowdell/sandbox/mocks/gen/authn/v1/mockauthnv1connect"
+	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/mockconnect"
 )
 
 const (
@@ -32,7 +32,7 @@ var mockCtx = mock.AnythingOfType("*context.valueCtx")
 type Request struct {
 	*connect.Request[healthv1.HealthCheckRequest]
 
-	mock *mockconnect.AnyRequest
+	mock *mockconnect.MockAnyRequest
 }
 
 func (r *Request) Spec() connect.Spec {
@@ -41,11 +41,11 @@ func (r *Request) Spec() connect.Spec {
 
 func Test_Interceptor_WrapUnary_Client(t *testing.T) {
 	// arrange
-	client := mockauthnv1connect.NewAuthnServiceClient(t)
+	client := mockauthnv1connect.NewMockAuthnServiceClient(t)
 
 	interceptor := authn.New(client)
 
-	inner := mockconnect.NewAnyRequest(t)
+	inner := mockconnect.NewMockAnyRequest(t)
 	inner.
 		EXPECT().
 		Spec().
@@ -97,7 +97,7 @@ func Test_Interceptor_WrapUnary_Success(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			client := mockauthnv1connect.NewAuthnServiceClient(t)
+			client := mockauthnv1connect.NewMockAuthnServiceClient(t)
 			client.
 				EXPECT().
 				Authenticate(
@@ -116,7 +116,7 @@ func Test_Interceptor_WrapUnary_Success(t *testing.T) {
 
 			interceptor := authn.New(client, tt.options...)
 
-			inner := mockconnect.NewAnyRequest(t)
+			inner := mockconnect.NewMockAnyRequest(t)
 			inner.
 				EXPECT().
 				Spec().
@@ -161,7 +161,7 @@ func Test_Interceptor_WrapUnary_Error(t *testing.T) {
 		"missing authorization": {
 			client: func(t *testing.T) authnv1connect.AuthnServiceClient {
 				t.Helper()
-				return mockauthnv1connect.NewAuthnServiceClient(t)
+				return mockauthnv1connect.NewMockAuthnServiceClient(t)
 			},
 			want: "unauthenticated: invalid or missing authorization",
 		},
@@ -169,7 +169,7 @@ func Test_Interceptor_WrapUnary_Error(t *testing.T) {
 			authn: "Basic " + testToken,
 			client: func(t *testing.T) authnv1connect.AuthnServiceClient {
 				t.Helper()
-				return mockauthnv1connect.NewAuthnServiceClient(t)
+				return mockauthnv1connect.NewMockAuthnServiceClient(t)
 			},
 			want: "unauthenticated: invalid or missing authorization",
 		},
@@ -178,7 +178,7 @@ func Test_Interceptor_WrapUnary_Error(t *testing.T) {
 			client: func(t *testing.T) authnv1connect.AuthnServiceClient {
 				t.Helper()
 
-				c := mockauthnv1connect.NewAuthnServiceClient(t)
+				c := mockauthnv1connect.NewMockAuthnServiceClient(t)
 				c.
 					EXPECT().
 					Authenticate(
@@ -202,7 +202,7 @@ func Test_Interceptor_WrapUnary_Error(t *testing.T) {
 			client: func(t *testing.T) authnv1connect.AuthnServiceClient {
 				t.Helper()
 
-				c := mockauthnv1connect.NewAuthnServiceClient(t)
+				c := mockauthnv1connect.NewMockAuthnServiceClient(t)
 				c.
 					EXPECT().
 					Authenticate(
@@ -226,7 +226,7 @@ func Test_Interceptor_WrapUnary_Error(t *testing.T) {
 			client: func(t *testing.T) authnv1connect.AuthnServiceClient {
 				t.Helper()
 
-				c := mockauthnv1connect.NewAuthnServiceClient(t)
+				c := mockauthnv1connect.NewMockAuthnServiceClient(t)
 				c.
 					EXPECT().
 					Authenticate(
@@ -271,7 +271,7 @@ func Test_Interceptor_WrapUnary_Error(t *testing.T) {
 
 func Test_Interceptor_WrapStreamingHandler_Success(t *testing.T) {
 	// arrange
-	client := mockauthnv1connect.NewAuthnServiceClient(t)
+	client := mockauthnv1connect.NewMockAuthnServiceClient(t)
 	client.
 		EXPECT().
 		Authenticate(
@@ -293,7 +293,7 @@ func Test_Interceptor_WrapStreamingHandler_Success(t *testing.T) {
 	headers := http.Header{}
 	headers.Set("Authorization", testAuthHeader)
 
-	conn := mockconnect.NewStreamingHandlerConn(t)
+	conn := mockconnect.NewMockStreamingHandlerConn(t)
 	conn.EXPECT().Spec().Return(connect.Spec{}).Once()
 	conn.EXPECT().RequestHeader().Return(headers).Once()
 
@@ -318,7 +318,7 @@ func Test_Interceptor_WrapStreamingHandler_Error(t *testing.T) {
 		"missing auth": {
 			client: func(t *testing.T) authnv1connect.AuthnServiceClient {
 				t.Helper()
-				return mockauthnv1connect.NewAuthnServiceClient(t)
+				return mockauthnv1connect.NewMockAuthnServiceClient(t)
 			},
 			want: "unauthenticated: invalid or missing authorization",
 		},
@@ -327,7 +327,7 @@ func Test_Interceptor_WrapStreamingHandler_Error(t *testing.T) {
 			client: func(t *testing.T) authnv1connect.AuthnServiceClient {
 				t.Helper()
 
-				c := mockauthnv1connect.NewAuthnServiceClient(t)
+				c := mockauthnv1connect.NewMockAuthnServiceClient(t)
 				c.
 					EXPECT().
 					Authenticate(
@@ -357,7 +357,7 @@ func Test_Interceptor_WrapStreamingHandler_Error(t *testing.T) {
 			headers := http.Header{}
 			headers.Set("Authorization", tt.authn)
 
-			conn := mockconnect.NewStreamingHandlerConn(t)
+			conn := mockconnect.NewMockStreamingHandlerConn(t)
 			conn.EXPECT().Spec().Return(connect.Spec{}).Once()
 			conn.EXPECT().RequestHeader().Return(headers).Once()
 

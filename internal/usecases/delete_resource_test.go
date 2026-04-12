@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/domain"
+	"github.com/mattdowdell/sandbox/internal/domain/repositories/mockrepositories"
 	"github.com/mattdowdell/sandbox/internal/usecases"
-	"github.com/mattdowdell/sandbox/mocks/domain/mockrepositories"
 	"github.com/mattdowdell/sandbox/pkg/slogt"
 )
 
@@ -29,7 +29,7 @@ func Test_DeleteResource_Success(t *testing.T) {
 	usecase := usecases.NewDeleteResource()
 	logger := slogt.New(t)
 
-	store := mockrepositories.NewResource(t)
+	store := mockrepositories.NewMockResource(t)
 	store.EXPECT().DeleteResource(t.Context(), id).Return(nil).Once()
 
 	// act
@@ -59,7 +59,7 @@ func Test_DeleteResource_Error(t *testing.T) {
 			usecase := usecases.NewDeleteResource()
 			logger := slogt.New(t)
 
-			store := mockrepositories.NewResource(t)
+			store := mockrepositories.NewMockResource(t)
 			store.EXPECT().DeleteResource(t.Context(), id).Return(tt.err).Once()
 
 			// act

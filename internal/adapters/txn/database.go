@@ -15,16 +15,19 @@ type Datastore interface {
 	repositories.Resource
 }
 
-// CommitFn commits a transaction.
-type CommitFn func() error
+// Ender provides methods for ending a transaction.
+type Ender interface {
+	// Commit commits a transaction.
+	Commit() error
 
-// RollbackFn rolls back a transaction. No error should be produced for a committed transaction.
-type RollbackFn func() error
+	// Rollback rolls back a transaction. No error should be produced for a committed transaction.
+	Rollback() error
+}
 
 // Provider provides access to either a transactional or non-transactional database.
 type Provider interface {
 	Datastore() Datastore
-	BeginTx(context.Context) (Datastore, CommitFn, RollbackFn, error)
+	BeginTx(context.Context) (Datastore, Ender, error)
 }
 
 // Func executes the given function within a transaction, automatically committing or rolling back
@@ -68,7 +71,7 @@ func Values[T1, T2 any](
 	provider Provider,
 	fn func(Datastore) (T1, T2, error),
 ) (T1, T2, error) {
-	conn, commit, rollback, err := provider.BeginTx(ctx)
+	conn, ender, err := provider.BeginTx(ctx)
 	if err != nil {
 		logger.ErrorContext(ctx, "failed to begin transaction", slogx.Err(err))
 
@@ -79,7 +82,7 @@ func Values[T1, T2 any](
 	}
 
 	defer func() {
-		if err := rollback(); err != nil {
+		if err := ender.Rollback(); err != nil {
 			logger.ErrorContext(ctx, "failed to rollback transaction", slogx.Err(err))
 		}
 	}()
@@ -92,7 +95,7 @@ func Values[T1, T2 any](
 		return t1, t2, err
 	}
 
-	if err := commit(); err != nil {
+	if err := ender.Commit(); err != nil {
 		slog.ErrorContext(ctx, "failed to commit transaction", slogx.Err(err))
 
 		var t1 T1

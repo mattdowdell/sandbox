@@ -9,7 +9,6 @@ import (
 
 	authnv1 "github.com/mattdowdell/sandbox/gen/authn/v1"
 	"github.com/mattdowdell/sandbox/internal/adapters/authnrpc"
-	"github.com/mattdowdell/sandbox/mocks/adapters/mockauthnrpc"
 	"github.com/mattdowdell/sandbox/pkg/slogt"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
@@ -26,12 +25,12 @@ func Test_Handler_Login_Success(t *testing.T) {
 	// arrange
 	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
 
-	issuer := mockauthnrpc.NewIssuer(t)
+	issuer := authnrpc.NewMockIssuer(t)
 	issuer.EXPECT().Issue(testID, testExpiresIn).Return(testToken, nil).Once()
 
 	handler := authnrpc.New(
 		issuer,
-		mockauthnrpc.NewParser(t),
+		authnrpc.NewMockParser(t),
 	)
 
 	req := connect.NewRequest(&authnv1.LoginRequest{
@@ -57,12 +56,12 @@ func Test_Handler_Login_Error(t *testing.T) {
 	// arrange
 	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
 
-	issuer := mockauthnrpc.NewIssuer(t)
+	issuer := authnrpc.NewMockIssuer(t)
 	issuer.EXPECT().Issue(testID, testExpiresIn).Return("", errors.New("example")).Once()
 
 	handler := authnrpc.New(
 		issuer,
-		mockauthnrpc.NewParser(t),
+		authnrpc.NewMockParser(t),
 	)
 
 	req := connect.NewRequest(&authnv1.LoginRequest{

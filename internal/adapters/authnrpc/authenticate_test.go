@@ -9,8 +9,6 @@ import (
 
 	authnv1 "github.com/mattdowdell/sandbox/gen/authn/v1"
 	"github.com/mattdowdell/sandbox/internal/adapters/authnrpc"
-	"github.com/mattdowdell/sandbox/mocks/adapters/mockauthnrpc"
-	"github.com/mattdowdell/sandbox/mocks/external/github.com/golang-jwt/mockjwt/v5"
 	"github.com/mattdowdell/sandbox/pkg/slogt"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
@@ -19,14 +17,14 @@ func Test_Handler_Authenticate_Success(t *testing.T) {
 	// arrange
 	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
 
-	claims := mockjwt.NewClaims(t)
+	claims := authnrpc.NewMockClaims(t)
 	claims.EXPECT().GetSubject().Return(testID, nil).Once()
 
-	parser := mockauthnrpc.NewParser(t)
+	parser := authnrpc.NewMockParser(t)
 	parser.EXPECT().Parse(testToken).Return(claims, nil).Once()
 
 	handler := authnrpc.New(
-		mockauthnrpc.NewIssuer(t),
+		authnrpc.NewMockIssuer(t),
 		parser,
 	)
 
@@ -50,11 +48,11 @@ func Test_Handler_Authenticate_ParseError(t *testing.T) {
 	// arrange
 	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
 
-	parser := mockauthnrpc.NewParser(t)
+	parser := authnrpc.NewMockParser(t)
 	parser.EXPECT().Parse(testToken).Return(nil, errors.New("example")).Once()
 
 	handler := authnrpc.New(
-		mockauthnrpc.NewIssuer(t),
+		authnrpc.NewMockIssuer(t),
 		parser,
 	)
 
@@ -74,14 +72,14 @@ func Test_Handler_Authenticate_SubjectError(t *testing.T) {
 	// arrange
 	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
 
-	claims := mockjwt.NewClaims(t)
+	claims := authnrpc.NewMockClaims(t)
 	claims.EXPECT().GetSubject().Return("", errors.New("error")).Once()
 
-	parser := mockauthnrpc.NewParser(t)
+	parser := authnrpc.NewMockParser(t)
 	parser.EXPECT().Parse(testToken).Return(claims, nil).Once()
 
 	handler := authnrpc.New(
-		mockauthnrpc.NewIssuer(t),
+		authnrpc.NewMockIssuer(t),
 		parser,
 	)
 

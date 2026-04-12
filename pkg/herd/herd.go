@@ -45,12 +45,12 @@ func New(migrations []Migration, options ...Option) (*Herd, error) {
 	systemRecorder := newRecorder(opts.nowFunc, TableNameSystem, version, revision)
 	userRecorder := newRecorder(opts.nowFunc, TableNameUser, version, revision)
 
-	system, err := newMigrator(systemMigrations, systemRecorder)
+	system, err := newMigrator(systemMigrations, systemRecorder, 0 /*target*/)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create system migrator: %w", err)
 	}
 
-	user, err := newMigrator(migrations, userRecorder)
+	user, err := newMigrator(migrations, userRecorder, opts.targetVersion)
 	if err != nil {
 		return nil, err
 	}

@@ -28,15 +28,16 @@ func NewProvider(db *sql.DB) *Provider {
 // BeginTx creates a Datastore within a transaction.
 func (p *Provider) BeginTx(
 	ctx context.Context,
-) (txn.Datastore, txn.CommitFn, txn.RollbackFn, error) {
+) (txn.Datastore, txn.Ender, error) {
 	tx, err := p.db.BeginTx(ctx, nil /*opts*/)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 
 	ds := NewDatastore(tx)
+	end := newEnder(tx)
 
-	return ds, tx.Commit, wrapRollback(tx.Rollback), nil
+	return ds, end, nil
 }
 
 // Datastore creates a Datastore without a transaction.
@@ -56,14 +57,29 @@ func NewDatastore(db qrm.DB) *Datastore {
 	}
 }
 
-// wrapRollback suppresses the error from a transaction rollback failure if it is caused by the
-// transaction already being committed. Otherwise the error is returned as is.
-func wrapRollback(fn txn.RollbackFn) txn.RollbackFn {
-	return func() error {
-		if err := fn(); err != nil && !errors.Is(err, sql.ErrTxDone) {
-			return err
-		}
+// Ender provides support for ending a transaction.
+type Ender struct {
+	tx *sql.Tx
+}
 
-		return nil
+// newEnder creates a new Ender.
+func newEnder(tx *sql.Tx) *Ender {
+	return &Ender{
+		tx: tx,
 	}
+}
+
+// Commit is used to commit a transaction.
+func (e *Ender) Commit() error {
+	return e.tx.Commit()
+}
+
+// Rollback is used to rollback a transaction, ignoring any errors caused by rollbacking an already
+// committed transaction.
+func (e *Ender) Rollback() error {
+	if err := e.tx.Rollback(); err != nil && !errors.Is(err, sql.ErrTxDone) {
+		return err
+	}
+
+	return nil
 }
