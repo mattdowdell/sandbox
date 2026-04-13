@@ -1,11 +1,7 @@
 ---
 # https://vektra.github.io/mockery/latest/configuration/
 
-dir: "mocks/{{ trimPrefix \"github.com/mattdowdell/sandbox/internal/\" .SrcPackagePath | dir }}/mock{{ .SrcPackagePath | base }}"
-filename: "mocks.go"
 include-auto-generated: true
-structname: "{{ .InterfaceName }}"
-pkgname: "mock{{ .SrcPackageName }}"
 template: "testify"
 template-data:
   unroll-variadic: true
@@ -14,7 +10,9 @@ packages:
   # internal dependencies
   github.com/mattdowdell/sandbox/gen/authn/v1/authnv1connect:
     config:
-      dir: "mocks/gen/authn/v1/mockauthnv1connect"
+      dir: "gen/authn/v1/authnv1connect/mockauthnv1connect"
+      filename: "mocks.go"
+      pkgname: "mockauthnv1connect"
     interfaces:
       AuthnServiceClient: {}
   github.com/mattdowdell/sandbox/internal/adapters/authnrpc:
@@ -29,25 +27,38 @@ packages:
   github.com/mattdowdell/sandbox/internal/adapters/txn:
     config:
       all: true
+      dir: "internal/adapters/txn/mocktxn"
+      filename: "mocks.go"
+      pkgname: "mocktxn"
   github.com/mattdowdell/sandbox/internal/adapters/usecasefacades:
     config:
       all: true
   github.com/mattdowdell/sandbox/internal/domain/repositories:
     config:
       all: true
+      dir: "internal/domain/repositories/mockrepositories"
+      filename: "mocks.go"
+      pkgname: "mockrepositories"
   github.com/mattdowdell/sandbox/internal/drivers/rpcserver:
     config:
       exclude-interface-regex: "^RecovererOption$"
       include-interface-regex: "^.+$"
+  github.com/mattdowdell/sandbox/pkg/slogt:
+    config:
+      all: true
   # external dependencies
   connectrpc.com/connect:
     config:
-      dir: "mocks/external/connectrpc.com/mockconnect"
+      dir: "internal/drivers/rpcserver/mockconnect"
+      filename: "mocks.go"
+      pkgname: "mockconnect"
     interfaces:
       AnyRequest: {}
       StreamingHandlerConn: {}
   github.com/golang-jwt/jwt/v5:
     config:
-      dir: "mocks/external/github.com/golang-jwt/mockjwt/v5"
+      dir: "internal/adapters/authnrpc"
+      filename: "jwt_mocks_test.go"
+      pkgname: "authnrpc"
     interfaces:
       Claims: {}

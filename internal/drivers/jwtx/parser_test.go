@@ -6,8 +6,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/mattdowdell/sandbox/internal/domain/repositories/mockrepositories"
 	"github.com/mattdowdell/sandbox/internal/drivers/jwtx"
-	"github.com/mattdowdell/sandbox/mocks/domain/mockrepositories"
 )
 
 const (
@@ -41,7 +41,7 @@ const (
 
 func Test_NewParserFromConfig(t *testing.T) {
 	// arrange
-	clock := mockrepositories.NewClock(t)
+	clock := mockrepositories.NewMockClock(t)
 	conf := jwtx.ParserConfig{
 		Audience: []string{testAudience},
 		Issuer:   testIssuer,
@@ -58,7 +58,7 @@ func Test_NewParserFromConfig(t *testing.T) {
 
 func Test_NewParser_Success(t *testing.T) {
 	// arrange
-	clock := mockrepositories.NewClock(t)
+	clock := mockrepositories.NewMockClock(t)
 
 	// act
 	parser, err := jwtx.NewParser(clock, []string{testAudience}, testIssuer, []string{testMethod})
@@ -110,7 +110,7 @@ func Test_NewParser_Error(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			clock := mockrepositories.NewClock(t)
+			clock := mockrepositories.NewMockClock(t)
 
 			// act
 			parser, err := jwtx.NewParser(clock, tt.audience, tt.issuer, tt.methods)
@@ -124,7 +124,7 @@ func Test_NewParser_Error(t *testing.T) {
 
 func Test_Parser_Parse_Success(t *testing.T) {
 	// arrange
-	clock := mockrepositories.NewClock(t)
+	clock := mockrepositories.NewMockClock(t)
 	clock.EXPECT().UTCNow().Return(testIssuedAt).Once()
 
 	parser, err := jwtx.NewParser(clock, []string{testAudience}, testIssuer, []string{testMethod})
@@ -223,7 +223,7 @@ func Test_Parser_Parse_Error(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			clock := mockrepositories.NewClock(t)
+			clock := mockrepositories.NewMockClock(t)
 			clock.EXPECT().UTCNow().Return(testIssuedAt).Maybe()
 
 			parser, err := jwtx.NewParser(clock, tt.audience, tt.issuer, []string{testMethod})

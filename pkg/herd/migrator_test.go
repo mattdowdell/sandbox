@@ -11,7 +11,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mattdowdell/sandbox/mocks/domain/mockrepositories"
 	"github.com/mattdowdell/sandbox/pkg/herd"
 )
 
@@ -21,6 +20,7 @@ const (
 	testHerdVersion      = 1
 	testMigrationVersion = 2
 	testMigration        = "-- example"
+	testTargetVersion    = 0
 )
 
 var (
@@ -57,16 +57,15 @@ func Test_newMigrator_Success(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			clock := mockrepositories.NewClock(t)
 			recorder := herd.NewRecorder(
-				clock.Now,
+				time.Now,
 				herd.TableNameUser,
 				testCodeVersion,
 				testCodeRevision,
 			)
 
 			// act
-			migrator, err := herd.NewMigrator(tt.have, recorder)
+			migrator, err := herd.NewMigrator(tt.have, recorder, testTargetVersion)
 
 			// assert
 			assert.NotNil(t, migrator)
@@ -100,16 +99,15 @@ func Test_newMigrator_Error(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			clock := mockrepositories.NewClock(t)
 			recorder := herd.NewRecorder(
-				clock.Now,
+				time.Now,
 				herd.TableNameUser,
 				testCodeVersion,
 				testCodeRevision,
 			)
 
 			// act
-			migrator, err := herd.NewMigrator(tt.have, recorder)
+			migrator, err := herd.NewMigrator(tt.have, recorder, testTargetVersion)
 
 			// assert
 			assert.Nil(t, migrator)
@@ -214,17 +212,14 @@ func Test_migrator_Migrate_Success(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			clock := mockrepositories.NewClock(t)
-			clock.EXPECT().Now().Return(now).Maybe()
-
 			recorder := herd.NewRecorder(
-				clock.Now,
+				testNowFunc(now),
 				herd.TableNameUser,
 				testCodeVersion,
 				testCodeRevision,
 			)
 
-			migrator, err := herd.NewMigrator(tt.migrations, recorder)
+			migrator, err := herd.NewMigrator(tt.migrations, recorder, testTargetVersion)
 			require.NoError(t, err)
 
 			db := tt.db(t)
@@ -354,17 +349,14 @@ func Test_migrator_Migrate_Error(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			clock := mockrepositories.NewClock(t)
-			clock.EXPECT().Now().Return(now).Maybe()
-
 			recorder := herd.NewRecorder(
-				clock.Now,
+				testNowFunc(now),
 				herd.TableNameUser,
 				testCodeVersion,
 				testCodeRevision,
 			)
 
-			migrator, err := herd.NewMigrator(tt.migrations, recorder)
+			migrator, err := herd.NewMigrator(tt.migrations, recorder, testTargetVersion)
 			require.NoError(t, err)
 
 			db := tt.db(t)

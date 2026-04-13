@@ -41,7 +41,7 @@ func SetupApp(ctx context.Context) (*App, error) {
 		return nil, err
 	}
 
-	herder, err := herd.New(migrations)
+	herder, err := herd.New(migrations, herd.WithTargetVersion(conf.App.TargetVersion))
 	if err != nil {
 		return nil, err
 	}

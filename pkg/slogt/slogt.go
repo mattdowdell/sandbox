@@ -6,36 +6,42 @@
 package slogt
 
 import (
+	"io"
 	"log/slog"
-	"testing"
 )
 
+// TB is a selection of the methods provided by [testing.TB].
+type TB interface {
+	Helper()
+	Output() io.Writer
+}
+
 // New is an alias for [Text].
-func New(tb testing.TB) *slog.Logger {
+func New(tb TB) *slog.Logger {
 	tb.Helper()
 	return Text(tb)
 }
 
 // Text wraps [TextWithOptions] with default (nil) options.
-func Text(tb testing.TB) *slog.Logger {
+func Text(tb TB) *slog.Logger {
 	tb.Helper()
 	return TextWithOptions(tb, nil)
 }
 
 // TextWithOptions creates a new logger using a text handler and the given options.
-func TextWithOptions(tb testing.TB, options *slog.HandlerOptions) *slog.Logger {
+func TextWithOptions(tb TB, options *slog.HandlerOptions) *slog.Logger {
 	tb.Helper()
 	return slog.New(slog.NewTextHandler(tb.Output(), options))
 }
 
 // JSON wraps [JSONWithOptions] with default (nil) options.
-func JSON(tb testing.TB) *slog.Logger {
+func JSON(tb TB) *slog.Logger {
 	tb.Helper()
 	return JSONWithOptions(tb, nil)
 }
 
 // JSONWithOptions creates a new logger using a JSON handler and default options.
-func JSONWithOptions(tb testing.TB, options *slog.HandlerOptions) *slog.Logger {
+func JSONWithOptions(tb TB, options *slog.HandlerOptions) *slog.Logger {
 	tb.Helper()
-	return slog.New(slog.NewTextHandler(tb.Output(), options))
+	return slog.New(slog.NewJSONHandler(tb.Output(), options))
 }

@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/configrpc"
-	"github.com/mattdowdell/sandbox/mocks/adapters/mockconfigrpc"
 )
 
 type TestConfig struct {
@@ -17,7 +16,7 @@ type TestConfig struct {
 
 func Test_New(t *testing.T) {
 	// arrange
-	loader := mockconfigrpc.NewLoader(t)
+	loader := configrpc.NewMockLoader(t)
 
 	// act
 	handler := configrpc.New[TestConfig](loader)
@@ -28,7 +27,7 @@ func Test_New(t *testing.T) {
 
 func Test_Handler_Register(t *testing.T) {
 	// arrange
-	loader := mockconfigrpc.NewLoader(t)
+	loader := configrpc.NewMockLoader(t)
 	handler := configrpc.New[TestConfig](loader)
 	mux := http.NewServeMux()
 

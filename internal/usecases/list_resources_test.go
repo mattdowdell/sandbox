@@ -10,8 +10,8 @@ import (
 	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 	"github.com/mattdowdell/sandbox/internal/domain/repositories"
+	"github.com/mattdowdell/sandbox/internal/domain/repositories/mockrepositories"
 	"github.com/mattdowdell/sandbox/internal/usecases"
-	"github.com/mattdowdell/sandbox/mocks/domain/mockrepositories"
 	"github.com/mattdowdell/sandbox/pkg/slogt"
 )
 
@@ -51,7 +51,7 @@ func Test_ListResources_Success(t *testing.T) {
 		},
 	}
 
-	store := mockrepositories.NewResource(t)
+	store := mockrepositories.NewMockResource(t)
 	store.EXPECT().ListResources(t.Context(), pager).Return(expected, nil).Once()
 
 	// act
@@ -70,7 +70,7 @@ func Test_ListResources_Error(t *testing.T) {
 		Limit: testLimit,
 	}
 
-	store := mockrepositories.NewResource(t)
+	store := mockrepositories.NewMockResource(t)
 	store.EXPECT().ListResources(t.Context(), pager).Return(nil, domain.ErrInternal).Once()
 
 	// act

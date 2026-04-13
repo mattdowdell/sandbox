@@ -31,12 +31,11 @@ func Test_Provider_BeginTx_Success(t *testing.T) {
 	provider := datastore.NewProvider(db)
 
 	// act
-	store, commit, rollback, err := provider.BeginTx(t.Context())
+	store, ender, err := provider.BeginTx(t.Context())
 
 	// assert
 	assert.NotNil(t, store)
-	assert.NotNil(t, commit)
-	assert.NotNil(t, rollback)
+	assert.NotNil(t, ender)
 	assert.NoError(t, err)
 }
 
@@ -49,12 +48,11 @@ func Test_Provider_BeginTx_Error(t *testing.T) {
 	provider := datastore.NewProvider(db)
 
 	// act
-	store, commit, rollback, err := provider.BeginTx(t.Context())
+	store, ender, err := provider.BeginTx(t.Context())
 
 	// assert
 	assert.Nil(t, store)
-	assert.Nil(t, commit)
-	assert.Nil(t, rollback)
+	assert.Nil(t, ender)
 	assert.EqualError(t, err, "example")
 }
 
@@ -71,7 +69,7 @@ func Test_Provider_Datastore(t *testing.T) {
 	assert.NotNil(t, store)
 }
 
-func Test_wrapRollback_Success(t *testing.T) {
+func Test_Ender_Rollback_Success(t *testing.T) {
 	tests := map[string]struct {
 		have error
 	}{
@@ -93,11 +91,11 @@ func Test_wrapRollback_Success(t *testing.T) {
 
 			provider := datastore.NewProvider(db)
 
-			_, _, rollback, err := provider.BeginTx(t.Context())
+			_, ender, err := provider.BeginTx(t.Context())
 			require.NoError(t, err)
 
 			// act
-			err = rollback()
+			err = ender.Rollback()
 
 			// assert
 			assert.NoError(t, err)
@@ -105,7 +103,7 @@ func Test_wrapRollback_Success(t *testing.T) {
 	}
 }
 
-func Test_wrapRollback_Error(t *testing.T) {
+func Test_Ender_Rollback_Error(t *testing.T) {
 	// arrange
 	db, mock := newMockDB(t)
 
@@ -114,11 +112,11 @@ func Test_wrapRollback_Error(t *testing.T) {
 
 	provider := datastore.NewProvider(db)
 
-	_, _, rollback, err := provider.BeginTx(t.Context())
+	_, ender, err := provider.BeginTx(t.Context())
 	require.NoError(t, err)
 
 	// act
-	err = rollback()
+	err = ender.Rollback()
 
 	// assert
 	assert.EqualError(t, err, "example")

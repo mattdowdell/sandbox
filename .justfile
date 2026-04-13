@@ -152,7 +152,6 @@ gen-go-jet:
 # Run the Go mockery generator.
 [group('generators')]
 gen-go-mockery: install-mockery
-    rm -rf mocks/
     {{ mockery }}
 
 # Run the tools generator.

@@ -7,26 +7,24 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/txn"
-	"github.com/mattdowdell/sandbox/mocks/adapters/mocktxn"
+	"github.com/mattdowdell/sandbox/internal/adapters/txn/mocktxn"
 	"github.com/mattdowdell/sandbox/pkg/slogt"
 )
 
 func Test_Func(t *testing.T) {
 	// arrange
 	logger := slogt.New(t)
-	datastore := mocktxn.NewDatastore(t)
+	datastore := mocktxn.NewMockDatastore(t)
 
-	commit := NewCommitFn(t)
-	commit.EXPECT().Execute().Return(nil).Once()
+	ender := mocktxn.NewMockEnder(t)
+	ender.EXPECT().Commit().Return(nil).Once()
+	ender.EXPECT().Rollback().Return(nil).Once()
 
-	rollback := NewRollbackFn(t)
-	rollback.EXPECT().Execute().Return(nil).Once()
-
-	provider := mocktxn.NewProvider(t)
+	provider := mocktxn.NewMockProvider(t)
 	provider.
 		EXPECT().
 		BeginTx(t.Context()).
-		Return(datastore, commit.Execute, rollback.Execute, nil).
+		Return(datastore, ender, nil).
 		Once()
 
 	// act
@@ -41,19 +39,17 @@ func Test_Func(t *testing.T) {
 func Test_Value(t *testing.T) {
 	// arrange
 	logger := slogt.New(t)
-	datastore := mocktxn.NewDatastore(t)
+	datastore := mocktxn.NewMockDatastore(t)
 
-	commit := NewCommitFn(t)
-	commit.EXPECT().Execute().Return(nil).Once()
+	ender := mocktxn.NewMockEnder(t)
+	ender.EXPECT().Commit().Return(nil).Once()
+	ender.EXPECT().Rollback().Return(nil).Once()
 
-	rollback := NewRollbackFn(t)
-	rollback.EXPECT().Execute().Return(nil).Once()
-
-	provider := mocktxn.NewProvider(t)
+	provider := mocktxn.NewMockProvider(t)
 	provider.
 		EXPECT().
 		BeginTx(t.Context()).
-		Return(datastore, commit.Execute, rollback.Execute, nil).
+		Return(datastore, ender, nil).
 		Once()
 
 	// act
@@ -82,19 +78,17 @@ func Test_Values_Success(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			logger := slogt.New(t)
-			datastore := mocktxn.NewDatastore(t)
+			datastore := mocktxn.NewMockDatastore(t)
 
-			commit := NewCommitFn(t)
-			commit.EXPECT().Execute().Return(nil).Once()
+			ender := mocktxn.NewMockEnder(t)
+			ender.EXPECT().Commit().Return(nil).Once()
+			ender.EXPECT().Rollback().Return(tt.rollbackErr).Once()
 
-			rollback := NewRollbackFn(t)
-			rollback.EXPECT().Execute().Return(tt.rollbackErr).Once()
-
-			provider := mocktxn.NewProvider(t)
+			provider := mocktxn.NewMockProvider(t)
 			provider.
 				EXPECT().
 				BeginTx(t.Context()).
-				Return(datastore, commit.Execute, rollback.Execute, nil).
+				Return(datastore, ender, nil).
 				Once()
 
 			// act
@@ -125,11 +119,11 @@ func Test_Values_Error(t *testing.T) {
 			provider: func(t *testing.T) txn.Provider {
 				t.Helper()
 
-				p := mocktxn.NewProvider(t)
+				p := mocktxn.NewMockProvider(t)
 				p.
 					EXPECT().
 					BeginTx(t.Context()).
-					Return(nil, nil, nil, errors.New("example")).
+					Return(nil, nil, errors.New("example")).
 					Once()
 
 				return p
@@ -141,17 +135,15 @@ func Test_Values_Error(t *testing.T) {
 			provider: func(t *testing.T) txn.Provider {
 				t.Helper()
 
-				datastore := mocktxn.NewDatastore(t)
-				commit := NewCommitFn(t)
+				datastore := mocktxn.NewMockDatastore(t)
+				ender := mocktxn.NewMockEnder(t)
+				ender.EXPECT().Rollback().Return(nil).Once()
 
-				rollback := NewRollbackFn(t)
-				rollback.EXPECT().Execute().Return(nil).Once()
-
-				p := mocktxn.NewProvider(t)
+				p := mocktxn.NewMockProvider(t)
 				p.
 					EXPECT().
 					BeginTx(t.Context()).
-					Return(datastore, commit.Execute, rollback.Execute, nil).
+					Return(datastore, ender, nil).
 					Once()
 
 				return p
@@ -165,19 +157,17 @@ func Test_Values_Error(t *testing.T) {
 			provider: func(t *testing.T) txn.Provider {
 				t.Helper()
 
-				datastore := mocktxn.NewDatastore(t)
+				datastore := mocktxn.NewMockDatastore(t)
 
-				commit := NewCommitFn(t)
-				commit.EXPECT().Execute().Return(errors.New("example")).Once()
+				ender := mocktxn.NewMockEnder(t)
+				ender.EXPECT().Commit().Return(errors.New("example")).Once()
+				ender.EXPECT().Rollback().Return(nil).Once()
 
-				rollback := NewRollbackFn(t)
-				rollback.EXPECT().Execute().Return(nil).Once()
-
-				p := mocktxn.NewProvider(t)
+				p := mocktxn.NewMockProvider(t)
 				p.
 					EXPECT().
 					BeginTx(t.Context()).
-					Return(datastore, commit.Execute, rollback.Execute, nil).
+					Return(datastore, ender, nil).
 					Once()
 
 				return p

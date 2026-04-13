@@ -9,14 +9,14 @@ import (
 
 	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
+	"github.com/mattdowdell/sandbox/internal/domain/repositories/mockrepositories"
 	"github.com/mattdowdell/sandbox/internal/usecases"
-	"github.com/mattdowdell/sandbox/mocks/domain/mockrepositories"
 	"github.com/mattdowdell/sandbox/pkg/slogt"
 )
 
 func Test_NewUpdateResource(t *testing.T) {
 	// arrange
-	clock := mockrepositories.NewClock(t)
+	clock := mockrepositories.NewMockClock(t)
 
 	// act
 	usecase := usecases.NewUpdateResource(clock)
@@ -30,7 +30,7 @@ func Test_UpdateResource_Success(t *testing.T) {
 	id := uuid.Must(uuid.NewV7())
 	now := time.Now().UTC().Round(time.Second)
 
-	clock := mockrepositories.NewClock(t)
+	clock := mockrepositories.NewMockClock(t)
 	clock.EXPECT().UTCNow().Return(now).Once()
 
 	usecase := usecases.NewUpdateResource(clock)
@@ -42,7 +42,7 @@ func Test_UpdateResource_Success(t *testing.T) {
 		UpdatedAt: now,
 	}
 
-	store := mockrepositories.NewResource(t)
+	store := mockrepositories.NewMockResource(t)
 	store.EXPECT().UpdateResource(t.Context(), expected).Return(expected, nil).Once()
 
 	changes := &entities.Resource{
@@ -79,7 +79,7 @@ func Test_UpdateResource_Error(t *testing.T) {
 			id := uuid.Must(uuid.NewV7())
 			now := time.Now().UTC().Round(time.Second)
 
-			clock := mockrepositories.NewClock(t)
+			clock := mockrepositories.NewMockClock(t)
 			clock.EXPECT().UTCNow().Return(now).Once()
 
 			usecase := usecases.NewUpdateResource(clock)
@@ -91,7 +91,7 @@ func Test_UpdateResource_Error(t *testing.T) {
 				UpdatedAt: now,
 			}
 
-			store := mockrepositories.NewResource(t)
+			store := mockrepositories.NewMockResource(t)
 			store.EXPECT().UpdateResource(t.Context(), expected).Return(nil, tt.err).Once()
 
 			changes := &entities.Resource{

@@ -17,6 +17,11 @@ import (
 )
 
 // ...
+type AppConfig struct {
+	TargetVersion int64 `koanf:"target_version"`
+}
+
+// ...
 type App struct {
 	conf       *Config
 	logger     *slog.Logger
