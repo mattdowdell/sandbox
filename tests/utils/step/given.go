@@ -55,17 +55,22 @@ func ExistingResourceName(ctx context.Context) (context.Context, error) {
 	return ctx, nil
 }
 
-// ...
+// EmptyID inserts an empty string as an ID into the context.
+func EmptyID(ctx context.Context) context.Context {
+	return input.IDIntoContext(ctx, "")
+}
+
+// NilUUID inserts a nil UUID as an ID into the context.
 func NilUUID(ctx context.Context) context.Context {
 	return input.IDIntoContext(ctx, uuid.Nil.String())
 }
 
-// ...
+// InvalidUUID inserts an invalid UUID as an ID into the context.
 func InvalidUUID(ctx context.Context) context.Context {
 	return input.IDIntoContext(ctx, "invalid")
 }
 
-// ...
+// ExistingID creates a new Resource and adds its ID into the context.
 func ExistingID(ctx context.Context) (context.Context, error) {
 	client, err := examplev1client.FromContext(ctx)
 	if err != nil {
@@ -90,7 +95,7 @@ func ExistingID(ctx context.Context) (context.Context, error) {
 	return ctx, err
 }
 
-// ...
+// ExistingResources creates the specified number of Resources and adds them to the context.
 func ExistingResources(ctx context.Context, count int) (context.Context, error) {
 	client, err := examplev1client.FromContext(ctx)
 	if err != nil {

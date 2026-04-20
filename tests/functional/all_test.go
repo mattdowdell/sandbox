@@ -72,6 +72,7 @@ func InitializeScenario(sc *godog.ScenarioContext) {
 	sc.Given(`^an existing resource name$`, step.ExistingResourceName)
 	sc.Given(`^a non-existent Resource ID$`, step.NilUUID)
 	sc.Given(`^an invalid Resource ID$`, step.InvalidUUID)
+	sc.Given(`^an empty Resource ID$`, step.InvalidUUID)
 	sc.Given(`^an existing Resource ID$`, step.ExistingID)
 	sc.Given(`^a limit of (-?\d+)$`, step.Limit)
 	sc.Given(`^(\d+) existing Resources$`, step.ExistingResources)
