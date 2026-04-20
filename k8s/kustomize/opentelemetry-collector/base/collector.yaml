@@ -1,0 +1,48 @@
+---
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: opentelemetry-collector
+spec:
+  mode: daemonset
+  config:
+    receivers:
+      filelog:
+        start_at: end
+        include_file_path: true
+        include:
+          - "/var/log/pods/*/*/*.log"
+        operators:
+          - id: container-parser
+            max_log_size: 102400
+            type: container
+        retry_on_failure:
+          enabled: true
+    exporters:
+      debug:
+        verbosity: basic
+      otlp_http:
+        endpoint: http://victoria-logs-victoria-logs-single-server.observability.svc.cluster.local:9428/insert/opentelemetry
+        tls:
+          insecure: true
+    service:
+      pipelines:
+        logs:
+          receivers:
+            - filelog
+          exporters:
+            - debug
+            - otlp_http
+      # telemetry:
+      #   logs:
+      #     level: DEBUG
+      #     encoding: console
+  volumeMounts:
+    - mountPath: /var/log/pods
+      name: varlogpods
+      readOnly: true
+  volumes:
+    - name: varlogpods
+      hostPath:
+        path: /var/log/pods
+

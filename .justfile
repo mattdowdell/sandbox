@@ -60,20 +60,26 @@ dev-restart: dev-down dev-up
 # start the development environment.
 [group('development environment')]
 tilt-up:
-    tilt up
+    tilt up --log-resource build
 
 # Stop the development environment.
 [group('development environment')]
 tilt-down:
     tilt down
 
-[private]
-_kind-up: install-kind install-ctlptl
+# Create the kind cluster used by Tilt.
+[group('development environment')]
+kind-up: install-kind install-ctlptl
     {{ ctlptl }} apply --filename ".ctlptl-config.yaml"
 
-[private]
-_kind-down: install-kind install-ctlptl
+# Delete the kind cluster used by Tilt.
+[group('development environment')]
+kind-down: install-kind install-ctlptl
     {{ ctlptl }} delete --filename ".ctlptl-config.yaml"
+
+# Recreate the kind cluster used by Tilt.
+[group('development environment')]
+kind-recreate: kind-down kind-up
 
 # Run all automated code modifications.
 checks: tidy vendor gen fmt

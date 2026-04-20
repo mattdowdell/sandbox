@@ -14,7 +14,7 @@ datasources:
       - name: "VictoriaMetrics"
         type: "victoriametrics-metrics-datasource"
         uid: "victoriametrics"
-        url: "http://victoria-metrics-single-server.default.svc.cluster.local:8428/"
+        url: "http://victoria-metrics-victoria-metrics-single-server.observability.svc.cluster.local:8428/"
         access: "proxy"
         basicAuth: false
         isDefault: true
@@ -23,7 +23,7 @@ datasources:
       - name: "VictoriaLogs"
         type: "victoriametrics-logs-datasource"
         uid: "victorialogs"
-        url: "http://victoria-logs-single-server.default.svc.cluster.local:9428/"
+        url: "http://victoria-logs-victoria-logs-single-server.observability.svc.cluster.local:9428/"
         access: "proxy"
         basicAuth: false
         isDefault: false
@@ -32,16 +32,7 @@ datasources:
       - name: "VictoriaTraces"
         type: "jaeger"
         uid: "victoriatraces"
-        url: "http://victoria-traces-single-vt-single-server.default.svc.cluster.local:10428/select/jaeger/"
-        access: "proxy"
-        basicAuth: false
-        isDefault: false
-        editable: false
-
-      - name: "Tempo"
-        type: "tempo"
-        uid: "tempo"
-        url: "http://tempo.default.svc.cluster.local:3200/"
+        url: "http://victoria-traces-vt-single-server.observability.svc.cluster.local:10428/select/jaeger/"
         access: "proxy"
         basicAuth: false
         isDefault: false

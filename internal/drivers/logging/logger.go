@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"strings"
 
-	"go.opentelemetry.io/contrib/bridges/otelslog"
+	// "go.opentelemetry.io/contrib/bridges/otelslog"
 )
 
 // Level controls the level of the default logger. It exists to allow modifications to the level
@@ -59,7 +59,7 @@ func New(level slog.Leveler, options ...Option) *slog.Logger {
 		option.apply(opts)
 	}
 
-	otelHandler := otelslog.NewHandler("", otelslog.WithSource(true))
+	// otelHandler := otelslog.NewHandler("", otelslog.WithSource(true))
 	jsonHandler := slog.NewJSONHandler(opts.writer, &slog.HandlerOptions{
 		AddSource:   true,
 		Level:       level,
@@ -67,7 +67,7 @@ func New(level slog.Leveler, options ...Option) *slog.Logger {
 	})
 
 	handler := slog.NewMultiHandler(
-		Wrap(otelHandler, opts.extractors),
+		// Wrap(otelHandler, opts.extractors),
 		Wrap(jsonHandler, opts.extractors),
 	)
 

@@ -45,7 +45,7 @@ spec:
             name: example
         - name: postgresql
           secret:
-            secretName: cluster-postgresql-app
+            secretName: postgresql-cluster-app
             items:
               - key: password
                 path: database_password
