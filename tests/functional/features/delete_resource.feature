@@ -33,4 +33,10 @@ Feature: Delete Resource
       Given valid authentication
       And an invalid Resource ID
       When I delete the Resource
-      Then I should fail with code=invalid_argument, msg=validation error: id: value must be a valid UUID
+      Then I should fail with code=invalid_argument, msg=validation error: id: must be a valid UUID
+
+    Scenario: Delete resource with empty ID
+      Given valid authentication
+      And an empty Resource ID
+      When I delete the Resource
+      Then I should fail with code=invalid_argument, msg=validation error: id: must be a valid UUID

@@ -58,14 +58,14 @@ func NewNameFromContext(ctx context.Context) (string, error) {
 	return "", errors.New("new name not found in context")
 }
 
-// ...
+// IDIntoContext adds an ID to the given context and returns the result.
 func IDIntoContext(ctx context.Context, id string) context.Context {
 	return context.WithValue(ctx, idCtxKey, id)
 }
 
-// ...
+// IDFromContext extracts an ID from the context, if one exists.
 func IDFromContext(ctx context.Context) (string, error) {
-	if id, ok := ctx.Value(idCtxKey).(string); ok && id != "" {
+	if id, ok := ctx.Value(idCtxKey).(string); ok {
 		return id, nil
 	}
 
