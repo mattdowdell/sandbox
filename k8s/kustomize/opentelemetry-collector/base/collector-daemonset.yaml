@@ -2,16 +2,15 @@
 apiVersion: opentelemetry.io/v1beta1
 kind: OpenTelemetryCollector
 metadata:
-  name: opentelemetry-collector
+  name: opentelemetry-daemonset
 spec:
   mode: daemonset
   config:
     receivers:
       filelog:
-        start_at: end
-        include_file_path: true
         include:
           - "/var/log/pods/*/*/*.log"
+        include_file_name: false
         operators:
           - id: container-parser
             max_log_size: 102400
@@ -31,12 +30,7 @@ spec:
           receivers:
             - filelog
           exporters:
-            - debug
             - otlp_http
-      # telemetry:
-      #   logs:
-      #     level: DEBUG
-      #     encoding: console
   volumeMounts:
     - mountPath: /var/log/pods
       name: varlogpods
