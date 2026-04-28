@@ -16,6 +16,11 @@ ignore {
 }
 
 ignore {
+    input.PkgName == "base-files"
+    input.Name == "verbatim"
+}
+
+ignore {
     input.PkgName == "netbase"
     input.Name == "GPL-2.0-only"
 }
