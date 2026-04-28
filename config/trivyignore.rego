@@ -16,12 +16,22 @@ ignore {
 }
 
 ignore {
+    input.PkgName == "base-files"
+    input.Name == "verbatim"
+}
+
+ignore {
     input.PkgName == "netbase"
     input.Name == "GPL-2.0-only"
 }
 
 ignore {
     input.PkgName == "tzdata"
+    input.Name == "public-domain"
+}
+
+ignore {
+    input.PkgName == "tzdata-legacy"
     input.Name == "public-domain"
 }
 
