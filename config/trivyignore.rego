@@ -26,6 +26,11 @@ ignore {
 }
 
 ignore {
+    input.PkgName == "tzdata-legacy"
+    input.Name == "public-domain"
+}
+
+ignore {
     input.PkgName = "media-types"
     input.Name = "ad-hoc"
 }
