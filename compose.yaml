@@ -135,7 +135,7 @@ services:
     restart: always
 
   grafana:
-    image: "mirror.gcr.io/grafana/grafana:12.4.3"
+    image: "mirror.gcr.io/grafana/grafana:13.0.1"
     pull_policy: "always"
     environment:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
