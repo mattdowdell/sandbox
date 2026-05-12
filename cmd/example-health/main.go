@@ -39,7 +39,11 @@ func run(ctx context.Context) int {
 		return exit.Failure
 	}
 
-	logger := logging.New(conf.Logging.Level)
+	logger, err := logging.New(conf.Logging.Level)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to setup logger", slogx.Err(err))
+		return exit.Failure
+	}
 
 	client := healthv1connect.NewHealthClient(
 		http.DefaultClient,

@@ -44,7 +44,11 @@ func main() {
 func run(ctx context.Context) int {
 	flag.Parse()
 
-	logger := logging.New(slog.LevelInfo)
+	logger, err := logging.New(slog.LevelInfo)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to setup logger", slogx.Err(err))
+		return exit.Failure
+	}
 
 	db, _, err := pgsql.NewFromConfig(ctx, pgsql.Config{
 		Hostname: *host,

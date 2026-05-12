@@ -114,7 +114,11 @@ func initObservability(
 		otelx.WithSampled(true),
 		otelx.WithBaggage(true),
 	)
-	logger := logging.NewAsDefaultFromConfig(conf.Logging, logging.WithExtractors(extractor))
+
+	logger, err := logging.NewAsDefaultFromConfig(conf.Logging, logging.WithExtractors(extractor))
+	if err != nil {
+		return nil, nil, nil, nil, err
+	}
 
 	return tpShutdown, mpShutdown, lpShutdown, logger, nil
 }

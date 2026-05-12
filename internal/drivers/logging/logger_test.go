@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/mattdowdell/sandbox/internal/drivers/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/otelx"
@@ -22,10 +23,11 @@ func Test_New(t *testing.T) {
 	// no arrange necessary
 
 	// act
-	logger := logging.New(slog.LevelInfo)
+	logger, err := logging.New(slog.LevelInfo)
 
 	// assert
 	assert.NotNil(t, logger)
+	assert.NoError(t, err)
 }
 
 func Test_NewFromConfig(t *testing.T) {
@@ -35,48 +37,53 @@ func Test_NewFromConfig(t *testing.T) {
 	}
 
 	// act
-	logger := logging.NewFromConfig(conf)
+	logger, err := logging.NewFromConfig(conf)
 
 	// assert
 	assert.NotNil(t, logger)
+	assert.NoError(t, err)
 }
 
 func Test_NewAsDefault(t *testing.T) {
 	// no arrange necessary
 
 	// act
-	logger := logging.NewAsDefault(slog.LevelInfo, slog.LevelDebug)
+	logger, err := logging.NewAsDefault(slog.LevelInfo, slog.LevelDebug)
 
 	// assert
 	assert.NotNil(t, logger)
 	assert.Equal(t, slog.LevelInfo, logging.Level.Level())
+	assert.NoError(t, err)
 }
 
 func Test_NewAsDefaultFromConfig(t *testing.T) {
 	// arrange
 	conf := logging.Config{
-		Level:       slog.LevelInfo,
-		LegacyLevel: slog.LevelDebug,
+		Level:             slog.LevelInfo,
+		LegacyLevel:       slog.LevelDebug,
+		EnableJSONHandler: true,
 	}
 
 	// act
-	logger := logging.NewAsDefaultFromConfig(conf)
+	logger, err := logging.NewAsDefaultFromConfig(conf)
 
 	// assert
 	assert.NotNil(t, logger)
 	assert.Equal(t, slog.LevelInfo, logging.Level.Level())
+	assert.NoError(t, err)
 }
 
 func Test_Output(t *testing.T) {
 	// arrange
 	var b bytes.Buffer
 
-	logger := logging.New(
+	logger, err := logging.New(
 		slog.LevelInfo,
 		logging.WithWriter(&b),
 		logging.WithSuppressSource(true),
 		logging.WithSuppressTime(true),
 	)
+	require.NoError(t, err)
 
 	// act
 	logger.InfoContext(t.Context(), "example")
@@ -90,13 +97,14 @@ func Test_Output_WithExtractor(t *testing.T) {
 	var b bytes.Buffer
 	extractor := otelx.NewExtractor()
 
-	logger := logging.New(
+	logger, err := logging.New(
 		slog.LevelInfo,
 		logging.WithWriter(&b),
 		logging.WithSuppressSource(true),
 		logging.WithSuppressTime(true),
 		logging.WithExtractors(extractor),
 	)
+	require.NoError(t, err)
 
 	ctx := otelt.MustSpan(t.Context(), testTraceID, testSpanID, true /*sampled*/)
 

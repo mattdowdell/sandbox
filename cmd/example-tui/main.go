@@ -17,7 +17,11 @@ func main() {
 }
 
 func run(ctx context.Context) int {
-	logger := logging.NewAsDefault(slog.LevelInfo, slog.LevelDebug)
+	logger, err := logging.NewAsDefault(slog.LevelInfo, slog.LevelDebug)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to setup logger", slogx.Err(err))
+		return exit.Failure
+	}
 
 	program := tea.NewProgram(New(), tea.WithAltScreen())
 
