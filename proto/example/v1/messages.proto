@@ -7,22 +7,22 @@ import "example/v1/models.proto";
 
 option go_package = "github.com/mattdowdell/sandbox/gen/example/v1;examplev1";
 
-// ...
+// CreateResourceRequest is used to create a new Resource.
 message CreateResourceRequest {
   ResourceCreate resource = 1 [(buf.validate.field).required = true];
 }
 
-// ...
+// CreateResourceResponse is returned upon successful creation of a Resource.
 message CreateResourceResponse {
   Resource resource = 1 [(buf.validate.field).required = true];
 }
 
-// ...
+// GetResourceRequest is used to retrieve a Resource.
 message GetResourceRequest {
-  string id = 1 [(buf.validate.field).string.uuid = true]; // TODO: check if empty is rejected
+  string id = 1 [(buf.validate.field).string.uuid = true];
 }
 
-// ...
+// GetResourceResponse is returned upon successful retrieval of a Resource.
 message GetResourceResponse {
   Resource resource = 1 [(buf.validate.field).required = true];
 }
@@ -65,7 +65,7 @@ message ListResourcesFilter {
   }];
 }
 
-// ...
+// ListResourcesRequest is used to list Resources.
 message ListResourcesRequest {
   // ...
   string next = 1;
@@ -83,7 +83,7 @@ message ListResourcesRequest {
   ListResourcesFilter filter = 4;
 }
 
-// ...
+// ListResourcesResponse is returned upon successful list of Resources.
 message ListResourcesResponse {
   // ...
   string next = 1;
@@ -92,22 +92,22 @@ message ListResourcesResponse {
   repeated Resource items = 2;
 }
 
-// ...
+// UpdateResourceRequest is used to update a Resource.
 message UpdateResourceRequest {
   ResourceUpdate resource = 1 [(buf.validate.field).required = true];
 }
 
-// ...
+// UpdateResourceResponse is returned upon successful update of a Resource.
 message UpdateResourceResponse {
   Resource resource = 1 [(buf.validate.field).required = true];
 }
 
-// ...
+// DeleteResourceRequest is used to delete a Resource.
 message DeleteResourceRequest {
-  string id = 1 [(buf.validate.field).string.uuid = true]; // TODO: check if empty is rejected
+  string id = 1 [(buf.validate.field).string.uuid = true];
 }
 
-// ...
+// DeleteResourceResponse is returned upon successful delete of a Resource.
 message DeleteResourceResponse {}
 
 // ...

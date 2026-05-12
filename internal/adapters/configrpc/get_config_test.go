@@ -10,7 +10,6 @@ import (
 
 	"github.com/mattdowdell/sandbox/gen/config/v1"
 	"github.com/mattdowdell/sandbox/internal/adapters/configrpc"
-	"github.com/mattdowdell/sandbox/mocks/adapters/mockconfigrpc"
 	"github.com/mattdowdell/sandbox/pkg/slogt"
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
@@ -19,7 +18,7 @@ func Test_Handler_GetConfig_Success(t *testing.T) {
 	// arrange
 	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
 
-	loader := mockconfigrpc.NewLoader(t)
+	loader := configrpc.NewMockLoader(t)
 	loader.
 		EXPECT().
 		Load(mockConfig).
@@ -56,7 +55,7 @@ func Test_Handler_GetConfig_LoadError(t *testing.T) {
 	// arrange
 	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
 
-	loader := mockconfigrpc.NewLoader(t)
+	loader := configrpc.NewMockLoader(t)
 	loader.
 		EXPECT().
 		Load(mockConfig).
@@ -80,7 +79,7 @@ func Test_Handler_GetConfig_EncodeError(t *testing.T) {
 	ctx := slogx.IntoContext(t.Context(), slogt.New(t))
 	val := new(bool)
 
-	loader := mockconfigrpc.NewLoader(t)
+	loader := configrpc.NewMockLoader(t)
 	loader.EXPECT().Load(val).Return(nil).Once()
 
 	handler := configrpc.New[bool](loader)

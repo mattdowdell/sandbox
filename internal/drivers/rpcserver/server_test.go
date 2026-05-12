@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver"
-	"github.com/mattdowdell/sandbox/mocks/drivers/mockrpcserver"
 )
 
 var mockServeMux = mock.AnythingOfType("*http.ServeMux")
@@ -25,7 +24,7 @@ func Test_NewFromConfig(t *testing.T) {
 
 	var opts []connect.HandlerOption
 
-	handler := mockrpcserver.NewHandler(t)
+	handler := rpcserver.NewMockHandler(t)
 	handler.EXPECT().Register(mockServeMux, opts).Once()
 
 	handlers := []rpcserver.Handler{
@@ -43,7 +42,7 @@ func Test_New(t *testing.T) {
 	// arrange
 	var opts []connect.HandlerOption
 
-	handler := mockrpcserver.NewHandler(t)
+	handler := rpcserver.NewMockHandler(t)
 	handler.EXPECT().Register(mockServeMux, opts).Once()
 
 	handlers := []rpcserver.Handler{

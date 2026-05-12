@@ -8,13 +8,12 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/examplerpc"
-	"github.com/mattdowdell/sandbox/mocks/adapters/mockexamplerpc"
 )
 
 func Test_New(t *testing.T) {
 	// arrange
-	resource := mockexamplerpc.NewResourceFacade(t)
-	auditEvent := mockexamplerpc.NewAuditEventFacade(t)
+	resource := examplerpc.NewMockResourceFacade(t)
+	auditEvent := examplerpc.NewMockAuditEventFacade(t)
 
 	// act
 	handler := examplerpc.New(resource, auditEvent)
@@ -26,8 +25,8 @@ func Test_New(t *testing.T) {
 func Test_Handler_Register(t *testing.T) {
 	// arrange
 	handler := examplerpc.New(
-		mockexamplerpc.NewResourceFacade(t),
-		mockexamplerpc.NewAuditEventFacade(t),
+		examplerpc.NewMockResourceFacade(t),
+		examplerpc.NewMockAuditEventFacade(t),
 	)
 
 	mux := http.NewServeMux()

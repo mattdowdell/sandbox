@@ -12,8 +12,9 @@ type Option interface {
 }
 
 type herdOpts struct {
-	buildInfo *debug.BuildInfo
-	nowFunc   func() time.Time
+	buildInfo     *debug.BuildInfo
+	nowFunc       func() time.Time
+	targetVersion int64
 }
 
 func (o *herdOpts) codeInfo() (version, revision string, err error) {
@@ -48,29 +49,62 @@ func defaultHerdOpts() *herdOpts {
 	}
 }
 
-type buildInfoOpt struct {
-	info *debug.BuildInfo
+type optionFn func(*herdOpts)
+
+func (f optionFn) apply(o *herdOpts) {
+	f(o)
 }
 
 // WithBuildInfo overrides the soure of the code version and revision used in migration records.
 // Defaults to the output of [runtime/debug.ReadBuildInfo].
+//
+// This option is intended to support unit testing, or when build info is otherwise unavailable.
 func WithBuildInfo(info *debug.BuildInfo) Option {
-	return &buildInfoOpt{info}
+	return optionFn(func(o *herdOpts) {
+		o.buildInfo = info
+	})
 }
 
-func (o *buildInfoOpt) apply(opts *herdOpts) {
-	opts.buildInfo = o.info
-}
-
-type nowFuncOpt struct {
-	nowFunc func() time.Time
+// WithBuildInfoValues wraps WithBuildInfo, constructing a [runtime/debug.BuildInfo] instance from
+// the given values.
+//
+//   - version should be the version of the application using Herd, e.g. a git tag.
+//   - revision should be the VCS revision at build time, e.g. a git commit.
+//
+// Both values must be non-empty.
+func WithBuildInfoValues(version, revision string) Option {
+	return optionFn(func(o *herdOpts) {
+		o.buildInfo = &debug.BuildInfo{
+			Main: debug.Module{
+				Version: version,
+			},
+			Settings: []debug.BuildSetting{
+				{
+					Key:   "vcs.revision",
+					Value: revision,
+				},
+			},
+		}
+	})
 }
 
 // WithNowFunc overrides the use of [time.Now] for recording when a migration was applied.
+//
+// This option is intended to support unit testing only.
 func WithNowFunc(fn func() time.Time) Option {
-	return &nowFuncOpt{fn}
+	return optionFn(func(o *herdOpts) {
+		o.nowFunc = fn
+	})
 }
 
-func (o *nowFuncOpt) apply(opts *herdOpts) {
-	opts.nowFunc = o.nowFunc
+// WithTargetVersion causes pending migrations with a version greater than the given value to be
+// skipped. By default, all pending migrations are applied, regardless of version.
+//
+// This option is intended to allow a number of migrations to be applied, before inserting data and
+// applying the final migration(s). This is useful when simulating a migration on a production
+// database using representative data.
+func WithTargetVersion(version int64) Option {
+	return optionFn(func(o *herdOpts) {
+		o.targetVersion = version
+	})
 }

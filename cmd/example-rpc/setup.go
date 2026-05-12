@@ -8,6 +8,7 @@ import (
 	"connectrpc.com/connect"
 	"connectrpc.com/grpchealth"
 	"connectrpc.com/grpcreflect"
+	"connectrpc.com/validate"
 	"github.com/gofrs/uuid/v5"
 	"go.opentelemetry.io/contrib/processors/baggagecopy"
 
@@ -35,7 +36,6 @@ import (
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/authn"
 	logginginterceptor "github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/logging"
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/otelconnectx"
-	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/interceptors/validatex"
 	"github.com/mattdowdell/sandbox/internal/usecases"
 	"github.com/mattdowdell/sandbox/pkg/timex"
 )
@@ -192,7 +192,7 @@ func initHandlerOptions(conf *Config) ([]connect.HandlerOption, error) {
 		return nil, err
 	}
 
-	validateInterceptor := validatex.New()
+	validateInterceptor := validate.NewInterceptor()
 	loggingInterceptor := logginginterceptor.New()
 
 	client := authn.NewClientFromConfig(

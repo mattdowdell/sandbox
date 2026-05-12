@@ -75,7 +75,7 @@ func (Direction) EnumDescriptor() ([]byte, []int) {
 	return file_example_v1_messages_proto_rawDescGZIP(), []int{0}
 }
 
-// ...
+// CreateResourceRequest is used to create a new Resource.
 type CreateResourceRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Resource      *ResourceCreate        `protobuf:"bytes,1,opt,name=resource,proto3" json:"resource,omitempty"`
@@ -120,7 +120,7 @@ func (x *CreateResourceRequest) GetResource() *ResourceCreate {
 	return nil
 }
 
-// ...
+// CreateResourceResponse is returned upon successful creation of a Resource.
 type CreateResourceResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Resource      *Resource              `protobuf:"bytes,1,opt,name=resource,proto3" json:"resource,omitempty"`
@@ -165,10 +165,10 @@ func (x *CreateResourceResponse) GetResource() *Resource {
 	return nil
 }
 
-// ...
+// GetResourceRequest is used to retrieve a Resource.
 type GetResourceRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"` // TODO: check if empty is rejected
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -210,7 +210,7 @@ func (x *GetResourceRequest) GetId() string {
 	return ""
 }
 
-// ...
+// GetResourceResponse is returned upon successful retrieval of a Resource.
 type GetResourceResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Resource      *Resource              `protobuf:"bytes,1,opt,name=resource,proto3" json:"resource,omitempty"`
@@ -358,7 +358,7 @@ func (x *ListResourcesFilter) GetId() []string {
 	return nil
 }
 
-// ...
+// ListResourcesRequest is used to list Resources.
 type ListResourcesRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// ...
@@ -431,7 +431,7 @@ func (x *ListResourcesRequest) GetFilter() *ListResourcesFilter {
 	return nil
 }
 
-// ...
+// ListResourcesResponse is returned upon successful list of Resources.
 type ListResourcesResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// ...
@@ -486,7 +486,7 @@ func (x *ListResourcesResponse) GetItems() []*Resource {
 	return nil
 }
 
-// ...
+// UpdateResourceRequest is used to update a Resource.
 type UpdateResourceRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Resource      *ResourceUpdate        `protobuf:"bytes,1,opt,name=resource,proto3" json:"resource,omitempty"`
@@ -531,7 +531,7 @@ func (x *UpdateResourceRequest) GetResource() *ResourceUpdate {
 	return nil
 }
 
-// ...
+// UpdateResourceResponse is returned upon successful update of a Resource.
 type UpdateResourceResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Resource      *Resource              `protobuf:"bytes,1,opt,name=resource,proto3" json:"resource,omitempty"`
@@ -576,10 +576,10 @@ func (x *UpdateResourceResponse) GetResource() *Resource {
 	return nil
 }
 
-// ...
+// DeleteResourceRequest is used to delete a Resource.
 type DeleteResourceRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"` // TODO: check if empty is rejected
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -621,7 +621,7 @@ func (x *DeleteResourceRequest) GetId() string {
 	return ""
 }
 
-// ...
+// DeleteResourceResponse is returned upon successful delete of a Resource.
 type DeleteResourceResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields

@@ -7,11 +7,10 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/mattdowdell/sandbox/internal/adapters/txn/mocktxn"
 	"github.com/mattdowdell/sandbox/internal/adapters/usecasefacades"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
 	"github.com/mattdowdell/sandbox/internal/domain/repositories"
-	"github.com/mattdowdell/sandbox/mocks/adapters/mocktxn"
-	"github.com/mattdowdell/sandbox/mocks/adapters/mockusecasefacades"
 )
 
 const (
@@ -21,22 +20,20 @@ const (
 func Test_Resource_Create(t *testing.T) {
 	// arrange
 	logger := slog.New(slog.DiscardHandler)
-	datastore := mocktxn.NewDatastore(t)
+	datastore := mocktxn.NewMockDatastore(t)
 
-	commit := NewCommitFn(t)
-	commit.EXPECT().Execute().Return(nil).Once()
+	ender := mocktxn.NewMockEnder(t)
+	ender.EXPECT().Commit().Return(nil).Once()
+	ender.EXPECT().Rollback().Return(nil).Once()
 
-	rollback := NewRollbackFn(t)
-	rollback.EXPECT().Execute().Return(nil).Once()
-
-	provider := mocktxn.NewProvider(t)
+	provider := mocktxn.NewMockProvider(t)
 	provider.
 		EXPECT().
 		BeginTx(t.Context()).
-		Return(datastore, commit.Execute, rollback.Execute, nil).
+		Return(datastore, ender, nil).
 		Once()
 
-	usecase := mockusecasefacades.NewResourceCreator(t)
+	usecase := usecasefacades.NewMockResourceCreator(t)
 	usecase.
 		EXPECT().
 		Execute(t.Context(), logger, datastore, &entities.Resource{}).
@@ -46,10 +43,10 @@ func Test_Resource_Create(t *testing.T) {
 	facade := usecasefacades.NewResource(
 		provider,
 		usecase,
-		mockusecasefacades.NewResourceGetter(t),
-		mockusecasefacades.NewResourceLister(t),
-		mockusecasefacades.NewResourceUpdater(t),
-		mockusecasefacades.NewResourceDeleter(t),
+		usecasefacades.NewMockResourceGetter(t),
+		usecasefacades.NewMockResourceLister(t),
+		usecasefacades.NewMockResourceUpdater(t),
+		usecasefacades.NewMockResourceDeleter(t),
 	)
 
 	// act
@@ -65,12 +62,12 @@ func Test_Resource_Get(t *testing.T) {
 	id := uuid.Must(uuid.NewV7())
 
 	logger := slog.New(slog.DiscardHandler)
-	datastore := mocktxn.NewDatastore(t)
+	datastore := mocktxn.NewMockDatastore(t)
 
-	provider := mocktxn.NewProvider(t)
+	provider := mocktxn.NewMockProvider(t)
 	provider.EXPECT().Datastore().Return(datastore).Once()
 
-	usecase := mockusecasefacades.NewResourceGetter(t)
+	usecase := usecasefacades.NewMockResourceGetter(t)
 	usecase.
 		EXPECT().
 		Execute(t.Context(), logger, datastore, id).
@@ -79,11 +76,11 @@ func Test_Resource_Get(t *testing.T) {
 
 	facade := usecasefacades.NewResource(
 		provider,
-		mockusecasefacades.NewResourceCreator(t),
+		usecasefacades.NewMockResourceCreator(t),
 		usecase,
-		mockusecasefacades.NewResourceLister(t),
-		mockusecasefacades.NewResourceUpdater(t),
-		mockusecasefacades.NewResourceDeleter(t),
+		usecasefacades.NewMockResourceLister(t),
+		usecasefacades.NewMockResourceUpdater(t),
+		usecasefacades.NewMockResourceDeleter(t),
 	)
 
 	// act
@@ -97,16 +94,16 @@ func Test_Resource_Get(t *testing.T) {
 func Test_Resource_List(t *testing.T) {
 	// arrange
 	logger := slog.New(slog.DiscardHandler)
-	datastore := mocktxn.NewDatastore(t)
+	datastore := mocktxn.NewMockDatastore(t)
 
 	pager := repositories.Pager{
 		Limit: testLimit,
 	}
 
-	provider := mocktxn.NewProvider(t)
+	provider := mocktxn.NewMockProvider(t)
 	provider.EXPECT().Datastore().Return(datastore).Once()
 
-	usecase := mockusecasefacades.NewResourceLister(t)
+	usecase := usecasefacades.NewMockResourceLister(t)
 	usecase.
 		EXPECT().
 		Execute(t.Context(), logger, datastore, pager).
@@ -115,11 +112,11 @@ func Test_Resource_List(t *testing.T) {
 
 	facade := usecasefacades.NewResource(
 		provider,
-		mockusecasefacades.NewResourceCreator(t),
-		mockusecasefacades.NewResourceGetter(t),
+		usecasefacades.NewMockResourceCreator(t),
+		usecasefacades.NewMockResourceGetter(t),
 		usecase,
-		mockusecasefacades.NewResourceUpdater(t),
-		mockusecasefacades.NewResourceDeleter(t),
+		usecasefacades.NewMockResourceUpdater(t),
+		usecasefacades.NewMockResourceDeleter(t),
 	)
 
 	// act
@@ -133,22 +130,19 @@ func Test_Resource_List(t *testing.T) {
 func Test_Resource_Update(t *testing.T) {
 	// arrange
 	logger := slog.New(slog.DiscardHandler)
-	datastore := mocktxn.NewDatastore(t)
+	datastore := mocktxn.NewMockDatastore(t)
+	ender := mocktxn.NewMockEnder(t)
+	ender.EXPECT().Commit().Return(nil).Once()
+	ender.EXPECT().Rollback().Return(nil).Once()
 
-	commit := NewCommitFn(t)
-	commit.EXPECT().Execute().Return(nil).Once()
-
-	rollback := NewRollbackFn(t)
-	rollback.EXPECT().Execute().Return(nil).Once()
-
-	provider := mocktxn.NewProvider(t)
+	provider := mocktxn.NewMockProvider(t)
 	provider.
 		EXPECT().
 		BeginTx(t.Context()).
-		Return(datastore, commit.Execute, rollback.Execute, nil).
+		Return(datastore, ender, nil).
 		Once()
 
-	usecase := mockusecasefacades.NewResourceUpdater(t)
+	usecase := usecasefacades.NewMockResourceUpdater(t)
 	usecase.
 		EXPECT().
 		Execute(t.Context(), logger, datastore, &entities.Resource{}).
@@ -157,11 +151,11 @@ func Test_Resource_Update(t *testing.T) {
 
 	facade := usecasefacades.NewResource(
 		provider,
-		mockusecasefacades.NewResourceCreator(t),
-		mockusecasefacades.NewResourceGetter(t),
-		mockusecasefacades.NewResourceLister(t),
+		usecasefacades.NewMockResourceCreator(t),
+		usecasefacades.NewMockResourceGetter(t),
+		usecasefacades.NewMockResourceLister(t),
 		usecase,
-		mockusecasefacades.NewResourceDeleter(t),
+		usecasefacades.NewMockResourceDeleter(t),
 	)
 
 	// act
@@ -177,22 +171,20 @@ func Test_Resource_Delete(t *testing.T) {
 	id := uuid.Must(uuid.NewV7())
 
 	logger := slog.New(slog.DiscardHandler)
-	datastore := mocktxn.NewDatastore(t)
+	datastore := mocktxn.NewMockDatastore(t)
 
-	commit := NewCommitFn(t)
-	commit.EXPECT().Execute().Return(nil).Once()
+	ender := mocktxn.NewMockEnder(t)
+	ender.EXPECT().Commit().Return(nil).Once()
+	ender.EXPECT().Rollback().Return(nil).Once()
 
-	rollback := NewRollbackFn(t)
-	rollback.EXPECT().Execute().Return(nil).Once()
-
-	provider := mocktxn.NewProvider(t)
+	provider := mocktxn.NewMockProvider(t)
 	provider.
 		EXPECT().
 		BeginTx(t.Context()).
-		Return(datastore, commit.Execute, rollback.Execute, nil).
+		Return(datastore, ender, nil).
 		Once()
 
-	usecase := mockusecasefacades.NewResourceDeleter(t)
+	usecase := usecasefacades.NewMockResourceDeleter(t)
 	usecase.
 		EXPECT().
 		Execute(t.Context(), logger, datastore, id).
@@ -201,10 +193,10 @@ func Test_Resource_Delete(t *testing.T) {
 
 	facade := usecasefacades.NewResource(
 		provider,
-		mockusecasefacades.NewResourceCreator(t),
-		mockusecasefacades.NewResourceGetter(t),
-		mockusecasefacades.NewResourceLister(t),
-		mockusecasefacades.NewResourceUpdater(t),
+		usecasefacades.NewMockResourceCreator(t),
+		usecasefacades.NewMockResourceGetter(t),
+		usecasefacades.NewMockResourceLister(t),
+		usecasefacades.NewMockResourceUpdater(t),
 		usecase,
 	)
 

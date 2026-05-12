@@ -10,9 +10,8 @@ import (
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/env/v2"
 	"github.com/knadh/koanf/providers/file"
+	"github.com/knadh/koanf/providers/k8smount"
 	"github.com/knadh/koanf/v2"
-
-	"github.com/mattdowdell/sandbox/internal/drivers/config/providers/k8smount"
 )
 
 // The delimiter to use for joining configuration keys.

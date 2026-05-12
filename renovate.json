@@ -5,6 +5,7 @@
   ],
   "schedule": ["* 0-6 * * 1"],
   "timezone": "Europe/London",
+  "addLabels": ["dependencies", "{{manager}}"],
   "gomod": {
     "managerFilePatterns": [".bingo/*.mod"],
     "ignorePaths": ["go.mod"]

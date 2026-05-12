@@ -164,7 +164,7 @@ helm_remote(
     repo_name="vm",
     repo_url="https://victoriametrics.github.io/helm-charts",
     # renovate: datasource=helm depName=victoria-metrics-single packageName=victoria-metrics-single registryUrl=https://victoriametrics.github.io/helm-charts
-    version="0.34.0",
+    version="0.38.0",
 )
 
 k8s_resource(
@@ -180,7 +180,7 @@ helm_remote(
     repo_name="vm",
     repo_url="https://victoriametrics.github.io/helm-charts",
     # renovate: datasource=helm depName=victoria-logs-single packageName=victoria-logs-single registryUrl=https://victoriametrics.github.io/helm-charts
-    version="0.11.31",
+    version="0.12.4",
 )
 
 k8s_resource(

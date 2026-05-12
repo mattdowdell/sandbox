@@ -9,6 +9,7 @@ import (
 )
 
 type Config struct {
+	App            AppConfig              `koanf:",squash"`
 	Logging        logging.Config         `koanf:"logging"`
 	Database       pgsql.Config           `koanf:"database"`
 	MeterProvider  metricx.ProviderConfig `koanf:"meterprovider"`

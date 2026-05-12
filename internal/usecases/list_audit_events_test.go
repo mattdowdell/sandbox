@@ -9,8 +9,8 @@ import (
 
 	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
+	"github.com/mattdowdell/sandbox/internal/domain/repositories/mockrepositories"
 	"github.com/mattdowdell/sandbox/internal/usecases"
-	"github.com/mattdowdell/sandbox/mocks/domain/mockrepositories"
 	"github.com/mattdowdell/sandbox/pkg/slogt"
 )
 
@@ -40,7 +40,7 @@ func Test_ListAuditEvents_Success(t *testing.T) {
 		},
 	}
 
-	store := mockrepositories.NewAuditEvent(t)
+	store := mockrepositories.NewMockAuditEvent(t)
 	store.EXPECT().ListAuditEvents(t.Context()).Return(expected, nil).Once()
 
 	// act
@@ -56,7 +56,7 @@ func Test_ListAuditEvents_Error(t *testing.T) {
 	usecase := usecases.NewListAuditEvents()
 	logger := slogt.New(t)
 
-	store := mockrepositories.NewAuditEvent(t)
+	store := mockrepositories.NewMockAuditEvent(t)
 	store.EXPECT().ListAuditEvents(t.Context()).Return(nil, domain.ErrInternal).Once()
 
 	// act

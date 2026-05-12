@@ -9,8 +9,8 @@ import (
 
 	"github.com/mattdowdell/sandbox/internal/domain"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
+	"github.com/mattdowdell/sandbox/internal/domain/repositories/mockrepositories"
 	"github.com/mattdowdell/sandbox/internal/usecases"
-	"github.com/mattdowdell/sandbox/mocks/domain/mockrepositories"
 	"github.com/mattdowdell/sandbox/pkg/slogt"
 )
 
@@ -39,7 +39,7 @@ func Test_GetResource_Success(t *testing.T) {
 		UpdatedAt: now,
 	}
 
-	store := mockrepositories.NewResource(t)
+	store := mockrepositories.NewMockResource(t)
 	store.EXPECT().GetResource(t.Context(), id).Return(expected, nil).Once()
 
 	// act
@@ -70,7 +70,7 @@ func Test_GetResource_Error(t *testing.T) {
 			usecase := usecases.NewGetResource()
 			logger := slogt.New(t)
 
-			store := mockrepositories.NewResource(t)
+			store := mockrepositories.NewMockResource(t)
 			store.EXPECT().GetResource(t.Context(), id).Return(nil, tt.err).Once()
 
 			// act

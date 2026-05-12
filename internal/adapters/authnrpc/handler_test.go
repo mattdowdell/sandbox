@@ -8,13 +8,12 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/mattdowdell/sandbox/internal/adapters/authnrpc"
-	"github.com/mattdowdell/sandbox/mocks/adapters/mockauthnrpc"
 )
 
 func Test_New(t *testing.T) {
 	// arrange
-	issuer := mockauthnrpc.NewIssuer(t)
-	parser := mockauthnrpc.NewParser(t)
+	issuer := authnrpc.NewMockIssuer(t)
+	parser := authnrpc.NewMockParser(t)
 
 	// act
 	handler := authnrpc.New(issuer, parser)
@@ -26,8 +25,8 @@ func Test_New(t *testing.T) {
 func Test_Handler_Register(t *testing.T) {
 	// arrange
 	handler := authnrpc.New(
-		mockauthnrpc.NewIssuer(t),
-		mockauthnrpc.NewParser(t),
+		authnrpc.NewMockIssuer(t),
+		authnrpc.NewMockParser(t),
 	)
 
 	mux := http.NewServeMux()

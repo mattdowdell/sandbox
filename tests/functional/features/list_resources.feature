@@ -48,13 +48,13 @@ Feature: List Resources
       Given valid authentication
       And a limit of -1
       When I list Resources
-      Then I should fail with code=invalid_argument, msg=validation error: limit: value must be greater than or equal to 0 and less than or equal to 100
+      Then I should fail with code=invalid_argument, msg=validation error: limit: must be greater than or equal to 0 and less than or equal to 100
 
     Scenario: List resources with a limit of 101
       Given valid authentication
       And a limit of 101
       When I list Resources
-      Then I should fail with code=invalid_argument, msg=validation error: limit: value must be greater than or equal to 0 and less than or equal to 100
+      Then I should fail with code=invalid_argument, msg=validation error: limit: must be greater than or equal to 0 and less than or equal to 100
 
   Rule: Next token is returned when more results are available
 

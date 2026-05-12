@@ -29,11 +29,11 @@ $(ACTIONLINT): $(BINGO_DIR)/actionlint.mod
 	@echo "(re)installing $(GOBIN)/actionlint-v1.7.12"
 	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=actionlint.mod -o=$(GOBIN)/actionlint-v1.7.12 "github.com/rhysd/actionlint/cmd/actionlint"
 
-BUF := $(GOBIN)/buf-v1.67.0
+BUF := $(GOBIN)/buf-v1.69.0
 $(BUF): $(BINGO_DIR)/buf.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/buf-v1.67.0"
-	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=buf.mod -o=$(GOBIN)/buf-v1.67.0 "github.com/bufbuild/buf/cmd/buf"
+	@echo "(re)installing $(GOBIN)/buf-v1.69.0"
+	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=buf.mod -o=$(GOBIN)/buf-v1.69.0 "github.com/bufbuild/buf/cmd/buf"
 
 CTLPTL := $(GOBIN)/ctlptl-v0.9.2
 $(CTLPTL): $(BINGO_DIR)/ctlptl.mod
@@ -47,11 +47,11 @@ $(GODOG): $(BINGO_DIR)/godog.mod
 	@echo "(re)installing $(GOBIN)/godog-v0.15.1"
 	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=godog.mod -o=$(GOBIN)/godog-v0.15.1 "github.com/cucumber/godog/cmd/godog"
 
-GOLANGCI_LINT := $(GOBIN)/golangci-lint-v2.11.4
+GOLANGCI_LINT := $(GOBIN)/golangci-lint-v2.12.2
 $(GOLANGCI_LINT): $(BINGO_DIR)/golangci-lint.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/golangci-lint-v2.11.4"
-	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=golangci-lint.mod -o=$(GOBIN)/golangci-lint-v2.11.4 "github.com/golangci/golangci-lint/v2/cmd/golangci-lint"
+	@echo "(re)installing $(GOBIN)/golangci-lint-v2.12.2"
+	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=golangci-lint.mod -o=$(GOBIN)/golangci-lint-v2.12.2 "github.com/golangci/golangci-lint/v2/cmd/golangci-lint"
 
 KIND := $(GOBIN)/kind-v0.31.0
 $(KIND): $(BINGO_DIR)/kind.mod

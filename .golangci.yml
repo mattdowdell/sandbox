@@ -73,6 +73,10 @@ linters:
         - performance
         - experimental
         - opinionated
+    goconst:
+      # allow hardcoded strings in unit tests
+      # or rather don't encourage tests and non-tests to share consts
+      ignore-tests: true
     godot:
       exclude:
         - "^\\s*\\[.+?\\]:\\s+" # ignore markdown ref links
@@ -110,9 +114,9 @@ linters:
           # allow less strict logging for tools
           - sloglint
 
-      - path: .*/example_test\.go$
+      - path: .*_test\.go$
         linters:
-          # allow less strict logging for examples
+          # allow less strict logging for examples and unit tests
           - sloglint
 
 issues:

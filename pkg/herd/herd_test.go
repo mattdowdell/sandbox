@@ -12,7 +12,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mattdowdell/sandbox/mocks/domain/mockrepositories"
 	"github.com/mattdowdell/sandbox/pkg/herd"
 )
 
@@ -43,27 +42,13 @@ CREATE TABLE herd_user_migrations (
 `
 )
 
-func testBuildInfo() *debug.BuildInfo {
-	return &debug.BuildInfo{
-		Main: debug.Module{
-			Version: testVersion,
-		},
-		Settings: []debug.BuildSetting{
-			{
-				Key:   "vcs.revision",
-				Value: testRevision,
-			},
-		},
-	}
-}
-
 func Test_New_Success(t *testing.T) {
 	// arrange
 	migrations, err := herd.CollectFileMigrations(migrationFS)
 	require.NoError(t, err)
 
 	// act
-	migrator, err := herd.New(migrations, herd.WithBuildInfo(testBuildInfo()))
+	migrator, err := herd.New(migrations, herd.WithBuildInfoValues(testVersion, testRevision))
 
 	// assert
 	assert.NotNil(t, migrator)
@@ -103,7 +88,7 @@ func Test_New_Error(t *testing.T) {
 				herd.NewFileMigration(0, ""),
 			},
 			options: []herd.Option{
-				herd.WithBuildInfo(testBuildInfo()),
+				herd.WithBuildInfoValues(testVersion, testRevision),
 			},
 			want: "migration version must be > 0, found: 0",
 		},
@@ -215,16 +200,13 @@ func Test_Herd_Migrate_Success(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			clock := mockrepositories.NewClock(t)
-			clock.EXPECT().Now().Return(now).Maybe()
-
 			migrations, err := herd.CollectFileMigrations(migrationFS)
 			require.NoError(t, err)
 
 			migrator, err := herd.New(
 				migrations,
-				herd.WithNowFunc(clock.Now),
-				herd.WithBuildInfo(testBuildInfo()),
+				herd.WithNowFunc(testNowFunc(now)),
+				herd.WithBuildInfoValues(testVersion, testRevision),
 			)
 			require.NoError(t, err)
 
@@ -282,7 +264,7 @@ func Test_Herd_Migrate_Error(t *testing.T) {
 			migrations, err := herd.CollectFileMigrations(migrationFS)
 			require.NoError(t, err)
 
-			migrator, err := herd.New(migrations, herd.WithBuildInfo(testBuildInfo()))
+			migrator, err := herd.New(migrations, herd.WithBuildInfoValues(testVersion, testRevision))
 			require.NoError(t, err)
 
 			db := tt.db(t)

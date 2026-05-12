@@ -11,9 +11,14 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mattdowdell/sandbox/mocks/domain/mockrepositories"
 	"github.com/mattdowdell/sandbox/pkg/herd"
 )
+
+func testNowFunc(now time.Time) func() time.Time {
+	return func() time.Time {
+		return now
+	}
+}
 
 func Test_newRecorder(t *testing.T) {
 	tests := map[string]struct {
@@ -30,10 +35,9 @@ func Test_newRecorder(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			clock := mockrepositories.NewClock(t)
 
 			// act
-			recorder := herd.NewRecorder(clock.Now, tt.table, testCodeVersion, testCodeRevision)
+			recorder := herd.NewRecorder(time.Now, tt.table, testCodeVersion, testCodeRevision)
 
 			// assert
 			assert.NotNil(t, recorder)
@@ -99,8 +103,7 @@ func Test_recorder_GetCurrentVersion_Success(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			clock := mockrepositories.NewClock(t)
-			recorder := herd.NewRecorder(clock.Now, tt.table, testCodeVersion, testCodeRevision)
+			recorder := herd.NewRecorder(time.Now, tt.table, testCodeVersion, testCodeRevision)
 			db := tt.db(t)
 
 			tx, err := db.BeginTx(t.Context(), &sql.TxOptions{})
@@ -156,8 +159,7 @@ func Test_recorder_GetCurrentVersion_Error(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(_ *testing.T) {
 			// arrange
-			clock := mockrepositories.NewClock(t)
-			recorder := herd.NewRecorder(clock.Now, tt.table, testCodeVersion, testCodeRevision)
+			recorder := herd.NewRecorder(time.Now, tt.table, testCodeVersion, testCodeRevision)
 
 			db := tt.db(t)
 
@@ -208,10 +210,7 @@ func Test_recorder_RecordMigration_Success(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			clock := mockrepositories.NewClock(t)
-			clock.EXPECT().Now().Return(now).Once()
-
-			recorder := herd.NewRecorder(clock.Now, tt.table, testCodeVersion, testCodeRevision)
+			recorder := herd.NewRecorder(testNowFunc(now), tt.table, testCodeVersion, testCodeRevision)
 
 			db, mock := newMockDB(t)
 			mock.ExpectBegin()
@@ -253,12 +252,7 @@ func Test_recorder_RecordMigration_Error(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(_ *testing.T) {
 			// arrange
-			now := time.Now().UTC().Truncate(time.Second)
-
-			clock := mockrepositories.NewClock(t)
-			clock.EXPECT().Now().Return(now).Maybe()
-
-			recorder := herd.NewRecorder(clock.Now, tt.table, testCodeVersion, testCodeRevision)
+			recorder := herd.NewRecorder(time.Now, tt.table, testCodeVersion, testCodeRevision)
 
 			db := tt.db(t)
 

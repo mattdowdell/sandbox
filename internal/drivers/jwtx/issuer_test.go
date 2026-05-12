@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/mattdowdell/sandbox/internal/domain/repositories/mockrepositories"
 	"github.com/mattdowdell/sandbox/internal/drivers/jwtx"
-	"github.com/mattdowdell/sandbox/mocks/domain/mockrepositories"
 )
 
 const (
@@ -31,8 +31,8 @@ var (
 
 func Test_NewIssuerFromConfig(t *testing.T) {
 	// arrange
-	clock := mockrepositories.NewClock(t)
-	generator := mockrepositories.NewUUIDGenerator(t)
+	clock := mockrepositories.NewMockClock(t)
+	generator := mockrepositories.NewMockUUIDGenerator(t)
 
 	conf := jwtx.IssuerConfig{
 		Issuer:   testIssuer,
@@ -49,8 +49,8 @@ func Test_NewIssuerFromConfig(t *testing.T) {
 
 func Test_NewIssuer_Success(t *testing.T) {
 	// arrange
-	clock := mockrepositories.NewClock(t)
-	generator := mockrepositories.NewUUIDGenerator(t)
+	clock := mockrepositories.NewMockClock(t)
+	generator := mockrepositories.NewMockUUIDGenerator(t)
 
 	// act
 	issuer, err := jwtx.NewIssuer(clock, generator, testIssuer, testAudience)
@@ -81,8 +81,8 @@ func Test_NewIssuer_Error(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			clock := mockrepositories.NewClock(t)
-			generator := mockrepositories.NewUUIDGenerator(t)
+			clock := mockrepositories.NewMockClock(t)
+			generator := mockrepositories.NewMockUUIDGenerator(t)
 
 			// act
 			issuer, err := jwtx.NewIssuer(clock, generator, tt.issuer, tt.audience)
@@ -96,10 +96,10 @@ func Test_NewIssuer_Error(t *testing.T) {
 
 func Test_Issuer_Issue_Success(t *testing.T) {
 	// arrange
-	clock := mockrepositories.NewClock(t)
+	clock := mockrepositories.NewMockClock(t)
 	clock.EXPECT().UTCNow().Return(testIssuedAt).Once()
 
-	generator := mockrepositories.NewUUIDGenerator(t)
+	generator := mockrepositories.NewMockUUIDGenerator(t)
 	generator.EXPECT().NewV4().Return(testID, nil).Once()
 
 	issuer, err := jwtx.NewIssuer(clock, generator, testIssuer, testAudience)
@@ -115,10 +115,10 @@ func Test_Issuer_Issue_Success(t *testing.T) {
 
 func Test_Issuer_Issue_Error(t *testing.T) {
 	// arrange
-	clock := mockrepositories.NewClock(t)
+	clock := mockrepositories.NewMockClock(t)
 	clock.EXPECT().UTCNow().Return(testIssuedAt).Once()
 
-	generator := mockrepositories.NewUUIDGenerator(t)
+	generator := mockrepositories.NewMockUUIDGenerator(t)
 	generator.EXPECT().NewV4().Return(uuid.Nil, errors.New("example")).Once()
 
 	issuer, err := jwtx.NewIssuer(clock, generator, testIssuer, testAudience)

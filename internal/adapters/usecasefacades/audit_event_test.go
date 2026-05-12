@@ -6,21 +6,20 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/mattdowdell/sandbox/internal/adapters/txn/mocktxn"
 	"github.com/mattdowdell/sandbox/internal/adapters/usecasefacades"
 	"github.com/mattdowdell/sandbox/internal/domain/entities"
-	"github.com/mattdowdell/sandbox/mocks/adapters/mocktxn"
-	"github.com/mattdowdell/sandbox/mocks/adapters/mockusecasefacades"
 )
 
 func Test_AuditEvent_List(t *testing.T) {
 	// arrange
 	logger := slog.New(slog.DiscardHandler)
-	datastore := mocktxn.NewDatastore(t)
+	datastore := mocktxn.NewMockDatastore(t)
 
-	provider := mocktxn.NewProvider(t)
+	provider := mocktxn.NewMockProvider(t)
 	provider.EXPECT().Datastore().Return(datastore).Once()
 
-	usecase := mockusecasefacades.NewAuditEventLister(t)
+	usecase := usecasefacades.NewMockAuditEventLister(t)
 	usecase.
 		EXPECT().
 		Execute(t.Context(), logger, datastore).
@@ -30,7 +29,7 @@ func Test_AuditEvent_List(t *testing.T) {
 	facade := usecasefacades.NewAuditEvent(
 		provider,
 		usecase,
-		mockusecasefacades.NewAuditEventWatcher(t),
+		usecasefacades.NewMockAuditEventWatcher(t),
 	)
 
 	// act
@@ -44,14 +43,14 @@ func Test_AuditEvent_List(t *testing.T) {
 func Test_AuditEvent_Watch(t *testing.T) {
 	// arrange
 	logger := slog.New(slog.DiscardHandler)
-	datastore := mocktxn.NewDatastore(t)
+	datastore := mocktxn.NewMockDatastore(t)
 
-	provider := mocktxn.NewProvider(t)
+	provider := mocktxn.NewMockProvider(t)
 	provider.EXPECT().Datastore().Return(datastore).Once()
 
 	ch := make(chan *entities.AuditEvent)
 
-	usecase := mockusecasefacades.NewAuditEventWatcher(t)
+	usecase := usecasefacades.NewMockAuditEventWatcher(t)
 	usecase.
 		EXPECT().
 		Execute(t.Context(), logger, datastore).
@@ -60,7 +59,7 @@ func Test_AuditEvent_Watch(t *testing.T) {
 
 	facade := usecasefacades.NewAuditEvent(
 		provider,
-		mockusecasefacades.NewAuditEventLister(t),
+		usecasefacades.NewMockAuditEventLister(t),
 		usecase,
 	)
 
