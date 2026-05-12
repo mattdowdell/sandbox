@@ -119,7 +119,6 @@ func (k *K8SMount) Read() (map[string]any, error) {
 	return maps.Unflatten(data, k.delim), nil
 }
 
-//nolint:gocritic,gocognit // named return vars don't make code much more readable
 func (k *K8SMount) walkDir(mountFS fs.FS, path string, d fs.DirEntry, err error) (string, string, error) {
 	if err != nil {
 		return "", "", err
@@ -200,7 +199,6 @@ func (k *K8SMount) Watch(fn func(any, error)) error {
 	return watcher.Add(k.mount)
 }
 
-//nolint:gocognit // short enough that the complaxity is acceptable
 func (k *K8SMount) watchDir(fn func(any, error)) {
 	defer k.watching.Store(false)
 
