@@ -59,7 +59,7 @@ jobs:
       - name: Get user ID
         id: user
         run: |
-          echo "id=$(gh api "/users/${APP_SLUG}\[bot\]" --jq '.id')" >> "$GITHUB_OUTPUT"
+          echo "id=$(gh api "/users/${APP_SLUG}[bot]" --jq '.id')" >> "$GITHUB_OUTPUT"
         env:
           GH_TOKEN: ${{ github.token }}
           APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
