@@ -7,7 +7,7 @@
 # Build target
 # ------------
 
-FROM --platform=$BUILDPLATFORM mirror.gcr.io/golang:1.26-bookworm@sha256:4f4ab2c90005e7e63cb631f0b4427f05422f241622ee3ec4727cc5febbf83e34 AS build
+FROM --platform=$BUILDPLATFORM mirror.gcr.io/golang:1.26-trixie@sha256:d08bf3ed2bd263088ca8e23fefaf10f1b71769f6932f0a4017ba28d2a5baf001 AS build
 
 WORKDIR /go/src
 
@@ -25,7 +25,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 # Debug target
 # ------------
 
-FROM gcr.io/distroless/static-debian12:debug-nonroot@sha256:afead1275cad5ec9662cdc09ce7fe5961a41467555fc30cd46a60247bf8bbdfd AS debug
+FROM gcr.io/distroless/static-debian13:debug-nonroot@sha256:fa2ca4ab94779411a1d20c2f5205ae550f1a366267b3ae6dfe9c40faae1bcb1e AS debug
 
 ARG SERVICE
 COPY --from=build /go/bin/${SERVICE} /${SERVICE}
@@ -35,7 +35,7 @@ COPY --from=build /go/bin/example-health /example-health
 # Runtime target
 # --------------
 
-FROM gcr.io/distroless/static-debian12:nonroot@sha256:a9329520abc449e3b14d5bc3a6ffae065bdde0f02667fa10880c49b35c109fd1 AS runtime
+FROM gcr.io/distroless/static-debian13:nonroot@sha256:e3f945647ffb95b5839c07038d64f9811adf17308b9121d8a2b87b6a22a80a39 AS runtime
 
 ARG SERVICE
 COPY --from=build /go/bin/${SERVICE} /${SERVICE}

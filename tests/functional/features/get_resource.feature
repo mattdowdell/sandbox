@@ -33,4 +33,4 @@ Feature: Get Resource
       Given valid authentication
       And an invalid Resource ID
       When I get the Resource
-      Then I should fail with code=invalid_argument, msg=validation error: id: value must be a valid UUID
+      Then I should fail with code=invalid_argument, msg=validation error: id: must be a valid UUID
