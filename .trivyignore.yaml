@@ -49,13 +49,33 @@ misconfigurations:
 
       TODO: investigate how this works in practice.
 
+  # https://avd.aquasec.com/misconfig/ksv001
+  - id: KSV001
+    statement: Kustomize patches are missing a security context.
+
+  # https://avd.aquasec.com/misconfig/ksv003
+  - id: KSV003
+    statement: Kustomize patches are missing a security context.
+
+  # https://avd.aquasec.com/misconfig/ksv004
+  - id: KSV004
+    statement: Kustomize patches are missing a security context.
+
   # https://avd.aquasec.com/misconfig/ksv011
   - id: KSV011
     statement: CPU limits will be added later.
 
+  # https://avd.aquasec.com/misconfig/ksv012
+  - id: KSV012
+    statement: Kustomize patches are missing a security context.
+
   # https://avd.aquasec.com/misconfig/ksv013
   - id: KSV013
     statement: Image tags are managed via kustomize.
+
+  # https://avd.aquasec.com/misconfig/ksv014
+  - id: KSV014
+    statement: Kustomize patches are missing a security context.
 
   # https://avd.aquasec.com/misconfig/ksv015
   - id: KSV015
@@ -69,9 +89,33 @@ misconfigurations:
   - id: KSV018
     statement: Memory limits will be added later.
 
+  # https://avd.aquasec.com/misconfig/ksv020
+  - id: KSV020
+    statement: Kustomize patches are missing a security context.
+
+  # https://avd.aquasec.com/misconfig/ksv021
+  - id: KSV021
+    statement: Kustomize patches are missing a security context.
+
+  # https://avd.aquasec.com/misconfig/ksv030
+  - id: KSV030
+    statement: Kustomize patches are missing a security context.
+
+  # https://avd.aquasec.com/misconfig/ksv104
+  - id: KSV104
+    statement: Kustomize patches are missing a security context.
+
+  # https://avd.aquasec.com/misconfig/ksv106
+  - id: KSV106
+    statement: Kustomize patches are missing a security context.
+
   # https://avd.aquasec.com/misconfig/ksv110
   - id: KSV110
-    statement: Namespaces are managed via kustomize, and 'default' is acceptable anyway
+    statement: Namespaces are managed via kustomize, and 'default' is acceptable anyway.
+
+  # https://avd.aquasec.com/misconfig/ksv118
+  - id: KSV118
+    statement: Kustomize patches are missing a security context.
 
   # https://avd.aquasec.com/misconfig/ksv0125
   - id: KSV0125

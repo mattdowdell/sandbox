@@ -1,0 +1,24 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-rpc
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: example
+  replicas: 3
+  template:
+    spec:
+      containers:
+        - name: "example-rpc"
+          env:
+            - name: GOCOVERDIR
+              value: "/covdata"
+          volumeMounts:
+            - name: covdata
+              mountPath: /covdata
+      volumes:
+        - name: covdata
+          emptyDir:
+            sizeLimit: 500Mi

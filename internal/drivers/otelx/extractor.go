@@ -71,6 +71,7 @@ func membersToAttrs(members []baggage.Member) slog.Attr {
 	attrs := make([]slog.Attr, 0, len(members))
 
 	for _, member := range members {
+		//nolint:sloglint // baggage keys can't be constant
 		attrs = append(attrs, slog.String(member.Key(), member.Value()))
 	}
 

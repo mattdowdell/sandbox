@@ -1,5 +1,5 @@
 ---
-# TODO: link docs
+# docker-compose variant of ../k8s/helm/grafana/values.yaml (dashboardProviders section).
 
 apiVersion: 1
 providers:
