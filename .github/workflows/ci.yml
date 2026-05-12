@@ -384,7 +384,7 @@ jobs:
 
       - name: Setup
         run: |
-          just _kind-up
+          just kind-up
           tilt ci
         env:
           # enable coverage builds
