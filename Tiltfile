@@ -23,7 +23,7 @@ def custom_docker_build(name, target="runtime", go_build_args=""):
     command = "docker buildx build --pull \
         --target {target} \
         --build-arg SERVICE={name} \
-        --build-arg GO_BUILD_ARGS={go_build_args} \
+        --build-arg GO_BUILD_ARGS={go_build_args!r} \
         -t $EXPECTED_REF ." \
         .format(
             name=name,

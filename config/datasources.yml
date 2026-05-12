@@ -1,5 +1,5 @@
 ---
-# TODO: link to docs
+# docker-compose variant of ../k8s/helm/grafana/values.yaml (datasources section).
 
 apiVersion: 1
 datasources:

@@ -54,7 +54,7 @@ just dev-up
 just dev-stop
 
 # restart
-dev dev-restart
+just dev-restart
 ```
 
 To enter the development environment to run other commands, run:

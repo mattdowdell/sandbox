@@ -5,6 +5,7 @@ resources:
   - ../base
 patches:
   - path: configmap.yaml
+  - path: deployment.yaml
 images:
   - name: "ghcr.io/mattdowdell/sandbox/example-rpc"
     newName: "example-rpc"

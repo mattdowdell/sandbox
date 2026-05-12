@@ -20,6 +20,7 @@ data:
   parser_issuer: "example"
   parser_methods: "HS256"
   rpcserver_host: "0.0.0.0"
+  rpcserver_enablecoverage: "true"
   rpcserver_enablepprof: "true"
   tracerprovider_insecure: "true"
   tracerprovider_endpoint: "victoria-traces-single-vt-single-server.default.svc.cluster.local:10428"
