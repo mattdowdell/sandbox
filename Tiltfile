@@ -7,11 +7,14 @@
 # Prevent tilt from accessing other clusters
 allow_k8s_contexts("kind-example")
 
+# Some charts seems to time out with the default of 30 seconds.
+update_settings(k8s_upsert_timeout_secs=120)
+
 # ----------
 # Extensions
 # ----------
 
-load("ext://helm_remote", "helm_remote")
+load("ext://helm_resource", "helm_repo", "helm_resource")
 
 # --------------
 # Local services
@@ -58,7 +61,7 @@ k8s_resource(
     labels=["services"],
     port_forwards=["127.0.0.1:5000:5000"],
     resource_deps=[
-        "postgresql",
+        "postgresql-cluster",
         "victoria-traces",
         "victoria-metrics",
         "victoria-logs",
@@ -69,7 +72,7 @@ k8s_resource(
     "example-db-migrate",
     labels=["services"],
     resource_deps=[
-        "postgresql",
+        "postgresql-cluster",
         "victoria-traces",
         "victoria-metrics",
         "victoria-logs",
@@ -80,144 +83,203 @@ k8s_resource(
 # Database
 # --------
 
-helm_remote(
-    "cloudnative-pg",
-    repo_name="cnpg",
-    repo_url="https://cloudnative-pg.github.io/charts",
+helm_repo(
+    name="cnpg",
+    url="https://cloudnative-pg.github.io/charts",
+    resource_name="cnpg-repo",
+    labels=["postgresql"],
+)
+
+helm_resource(
+    name="cloudnative-pg",
+    chart="cnpg/cloudnative-pg",
     namespace="cnpg-system",
-    create_namespace=True,
-    # renovate: datasource=helm depName=cloudnative-pg packageName=cloudnative-pg registryUrl=https://cloudnative-pg.github.io/charts
-    version="0.28.0",
-)
-
-k8s_resource(
-    "cloudnative-pg",
-    objects=[
-        "cnpg-system:namespace",
-        "backups.postgresql.cnpg.io:customresourcedefinition",
-        "clusterimagecatalogs.postgresql.cnpg.io:customresourcedefinition",
-        "clusters.postgresql.cnpg.io:customresourcedefinition",
-        "databases.postgresql.cnpg.io:customresourcedefinition",
-        "failoverquorums.postgresql.cnpg.io:customresourcedefinition",
-        "imagecatalogs.postgresql.cnpg.io:customresourcedefinition",
-        "poolers.postgresql.cnpg.io:customresourcedefinition",
-        "publications.postgresql.cnpg.io:customresourcedefinition",
-        "scheduledbackups.postgresql.cnpg.io:customresourcedefinition",
-        "subscriptions.postgresql.cnpg.io:customresourcedefinition",
-        "cnpg-mutating-webhook-configuration:mutatingwebhookconfiguration",
-        "cloudnative-pg:serviceaccount",
-        "cloudnative-pg:clusterrole",
-        "cloudnative-pg-view:clusterrole",
-        "cloudnative-pg-edit:clusterrole",
-        "cloudnative-pg:clusterrolebinding",
-        "cnpg-controller-manager-config:configmap",
-        "cnpg-default-monitoring:configmap",
-        "cnpg-validating-webhook-configuration:validatingwebhookconfiguration",
+    flags=[
+        "--create-namespace",
+        "--version=0.28.0",
     ],
-    labels="postgresql",
+    resource_deps=["cnpg-repo"],
+    labels=["postgresql"],
 )
 
-k8s_kind("Cluster", api_version="postgresql.cnpg.io/v1")
-
-helm_remote(
-    "cluster",
-    repo_name="cnpg",
-    repo_url="https://cloudnative-pg.github.io/charts",
-    namespace="default",
-    # renovate: datasource=helm depName=cluster packageName=cluster registryUrl=https://cloudnative-pg.github.io/charts
-    version="0.6.0",
-    values=["k8s/helm/postgresql/values.yaml"],
+k8s_kind(
+    "Cluster",
+    api_version="postgresql.cnpg.io/v1",
+    image_json_path="{.spec.imageName}",
 )
 
-k8s_resource(
-    "cluster-postgresql",
-    new_name="postgresql",
-    objects=[
-        "cluster-postgresql-monitoring-logical-replication:configmap"
+helm_resource(
+    name="postgresql-cluster",
+    chart="cnpg/cluster",
+    flags=[
+        # renovate: datasource=helm depName=cluster packageName=cluster registryUrl=https://cloudnative-pg.github.io/charts
+        "--version=0.6.0",
+        "--values=k8s/helm/postgresql/values.yaml",
     ],
-    labels="postgresql",
-    resource_deps=["cloudnative-pg"],
+    deps=["k8s/helm/postgresql/values.yaml"],
+    resource_deps=[
+        "cnpg-repo",
+        "cloudnative-pg",
+    ],
+    labels=["postgresql"],
     port_forwards=["127.0.0.1:5432:5432"],
+)
+
+# ------------
+# Cert Manager
+# ------------
+
+helm_repo(
+    "jetstack",
+    "https://charts.jetstack.io", # TODO: migrate to oci repo
+    resource_name="cert-manager-repo",
+    labels=["cert-manager"],
+)
+
+helm_resource(
+    "cert-manager",
+    "jetstack/cert-manager",
+    resource_deps=["cert-manager-repo"],
+    labels=["cert-manager"],
+    namespace="cert-manager",
+    flags=[
+        # renovate: datasource=helm depName=cert-manager packageName=cert-manager registryUrl=https://charts.jetstack.io
+        "--version=1.20.2",
+        "--create-namespace",
+        "--values=k8s/helm/cert-manager/values.yaml",
+    ],
+)
+
+# -------------
+# OpenTelemetry
+# -------------
+
+helm_repo(
+    "open-telemetry",
+    "https://open-telemetry.github.io/opentelemetry-helm-charts",
+    resource_name="opentelemetry-repo",
+    labels="opentelemetry",
+)
+
+helm_resource(
+    "opentelemetry-operator",
+    "open-telemetry/opentelemetry-operator",
+    namespace="opentelemetry",
+    labels=["opentelemetry"],
+    flags=[
+        "--create-namespace",
+        # renovate: datasource=helm depName=opentelemetry-operator packageName=opentelemetry-operator registryUrl=https://open-telemetry.github.io/opentelemetry-helm-charts
+        "--version=0.110.0",
+        "--values=k8s/helm/opentelemetry-operator/values.yaml",
+    ],
+    resource_deps=["cert-manager"],
+)
+
+# There's a delay between the operator deployment becoming ready
+# and the mutating webhook for OpentelemetryCollector CRD being usable
+# https://github.com/open-telemetry/opentelemetry-operator/issues/3194
+local_resource(
+    "opentelemetry-operator-ready",
+    "./tools/wait-for-otel-operator.sh",
+    resource_deps=["opentelemetry-operator"],
+    labels=["opentelemetry"],
+)
+
+k8s_kind(
+    "OpenTelemetryCollector",
+    api_version="opentelemetry.io/v1beta1",
+)
+
+k8s_yaml(kustomize(os.path.join(config.main_dir, "k8s/kustomize/opentelemetry-collector/base")))
+
+k8s_resource(
+    "opentelemetry-daemonset",
+    labels=["opentelemetry"],
+    resource_deps=[
+        "opentelemetry-operator-ready",
+    ],
 )
 
 # -------------
 # Observability
 # -------------
 
-helm_remote(
-    "victoria-traces-single",
-    repo_name="vm",
-    repo_url="https://victoriametrics.github.io/helm-charts",
-    # renovate: datasource=helm depName=victoria-traces-single packageName=victoria-traces-single registryUrl=https://victoriametrics.github.io/helm-charts
-    version="0.0.7",
+helm_repo(
+    name="vm",
+    url="https://victoriametrics.github.io/helm-charts",
+    resource_name="vm-repo",
+    labels=["observability"],
 )
 
-k8s_resource(
-    "victoria-traces-single-vt-single-server",
-    new_name="victoria-traces",
+helm_repo(
+    name="grafana-community",
+    url="https://grafana-community.github.io/helm-charts",
+    resource_name="grafana-repo",
+    labels=["observability"],
+)
+
+helm_resource(
+    name="victoria-traces",
+    chart="vm/victoria-traces-single",
+    namespace="observability",
+    flags=[
+        "--create-namespace",
+        # renovate: datasource=helm depName=victoria-traces-single packageName=victoria-traces-single registryUrl=https://victoriametrics.github.io/helm-charts
+        "--version=0.0.7",
+    ],
+    resource_deps=["vm-repo"],
     labels=["observability"],
     port_forwards=["127.0.0.1:10428:10428"],
 )
 
-helm_remote(
-    "victoria-metrics-single",
-    repo_name="vm",
-    repo_url="https://victoriametrics.github.io/helm-charts",
-    # renovate: datasource=helm depName=victoria-metrics-single packageName=victoria-metrics-single registryUrl=https://victoriametrics.github.io/helm-charts
-    version="0.38.0",
-)
-
-k8s_resource(
-    "victoria-metrics-single-server",
-    new_name="victoria-metrics",
-    objects=["victoria-metrics-single-server:serviceaccount"],
+helm_resource(
+    name="victoria-metrics",
+    chart="vm/victoria-metrics-single",
+    namespace="observability",
+    flags=[
+        "--create-namespace",
+        # renovate: datasource=helm depName=victoria-metrics-single packageName=victoria-metrics-single registryUrl=https://victoriametrics.github.io/helm-charts
+        "--version=0.38.0",
+    ],
+    resource_deps=["vm-repo"],
     labels=["observability"],
     port_forwards=["127.0.0.1:8428:8428"],
 )
 
-helm_remote(
-    "victoria-logs-single",
-    repo_name="vm",
-    repo_url="https://victoriametrics.github.io/helm-charts",
-    # renovate: datasource=helm depName=victoria-logs-single packageName=victoria-logs-single registryUrl=https://victoriametrics.github.io/helm-charts
-    version="0.12.4",
-)
-
-k8s_resource(
-    "victoria-logs-single-server",
-    new_name="victoria-logs",
+helm_resource(
+    name="victoria-logs",
+    chart="vm/victoria-logs-single",
+    namespace="observability",
+    flags=[
+        "--create-namespace",
+        # renovate: datasource=helm depName=victoria-logs-single packageName=victoria-logs-single registryUrl=https://victoriametrics.github.io/helm-charts
+        "--version=0.12.4",
+    ],
+    resource_deps=["vm-repo"],
     labels=["observability"],
     port_forwards=["127.0.0.1:9428:9428"],
 )
 
 k8s_yaml(kustomize(os.path.join(config.main_dir, "k8s/kustomize/grafana/base")))
 
-helm_remote(
-    "grafana",
-    repo_name="grafana-community",
-    repo_url="https://grafana-community.github.io/helm-charts",
-    # renovate: datasource=helm depName=grafana packageName=grafana registryUrl=https://grafana.github.io/helm-charts
-    version="10.5.15",
-    values=["k8s/helm/grafana/values.yaml"],
+k8s_resource(
+    new_name="grafana-dashboards",
+    objects=["grafana-dashboards:configmap"],
+    labels=["observability"],
 )
 
-k8s_resource(
-    "grafana",
-    objects=[
-        "grafana:serviceaccount",
-        "grafana:role",
-        "grafana-clusterrole:clusterrole",
-        "grafana:rolebinding",
-        "grafana-clusterrolebinding:clusterrolebinding",
-        "grafana:configmap",
-        "grafana:secret",
-        "grafana-dashboards:configmap",
+helm_resource(
+    name="grafana",
+    chart="grafana-community/grafana",
+    namespace="observability",
+    flags=[
+        "--create-namespace",
+        # renovate: datasource=helm depName=grafana packageName=grafana registryUrl=https://grafana.github.io/helm-charts
+        "--version=10.5.15",
+        "--values=k8s/helm/grafana/values.yaml"
     ],
+    deps=["k8s/helm/grafana/values.yaml"],
+    resource_deps=["grafana-dashboards", "vm-repo"],
     labels=["observability"],
     port_forwards=["127.0.0.1:3000:3000"],
-    resource_deps=[
-        "victoria-traces",
-        "victoria-metrics",
-        "victoria-logs",
-    ],
 )

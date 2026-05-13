@@ -11,68 +11,68 @@ type Option interface {
 }
 
 type loggerOpts struct {
-	writer         io.Writer
-	suppressTime   bool
-	suppressSource bool
-	extractors     []Extractor
+	writer            io.Writer
+	suppressTime      bool
+	suppressSource    bool
+	extractors        []Extractor
+	enableJSONHandler bool
+	enableOtelHandler bool
 }
 
 func defaultOptions() *loggerOpts {
 	return &loggerOpts{
-		writer: os.Stdout,
+		writer:            os.Stdout,
+		enableJSONHandler: true,
 	}
+}
+
+type optionFn func(*loggerOpts)
+
+func (f optionFn) apply(o *loggerOpts) {
+	f(o)
 }
 
 // WithWriter sets the output of a JSON logger. Defaults to os.Stdout.
 func WithWriter(w io.Writer) Option {
-	return &writerOpt{
-		w: w,
-	}
-}
-
-type writerOpt struct {
-	w io.Writer
-}
-
-func (o *writerOpt) apply(options *loggerOpts) {
-	options.writer = o.w
+	return optionFn(func(o *loggerOpts) {
+		o.writer = w
+	})
 }
 
 // WithSuppressTime suppresses the time field of a log record. This is intended for testing where a
 // deterministic log record is required.
 func WithSuppressTime(suppress bool) Option {
-	return suppressTimeOpt(suppress)
-}
-
-type suppressTimeOpt bool
-
-func (o suppressTimeOpt) apply(options *loggerOpts) {
-	options.suppressTime = bool(o)
+	return optionFn(func(o *loggerOpts) {
+		o.suppressTime = suppress
+	})
 }
 
 // WithSuppressSource suppresses the source field of a log record. This is intended for testing
 // where a deterministic log record is required.
 func WithSuppressSource(suppress bool) Option {
-	return suppressSourceOpt(suppress)
-}
-
-type suppressSourceOpt bool
-
-func (o suppressSourceOpt) apply(options *loggerOpts) {
-	options.suppressSource = bool(o)
+	return optionFn(func(o *loggerOpts) {
+		o.suppressSource = suppress
+	})
 }
 
 // WithExtractors adds context extractors to the logger.
 func WithExtractors(extractors ...Extractor) Option {
-	return &extractorsOpt{
-		e: extractors,
-	}
+	return optionFn(func(o *loggerOpts) {
+		o.extractors = append(o.extractors, extractors...)
+	})
 }
 
-type extractorsOpt struct {
-	e []Extractor
+// EnableJSONHandler enables the output of JSON logs to the configured writer.
+func EnableJSONHandler(enabled bool) Option {
+	return optionFn(func(o *loggerOpts) {
+		o.enableJSONHandler = enabled
+	})
 }
 
-func (o *extractorsOpt) apply(options *loggerOpts) {
-	options.extractors = append(options.extractors, o.e...)
+// EnableOtelHandler enables the OpenTelemetry log handler which exports logs to the configured
+// endpoint.
+func EnableOtelHandler(enabled bool) Option {
+	return optionFn(func(o *loggerOpts) {
+		o.enableOtelHandler = enabled
+	})
 }
