@@ -403,20 +403,20 @@ jobs:
         run: just functional
 
       # TODO: look into fixing this
-      # - name: Collect coverage
-      #   run: |
-      #     set -x
-      #     i=0
-      #     for name in $(kubectl get po -lapp=example -ojsonpath='{.items[*].metadata.name}'); do
-      #       kubectl port-forward "pod/$name" "600$i:5000" &
-      #       sleep 3
-      #       curl -X POST "http://localhost:600$i/coverage" -v
-      #       kubectl cp ./.covdata/ "$name:/covdata/*"
-      #       kill %1
-      #       ((i++))
-      #     done
+      - name: Collect coverage
+        run: |
+          set -x
+          i=0
+          for name in $(kubectl get po -lapp=example -ojsonpath='{.items[*].metadata.name}'); do
+            kubectl port-forward "pod/$name" "600$i:5000" &
+            sleep 3
+            curl -X POST "http://localhost:600$i/coverage" -v
+            kubectl cp ./.covdata/ "$name:/covdata/*"
+            ((i++))
+          done
 
-      #     ls -alph ./.covdata/
+          kill $(jobs -p)
+          ls -alph ./.covdata/
 
       #     go tool covdata percent -i=.covdata
       #     go tool covdata textfmt -i=.covdata -o cover.out
