@@ -175,6 +175,16 @@ helm_resource(
     resource_deps=["cert-manager"],
 )
 
+# There's a delay between the operator deployment becoming ready
+# and the mutating webhook for OpentelemetryCollector CRD being usable
+# https://github.com/open-telemetry/opentelemetry-operator/issues/3194
+local_resource(
+    "opentelemetry-operator-ready",
+    "./tools/wait-for-otel-operator.sh",
+    resource_deps=["opentelemetry-operator"],
+    labels=["opentelemetry"],
+)
+
 k8s_kind(
     "OpenTelemetryCollector",
     api_version="opentelemetry.io/v1beta1",
@@ -183,10 +193,10 @@ k8s_kind(
 k8s_yaml(kustomize(os.path.join(config.main_dir, "k8s/kustomize/opentelemetry-collector/base")))
 
 k8s_resource(
-    "opentelemetry-collector",
+    "opentelemetry-daemonset",
     labels=["opentelemetry"],
     resource_deps=[
-        "opentelemetry-operator",
+        "opentelemetry-operator-ready",
     ],
 )
 
