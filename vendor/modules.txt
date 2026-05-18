@@ -337,7 +337,7 @@ github.com/knadh/koanf/maps
 # github.com/knadh/koanf/parsers/json v1.0.0
 ## explicit; go 1.23.0
 github.com/knadh/koanf/parsers/json
-# github.com/knadh/koanf/parsers/toml/v2 v2.2.0
+# github.com/knadh/koanf/parsers/toml/v2 v2.2.1
 ## explicit; go 1.23.0
 github.com/knadh/koanf/parsers/toml/v2
 # github.com/knadh/koanf/parsers/yaml v1.1.0
@@ -388,11 +388,10 @@ github.com/muesli/cancelreader
 # github.com/muesli/termenv v0.16.0
 ## explicit; go 1.17
 github.com/muesli/termenv
-# github.com/pelletier/go-toml/v2 v2.2.4
+# github.com/pelletier/go-toml/v2 v2.3.1
 ## explicit; go 1.21.0
 github.com/pelletier/go-toml/v2
 github.com/pelletier/go-toml/v2/internal/characters
-github.com/pelletier/go-toml/v2/internal/danger
 github.com/pelletier/go-toml/v2/internal/tracker
 github.com/pelletier/go-toml/v2/unstable
 # github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
