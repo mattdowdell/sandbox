@@ -10,8 +10,6 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
-	"golang.org/x/net/http2"
-	"golang.org/x/net/http2/h2c"
 
 	"github.com/mattdowdell/sandbox/internal/drivers/rpcserver/coverage"
 )
@@ -72,10 +70,15 @@ func New(
 		mux.HandleFunc("POST /coverage", coverage.Collect)
 	}
 
+	protocols := new(http.Protocols)
+	protocols.SetHTTP1(true)
+	protocols.SetUnencryptedHTTP2(true)
+
 	return &Server{
 		server: &http.Server{
 			Addr:              net.JoinHostPort(host, strconv.FormatUint(uint64(port), 10 /*base*/)),
-			Handler:           h2c.NewHandler(mux, &http2.Server{}),
+			Handler:           mux,
+			Protocols:         protocols,
 			ReadHeaderTimeout: readHeaderTimeout,
 		},
 		ch: make(chan struct{}),
