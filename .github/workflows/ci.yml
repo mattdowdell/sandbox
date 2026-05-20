@@ -356,7 +356,9 @@ jobs:
           go-version-file: "go.mod"
 
       - name: Install Just
-        uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3.1.0
+        uses: taiki-e/install-action@fa0dd4cd0a40696e6f9766370614a5ce482e6aa8 # v2.77.5
+        with:
+          tool: just
 
       - name: Install bingo
         uses: mattdowdell/go-installer@de5d072ade9fc895652cd6a93ac4bde11e105bc6 # v0.4.0
