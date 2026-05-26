@@ -1,4 +1,5 @@
-// ...
+// Package defaults provides support for setting default values in struct fields based on the value
+// of the "default" struct tag.
 package defaults
 
 import (
@@ -11,7 +12,34 @@ import (
 
 const tagName = "default"
 
-// ...
+// Set sets the fields of a struct to the values in the "default" struct tag. The target argument
+// must be a pointer to a struct.
+//
+// By default, the following types are natively supported:
+//
+// - int, int, int16, int32, int64 via [strconv.ParseInt].
+// - uint, uint8, uint16, uint32, uint64, uintptr via [strconv.ParseUint].
+// - float32, float64 via [strconv.ParseFloat].
+// - bool via [strconv.ParseBool].
+// - string
+// - [time.Duration] via [time.ParseDuration].
+//
+// Integer default values can be specified in binary, octal, decimal, and hexadecimal by adding the
+// appropriate prefix. Unparseable values result in an error being returned.
+//
+// Structs within structs are also supported under the assumption they contain their own set of
+// supported types.
+//
+// Support for types other than those explicitly supported can implement [encoding.TextUnmarshaler].
+// This can also be implemented for type aliases of the supported types to override the default
+// behaviour. Types that are not supported natively and do not implement [encoding.TextUmarshaler]
+// result in an error being returned.
+//
+// Defaults are not applied in the following circumstances:
+//
+// - Private fields are skipped.
+// - Fields with a non-zero value are skipped.
+// - Empty values of the "default" struct tag are skipped.
 func Set(target any) error {
 	val := reflect.ValueOf(target)
 	if k := val.Kind(); k != reflect.Pointer {
@@ -26,7 +54,6 @@ func Set(target any) error {
 	return setStruct(elem)
 }
 
-// ...
 func setStruct(val reflect.Value) error {
 	typ := val.Type()
 	for i := range typ.NumField() {
@@ -43,7 +70,6 @@ func setStruct(val reflect.Value) error {
 	return nil
 }
 
-// ...
 func setField(field reflect.Value, tag string) error {
 	ok, err := shouldSet(field, tag)
 	if err != nil {
@@ -72,6 +98,7 @@ func setField(field reflect.Value, tag string) error {
 
 func shouldSet(field reflect.Value, tag string) (bool, error) {
 	if !field.CanSet() {
+		// if we get here, we probably have a bug
 		return false, errors.New("unsettable field")
 	}
 

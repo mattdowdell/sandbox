@@ -301,7 +301,7 @@ func Test_Set_Error(t *testing.T) {
 		want string
 	}{
 		"non-pointer struct": {
-			have: Sample{},
+			have: Pimitives{},
 			want: "expected struct pointer, found: struct",
 		},
 		"non-struct pointer": {
