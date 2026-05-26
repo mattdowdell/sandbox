@@ -120,14 +120,11 @@ func Load[T any](opts *Options) (*T, error) {
 //		Level string `koanf:"level" default:"info"`
 //	}
 //
-// A default-able field type can be anything supported by [defaults], or an implementation of
-// [defaults.Setter] or [encoding.TextUnmarshaler]. An invalid default value will be skipped and
-// will not cause an error to be returned.
+// A default-able field type can be anything supported by the defaults subpackage. An invalid
+// default value will cause an error to be returned.
 //
 // [mapstructure]: https://pkg.go.dev/github.com/go-viper/mapstructure/v2
 // [encoding.TextUnmarshaler]: https://pkg.go.dev/encoding#TextUnmarshaler
-// [defaults]: https://pkg.go.dev/github.com/creasty/defaults
-// [defaults.Setter]: https://pkg.go.dev/github.com/creasty/defaults#Setter
 func (l *Loader) Load(target any) error {
 	if err := l.inner.Load(l.env, nil /*parser*/); err != nil {
 		return err

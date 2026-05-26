@@ -18,7 +18,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/feature/rds/auth v1.6.23
 	github.com/charmbracelet/bubbletea v1.3.10
 	github.com/charmbracelet/lipgloss v1.1.0
-	github.com/creasty/defaults v1.8.0
 	github.com/cucumber/godog v0.15.1
 	github.com/go-jet/jet/v2 v2.14.1
 	github.com/gofrs/uuid/v5 v5.4.0
