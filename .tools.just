@@ -8,7 +8,7 @@ actionlint := join(gopath, "bin", "actionlint-v1.7.12")
 install-actionlint:
     {{ if path_exists(actionlint) == "true" { "" } else { "bingo get actionlint" } }}
 
-buf := join(gopath, "bin", "buf-v1.69.0")
+buf := join(gopath, "bin", "buf-v1.70.0")
 
 [private]
 install-buf:
