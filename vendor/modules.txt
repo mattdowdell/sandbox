@@ -207,8 +207,8 @@ github.com/erikgeiser/coninput
 ## explicit; go 1.23
 github.com/fsnotify/fsnotify
 github.com/fsnotify/fsnotify/internal
-# github.com/go-jet/jet/v2 v2.14.1
-## explicit; go 1.23.0
+# github.com/go-jet/jet/v2 v2.15.0
+## explicit; go 1.24.0
 github.com/go-jet/jet/v2/generator/metadata
 github.com/go-jet/jet/v2/generator/postgres
 github.com/go-jet/jet/v2/generator/template
@@ -285,31 +285,15 @@ github.com/hashicorp/go-memdb
 # github.com/hashicorp/golang-lru v0.5.4
 ## explicit; go 1.12
 github.com/hashicorp/golang-lru/simplelru
-# github.com/jackc/chunkreader/v2 v2.0.1
-## explicit; go 1.12
-github.com/jackc/chunkreader/v2
-# github.com/jackc/pgconn v1.14.3
-## explicit; go 1.17
-github.com/jackc/pgconn
-github.com/jackc/pgconn/internal/ctxwatch
 # github.com/jackc/pgerrcode v0.0.0-20250907135507-afb5586c32a6
 ## explicit; go 1.12
 github.com/jackc/pgerrcode
-# github.com/jackc/pgio v1.0.0
-## explicit; go 1.12
-github.com/jackc/pgio
 # github.com/jackc/pgpassfile v1.0.0
 ## explicit; go 1.12
 github.com/jackc/pgpassfile
-# github.com/jackc/pgproto3/v2 v2.3.3
-## explicit; go 1.12
-github.com/jackc/pgproto3/v2
 # github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761
 ## explicit; go 1.14
 github.com/jackc/pgservicefile
-# github.com/jackc/pgtype v1.14.4
-## explicit; go 1.13
-github.com/jackc/pgtype
 # github.com/jackc/pgx/v5 v5.9.2
 ## explicit; go 1.25.0
 github.com/jackc/pgx/v5
@@ -352,10 +336,17 @@ github.com/knadh/koanf/providers/k8smount
 # github.com/knadh/koanf/v2 v2.3.4
 ## explicit; go 1.23.0
 github.com/knadh/koanf/v2
-# github.com/lib/pq v1.10.9
-## explicit; go 1.13
+# github.com/lib/pq v1.12.3
+## explicit; go 1.21
 github.com/lib/pq
+github.com/lib/pq/internal/pgpass
+github.com/lib/pq/internal/pgservice
+github.com/lib/pq/internal/pqsql
+github.com/lib/pq/internal/pqtime
+github.com/lib/pq/internal/pqutil
+github.com/lib/pq/internal/proto
 github.com/lib/pq/oid
+github.com/lib/pq/pqerror
 github.com/lib/pq/scram
 # github.com/lucasb-eyer/go-colorful v1.2.0
 ## explicit; go 1.12
@@ -533,9 +524,6 @@ go.opentelemetry.io/proto/otlp/trace/v1
 # go.yaml.in/yaml/v3 v3.0.4
 ## explicit; go 1.16
 go.yaml.in/yaml/v3
-# golang.org/x/crypto v0.51.0
-## explicit; go 1.25.0
-golang.org/x/crypto/pbkdf2
 # golang.org/x/exp v0.0.0-20250911091902-df9299821621
 ## explicit; go 1.24.0
 golang.org/x/exp/slices
