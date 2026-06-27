@@ -65,11 +65,11 @@ $(KUBE_SCORE): $(BINGO_DIR)/kube-score.mod
 	@echo "(re)installing $(GOBIN)/kube-score-v1.20.0"
 	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=kube-score.mod -o=$(GOBIN)/kube-score-v1.20.0 "github.com/zegl/kube-score/cmd/kube-score"
 
-KUBECONFORM := $(GOBIN)/kubeconform-v0.7.0
+KUBECONFORM := $(GOBIN)/kubeconform-v0.8.0
 $(KUBECONFORM): $(BINGO_DIR)/kubeconform.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/kubeconform-v0.7.0"
-	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=kubeconform.mod -o=$(GOBIN)/kubeconform-v0.7.0 "github.com/yannh/kubeconform/cmd/kubeconform"
+	@echo "(re)installing $(GOBIN)/kubeconform-v0.8.0"
+	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=kubeconform.mod -o=$(GOBIN)/kubeconform-v0.8.0 "github.com/yannh/kubeconform/cmd/kubeconform"
 
 KUSTOMIZE := $(GOBIN)/kustomize-v5.8.1
 $(KUSTOMIZE): $(BINGO_DIR)/kustomize.mod
