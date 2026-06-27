@@ -59,7 +59,7 @@ type MockLoader_Load_Call struct {
 
 // Load is a helper method to define mock.On call
 //   - v any
-func (_e *MockLoader_Expecter) Load(v interface{}) *MockLoader_Load_Call {
+func (_e *MockLoader_Expecter) Load(v any) *MockLoader_Load_Call {
 	return &MockLoader_Load_Call{Call: _e.mock.On("Load", v)}
 }
 

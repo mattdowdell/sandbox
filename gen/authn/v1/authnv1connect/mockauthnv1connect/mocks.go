@@ -75,7 +75,7 @@ type MockAuthnServiceClient_Authenticate_Call struct {
 // Authenticate is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[authnv1.AuthenticateRequest]
-func (_e *MockAuthnServiceClient_Expecter) Authenticate(context1 interface{}, request interface{}) *MockAuthnServiceClient_Authenticate_Call {
+func (_e *MockAuthnServiceClient_Expecter) Authenticate(context1 any, request any) *MockAuthnServiceClient_Authenticate_Call {
 	return &MockAuthnServiceClient_Authenticate_Call{Call: _e.mock.On("Authenticate", context1, request)}
 }
 
@@ -143,7 +143,7 @@ type MockAuthnServiceClient_Login_Call struct {
 // Login is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[authnv1.LoginRequest]
-func (_e *MockAuthnServiceClient_Expecter) Login(context1 interface{}, request interface{}) *MockAuthnServiceClient_Login_Call {
+func (_e *MockAuthnServiceClient_Expecter) Login(context1 any, request any) *MockAuthnServiceClient_Login_Call {
 	return &MockAuthnServiceClient_Login_Call{Call: _e.mock.On("Login", context1, request)}
 }
 

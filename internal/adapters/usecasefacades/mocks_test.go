@@ -79,7 +79,7 @@ type MockResourceCreator_Execute_Call struct {
 //   - logger *slog.Logger
 //   - resource repositories.Resource
 //   - resource1 *entities.Resource
-func (_e *MockResourceCreator_Expecter) Execute(context1 interface{}, logger interface{}, resource interface{}, resource1 interface{}) *MockResourceCreator_Execute_Call {
+func (_e *MockResourceCreator_Expecter) Execute(context1 any, logger any, resource any, resource1 any) *MockResourceCreator_Execute_Call {
 	return &MockResourceCreator_Execute_Call{Call: _e.mock.On("Execute", context1, logger, resource, resource1)}
 }
 
@@ -186,7 +186,7 @@ type MockResourceGetter_Execute_Call struct {
 //   - logger *slog.Logger
 //   - resource repositories.Resource
 //   - uUID uuid.UUID
-func (_e *MockResourceGetter_Expecter) Execute(context1 interface{}, logger interface{}, resource interface{}, uUID interface{}) *MockResourceGetter_Execute_Call {
+func (_e *MockResourceGetter_Expecter) Execute(context1 any, logger any, resource any, uUID any) *MockResourceGetter_Execute_Call {
 	return &MockResourceGetter_Execute_Call{Call: _e.mock.On("Execute", context1, logger, resource, uUID)}
 }
 
@@ -293,7 +293,7 @@ type MockResourceLister_Execute_Call struct {
 //   - logger *slog.Logger
 //   - resource repositories.Resource
 //   - pager repositories.Pager
-func (_e *MockResourceLister_Expecter) Execute(context1 interface{}, logger interface{}, resource interface{}, pager interface{}) *MockResourceLister_Execute_Call {
+func (_e *MockResourceLister_Expecter) Execute(context1 any, logger any, resource any, pager any) *MockResourceLister_Execute_Call {
 	return &MockResourceLister_Execute_Call{Call: _e.mock.On("Execute", context1, logger, resource, pager)}
 }
 
@@ -400,7 +400,7 @@ type MockResourceUpdater_Execute_Call struct {
 //   - logger *slog.Logger
 //   - resource repositories.Resource
 //   - resource1 *entities.Resource
-func (_e *MockResourceUpdater_Expecter) Execute(context1 interface{}, logger interface{}, resource interface{}, resource1 interface{}) *MockResourceUpdater_Execute_Call {
+func (_e *MockResourceUpdater_Expecter) Execute(context1 any, logger any, resource any, resource1 any) *MockResourceUpdater_Execute_Call {
 	return &MockResourceUpdater_Execute_Call{Call: _e.mock.On("Execute", context1, logger, resource, resource1)}
 }
 
@@ -496,7 +496,7 @@ type MockResourceDeleter_Execute_Call struct {
 //   - logger *slog.Logger
 //   - resource repositories.Resource
 //   - uUID uuid.UUID
-func (_e *MockResourceDeleter_Expecter) Execute(context1 interface{}, logger interface{}, resource interface{}, uUID interface{}) *MockResourceDeleter_Execute_Call {
+func (_e *MockResourceDeleter_Expecter) Execute(context1 any, logger any, resource any, uUID any) *MockResourceDeleter_Execute_Call {
 	return &MockResourceDeleter_Execute_Call{Call: _e.mock.On("Execute", context1, logger, resource, uUID)}
 }
 
@@ -602,7 +602,7 @@ type MockAuditEventLister_Execute_Call struct {
 //   - context1 context.Context
 //   - logger *slog.Logger
 //   - auditEvent repositories.AuditEvent
-func (_e *MockAuditEventLister_Expecter) Execute(context1 interface{}, logger interface{}, auditEvent interface{}) *MockAuditEventLister_Execute_Call {
+func (_e *MockAuditEventLister_Expecter) Execute(context1 any, logger any, auditEvent any) *MockAuditEventLister_Execute_Call {
 	return &MockAuditEventLister_Execute_Call{Call: _e.mock.On("Execute", context1, logger, auditEvent)}
 }
 
@@ -694,7 +694,7 @@ type MockAuditEventWatcher_Execute_Call struct {
 //   - context1 context.Context
 //   - logger *slog.Logger
 //   - auditEvent repositories.AuditEvent
-func (_e *MockAuditEventWatcher_Expecter) Execute(context1 interface{}, logger interface{}, auditEvent interface{}) *MockAuditEventWatcher_Execute_Call {
+func (_e *MockAuditEventWatcher_Expecter) Execute(context1 any, logger any, auditEvent any) *MockAuditEventWatcher_Execute_Call {
 	return &MockAuditEventWatcher_Execute_Call{Call: _e.mock.On("Execute", context1, logger, auditEvent)}
 }
 

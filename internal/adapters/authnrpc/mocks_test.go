@@ -71,7 +71,7 @@ type MockParser_Parse_Call struct {
 
 // Parse is a helper method to define mock.On call
 //   - s string
-func (_e *MockParser_Expecter) Parse(s interface{}) *MockParser_Parse_Call {
+func (_e *MockParser_Expecter) Parse(s any) *MockParser_Parse_Call {
 	return &MockParser_Parse_Call{Call: _e.mock.On("Parse", s)}
 }
 
@@ -159,7 +159,7 @@ type MockIssuer_Issue_Call struct {
 // Issue is a helper method to define mock.On call
 //   - s string
 //   - v uint32
-func (_e *MockIssuer_Expecter) Issue(s interface{}, v interface{}) *MockIssuer_Issue_Call {
+func (_e *MockIssuer_Expecter) Issue(s any, v any) *MockIssuer_Issue_Call {
 	return &MockIssuer_Issue_Call{Call: _e.mock.On("Issue", s, v)}
 }
 

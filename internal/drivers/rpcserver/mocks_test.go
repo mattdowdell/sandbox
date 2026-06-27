@@ -52,7 +52,7 @@ type MockHandler_Register_Call struct {
 // Register is a helper method to define mock.On call
 //   - serveMux *http.ServeMux
 //   - handlerOptions []connect.HandlerOption
-func (_e *MockHandler_Expecter) Register(serveMux interface{}, handlerOptions interface{}) *MockHandler_Register_Call {
+func (_e *MockHandler_Expecter) Register(serveMux any, handlerOptions any) *MockHandler_Register_Call {
 	return &MockHandler_Register_Call{Call: _e.mock.On("Register", serveMux, handlerOptions)}
 }
 

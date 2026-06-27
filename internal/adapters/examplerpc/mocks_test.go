@@ -78,7 +78,7 @@ type MockResourceFacade_Create_Call struct {
 //   - context1 context.Context
 //   - logger *slog.Logger
 //   - resource *entities.Resource
-func (_e *MockResourceFacade_Expecter) Create(context1 interface{}, logger interface{}, resource interface{}) *MockResourceFacade_Create_Call {
+func (_e *MockResourceFacade_Expecter) Create(context1 any, logger any, resource any) *MockResourceFacade_Create_Call {
 	return &MockResourceFacade_Create_Call{Call: _e.mock.On("Create", context1, logger, resource)}
 }
 
@@ -141,7 +141,7 @@ type MockResourceFacade_Delete_Call struct {
 //   - context1 context.Context
 //   - logger *slog.Logger
 //   - uUID uuid.UUID
-func (_e *MockResourceFacade_Expecter) Delete(context1 interface{}, logger interface{}, uUID interface{}) *MockResourceFacade_Delete_Call {
+func (_e *MockResourceFacade_Expecter) Delete(context1 any, logger any, uUID any) *MockResourceFacade_Delete_Call {
 	return &MockResourceFacade_Delete_Call{Call: _e.mock.On("Delete", context1, logger, uUID)}
 }
 
@@ -215,7 +215,7 @@ type MockResourceFacade_Get_Call struct {
 //   - context1 context.Context
 //   - logger *slog.Logger
 //   - uUID uuid.UUID
-func (_e *MockResourceFacade_Expecter) Get(context1 interface{}, logger interface{}, uUID interface{}) *MockResourceFacade_Get_Call {
+func (_e *MockResourceFacade_Expecter) Get(context1 any, logger any, uUID any) *MockResourceFacade_Get_Call {
 	return &MockResourceFacade_Get_Call{Call: _e.mock.On("Get", context1, logger, uUID)}
 }
 
@@ -289,7 +289,7 @@ type MockResourceFacade_List_Call struct {
 //   - context1 context.Context
 //   - logger *slog.Logger
 //   - pager repositories.Pager
-func (_e *MockResourceFacade_Expecter) List(context1 interface{}, logger interface{}, pager interface{}) *MockResourceFacade_List_Call {
+func (_e *MockResourceFacade_Expecter) List(context1 any, logger any, pager any) *MockResourceFacade_List_Call {
 	return &MockResourceFacade_List_Call{Call: _e.mock.On("List", context1, logger, pager)}
 }
 
@@ -363,7 +363,7 @@ type MockResourceFacade_Update_Call struct {
 //   - context1 context.Context
 //   - logger *slog.Logger
 //   - resource *entities.Resource
-func (_e *MockResourceFacade_Expecter) Update(context1 interface{}, logger interface{}, resource interface{}) *MockResourceFacade_Update_Call {
+func (_e *MockResourceFacade_Expecter) Update(context1 any, logger any, resource any) *MockResourceFacade_Update_Call {
 	return &MockResourceFacade_Update_Call{Call: _e.mock.On("Update", context1, logger, resource)}
 }
 
@@ -463,7 +463,7 @@ type MockAuditEventFacade_List_Call struct {
 // List is a helper method to define mock.On call
 //   - context1 context.Context
 //   - logger *slog.Logger
-func (_e *MockAuditEventFacade_Expecter) List(context1 interface{}, logger interface{}) *MockAuditEventFacade_List_Call {
+func (_e *MockAuditEventFacade_Expecter) List(context1 any, logger any) *MockAuditEventFacade_List_Call {
 	return &MockAuditEventFacade_List_Call{Call: _e.mock.On("List", context1, logger)}
 }
 
@@ -522,7 +522,7 @@ type MockAuditEventFacade_Watch_Call struct {
 // Watch is a helper method to define mock.On call
 //   - context1 context.Context
 //   - logger *slog.Logger
-func (_e *MockAuditEventFacade_Expecter) Watch(context1 interface{}, logger interface{}) *MockAuditEventFacade_Watch_Call {
+func (_e *MockAuditEventFacade_Expecter) Watch(context1 any, logger any) *MockAuditEventFacade_Watch_Call {
 	return &MockAuditEventFacade_Watch_Call{Call: _e.mock.On("Watch", context1, logger)}
 }
 
