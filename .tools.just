@@ -44,7 +44,7 @@ kube-score := join(gopath, "bin", "kube-score-v1.20.0")
 install-kube-score:
     {{ if path_exists(kube-score) == "true" { "" } else { "bingo get kube-score" } }}
 
-kubeconform := join(gopath, "bin", "kubeconform-v0.7.0")
+kubeconform := join(gopath, "bin", "kubeconform-v0.8.0")
 
 [private]
 install-kubeconform:
