@@ -66,7 +66,7 @@ type MockDatastore_CreateAuditEvent_Call struct {
 // CreateAuditEvent is a helper method to define mock.On call
 //   - context1 context.Context
 //   - auditEvent *entities.AuditEvent
-func (_e *MockDatastore_Expecter) CreateAuditEvent(context1 interface{}, auditEvent interface{}) *MockDatastore_CreateAuditEvent_Call {
+func (_e *MockDatastore_Expecter) CreateAuditEvent(context1 any, auditEvent any) *MockDatastore_CreateAuditEvent_Call {
 	return &MockDatastore_CreateAuditEvent_Call{Call: _e.mock.On("CreateAuditEvent", context1, auditEvent)}
 }
 
@@ -123,7 +123,7 @@ type MockDatastore_CreateResource_Call struct {
 // CreateResource is a helper method to define mock.On call
 //   - context1 context.Context
 //   - resource *entities.Resource
-func (_e *MockDatastore_Expecter) CreateResource(context1 interface{}, resource interface{}) *MockDatastore_CreateResource_Call {
+func (_e *MockDatastore_Expecter) CreateResource(context1 any, resource any) *MockDatastore_CreateResource_Call {
 	return &MockDatastore_CreateResource_Call{Call: _e.mock.On("CreateResource", context1, resource)}
 }
 
@@ -180,7 +180,7 @@ type MockDatastore_DeleteResource_Call struct {
 // DeleteResource is a helper method to define mock.On call
 //   - context1 context.Context
 //   - uUID uuid.UUID
-func (_e *MockDatastore_Expecter) DeleteResource(context1 interface{}, uUID interface{}) *MockDatastore_DeleteResource_Call {
+func (_e *MockDatastore_Expecter) DeleteResource(context1 any, uUID any) *MockDatastore_DeleteResource_Call {
 	return &MockDatastore_DeleteResource_Call{Call: _e.mock.On("DeleteResource", context1, uUID)}
 }
 
@@ -248,7 +248,7 @@ type MockDatastore_GetResource_Call struct {
 // GetResource is a helper method to define mock.On call
 //   - context1 context.Context
 //   - uUID uuid.UUID
-func (_e *MockDatastore_Expecter) GetResource(context1 interface{}, uUID interface{}) *MockDatastore_GetResource_Call {
+func (_e *MockDatastore_Expecter) GetResource(context1 any, uUID any) *MockDatastore_GetResource_Call {
 	return &MockDatastore_GetResource_Call{Call: _e.mock.On("GetResource", context1, uUID)}
 }
 
@@ -315,7 +315,7 @@ type MockDatastore_ListAuditEvents_Call struct {
 
 // ListAuditEvents is a helper method to define mock.On call
 //   - context1 context.Context
-func (_e *MockDatastore_Expecter) ListAuditEvents(context1 interface{}) *MockDatastore_ListAuditEvents_Call {
+func (_e *MockDatastore_Expecter) ListAuditEvents(context1 any) *MockDatastore_ListAuditEvents_Call {
 	return &MockDatastore_ListAuditEvents_Call{Call: _e.mock.On("ListAuditEvents", context1)}
 }
 
@@ -378,7 +378,7 @@ type MockDatastore_ListResources_Call struct {
 // ListResources is a helper method to define mock.On call
 //   - context1 context.Context
 //   - pager repositories.Pager
-func (_e *MockDatastore_Expecter) ListResources(context1 interface{}, pager interface{}) *MockDatastore_ListResources_Call {
+func (_e *MockDatastore_Expecter) ListResources(context1 any, pager any) *MockDatastore_ListResources_Call {
 	return &MockDatastore_ListResources_Call{Call: _e.mock.On("ListResources", context1, pager)}
 }
 
@@ -446,7 +446,7 @@ type MockDatastore_UpdateResource_Call struct {
 // UpdateResource is a helper method to define mock.On call
 //   - context1 context.Context
 //   - resource *entities.Resource
-func (_e *MockDatastore_Expecter) UpdateResource(context1 interface{}, resource interface{}) *MockDatastore_UpdateResource_Call {
+func (_e *MockDatastore_Expecter) UpdateResource(context1 any, resource any) *MockDatastore_UpdateResource_Call {
 	return &MockDatastore_UpdateResource_Call{Call: _e.mock.On("UpdateResource", context1, resource)}
 }
 
@@ -503,7 +503,7 @@ type MockDatastore_WatchAuditEvents_Call struct {
 // WatchAuditEvents is a helper method to define mock.On call
 //   - context1 context.Context
 //   - auditEventCh chan<- *entities.AuditEvent
-func (_e *MockDatastore_Expecter) WatchAuditEvents(context1 interface{}, auditEventCh interface{}) *MockDatastore_WatchAuditEvents_Call {
+func (_e *MockDatastore_Expecter) WatchAuditEvents(context1 any, auditEventCh any) *MockDatastore_WatchAuditEvents_Call {
 	return &MockDatastore_WatchAuditEvents_Call{Call: _e.mock.On("WatchAuditEvents", context1, auditEventCh)}
 }
 
@@ -720,7 +720,7 @@ type MockProvider_BeginTx_Call struct {
 
 // BeginTx is a helper method to define mock.On call
 //   - context1 context.Context
-func (_e *MockProvider_Expecter) BeginTx(context1 interface{}) *MockProvider_BeginTx_Call {
+func (_e *MockProvider_Expecter) BeginTx(context1 any) *MockProvider_BeginTx_Call {
 	return &MockProvider_BeginTx_Call{Call: _e.mock.On("BeginTx", context1)}
 }
 

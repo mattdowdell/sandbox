@@ -66,7 +66,7 @@ type MockAuditEvent_CreateAuditEvent_Call struct {
 // CreateAuditEvent is a helper method to define mock.On call
 //   - context1 context.Context
 //   - auditEvent *entities.AuditEvent
-func (_e *MockAuditEvent_Expecter) CreateAuditEvent(context1 interface{}, auditEvent interface{}) *MockAuditEvent_CreateAuditEvent_Call {
+func (_e *MockAuditEvent_Expecter) CreateAuditEvent(context1 any, auditEvent any) *MockAuditEvent_CreateAuditEvent_Call {
 	return &MockAuditEvent_CreateAuditEvent_Call{Call: _e.mock.On("CreateAuditEvent", context1, auditEvent)}
 }
 
@@ -133,7 +133,7 @@ type MockAuditEvent_ListAuditEvents_Call struct {
 
 // ListAuditEvents is a helper method to define mock.On call
 //   - context1 context.Context
-func (_e *MockAuditEvent_Expecter) ListAuditEvents(context1 interface{}) *MockAuditEvent_ListAuditEvents_Call {
+func (_e *MockAuditEvent_Expecter) ListAuditEvents(context1 any) *MockAuditEvent_ListAuditEvents_Call {
 	return &MockAuditEvent_ListAuditEvents_Call{Call: _e.mock.On("ListAuditEvents", context1)}
 }
 
@@ -185,7 +185,7 @@ type MockAuditEvent_WatchAuditEvents_Call struct {
 // WatchAuditEvents is a helper method to define mock.On call
 //   - context1 context.Context
 //   - auditEventCh chan<- *entities.AuditEvent
-func (_e *MockAuditEvent_Expecter) WatchAuditEvents(context1 interface{}, auditEventCh interface{}) *MockAuditEvent_WatchAuditEvents_Call {
+func (_e *MockAuditEvent_Expecter) WatchAuditEvents(context1 any, auditEventCh any) *MockAuditEvent_WatchAuditEvents_Call {
 	return &MockAuditEvent_WatchAuditEvents_Call{Call: _e.mock.On("WatchAuditEvents", context1, auditEventCh)}
 }
 
@@ -312,7 +312,7 @@ type MockClock_Since_Call struct {
 
 // Since is a helper method to define mock.On call
 //   - t time.Time
-func (_e *MockClock_Expecter) Since(t interface{}) *MockClock_Since_Call {
+func (_e *MockClock_Expecter) Since(t any) *MockClock_Since_Call {
 	return &MockClock_Since_Call{Call: _e.mock.On("Since", t)}
 }
 
@@ -407,7 +407,7 @@ type MockClock_Until_Call struct {
 
 // Until is a helper method to define mock.On call
 //   - t time.Time
-func (_e *MockClock_Expecter) Until(t interface{}) *MockClock_Until_Call {
+func (_e *MockClock_Expecter) Until(t any) *MockClock_Until_Call {
 	return &MockClock_Until_Call{Call: _e.mock.On("Until", t)}
 }
 
@@ -486,7 +486,7 @@ type MockResource_CreateResource_Call struct {
 // CreateResource is a helper method to define mock.On call
 //   - context1 context.Context
 //   - resource *entities.Resource
-func (_e *MockResource_Expecter) CreateResource(context1 interface{}, resource interface{}) *MockResource_CreateResource_Call {
+func (_e *MockResource_Expecter) CreateResource(context1 any, resource any) *MockResource_CreateResource_Call {
 	return &MockResource_CreateResource_Call{Call: _e.mock.On("CreateResource", context1, resource)}
 }
 
@@ -543,7 +543,7 @@ type MockResource_DeleteResource_Call struct {
 // DeleteResource is a helper method to define mock.On call
 //   - context1 context.Context
 //   - uUID uuid.UUID
-func (_e *MockResource_Expecter) DeleteResource(context1 interface{}, uUID interface{}) *MockResource_DeleteResource_Call {
+func (_e *MockResource_Expecter) DeleteResource(context1 any, uUID any) *MockResource_DeleteResource_Call {
 	return &MockResource_DeleteResource_Call{Call: _e.mock.On("DeleteResource", context1, uUID)}
 }
 
@@ -611,7 +611,7 @@ type MockResource_GetResource_Call struct {
 // GetResource is a helper method to define mock.On call
 //   - context1 context.Context
 //   - uUID uuid.UUID
-func (_e *MockResource_Expecter) GetResource(context1 interface{}, uUID interface{}) *MockResource_GetResource_Call {
+func (_e *MockResource_Expecter) GetResource(context1 any, uUID any) *MockResource_GetResource_Call {
 	return &MockResource_GetResource_Call{Call: _e.mock.On("GetResource", context1, uUID)}
 }
 
@@ -679,7 +679,7 @@ type MockResource_ListResources_Call struct {
 // ListResources is a helper method to define mock.On call
 //   - context1 context.Context
 //   - pager repositories.Pager
-func (_e *MockResource_Expecter) ListResources(context1 interface{}, pager interface{}) *MockResource_ListResources_Call {
+func (_e *MockResource_Expecter) ListResources(context1 any, pager any) *MockResource_ListResources_Call {
 	return &MockResource_ListResources_Call{Call: _e.mock.On("ListResources", context1, pager)}
 }
 
@@ -747,7 +747,7 @@ type MockResource_UpdateResource_Call struct {
 // UpdateResource is a helper method to define mock.On call
 //   - context1 context.Context
 //   - resource *entities.Resource
-func (_e *MockResource_Expecter) UpdateResource(context1 interface{}, resource interface{}) *MockResource_UpdateResource_Call {
+func (_e *MockResource_Expecter) UpdateResource(context1 any, resource any) *MockResource_UpdateResource_Call {
 	return &MockResource_UpdateResource_Call{Call: _e.mock.On("UpdateResource", context1, resource)}
 }
 

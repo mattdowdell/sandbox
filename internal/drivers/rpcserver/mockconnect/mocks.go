@@ -106,7 +106,7 @@ type MockStreamingHandlerConn_Receive_Call struct {
 
 // Receive is a helper method to define mock.On call
 //   - v any
-func (_e *MockStreamingHandlerConn_Expecter) Receive(v interface{}) *MockStreamingHandlerConn_Receive_Call {
+func (_e *MockStreamingHandlerConn_Expecter) Receive(v any) *MockStreamingHandlerConn_Receive_Call {
 	return &MockStreamingHandlerConn_Receive_Call{Call: _e.mock.On("Receive", v)}
 }
 
@@ -295,7 +295,7 @@ type MockStreamingHandlerConn_Send_Call struct {
 
 // Send is a helper method to define mock.On call
 //   - v any
-func (_e *MockStreamingHandlerConn_Expecter) Send(v interface{}) *MockStreamingHandlerConn_Send_Call {
+func (_e *MockStreamingHandlerConn_Expecter) Send(v any) *MockStreamingHandlerConn_Send_Call {
 	return &MockStreamingHandlerConn_Send_Call{Call: _e.mock.On("Send", v)}
 }
 
@@ -663,7 +663,7 @@ type MockAnyRequest_setRequestMethod_Call struct {
 
 // setRequestMethod is a helper method to define mock.On call
 //   - s string
-func (_e *MockAnyRequest_Expecter) setRequestMethod(s interface{}) *MockAnyRequest_setRequestMethod_Call {
+func (_e *MockAnyRequest_Expecter) setRequestMethod(s any) *MockAnyRequest_setRequestMethod_Call {
 	return &MockAnyRequest_setRequestMethod_Call{Call: _e.mock.On("setRequestMethod", s)}
 }
 
