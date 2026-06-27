@@ -196,6 +196,7 @@ github.com/bufbuild/buf v1.69.0 h1:q1YTnHJISHuoeUdmsuC9u+nb9rV8glM/TOsPNEteEzg=
 github.com/bufbuild/buf v1.69.0/go.mod h1:Q3KRCXSanDCMFs2zL/MqUwUQV0OUqs23P2sy58CW0nc=
 github.com/bufbuild/buf v1.70.0 h1:rGL4TGoy8F1DbQa4BSlMOVBBR7lWblfnKxUdOxmeFns=
 github.com/bufbuild/buf v1.70.0/go.mod h1:5gCCIpDmBzhiSJwqmxmbdN5aRZQYGmFSGnOBE7seP8c=
+github.com/bufbuild/buf v1.71.0/go.mod h1:fbHMfu0nEbIPQT3IG7rAfPZXoFYEfZJuqFbAXu1wnRU=
 github.com/bufbuild/protocompile v0.14.1 h1:iA73zAf/fyljNjQKwYzUHD6AD4R8KMasmwa/FBatYVw=
 github.com/bufbuild/protocompile v0.14.1/go.mod h1:ppVdAIhbr2H8asPk6k4pY7t9zB1OU5DoEw9xY/FUi1c=
 github.com/bufbuild/protocompile v0.14.2-0.20251017200126-6da99d83224e h1:k4BETn+kh6RM6d+fG80avRtVc/v3mzFx92I4XqYOgGQ=
