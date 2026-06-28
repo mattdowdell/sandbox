@@ -439,8 +439,8 @@ jobs:
           kubectl logs -lbatch.kubernetes.io/job-name=example-db-migrate
           echo "::endgroup::"
 
-  tag:
-    name: Tag
+  version:
+    name: Version
     needs:
       - unit
       - scan-gitleaks
@@ -452,8 +452,7 @@ jobs:
       contents: write # for pushing tags (and checkout)
     runs-on: ubuntu-latest
     outputs:
-      short: ${{ steps.tag.outputs.short }}
-      long: ${{ steps.tag.outputs.long }}
+      version: ${{ steps.version.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -461,16 +460,16 @@ jobs:
           fetch-depth: 0
           persist-credentials: true
 
-      - name: Tag
-        id: tag
-        uses: ./.github/actions/tag
+      - name: Version
+        id: version
+        uses: ./.github/actions/zerover
         with:
-          rollover: true
+          create: ${{ github.event_name == 'push' }}
 
   build:
     name: Build
     needs:
-      - tag
+      - version
     runs-on: ubuntu-latest
     permissions:
       contents: read # for checkout
@@ -506,5 +505,5 @@ jobs:
         with:
           service: example-rpc
           repository: ghcr.io/mattdowdell/sandbox/example-rpc
-          version: ${{ needs.tag.outputs.long }}
+          version: ${{ needs.version.outputs.version }}
           trivy-version: ${{ steps.trivy-version.outputs.version }}
