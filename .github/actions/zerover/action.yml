@@ -17,6 +17,8 @@ description: |
 
   When create=true, creates and pushes a new tag with incremented version.
 
+  IMPORTANT: Requires actions/checkout with fetch-depth: 0 for proper tag detection.
+
 inputs:
   create:
     description: |

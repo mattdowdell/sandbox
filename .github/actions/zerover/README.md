@@ -11,13 +11,32 @@ A GitHub Action for managing versioning with a [ZeroVer](https://0ver.org/) phil
 - **Dev Versions**: Automatic dev version generation with timestamps and commit hashes
 - **Flexible Tag Creation**: Control when tags are created vs. when versions are calculated
 
+## Prerequisites
+
+**Important**: This action requires full git history to properly detect tags and calculate versions. Always use `fetch-depth: 0` with `actions/checkout`:
+
+```yaml
+- uses: actions/checkout@v7
+  with:
+    fetch-depth: 0 # to calculate version correctly
+    persist-credentials: true # for pushing tags
+```
+
+The action will emit a warning if a shallow clone is detected.
+
 ## Usage
 
 ### Basic Usage - Get Current Version
 
 ```yaml
+- uses: actions/checkout@v7
+  with:
+    fetch-depth: 0 # to calculate version correctly
+    persist-credentials: true # for pushing tags
+
 - uses: ./.github/actions/zerover
   id: version
+
 - run: echo "Version is ${{ steps.version.outputs.version }}"
 ```
 
@@ -28,10 +47,16 @@ A GitHub Action for managing versioning with a [ZeroVer](https://0ver.org/) phil
 ### Create a New Tag
 
 ```yaml
+- uses: actions/checkout@v7
+  with:
+    fetch-depth: 0 # to calculate version correctly
+    persist-credentials: true # for pushing tags
+
 - uses: ./.github/actions/zerover
   id: version
   with:
     create: true
+
 - run: echo "Created version ${{ steps.version.outputs.version }}"
 ```
 
@@ -135,9 +160,10 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # to calculate version correctly
+          persist-credentials: true # for pushing tags
       
       - uses: ./.github/actions/zerover
         id: version
@@ -163,9 +189,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # to calculate version correctly
+          persist-credentials: true # for pushing tags
       
       - uses: ./.github/actions/zerover
         id: version

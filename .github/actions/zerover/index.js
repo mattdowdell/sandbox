@@ -22,6 +22,9 @@
  * - created: Boolean indicating if a new tag was created
  */
 module.exports = async ({ core, exec }) => {
+  // Check repository depth and warn if shallow
+  await checkRepositoryDepth({ core, exec });
+
   const shouldCreate = process.env.create === "true";
 
   let tag;
@@ -42,6 +45,28 @@ module.exports = async ({ core, exec }) => {
   core.setOutput("version", version);
   core.setOutput("created", created.toString());
 };
+
+/**
+ * Check if the repository has full history (not a shallow clone).
+ *
+ * ZeroVer action requires fetch-depth: 0 for proper tag detection and version calculation.
+ * This function warns users if a shallow clone is detected.
+ */
+async function checkRepositoryDepth({ core, exec }) {
+  const result = await exec.getExecOutput(
+    "git",
+    ["rev-parse", "--is-shallow-repository"],
+    { ignoreReturnCode: true }
+  );
+
+  if (result.stdout.trim() === "true") {
+    core.warning(
+      "Repository appears to be a shallow clone. " +
+      "ZeroVer action works best with fetch-depth: 0 to ensure all tags are available. " +
+      "Add 'fetch-depth: 0' to your actions/checkout step."
+    );
+  }
+}
 
 /**
  * Get the current tag and create the next tag by incrementing the version.
