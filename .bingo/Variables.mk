@@ -29,11 +29,11 @@ $(ACTIONLINT): $(BINGO_DIR)/actionlint.mod
 	@echo "(re)installing $(GOBIN)/actionlint-v1.7.12"
 	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=actionlint.mod -o=$(GOBIN)/actionlint-v1.7.12 "github.com/rhysd/actionlint/cmd/actionlint"
 
-BUF := $(GOBIN)/buf-v1.70.0
+BUF := $(GOBIN)/buf-v1.71.0
 $(BUF): $(BINGO_DIR)/buf.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/buf-v1.70.0"
-	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=buf.mod -o=$(GOBIN)/buf-v1.70.0 "github.com/bufbuild/buf/cmd/buf"
+	@echo "(re)installing $(GOBIN)/buf-v1.71.0"
+	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=buf.mod -o=$(GOBIN)/buf-v1.71.0 "github.com/bufbuild/buf/cmd/buf"
 
 CTLPTL := $(GOBIN)/ctlptl-v0.9.4
 $(CTLPTL): $(BINGO_DIR)/ctlptl.mod
