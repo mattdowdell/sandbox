@@ -47,7 +47,10 @@ inputs:
     description: |
       The maximum value for patch version before rolling over to increment minor version.
       Only applies when strategy=rollover.
-      Example: With rollover-max=100, version 0.5.99 → 0.6.0
+      Set to 0 or negative to disable rollover (patch version increments indefinitely).
+      Examples:
+        - rollover-max=100: version 0.5.99 → 0.6.0
+        - rollover-max=0: version 0.5.999 → 0.5.1000 (never rolls over)
     required: false
     default: "100"
 

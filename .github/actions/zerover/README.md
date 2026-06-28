@@ -49,6 +49,18 @@ A GitHub Action for managing versioning with a [ZeroVer](https://0ver.org/) phil
 - `0.5.50` → `0.5.51` (normal increment)
 - `0.5.99` → `0.6.0` (rollover to minor)
 
+**Disable rollover** (patch increments indefinitely):
+```yaml
+- uses: ./.github/actions/zerover
+  with:
+    create: true
+    strategy: rollover
+    rollover-max: 0
+```
+
+**Behavior**:
+- `0.5.999` → `0.5.1000` (no rollover)
+
 ### Using Conventional Commits Strategy
 
 ```yaml
@@ -82,7 +94,7 @@ A GitHub Action for managing versioning with a [ZeroVer](https://0ver.org/) phil
 | `user-name` | Git user name for creating tags | No | `github-actions[bot]` |
 | `user-email` | Git user email for creating tags | No | `41898282+github-actions[bot]@users.noreply.github.com` |
 | `strategy` | Versioning strategy (`rollover` or `conventional-commits`) | No | `rollover` |
-| `rollover-max` | Maximum patch version before rollover (rollover strategy only) | No | `100` |
+| `rollover-max` | Maximum patch version before rollover (rollover strategy only). Set to 0 to disable rollover. | No | `100` |
 
 ## Outputs
 

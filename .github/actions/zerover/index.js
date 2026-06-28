@@ -241,9 +241,11 @@ function formatVersion(parts) {
  * rollover-max value, increments the minor version and resets patch to 0.
  * The major version is never modified (ZeroVer philosophy).
  *
- * Example with rollover-max=100:
- * - v0.5.50 → v0.5.51
- * - v0.5.99 → v0.6.0
+ * If rollover-max is <= 0, it is treated as infinity (no rollover ever occurs).
+ *
+ * Examples:
+ * - rollover-max=100: v0.5.50 → v0.5.51, v0.5.99 → v0.6.0
+ * - rollover-max=0: v0.5.999 → v0.5.1000 (never rolls over)
  *
  * @param {string} tag - Current version tag
  * @returns {string} Next version tag
@@ -255,8 +257,8 @@ function incrementVersionRollover({ tag }) {
   // Increment patch version
   parts[2] = parts[2] + 1;
 
-  // Check for rollover
-  if (parts[2] >= rolloverMax) {
+  // Check for rollover (only if rolloverMax > 0)
+  if (rolloverMax > 0 && parts[2] >= rolloverMax) {
     parts[1] = parts[1] + 1; // Increment minor
     parts[2] = 0; // Reset patch
   }
