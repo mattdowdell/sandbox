@@ -1,0 +1,88 @@
+---
+name: "ZeroVer"
+description: |
+  ZeroVer versioning action for GitHub repositories.
+
+  Manages versioning with a ZeroVer philosophy (major version stays at 0).
+  Supports two strategies:
+  - rollover: Increments patch version, rolling over to minor when reaching a limit
+  - conventional-commits: Analyzes commit messages to determine version increments
+
+  When create=false, returns the current version:
+  - Clean tag if on tagged commit (e.g., "0.1.4")
+  - Dev version if not on tagged commit (e.g., "0.1.4-dev.20260628143052.abc123def456")
+    Format: {base-version}-dev.{timestamp}.{commit-hash}
+    - timestamp: YYYYMMDDHHmmss in UTC
+    - commit-hash: 12-character abbreviated hash
+
+  When create=true, creates and pushes a new tag with incremented version.
+
+inputs:
+  create:
+    description: |
+      Whether to create a new tag.
+      - true: Creates and pushes a new tag with incremented version
+      - false: Returns current version (clean tag if commit is tagged, dev version otherwise)
+    required: false
+    default: "false"
+  user-name:
+    description: "The git user name to use when creating tags."
+    required: false
+    default: "github-actions[bot]"
+  user-email:
+    description: "The git user email to use when creating tags."
+    required: false
+    default: "41898282+github-actions[bot]@users.noreply.github.com"
+  strategy:
+    description: |
+      The versioning strategy to use when creating tags (only applies when create=true).
+      - rollover: Increment patch version, rolling over to minor when reaching rollover-max
+      - conventional-commits: Analyze commit messages following Conventional Commits spec
+        * feat: or breaking changes → increment minor version
+        * other commits (fix:, chore:, etc.) → increment patch version
+      The major version is never incremented (ZeroVer philosophy).
+    required: false
+    default: "rollover"
+  rollover-max:
+    description: |
+      The maximum value for patch version before rolling over to increment minor version.
+      Only applies when strategy=rollover.
+      Example: With rollover-max=100, version 0.5.99 → 0.6.0
+    required: false
+    default: "100"
+
+outputs:
+  version:
+    description: |
+      The current version (without 'v' prefix).
+      Format depends on context:
+      - When create=true: Clean version (e.g., "0.1.5")
+      - When create=false and commit is tagged: Clean version (e.g., "0.1.4")
+      - When create=false and commit is not tagged: Dev version with timestamp and hash (e.g., "0.1.4-dev.20260628143052.abc123def456")
+    value: ${{ steps.get-version.outputs.version }}
+  created:
+    description: |
+      Whether a new tag was created.
+      - "true": A new tag was created and pushed
+      - "false": No tag was created (either create=false or current commit already tagged)
+    value: ${{ steps.get-version.outputs.created }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Get version
+      id: get-version
+      uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+      with:
+        script: |
+          const path = require('path');
+
+          const script = require(path.join(process.env.GITHUB_ACTION_PATH, 'index.js'));
+          await script({ core, context, exec });
+      env:
+        TZ: UTC
+        create: ${{ inputs.create }}
+        user_name: ${{ inputs.user-name }}
+        user_email: ${{ inputs.user-email }}
+        strategy: ${{ inputs.strategy }}
+        rollover_max: ${{ inputs.rollover-max }}
