@@ -169,7 +169,7 @@ helm_resource(
     flags=[
         "--create-namespace",
         # renovate: datasource=helm depName=opentelemetry-operator packageName=opentelemetry-operator registryUrl=https://open-telemetry.github.io/opentelemetry-helm-charts
-        "--version=0.115.0",
+        "--version=0.117.0",
         "--values=k8s/helm/opentelemetry-operator/values.yaml",
     ],
     resource_deps=["cert-manager"],
