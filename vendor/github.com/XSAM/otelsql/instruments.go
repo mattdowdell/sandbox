@@ -19,7 +19,7 @@ import (
 	"strings"
 
 	"go.opentelemetry.io/otel/metric"
-	semconv "go.opentelemetry.io/otel/semconv/v1.30.0"
+	"go.opentelemetry.io/otel/semconv/v1.40.0/dbconv"
 )
 
 const (
@@ -37,29 +37,15 @@ type dbStatsInstruments struct {
 }
 
 type instruments struct {
-	// The legacyLatency of calls in milliseconds
-	legacyLatency metric.Float64Histogram
 	// The duration of calls in seconds
-	duration metric.Float64Histogram
+	duration dbconv.ClientOperationDuration
 }
 
 func newInstruments(meter metric.Meter) (*instruments, error) {
 	var instruments instruments
 
 	var err error
-	if instruments.legacyLatency, err = meter.Float64Histogram(
-		strings.Join([]string{namespace, "latency"}, "."),
-		metric.WithDescription("The latency of calls in milliseconds"),
-		metric.WithUnit("ms"),
-	); err != nil {
-		return nil, fmt.Errorf("failed to create legacy latency instrument, %w", err)
-	}
-
-	if instruments.duration, err = meter.Float64Histogram(
-		semconv.DBClientOperationDurationName,
-		metric.WithDescription(semconv.DBClientOperationDurationDescription),
-		metric.WithUnit(semconv.DBClientOperationDurationUnit),
-	); err != nil {
+	if instruments.duration, err = dbconv.NewClientOperationDuration(meter); err != nil {
 		return nil, fmt.Errorf("failed to create duration instrument, %w", err)
 	}
 
