@@ -1,3 +1,4 @@
+# -*- mode: Python -*-
 # https://docs.tilt.dev/api.html
 
 # -----
@@ -108,6 +109,15 @@ k8s_kind(
     image_json_path="{.spec.imageName}",
 )
 
+# There's a delay between the operator deployment becoming ready
+# and the webhook for the Cluster CRD being usable
+local_resource(
+    "cnpg-operator-ready",
+    "./tools/wait-for-cnpg-operator.sh",
+    resource_deps=["cloudnative-pg"],
+    labels=["postgresql"],
+)
+
 helm_resource(
     name="postgresql-cluster",
     chart="cnpg/cluster",
@@ -119,7 +129,7 @@ helm_resource(
     deps=["k8s/helm/postgresql/values.yaml"],
     resource_deps=[
         "cnpg-repo",
-        "cloudnative-pg",
+        "cnpg-operator-ready",
     ],
     labels=["postgresql"],
     port_forwards=["127.0.0.1:5432:5432"],
