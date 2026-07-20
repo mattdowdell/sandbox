@@ -8,6 +8,22 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [0.43.0] - 2026-07-12
+
+### Removed
+
+- **BREAKING** Remove support for `OTEL_SEMCONV_STABILITY_OPT_IN` environment variable, legacy `db.sql.latency` metric, and `db.statement` span attribute. Only stable Semantic Conventions are now used. (#617)
+
+### Changed
+
+- ~~Upgrade OTel Semconv to `v1.40.0`.~~ (#606)
+- Upgrade OTel Semconv to `v1.44.0`. (#615)
+
+### Fixed
+
+- Implement `driver.Validator` on `otConn` so that `database/sql` connection pool health checks are properly delegated to the underlying driver connection. (#619)
+- `AttributesFromDSN` no longer panics on DSNs that wrap a unix-socket path in the `protocol(/path/to.sock)` form, e.g. `unix(/tmp/mysql.sock)/dbname`. The parser now extracts the address from inside the parentheses before splitting on `/`. (#625)
+
 ## [0.42.0] - 2026-03-30
 
 ### ⚠️ Notice ⚠️
@@ -523,7 +539,8 @@ It contains instrumentation for trace and depends on OTel `v0.18.0`.
 [Go 1.24]: https://go.dev/doc/go1.24
 [Go 1.23]: https://go.dev/doc/go1.23
 
-[Unreleased]: https://github.com/XSAM/otelsql/compare/v0.42.0...HEAD
+[Unreleased]: https://github.com/XSAM/otelsql/compare/v0.43.0...HEAD
+[0.43.0]: https://github.com/XSAM/otelsql/releases/tag/v0.43.0
 [0.42.0]: https://github.com/XSAM/otelsql/releases/tag/v0.42.0
 [0.41.0]: https://github.com/XSAM/otelsql/releases/tag/v0.41.0
 [0.40.0]: https://github.com/XSAM/otelsql/releases/tag/v0.40.0
