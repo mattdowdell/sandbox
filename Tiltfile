@@ -123,7 +123,7 @@ helm_resource(
     chart="cnpg/cluster",
     flags=[
         # renovate: datasource=helm depName=cluster packageName=cluster registryUrl=https://cloudnative-pg.github.io/charts
-        "--version=0.7.0",
+        "--version=0.8.0",
         "--values=k8s/helm/postgresql/values.yaml",
     ],
     deps=["k8s/helm/postgresql/values.yaml"],
