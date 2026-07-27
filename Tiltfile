@@ -263,7 +263,7 @@ helm_resource(
     flags=[
         "--create-namespace",
         # renovate: datasource=helm depName=victoria-logs-single packageName=victoria-logs-single registryUrl=https://victoriametrics.github.io/helm-charts
-        "--version=0.13.8",
+        "--version=0.13.9",
     ],
     resource_deps=["vm-repo"],
     labels=["observability"],
