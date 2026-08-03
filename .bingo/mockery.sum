@@ -152,6 +152,7 @@ github.com/vektra/mockery/v3 v3.7.0 h1:Dd0EeaOcRJBVP9n3oYOVPV7KdPaaE3EcwTppaZIsF
 github.com/vektra/mockery/v3 v3.7.0/go.mod h1:z9Wr23Ha8etImqQwS3boTNR9WkjX6tIklW5c88DRkSw=
 github.com/vektra/mockery/v3 v3.7.1 h1:4jZJCTzf5CEXSXHOtgIu3TuHYUuDKwcc/0vurjQEpjk=
 github.com/vektra/mockery/v3 v3.7.1/go.mod h1:fbChccNiUvQaUVaCHS6/7OL5/D65KljJVk31LuPPUjY=
+github.com/vektra/mockery/v3 v3.7.2 h1:x4r2DwXSdOZdrs89+IKX4VS1dfJySc/YbZsrW80zMBY=
 github.com/vektra/mockery/v3 v3.7.2/go.mod h1:fbChccNiUvQaUVaCHS6/7OL5/D65KljJVk31LuPPUjY=
 github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f h1:J9EGpcZtP0E/raorCMxlFGSTBrsSlaDGf3jU/qvAE2c=
 github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f/go.mod h1:N2zxlSyiKSe5eX1tZViRH5QA0qijqEDrYZiPEAiq3wU=

@@ -77,11 +77,11 @@ $(KUSTOMIZE): $(BINGO_DIR)/kustomize.mod
 	@echo "(re)installing $(GOBIN)/kustomize-v5.8.1"
 	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=kustomize.mod -o=$(GOBIN)/kustomize-v5.8.1 "sigs.k8s.io/kustomize/kustomize/v5"
 
-MOCKERY := $(GOBIN)/mockery-v3.7.1
+MOCKERY := $(GOBIN)/mockery-v3.7.2
 $(MOCKERY): $(BINGO_DIR)/mockery.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/mockery-v3.7.1"
-	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=mockery.mod -o=$(GOBIN)/mockery-v3.7.1 "github.com/vektra/mockery/v3"
+	@echo "(re)installing $(GOBIN)/mockery-v3.7.2"
+	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=mockery.mod -o=$(GOBIN)/mockery-v3.7.2 "github.com/vektra/mockery/v3"
 
 PROTOC_GEN_CONNECT_GO := $(GOBIN)/protoc-gen-connect-go-v1.19.1
 $(PROTOC_GEN_CONNECT_GO): $(BINGO_DIR)/protoc-gen-connect-go.mod
