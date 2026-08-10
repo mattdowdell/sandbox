@@ -20,7 +20,7 @@ require (
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/cucumber/godog v0.16.0
 	github.com/go-jet/jet/v2 v2.15.0
-	github.com/gofrs/uuid/v5 v5.4.0
+	github.com/gofrs/uuid/v5 v5.5.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgerrcode v0.0.0-20250907135507-afb5586c32a6
