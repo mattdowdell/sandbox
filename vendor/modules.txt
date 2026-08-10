@@ -239,8 +239,8 @@ github.com/go-logr/stdr
 ## explicit; go 1.18
 github.com/go-viper/mapstructure/v2
 github.com/go-viper/mapstructure/v2/internal/errors
-# github.com/gofrs/uuid/v5 v5.4.0
-## explicit; go 1.19
+# github.com/gofrs/uuid/v5 v5.5.0
+## explicit; go 1.25
 github.com/gofrs/uuid/v5
 # github.com/golang-jwt/jwt/v5 v5.3.1
 ## explicit; go 1.21
