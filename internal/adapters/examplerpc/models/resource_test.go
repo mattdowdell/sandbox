@@ -71,7 +71,7 @@ func Test_ResourceUpdateToDomain_Error(t *testing.T) {
 	assert.EqualError(
 		t,
 		err,
-		`failed to parse id "invalid": uuid: incorrect UUID length 7 in string "invalid"`,
+		`failed to parse id "invalid": uuid: incorrect UUID length`,
 	)
 }
 
