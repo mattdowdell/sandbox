@@ -449,6 +449,7 @@ jobs:
       - functional-compose
       - functional-tilt
     permissions:
+      actions: write # for pushing tags after workflows have been modified
       contents: write # for pushing tags (and checkout)
     runs-on: ubuntu-latest
     outputs:
