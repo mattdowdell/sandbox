@@ -324,7 +324,7 @@ github.com/knadh/koanf/parsers/json
 # github.com/knadh/koanf/parsers/toml/v2 v2.2.2
 ## explicit; go 1.23.0
 github.com/knadh/koanf/parsers/toml/v2
-# github.com/knadh/koanf/parsers/yaml v1.1.0
+# github.com/knadh/koanf/parsers/yaml v1.1.1
 ## explicit; go 1.23.0
 github.com/knadh/koanf/parsers/yaml
 # github.com/knadh/koanf/providers/env/v2 v2.0.0
