@@ -20,7 +20,7 @@ ctlptl := join(gopath, "bin", "ctlptl-v0.9.4")
 install-ctlptl:
     {{ if path_exists(ctlptl) == "true" { "" } else { "bingo get ctlptl" } }}
 
-godog := join(gopath, "bin", "godog-v0.15.1")
+godog := join(gopath, "bin", "godog-v0.16.0")
 
 [private]
 install-godog:

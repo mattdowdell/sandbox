@@ -41,11 +41,11 @@ $(CTLPTL): $(BINGO_DIR)/ctlptl.mod
 	@echo "(re)installing $(GOBIN)/ctlptl-v0.9.4"
 	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=ctlptl.mod -o=$(GOBIN)/ctlptl-v0.9.4 "github.com/tilt-dev/ctlptl/cmd/ctlptl"
 
-GODOG := $(GOBIN)/godog-v0.15.1
+GODOG := $(GOBIN)/godog-v0.16.0
 $(GODOG): $(BINGO_DIR)/godog.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/godog-v0.15.1"
-	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=godog.mod -o=$(GOBIN)/godog-v0.15.1 "github.com/cucumber/godog/cmd/godog"
+	@echo "(re)installing $(GOBIN)/godog-v0.16.0"
+	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=godog.mod -o=$(GOBIN)/godog-v0.16.0 "github.com/cucumber/godog/cmd/godog"
 
 GOLANGCI_LINT := $(GOBIN)/golangci-lint-v2.12.2
 $(GOLANGCI_LINT): $(BINGO_DIR)/golangci-lint.mod
