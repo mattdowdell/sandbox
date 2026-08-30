@@ -21,6 +21,11 @@ ignore {
 }
 
 ignore {
+    input.PkgName == "ca-certificates"
+    {"GPL-2.0-or-later", "GPL-2.0-only", "MPL-2.0"}[input.Name]
+}
+
+ignore {
     input.PkgName == "netbase"
     input.Name == "GPL-2.0-only"
 }
