@@ -16,7 +16,7 @@ runs:
         setup_only: true
 
     - name: Install Just
-      uses: taiki-e/install-action@b6b84cf49ebfe0176417bdce007c624f0db37f20 # v2.86.2
+      uses: taiki-e/install-action@6cd13508893c0e7eab5f273c2575d3859bd7229a # v2.86.6
       with:
         tool: just
 
