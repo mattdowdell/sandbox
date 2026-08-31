@@ -20,7 +20,7 @@ jobs:
   collect:
     name: Collect
     permissions:
-      contents: read
+      contents: write
     runs-on: "ubuntu-latest"
     outputs:
       names: ${{ steps.collect.outputs.names }}
