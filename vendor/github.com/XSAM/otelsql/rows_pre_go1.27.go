@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:build !go1.27
+
 package otelsql
 
-// Version is the current release version of otelsql in use.
-func Version() string {
-	return "0.44.0"
+import "database/sql/driver"
+
+func wrapRowsColumnScanner(rows *otRows) driver.Rows {
+	return rows
 }
