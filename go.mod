@@ -4,7 +4,7 @@ go 1.26
 
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-20260825204119-511051f7f437.1
-	buf.build/gen/go/grpc/grpc/connectrpc/go v1.20.0-20260331211127-1730f7242d0f.1
+	buf.build/gen/go/grpc/grpc/connectrpc/go v1.20.0-20260903202810-d49c978ac9cc.1
 	buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.12-20260331211127-1730f7242d0f.1
 	buf.build/go/protovalidate v1.3.0
 	connectrpc.com/connect v1.20.0
