@@ -7,7 +7,7 @@ require (
 	buf.build/gen/go/grpc/grpc/connectrpc/go v1.20.0-20260331211127-1730f7242d0f.1
 	buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.12-20260331211127-1730f7242d0f.1
 	buf.build/go/protovalidate v1.3.0
-	connectrpc.com/connect v1.20.0
+	connectrpc.com/connect v1.21.0
 	connectrpc.com/grpchealth v1.5.0
 	connectrpc.com/grpcreflect v1.3.0
 	connectrpc.com/otelconnect v0.9.0

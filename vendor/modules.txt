@@ -15,7 +15,7 @@ buf.build/go/protovalidate/internal/rules
 # cel.dev/expr v0.25.2
 ## explicit; go 1.23.0
 cel.dev/expr
-# connectrpc.com/connect v1.20.0
+# connectrpc.com/connect v1.21.0
 ## explicit; go 1.25.0
 connectrpc.com/connect
 connectrpc.com/connect/internal/gen/connectext/grpc/status/v1
