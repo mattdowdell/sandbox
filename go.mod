@@ -11,7 +11,7 @@ require (
 	connectrpc.com/grpchealth v1.5.0
 	connectrpc.com/grpcreflect v1.3.0
 	connectrpc.com/otelconnect v0.9.0
-	connectrpc.com/validate v0.6.0
+	connectrpc.com/validate v0.7.0
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/XSAM/otelsql v0.43.0
 	github.com/aws/aws-sdk-go-v2/config v1.33.3

@@ -56,8 +56,8 @@ connectrpc.com/grpcreflect/internal/gen/go/connectext/grpc/reflection/v1
 # connectrpc.com/otelconnect v0.9.0
 ## explicit; go 1.24
 connectrpc.com/otelconnect
-# connectrpc.com/validate v0.6.0
-## explicit; go 1.24.0
+# connectrpc.com/validate v0.7.0
+## explicit; go 1.26.0
 connectrpc.com/validate
 # github.com/DATA-DOG/go-sqlmock v1.5.2
 ## explicit; go 1.15

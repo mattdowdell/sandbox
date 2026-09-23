@@ -1,4 +1,4 @@
-// Copyright 2023-2025 The Connect Authors
+// Copyright 2023-2026 The Connect Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,8 +35,8 @@ type Option interface {
 }
 
 // WithValidator configures the [Interceptor] to use a customized
-// [protovalidate.Validator]. By default, [protovalidate.GlobalInterceptor]
-// is used See [protovalidate.ValidatorOption] for the range of available
+// [protovalidate.Validator]. By default, [protovalidate.GlobalValidator]
+// is used. See [protovalidate.ValidatorOption] for the range of available
 // customizations.
 func WithValidator(validator protovalidate.Validator) Option {
 	return optionFunc(func(i *Interceptor) {
@@ -49,9 +49,9 @@ func WithValidator(validator protovalidate.Validator) Option {
 //
 // By default:
 //
-// - Unary: Response messages from the server are not validated.
-// - Client streams: Received messages are not validated.
-// - Server streams: Sent messages are not validated.
+//   - Unary: Response messages from the server are not validated.
+//   - Client streams: Received messages are not validated.
+//   - Server streams: Sent messages are not validated.
 //
 // However, these messages are all validated if this option is set.
 func WithValidateResponses() Option {
