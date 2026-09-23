@@ -12,7 +12,7 @@ default ignore = false
 
 ignore {
     input.PkgName == "base-files"
-    input.Name == "GPL-2.0-or-later"
+    {"GPL-2.0-or-later", "GPL-2.0-only"}[input.Name]
 }
 
 ignore {
