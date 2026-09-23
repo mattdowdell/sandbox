@@ -72,7 +72,7 @@ jobs:
           persist-credentials: true # re-used for commit/push
 
       - name: Setup checks
-        uses: ./.github/actions/setup-checks
+        uses: $/.github/actions/setup-checks
 
       - name: Start database
         uses: hoverkraft-tech/compose-action@ee6af68587292d72db67743171809c19787df4c9 # v3.1.0

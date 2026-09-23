@@ -57,7 +57,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup checks
-        uses: ./.github/actions/setup-checks
+        uses: $/.github/actions/setup-checks
 
       - name: Start database
         uses: hoverkraft-tech/compose-action@ee6af68587292d72db67743171809c19787df4c9 # v3.1.0
@@ -271,7 +271,7 @@ jobs:
           persist-credentials: false
 
       - name: Run gitleaks
-        uses: ./.github/actions/gitleaks
+        uses: $/.github/actions/gitleaks
 
       # TODO: always run
       - name: Upload Gitleaks scan results
@@ -463,7 +463,7 @@ jobs:
 
       - name: Version
         id: version
-        uses: ./.github/actions/zerover
+        uses: $/.github/actions/zerover
         with:
           create: ${{ github.event_name == 'push' }}
 
@@ -502,7 +502,7 @@ jobs:
           ./tools/bingo-version.sh trivy >> "$GITHUB_OUTPUT"
 
       - name: Build
-        uses: ./.github/actions/container-build
+        uses: $/.github/actions/container-build
         with:
           service: example-rpc
           repository: ghcr.io/mattdowdell/sandbox/example-rpc

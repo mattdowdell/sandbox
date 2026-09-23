@@ -67,7 +67,7 @@ jobs:
 
       - name: Update
         id: update
-        uses: ./.github/actions/bingo-update
+        uses: $/.github/actions/bingo-update
         with:
           name: ${{ matrix.name }}
           dry-run: ${{ inputs.dry-run }}
