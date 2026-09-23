@@ -154,7 +154,7 @@ helm_resource(
     namespace="cert-manager",
     flags=[
         # renovate: datasource=helm depName=cert-manager packageName=cert-manager registryUrl=https://charts.jetstack.io
-        "--version=v1.21.1",
+        "--version=v1.21.2",
         "--create-namespace",
         "--values=k8s/helm/cert-manager/values.yaml",
     ],
