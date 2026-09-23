@@ -8,6 +8,30 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+<!-- Released section -->
+<!-- Don't change this section unless doing release -->
+
+## [0.44.0] - 2026-09-06
+
+This release is the last to support [Go 1.25].
+The next release will require at least [Go 1.26].
+
+### Added
+
+- Support testing of [Go 1.27]. (#650)
+- Add `WithSpanErrorAttributesGetter` option to set additional attributes (e.g., `db.response.status_code`) on spans when an operation returns an error. (#651)
+- Add `SpanOptions.RowsChildOfQuery` to create `sql.rows` spans as children of the `sql.conn.query` or `sql.stmt.query` span that produced them, so concurrent queries can be correlated with their result iteration. (#652)
+- Support `driver.RowsColumnScanner` on [Go 1.27]. (#649)
+
+### Changed
+
+- Replace `ErrorTypeAttributes` with `ErrorTypeAttribute` to avoid allocating an additional slice. (#643)
+- Upgrade OTel to `v1.46.0`. (#644)
+
+### Fixed
+
+- `db.client.operation.duration` histogram now uses the explicit bucket boundaries recommended by the OTel Semantic Conventions (`0.001` to `10` seconds) instead of the SDK defaults, which placed virtually all database operations in the first bucket. (#632)
+
 ## [0.43.0] - 2026-07-12
 
 ### Removed
@@ -16,8 +40,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Changed
 
-- ~~Upgrade OTel Semconv to `v1.40.0`.~~ (#606)
-- Upgrade OTel Semconv to `v1.44.0`. (#615)
+- ~~Upgrade OTel to `v1.40.0`.~~ (#606)
+- Upgrade OTel to `v1.44.0`. (#615)
 
 ### Fixed
 
@@ -534,6 +558,9 @@ It contains instrumentation for trace and depends on OTel `v0.18.0`.
 - Example code for a basic usage.
 - Apache-2.0 license.
 
+<!-- Released section ended -->
+
+[Go 1.27]: https://go.dev/doc/go1.27
 [Go 1.26]: https://go.dev/doc/go1.26
 [Go 1.25]: https://go.dev/doc/go1.25
 [Go 1.24]: https://go.dev/doc/go1.24
