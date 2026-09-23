@@ -17,10 +17,19 @@ func NewMockStreamingHandlerConn(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *MockStreamingHandlerConn {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &MockStreamingHandlerConn{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -83,8 +92,8 @@ func (_c *MockStreamingHandlerConn_Peer_Call) RunAndReturn(run func() connect.Pe
 }
 
 // Receive provides a mock function for the type MockStreamingHandlerConn
-func (_mock *MockStreamingHandlerConn) Receive(v any) error {
-	ret := _mock.Called(v)
+func (_mock *MockStreamingHandlerConn) Receive(anyMoqParam any) error {
+	ret := _mock.Called(anyMoqParam)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Receive")
@@ -92,7 +101,7 @@ func (_mock *MockStreamingHandlerConn) Receive(v any) error {
 
 	var r0 error
 	if returnFunc, ok := ret.Get(0).(func(any) error); ok {
-		r0 = returnFunc(v)
+		r0 = returnFunc(anyMoqParam)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -105,12 +114,12 @@ type MockStreamingHandlerConn_Receive_Call struct {
 }
 
 // Receive is a helper method to define mock.On call
-//   - v any
-func (_e *MockStreamingHandlerConn_Expecter) Receive(v any) *MockStreamingHandlerConn_Receive_Call {
-	return &MockStreamingHandlerConn_Receive_Call{Call: _e.mock.On("Receive", v)}
+//   - anyMoqParam any
+func (_e *MockStreamingHandlerConn_Expecter) Receive(anyMoqParam any) *MockStreamingHandlerConn_Receive_Call {
+	return &MockStreamingHandlerConn_Receive_Call{Call: _e.mock.On("Receive", anyMoqParam)}
 }
 
-func (_c *MockStreamingHandlerConn_Receive_Call) Run(run func(v any)) *MockStreamingHandlerConn_Receive_Call {
+func (_c *MockStreamingHandlerConn_Receive_Call) Run(run func(anyMoqParam any)) *MockStreamingHandlerConn_Receive_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 any
 		if args[0] != nil {
@@ -128,7 +137,7 @@ func (_c *MockStreamingHandlerConn_Receive_Call) Return(err error) *MockStreamin
 	return _c
 }
 
-func (_c *MockStreamingHandlerConn_Receive_Call) RunAndReturn(run func(v any) error) *MockStreamingHandlerConn_Receive_Call {
+func (_c *MockStreamingHandlerConn_Receive_Call) RunAndReturn(run func(anyMoqParam any) error) *MockStreamingHandlerConn_Receive_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -272,8 +281,8 @@ func (_c *MockStreamingHandlerConn_ResponseTrailer_Call) RunAndReturn(run func()
 }
 
 // Send provides a mock function for the type MockStreamingHandlerConn
-func (_mock *MockStreamingHandlerConn) Send(v any) error {
-	ret := _mock.Called(v)
+func (_mock *MockStreamingHandlerConn) Send(anyMoqParam any) error {
+	ret := _mock.Called(anyMoqParam)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Send")
@@ -281,7 +290,7 @@ func (_mock *MockStreamingHandlerConn) Send(v any) error {
 
 	var r0 error
 	if returnFunc, ok := ret.Get(0).(func(any) error); ok {
-		r0 = returnFunc(v)
+		r0 = returnFunc(anyMoqParam)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -294,12 +303,12 @@ type MockStreamingHandlerConn_Send_Call struct {
 }
 
 // Send is a helper method to define mock.On call
-//   - v any
-func (_e *MockStreamingHandlerConn_Expecter) Send(v any) *MockStreamingHandlerConn_Send_Call {
-	return &MockStreamingHandlerConn_Send_Call{Call: _e.mock.On("Send", v)}
+//   - anyMoqParam any
+func (_e *MockStreamingHandlerConn_Expecter) Send(anyMoqParam any) *MockStreamingHandlerConn_Send_Call {
+	return &MockStreamingHandlerConn_Send_Call{Call: _e.mock.On("Send", anyMoqParam)}
 }
 
-func (_c *MockStreamingHandlerConn_Send_Call) Run(run func(v any)) *MockStreamingHandlerConn_Send_Call {
+func (_c *MockStreamingHandlerConn_Send_Call) Run(run func(anyMoqParam any)) *MockStreamingHandlerConn_Send_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 any
 		if args[0] != nil {
@@ -317,7 +326,7 @@ func (_c *MockStreamingHandlerConn_Send_Call) Return(err error) *MockStreamingHa
 	return _c
 }
 
-func (_c *MockStreamingHandlerConn_Send_Call) RunAndReturn(run func(v any) error) *MockStreamingHandlerConn_Send_Call {
+func (_c *MockStreamingHandlerConn_Send_Call) RunAndReturn(run func(anyMoqParam any) error) *MockStreamingHandlerConn_Send_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -372,10 +381,19 @@ func NewMockAnyRequest(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *MockAnyRequest {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &MockAnyRequest{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -429,8 +447,8 @@ func (_c *MockAnyRequest_Any_Call) Run(run func()) *MockAnyRequest_Any_Call {
 	return _c
 }
 
-func (_c *MockAnyRequest_Any_Call) Return(v any) *MockAnyRequest_Any_Call {
-	_c.Call.Return(v)
+func (_c *MockAnyRequest_Any_Call) Return(anyMoqParam any) *MockAnyRequest_Any_Call {
+	_c.Call.Return(anyMoqParam)
 	return _c
 }
 
