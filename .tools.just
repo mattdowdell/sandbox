@@ -56,7 +56,7 @@ kustomize := join(gopath, "bin", "kustomize-v5.8.1")
 install-kustomize:
     {{ if path_exists(kustomize) == "true" { "" } else { "bingo get kustomize" } }}
 
-mockery := join(gopath, "bin", "mockery-v3.7.3")
+mockery := join(gopath, "bin", "mockery-v3.8.0")
 
 [private]
 install-mockery:

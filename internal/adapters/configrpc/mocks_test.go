@@ -14,10 +14,19 @@ func NewMockLoader(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *MockLoader {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &MockLoader{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -36,8 +45,8 @@ func (_m *MockLoader) EXPECT() *MockLoader_Expecter {
 }
 
 // Load provides a mock function for the type MockLoader
-func (_mock *MockLoader) Load(v any) error {
-	ret := _mock.Called(v)
+func (_mock *MockLoader) Load(anyMoqParam any) error {
+	ret := _mock.Called(anyMoqParam)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Load")
@@ -45,7 +54,7 @@ func (_mock *MockLoader) Load(v any) error {
 
 	var r0 error
 	if returnFunc, ok := ret.Get(0).(func(any) error); ok {
-		r0 = returnFunc(v)
+		r0 = returnFunc(anyMoqParam)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -58,12 +67,12 @@ type MockLoader_Load_Call struct {
 }
 
 // Load is a helper method to define mock.On call
-//   - v any
-func (_e *MockLoader_Expecter) Load(v any) *MockLoader_Load_Call {
-	return &MockLoader_Load_Call{Call: _e.mock.On("Load", v)}
+//   - anyMoqParam any
+func (_e *MockLoader_Expecter) Load(anyMoqParam any) *MockLoader_Load_Call {
+	return &MockLoader_Load_Call{Call: _e.mock.On("Load", anyMoqParam)}
 }
 
-func (_c *MockLoader_Load_Call) Run(run func(v any)) *MockLoader_Load_Call {
+func (_c *MockLoader_Load_Call) Run(run func(anyMoqParam any)) *MockLoader_Load_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 any
 		if args[0] != nil {
@@ -81,7 +90,7 @@ func (_c *MockLoader_Load_Call) Return(err error) *MockLoader_Load_Call {
 	return _c
 }
 
-func (_c *MockLoader_Load_Call) RunAndReturn(run func(v any) error) *MockLoader_Load_Call {
+func (_c *MockLoader_Load_Call) RunAndReturn(run func(anyMoqParam any) error) *MockLoader_Load_Call {
 	_c.Call.Return(run)
 	return _c
 }
