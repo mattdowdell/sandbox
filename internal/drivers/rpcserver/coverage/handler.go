@@ -3,10 +3,9 @@
 package coverage
 
 import (
+	"encoding/json"
 	"log/slog"
 	"net/http"
-	"os"
-	"runtime/coverage"
 
 	"github.com/mattdowdell/sandbox/pkg/slogx"
 )
@@ -16,30 +15,30 @@ import (
 func Collect(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
-	dir := os.Getenv("GOCOVERDIR")
-	if dir == "" {
-		slog.WarnContext(ctx, "GOCOVERDIR not set")
+	if err := writeCoverage(); err != nil {
+		slog.ErrorContext(ctx, "failed to write coverage", slogx.Err(err))
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	if err := coverage.WriteCountersDir(dir); err != nil {
-		slog.ErrorContext(ctx, "failed to write convcounters", slogx.Err(err))
+	files, err := listCoverage()
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to list coverage files", slogx.Err(err))
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	if err := coverage.WriteMetaDir(dir); err != nil {
-		slog.ErrorContext(ctx, "failed to write covmeta", slogx.Err(err))
+	body, err := json.Marshal(files)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to marshal response body", slogx.Err(err))
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	if err := coverage.ClearCounters(); err != nil {
-		slog.ErrorContext(ctx, "failed to clear coverage counters", slogx.Err(err))
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+	writer.WriteHeader(http.StatusOK)
+	writer.Header().Add("Content-Type", "application/json")
 
-	writer.WriteHeader(http.StatusNoContent)
+	if _, err := writer.Write(body); err != nil {
+		slog.WarnContext(ctx, "failed to write response body", slogx.Err(err))
+	}
 }
