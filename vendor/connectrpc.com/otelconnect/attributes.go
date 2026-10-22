@@ -15,23 +15,32 @@
 package otelconnect
 
 import (
-	"fmt"
 	"net"
 	"net/http"
 	"strconv"
 	"strings"
 
-	"connectrpc.com/connect"
+	connectv1 "connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 	"go.opentelemetry.io/otel/attribute"
-	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.43.0"
 )
 
-// AttributeFilter is used to filter attributes out based on the [connect.Spec]
-// and [attribute.KeyValue]. If the filter returns true the attribute will be
-// kept else it will be removed. AttributeFilter must be safe to call concurrently.
-type AttributeFilter func(connect.Spec, attribute.KeyValue) bool
+const statusCodeOK = "OK" // success
 
-func (filter AttributeFilter) filter(spec connect.Spec, values ...attribute.KeyValue) []attribute.KeyValue {
+// AttributeFilter is used to filter attributes out based on the
+// [connectv1.Spec] and [attribute.KeyValue]. If the filter returns true the
+// attribute will be kept else it will be removed. AttributeFilter must be safe
+// to call concurrently.
+//
+// AttributeFilter takes a connect-go v1 spec. [WithAttributeFilter] also
+// accepts a filter that takes a connect-go v2 spec.
+type AttributeFilter func(connectv1.Spec, attribute.KeyValue) bool
+
+// attributeFilter is an attribute filter bound to one side of an RPC.
+type attributeFilter func(connect.Spec, attribute.KeyValue) bool
+
+func (filter attributeFilter) filter(spec connect.Spec, values ...attribute.KeyValue) []attribute.KeyValue {
 	if filter == nil {
 		return values
 	}
@@ -47,90 +56,74 @@ func (filter AttributeFilter) filter(spec connect.Spec, values ...attribute.KeyV
 	return filteredValues
 }
 
-func addProcedureAttributes(attrs []attribute.KeyValue, procedure string) []attribute.KeyValue {
-	svc, method, ok := strings.Cut(procedure, "/")
-	if !ok {
-		// fall back to treating the whole string as the method
-		return append(attrs, semconv.RPCMethodKey.String(procedure))
-	}
-	if svc != "" {
-		attrs = append(attrs, semconv.RPCServiceKey.String(svc))
-	}
-	if method != "" {
-		attrs = append(attrs, semconv.RPCMethodKey.String(method))
-	}
-	return attrs
+// filterFrom filters values from start onward, in place.
+func (filter attributeFilter) filterFrom(spec connect.Spec, values []attribute.KeyValue, start int) []attribute.KeyValue {
+	return values[:start+len(filter.filter(spec, values[start:]...))]
 }
 
-func addRequestAttributes(protocol string, attrs []attribute.KeyValue, spec connect.Spec, peer connect.Peer) []attribute.KeyValue {
-	if addr := peer.Addr; addr != "" {
-		attrs = addAddressAttributes(attrs, addr)
-	}
-	name := strings.TrimLeft(spec.Procedure, "/")
-	attrs = append(attrs, semconv.RPCSystemKey.String(protocol))
-	attrs = addProcedureAttributes(attrs, name)
-	return attrs
+func addRequestAttributes(protocol string, attrs []attribute.KeyValue, spec connect.Spec) []attribute.KeyValue {
+	return append(attrs,
+		semconv.RPCSystemNameKey.String(protocol),
+		semconv.RPCMethodKey.String(strings.TrimLeft(spec.Procedure, "/")),
+	)
 }
 
-func addAddressAttributes(attrs []attribute.KeyValue, address string) []attribute.KeyValue {
+func addAddressAttributes(attrs []attribute.KeyValue, address string, addressKey, portKey attribute.Key) []attribute.KeyValue {
+	if address == "" {
+		return attrs
+	}
 	if host, port, err := net.SplitHostPort(address); err == nil {
-		portInt, err := strconv.Atoi(port)
-		if err == nil {
-			return append(attrs,
-				semconv.NetPeerNameKey.String(host),
-				semconv.NetPeerPortKey.Int(portInt),
-			)
+		if portInt, err := strconv.Atoi(port); err == nil {
+			return append(attrs, addressKey.String(host), portKey.Int(portInt))
 		}
 	}
-	return append(attrs, semconv.NetPeerNameKey.String(address))
+	return append(attrs, addressKey.String(address))
 }
 
-func statusCodeAttribute(protocol string, serverErr error) (attribute.KeyValue, bool) {
-	// Following the respective specifications, use integers and "status_code" for
-	// gRPC codes in contrast to strings and "error_code" for Connect codes.
-	switch protocol {
-	case grpcProtocol:
-		codeKey := attribute.Key("rpc." + protocol + ".status_code")
-		if serverErr != nil {
-			return codeKey.Int64(int64(connect.CodeOf(serverErr))), true
-		}
-		return codeKey.Int64(0), true // gRPC uses 0 for success
-	case connectProtocol:
-		if connect.IsNotModifiedError(serverErr) {
-			// A "not modified" error is special: it's code is technically "unknown" but
-			// it would be misleading to label it as an unknown error since it's not really
-			// an error, but rather a sentinel to trigger a "304 Not Modified" HTTP status.
-			return semconv.HTTPStatusCodeKey.Int(http.StatusNotModified), true
-		}
-		if serverErr != nil {
-			codeKey := attribute.Key("rpc." + protocol + ".error_code")
-			return codeKey.String(connect.CodeOf(serverErr).String()), true
-		}
+func addStatusAttributes(attrs []attribute.KeyValue, status rpcStatus) []attribute.KeyValue {
+	switch {
+	case status.err == nil:
+		return append(attrs, semconv.RPCResponseStatusCodeKey.String(statusCodeOK))
+	case status.notModified:
+		// A "not modified" error is special: it's code is technically "unknown" but
+		// it would be misleading to label it as an unknown error since it's not really
+		// an error, but rather a sentinel to trigger a "304 Not Modified" HTTP status.
+		return append(attrs,
+			semconv.RPCResponseStatusCodeKey.String(statusCodeOK),
+			semconv.HTTPResponseStatusCodeKey.Int(http.StatusNotModified),
+		)
+	default:
+		// Mirror gRPC's canonical names, e.g. DEADLINE_EXCEEDED.
+		code := strings.ToUpper(status.code.String())
+		return append(attrs,
+			semconv.RPCResponseStatusCodeKey.String(code),
+			semconv.ErrorTypeKey.String(code),
+		)
 	}
-	return attribute.KeyValue{}, false
 }
 
-func headerAttributes(protocol, eventType string, metadata http.Header, allowedKeys []string) []attribute.KeyValue {
+// headerValues is a [*connect.Header] or an [http.Header].
+type headerValues interface {
+	Values(key string) []string
+}
+
+func headerAttributes(eventType string, metadata headerValues, allowedKeys []string) []attribute.KeyValue {
 	attributes := make([]attribute.KeyValue, 0, len(allowedKeys))
-	return addHeaderAttributes(attributes, protocol, eventType, metadata, allowedKeys)
+	return addHeaderAttributes(attributes, eventType, metadata, allowedKeys)
 }
 
-func addHeaderAttributes(attributes []attribute.KeyValue, protocol, eventType string, metadata http.Header, allowedKeys []string) []attribute.KeyValue {
+func addHeaderAttributes(attributes []attribute.KeyValue, eventType string, metadata headerValues, allowedKeys []string) []attribute.KeyValue {
 	for _, allowedKey := range allowedKeys {
-		if val, ok := metadata[allowedKey]; ok {
-			keyValue := attribute.StringSlice(
-				formatHeaderAttributeKey(protocol, eventType, allowedKey),
-				val,
-			)
-			attributes = append(attributes, keyValue)
+		values := metadata.Values(allowedKey)
+		if len(values) == 0 {
+			continue
+		}
+		key := strings.ToLower(allowedKey)
+		if eventType == requestKey {
+			attributes = append(attributes, semconv.RPCRequestMetadata(key, values...))
+		} else {
+			attributes = append(attributes, semconv.RPCResponseMetadata(key, values...))
 		}
 	}
 	return attributes
-}
-
-// formatHeaderAttributeKey formats header attributes as suggested by the OpenTelemetry specification:
-// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/rpc.md#grpc-request-and-response-metadata
-func formatHeaderAttributeKey(protocol, eventType, key string) string {
-	key = strings.ReplaceAll(strings.ToLower(key), "-", "_")
-	return fmt.Sprintf("rpc.%s.%s.metadata.%s", protocol, eventType, key)
 }

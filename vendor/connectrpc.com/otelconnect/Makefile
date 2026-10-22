@@ -7,9 +7,9 @@ MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 MAKEFLAGS += --no-print-directory
 BIN := $(abspath .tmp/bin)
-BUF_VERSION := 1.56.0
+BUF_VERSION := 1.66.0
 COPYRIGHT_YEARS := 2022-2025
-GOLANGCI_VERSION := 2.4.0
+GOLANGCI_VERSION := 2.13.2
 LICENSE_IGNORE := -e /gen/
 # Set to use a different compiler. For example, `GO=go1.18rc1 make test`.
 GO ?= go
@@ -51,7 +51,7 @@ lintfix: $(BIN)/golangci-lint $(BIN)/buf ## Automatically fix some lint errors
 	$(BIN)/buf format -w .
 
 .PHONY: generate
-generate: $(BIN)/buf $(BIN)/protoc-gen-go $(BIN)/protoc-gen-connect-go $(BIN)/license-header ## Regenerate code and licenses
+generate: $(BIN)/buf $(BIN)/protoc-gen-go $(BIN)/protoc-gen-connect-go $(BIN)/protoc-gen-connect-go-v1 $(BIN)/license-header ## Regenerate code and licenses
 	rm -rf internal/gen
 	PATH=$(BIN) $(BIN)/buf generate
 	@# We want to operate on a list of modified and new files, excluding
@@ -80,7 +80,12 @@ checkgenerate:
 $(BIN)/protoc-gen-connect-go: go.mod
 	@mkdir -p $(@D)
 	@# The version of protoc-gen-connect-go is determined by the version in go.mod
-	GOBIN=$(abspath $(@D)) $(GO) install connectrpc.com/connect/cmd/protoc-gen-connect-go
+	GOBIN=$(abspath $(@D)) $(GO) install connectrpc.com/connect/v2/cmd/protoc-gen-connect-go
+
+$(BIN)/protoc-gen-connect-go-v1: go.mod
+	@mkdir -p $(@D)
+	@# The version of protoc-gen-connect-go-v1 is determined by the version in go.mod
+	$(GO) build -o $@ connectrpc.com/connect/cmd/protoc-gen-connect-go
 
 $(BIN)/buf: Makefile
 	@mkdir -p $(@D)
