@@ -25,7 +25,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 # Debug target
 # ------------
 
-FROM gcr.io/distroless/static-debian13:debug-nonroot@sha256:2a581fcbda6320d4d17fd6ff4774bb96e4825d2be9c2bca59f0777b429997f51 AS debug
+FROM gcr.io/distroless/static-debian13:debug-nonroot@sha256:c7b8faacc4439b8f5c41ca7ce4a3f8ff3e8520cb0c3444fae7292f687b00d0dd AS debug
 
 ARG SERVICE
 COPY --from=build /go/bin/${SERVICE} /${SERVICE}
@@ -35,7 +35,7 @@ COPY --from=build /go/bin/example-health /example-health
 # Runtime target
 # --------------
 
-FROM gcr.io/distroless/static-debian13:nonroot@sha256:e2e927ec666bae08560abb3c55d0659eceabb657f56b6782ab500a9fc7f555e3 AS runtime
+FROM gcr.io/distroless/static-debian13:nonroot@sha256:18f4cc26c9ffa7f20a359298be7deadac5c607c8e03a02b8119f1a5fc2f82c99 AS runtime
 
 ARG SERVICE
 COPY --from=build /go/bin/${SERVICE} /${SERVICE}
