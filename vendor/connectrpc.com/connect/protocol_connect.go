@@ -126,6 +126,9 @@ func (*connectHandler) SetTimeout(request *http.Request) (context.Context, conte
 	if err != nil {
 		return nil, nil, errorf(CodeInvalidArgument, "parse timeout: %w", err)
 	}
+	if millis < 0 {
+		return nil, nil, errorf(CodeInvalidArgument, "parse timeout: %q is negative", timeout)
+	}
 	ctx, cancel := context.WithTimeout(
 		request.Context(),
 		time.Duration(millis)*time.Millisecond,
@@ -324,12 +327,13 @@ func (c *connectClient) WriteRequestHeader(streamType StreamType, header http.He
 	header[headerContentType] = []string{
 		connectContentTypeForCodecName(streamType, c.Codec.Name()),
 	}
+	// Always set Accept-Encoding. If left unset, http.Client will set a default
+	// gzip and transparently decode the response. This applies to both unary and
+	// streaming RPCs. For streaming calls it stays "identity" as compression is
+	// applied per message.
+	header[connectUnaryHeaderAcceptCompression] = []string{compressionIdentity}
 	acceptCompressionHeader := connectUnaryHeaderAcceptCompression
 	if streamType != StreamTypeUnary {
-		// If we don't set Accept-Encoding, by default http.Client will ask the
-		// server to compress the whole stream. Since we're already compressing
-		// each message, this is a waste.
-		header[connectUnaryHeaderAcceptCompression] = []string{compressionIdentity}
 		acceptCompressionHeader = connectStreamingHeaderAcceptCompression
 		// We only write the request encoding header here for streaming calls,
 		// since the streaming envelope lets us choose whether to compress each
@@ -350,13 +354,9 @@ func (c *connectClient) NewConn(
 	header http.Header,
 ) streamingClientConn {
 	if deadline, ok := ctx.Deadline(); ok {
-		millis := int64(time.Until(deadline) / time.Millisecond)
-		if millis > 0 {
-			encoded := strconv.FormatInt(millis, 10 /* base */)
-			if len(encoded) <= 10 {
-				header[connectHeaderTimeout] = []string{encoded}
-			} // else effectively unbounded
-		}
+		if encoded := connectEncodeTimeout(time.Until(deadline)); encoded != "" {
+			header[connectHeaderTimeout] = []string{encoded}
+		} // else effectively unbounded
 	}
 	duplexCall := newDuplexHTTPCall(ctx, c.HTTPClient, c.URL, spec, header)
 	var conn streamingClientConn
@@ -536,32 +536,41 @@ func (cc *connectUnaryClientConn) validateResponse(response *http.Response) *Err
 	}
 	cc.unmarshaler.compressionPool = cc.compressionPools.Get(compression)
 	if response.StatusCode != http.StatusOK {
-		unmarshaler := connectUnaryUnmarshaler{
-			ctx:             cc.unmarshaler.ctx,
-			reader:          response.Body,
-			compressionPool: cc.unmarshaler.compressionPool,
-			bufferPool:      cc.bufferPool,
-		}
-		var wireErr connectWireError
-		if err := unmarshaler.UnmarshalFunc(&wireErr, json.Unmarshal); err != nil {
-			return NewError(
-				httpToCode(response.StatusCode),
-				errors.New(response.Status),
-			)
-		}
-		if wireErr.Code == 0 {
-			// code not set? default to one implied by HTTP status
-			wireErr.Code = httpToCode(response.StatusCode)
-		}
-		serverErr := wireErr.asError()
-		if serverErr == nil {
-			return nil
-		}
-		serverErr.meta = cc.responseHeader.Clone()
-		mergeHeaders(serverErr.meta, cc.responseTrailer)
-		return serverErr
+		return cc.unmarshalResponseError(response)
 	}
 	return nil
+}
+
+// unmarshalResponseError reads the JSON error body of a non-200 response.
+func (cc *connectUnaryClientConn) unmarshalResponseError(response *http.Response) *Error {
+	unmarshaler := connectUnaryUnmarshaler{
+		ctx:             cc.unmarshaler.ctx,
+		reader:          response.Body,
+		compressionPool: cc.unmarshaler.compressionPool,
+		bufferPool:      cc.bufferPool,
+		readMaxBytes:    cc.unmarshaler.readMaxBytes,
+	}
+	var wireErr connectWireError
+	if err := unmarshaler.UnmarshalFunc(&wireErr, json.Unmarshal); err != nil {
+		if err.Code() == CodeResourceExhausted {
+			return err // error body exceeds readMaxBytes
+		}
+		return NewError(
+			httpToCode(response.StatusCode),
+			errors.New(response.Status),
+		)
+	}
+	if wireErr.Code == 0 {
+		// code not set? default to one implied by HTTP status
+		wireErr.Code = httpToCode(response.StatusCode)
+	}
+	serverErr := wireErr.asError()
+	if serverErr == nil {
+		return nil
+	}
+	serverErr.meta = cc.responseHeader.Clone()
+	mergeHeaders(serverErr.meta, cc.responseTrailer)
+	return serverErr
 }
 
 type connectStreamingClientConn struct {
@@ -739,7 +748,14 @@ func (hc *connectUnaryHandlerConn) Close(err error) error {
 	// In unary Connect, errors always use application/json.
 	setHeaderCanonical(hc.responseWriter.Header(), headerContentType, connectUnaryContentTypeJSON)
 	hc.responseWriter.WriteHeader(connectCodeToHTTP(CodeOf(err)))
-	data, marshalErr := json.Marshal(newConnectWireError(err))
+	wireErr := newConnectWireError(err)
+	data, marshalErr := json.Marshal(wireErr)
+	if marshalErr == nil && hc.marshaler.sendMaxBytes > 0 && len(data) > hc.marshaler.sendMaxBytes {
+		// The error exceeds sendMaxBytes. Rather than drop it, send only the
+		// code and message.
+		wireErr.Details = nil
+		data, marshalErr = json.Marshal(wireErr)
+	}
 	if marshalErr != nil {
 		_ = hc.request.Body.Close()
 		return errorf(CodeInternal, "marshal error: %w", err)
@@ -859,7 +875,27 @@ func (m *connectStreamingMarshaler) MarshalEndStream(err error, trailer http.Hea
 	}
 	raw := bytes.NewBuffer(data)
 	defer m.bufferPool.Put(raw)
-	return m.Write(&envelope{
+	writeErr := m.Write(&envelope{
+		Data:  raw,
+		Flags: connectFlagEnvelopeEndStream,
+	})
+	if writeErr == nil || writeErr.Code() != CodeResourceExhausted {
+		return writeErr
+	}
+	// The end of stream exceeds sendMaxBytes. Rather than drop it, send only
+	// the error code and message, reporting the limit if there's no error.
+	if err == nil {
+		err = writeErr
+	}
+	end = &connectEndStreamMessage{Error: newConnectWireError(err)}
+	end.Error.Details = nil
+	data, marshalErr = json.Marshal(end)
+	if marshalErr != nil {
+		return errorf(CodeInternal, "marshal end stream: %w", marshalErr)
+	}
+	raw.Reset()
+	_, _ = raw.Write(data)
+	return m.write(&envelope{
 		Data:  raw,
 		Flags: connectFlagEnvelopeEndStream,
 	})
@@ -1315,6 +1351,17 @@ func connectCodeToHTTP(code Code) int {
 	default:
 		return 500 // same as CodeUnknown
 	}
+}
+
+// connectEncodeTimeout encodes timeout as a positive number of milliseconds.
+// Returns an empty string for timeouts over the protocol's ten-digit limit.
+func connectEncodeTimeout(timeout time.Duration) string {
+	millis := max(int64(timeout/time.Millisecond), 1)
+	encoded := strconv.FormatInt(millis, 10 /* base */)
+	if len(encoded) > 10 {
+		return ""
+	}
+	return encoded
 }
 
 func connectCodecForContentType(streamType StreamType, contentType string) string {
