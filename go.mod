@@ -30,7 +30,7 @@ require (
 	github.com/knadh/koanf/parsers/yaml v1.1.1
 	github.com/knadh/koanf/providers/env/v2 v2.0.2
 	github.com/knadh/koanf/providers/file v1.2.1
-	github.com/knadh/koanf/providers/k8smount v0.1.1
+	github.com/knadh/koanf/providers/k8smount v0.1.2
 	github.com/knadh/koanf/v2 v2.3.8
 	github.com/stretchr/testify v1.12.1
 	go.opentelemetry.io/contrib/bridges/otelslog v0.20.0
