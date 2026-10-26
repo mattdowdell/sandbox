@@ -41,8 +41,8 @@ cel.dev/cel-go/parser/gen
 # cel.dev/expr v0.25.3
 ## explicit; go 1.23.0
 cel.dev/expr
-# connectrpc.com/connect v1.21.0
-## explicit; go 1.25.0
+# connectrpc.com/connect v1.21.1
+## explicit; go 1.26.0
 connectrpc.com/connect
 connectrpc.com/connect/internal/gen/connectext/grpc/status/v1
 # connectrpc.com/connect/v2 v2.0.0
