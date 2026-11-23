@@ -88,7 +88,7 @@ services:
         condition: service_healthy
 
   postgres:
-    image: "mirror.gcr.io/postgres:18"
+    image: "mirror.gcr.io/postgres:19"
     pull_policy: "always"
     environment:
       POSTGRES_USER: "postgres"
