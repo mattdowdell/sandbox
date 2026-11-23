@@ -168,7 +168,7 @@ func (bldr *builder) processMessageExpressions(
 		return
 	}
 
-	msgEval.Append(celPrograms{programSet: compiledExprs})
+	msgEval.Append(&celPrograms{programSet: compiledExprs})
 }
 
 func (bldr *builder) processMessageOneofRules(
@@ -223,7 +223,7 @@ func (bldr *builder) processOneofRules(
 	for i := range oneofs.Len() {
 		oneofDesc := oneofs.Get(i)
 		oneofRules, _ := ResolveOneofRules(oneofDesc)
-		oneofEval := oneof{
+		oneofEval := &oneof{
 			Descriptor: oneofDesc,
 			Required:   oneofRules.GetRequired(),
 		}
@@ -254,12 +254,12 @@ func (bldr *builder) buildField(
 	fieldRules *validate.FieldRules,
 	msgRules *validate.MessageRules,
 	cache messageCache,
-) (field, error) {
+) (*field, error) {
 	if fieldRules != nil && !fieldRules.HasIgnore() && isPartOfMessageOneof(msgRules, fieldDescriptor) {
 		fieldRules = proto.CloneOf(fieldRules)
 		fieldRules.SetIgnore(validate.Ignore_IGNORE_IF_ZERO_VALUE)
 	}
-	fld := field{
+	fld := &field{
 		Value: value{
 			Descriptor: fieldDescriptor,
 		},
@@ -293,7 +293,6 @@ func (bldr *builder) buildValue(
 		bldr.processWrapperRules,
 		bldr.processStandardRules,
 		bldr.processAnyRules,
-		bldr.processEnumRules,
 		bldr.processMapRules,
 		bldr.processRepeatedRules,
 	}
@@ -376,7 +375,7 @@ func (bldr *builder) processFieldExpressions(
 	if len(compiledExpressions.programs) > 0 {
 		compiledExpressions.env = cmp.Or(compiledExpressions.env, celRuleCompiledExpressions.env, bldr.env)
 		eval.Rules = append(eval.Rules,
-			celPrograms{
+			&celPrograms{
 				base:       newBase(eval),
 				programSet: compiledExpressions,
 			},
@@ -445,7 +444,11 @@ func (bldr *builder) processWrapperRules(
 		Descriptor: valEval.Descriptor,
 		NestedRule: valEval.NestedRule,
 	}
-	err := bldr.buildValue(fdesc.Message().Fields().ByName("value"), rules, &unwrapped, cache)
+	// Only the type rules apply to the inner value; the outer pipeline already
+	// handled the rest (cel, cel_expression, ...), which would otherwise run twice.
+	innerRules := &validate.FieldRules{}
+	innerRules.ProtoReflect().Set(setOneof, refRules.Get(setOneof))
+	err := bldr.buildValue(fdesc.Message().Fields().ByName("value"), innerRules, &unwrapped, cache)
 	if err != nil {
 		return err
 	}
@@ -461,47 +464,68 @@ func (bldr *builder) processStandardRules(
 ) error {
 	// If this is a wrapper field, just return. Wrapper fields are handled by
 	// processWrapperRules and their wrapped values are passed through the process gauntlet.
-	if isMessageField(fdesc) {
+	// A list of wrappers still needs its list-level rules (min_items, unique).
+	if isMessageField(fdesc) && (!fdesc.IsList() || valEval.NestedRule != nil) {
 		if _, ok := expectedWrapperRules(fdesc.Message().FullName()); ok {
 			return nil
 		}
 	}
 
-	// make a copy of the rules because we're going to clear anything handled by native rules, leaving
-	// anything else to be handled by CEL rules. this allows us to fall back to CEL rules if there is no
-	// native rule (for example, when a new rule is added to the validate proto, but the native code hasn't
-	// been updated. we are making a copy because we don't want to modify the original rules in case they are
-	// reused (happens in some test cases, could happen in production code with dynamic messages).
-	rules = proto.CloneOf[*validate.FieldRules](rules)
+	// Enums are an interesting case, because checking defined_only requires its own evaluator outside of CEL
+	// (the names are stripped when they reach CEL). For consistency, we want to always process rules in the
+	// same order, whether it's CEL or Native (and across all languages). For enums, that order is const,
+	// defined_only, in, not_in. If we are running with native rules disabled, or the native enum builder can't
+	// handle the rules, and there's an enum rule, we need to check if there's a defined_only rule. If there is and there is an enum const rule as well, then
+	// we need to add an evaluator for the const rule, make a copy of the rules without const rule, then add
+	// the defined only rule. This leads to an extra call to proto.CloneOf in this case, but really, it's
+	// pretty rare.
+	allRules := rules
+	enumRules := rules.GetEnum()
+	if fdesc.Kind() == protoreflect.EnumKind && enumRules.GetDefinedOnly() &&
+		(bldr.disableNativeRules || !canBuildNativeEnumRules(enumRules)) {
+		if enumRules.HasConst() {
+			constRules := validate.FieldRules_builder{
+				Enum: validate.EnumRules_builder{Const: new(enumRules.GetConst())}.Build(),
+			}.Build()
+			if err := bldr.appendStandardRules(fdesc, constRules, allRules, valEval); err != nil {
+				return err
+			}
+			// make a copy of the rules without const so const isn't evaluated twice
+			rules = proto.CloneOf(rules)
+			rules.GetEnum().ClearConst()
+		}
+		valEval.Append(&definedEnum{
+			base:             newBase(valEval),
+			ValueDescriptors: fdesc.Enum().Values(),
+		})
+	}
+	return bldr.appendStandardRules(fdesc, rules, allRules, valEval)
+}
 
-	// put behind a feature flag to allow for testing.
-	// it's easier to follow like this, don't break it up
-	//nolint:nestif
+func (bldr *builder) appendStandardRules(
+	fdesc protoreflect.FieldDescriptor,
+	rules *validate.FieldRules,
+	allRules *validate.FieldRules,
+	valEval *value,
+) error {
+	// Native builders clear the rules they handle so CEL skips them. They get
+	// a copy, because a builder can bail out after clearing some rules.
+	// Without a native evaluator, CEL compiles every rule. cache.Build doesn't
+	// modify rules, so it can be the field's shared options.
+	celRules := rules
 	if !bldr.disableNativeRules {
-		// Try native Go evaluators for repeated list-level rules (min_items, max_items, unique).
-		if fdesc.IsList() && valEval.NestedRule == nil {
-			if native := tryNativeRepeatedRules(newBase(valEval), rules.GetRepeated()); native != nil {
-				valEval.Append(native)
-			}
-		}
-		// Try native Go evaluators for map-level rules (min_pairs, max_pairs).
-		if fdesc.IsMap() && valEval.NestedRule == nil {
-			if native := tryNativeMapRules(newBase(valEval), rules.GetMap()); native != nil {
-				valEval.Append(native)
-			}
-		}
-		// Try native Go evaluators for known simple rules before falling back to CEL.
-		if !fdesc.IsMap() && !fdesc.IsList() {
-			if native := bldr.tryNativeRules(fdesc, rules, valEval); native != nil {
-				valEval.Append(native)
-			}
+		nativeRules := proto.CloneOf(rules)
+		if native := bldr.tryNativeStandardRules(fdesc, nativeRules, valEval); native != nil {
+			valEval.Append(native)
+			celRules = nativeRules
 		}
 	}
 
 	stdRules, err := bldr.rules.Build(
 		bldr.env,
 		fdesc,
-		rules,
+		celRules,
+		allRules,
 		bldr.extensionTypeResolver,
 		bldr.allowUnknownFields,
 		valEval.NestedRule != nil,
@@ -509,11 +533,31 @@ func (bldr *builder) processStandardRules(
 	if err != nil {
 		return err
 	}
-	valEval.Append(celPrograms{
+	valEval.Append(&celPrograms{
 		base:       newBase(valEval),
 		programSet: stdRules,
 	})
 	return nil
+}
+
+func (bldr *builder) tryNativeStandardRules(
+	fdesc protoreflect.FieldDescriptor,
+	rules *validate.FieldRules,
+	valEval *value,
+) evaluator {
+	switch {
+	case fdesc.IsList() && valEval.NestedRule == nil:
+		// List-level rules (min_items, max_items, unique).
+		return tryNativeRepeatedRules(newBase(valEval), rules.GetRepeated())
+	case fdesc.IsMap():
+		// Map-level rules (min_pairs, max_pairs).
+		return tryNativeMapRules(newBase(valEval), rules.GetMap())
+	default:
+		// Scalar rules for plain fields, map keys/values, and repeated
+		// items. A non-nil NestedRule means we're compiling rules for an
+		// individual item, not the list itself.
+		return bldr.tryNativeRules(fdesc, rules, valEval)
+	}
 }
 
 func (bldr *builder) tryNativeRules(
@@ -556,7 +600,7 @@ func (bldr *builder) tryNativeRules(
 	case protoreflect.BoolKind:
 		native = tryBuildNativeBoolRules(base, rules.GetBool())
 	case protoreflect.EnumKind:
-		native = tryBuildNativeEnumRules(base, rules.GetEnum())
+		native = tryBuildNativeEnumRules(base, rules.GetEnum(), fdesc.Enum().Values())
 	case protoreflect.BytesKind:
 		native = tryBuildNativeBytesRules(base, rules.GetBytes())
 	default:
@@ -565,15 +609,10 @@ func (bldr *builder) tryNativeRules(
 	if native == nil {
 		return nil
 	}
-	// processWrapperRules swaps in the inner "value" field as fdesc when
-	// building rules for a wrapper WKT (Int32Value, StringValue, ...), but
-	// leaves valEval.Descriptor pointing at the outer wrapper message field.
-	// Detect that here and wrap the native eval so it unwraps the wrapper
-	// message at runtime before calling val.Int()/Bytes()/etc.
-	if valEval.Descriptor != nil &&
-		(valEval.Descriptor.Kind() == protoreflect.MessageKind ||
-			valEval.Descriptor.Kind() == protoreflect.GroupKind) {
-		native = wrappedValueEval{
+	// For wrapper WKTs, fdesc is the inner "value" field but the runtime value is
+	// the wrapper message. valEval.Descriptor is nil for list items/map values.
+	if _, isWrapper := expectedWrapperRules(fdesc.ContainingMessage().FullName()); isWrapper {
+		native = &wrappedValueEval{
 			innerField: fdesc,
 			inner:      native,
 		}
@@ -597,7 +636,7 @@ func (bldr *builder) processAnyRules(
 	anyPbDesc := (&validate.AnyRules{}).ProtoReflect().Descriptor()
 	inField := anyPbDesc.Fields().ByName("in")
 	notInField := anyPbDesc.Fields().ByName("not_in")
-	anyEval := anyPB{
+	anyEval := &anyPB{
 		base:              newBase(valEval),
 		TypeURLDescriptor: typeURLDesc,
 		In:                stringsToSet(fieldRules.GetAny().GetIn()),
@@ -606,24 +645,6 @@ func (bldr *builder) processAnyRules(
 		NotInValue:        fieldRules.GetAny().ProtoReflect().Get(notInField),
 	}
 	valEval.Append(anyEval)
-	return nil
-}
-
-func (bldr *builder) processEnumRules(
-	fdesc protoreflect.FieldDescriptor,
-	fieldRules *validate.FieldRules,
-	valEval *value,
-	_ messageCache,
-) error {
-	if fdesc.Kind() != protoreflect.EnumKind {
-		return nil
-	}
-	if fieldRules.GetEnum().GetDefinedOnly() {
-		valEval.Append(definedEnum{
-			base:             newBase(valEval),
-			ValueDescriptors: fdesc.Enum().Values(),
-		})
-	}
 	return nil
 }
 

@@ -86,7 +86,7 @@ func tryNativeRepeatedRules(base base, rules *validate.RepeatedRules) evaluator 
 		return nil
 	}
 
-	return nativeRepeatedEval{
+	return &nativeRepeatedEval{
 		base:     base,
 		minItems: minItems,
 		maxItems: maxItems,
@@ -107,24 +107,21 @@ func uniqueCheckerForKind(desc protoreflect.FieldDescriptor) uniqueChecker {
 		return nil
 	}
 	switch desc.Kind() {
-	case protoreflect.Int32Kind, protoreflect.Sint32Kind, protoreflect.Sfixed32Kind:
-		return isUniqueList[int32]
-	case protoreflect.Int64Kind, protoreflect.Sint64Kind, protoreflect.Sfixed64Kind:
-		return isUniqueList[int64]
-	case protoreflect.Uint32Kind, protoreflect.Fixed32Kind:
-		return isUniqueList[uint32]
-	case protoreflect.Uint64Kind, protoreflect.Fixed64Kind:
-		return isUniqueList[uint64]
-	case protoreflect.FloatKind:
-		return isUniqueList[float32]
-	case protoreflect.DoubleKind:
-		return isUniqueList[float64]
+	// Widening the 32-bit kinds is one-to-one, so uniqueness is unchanged.
+	case protoreflect.Int32Kind, protoreflect.Sint32Kind, protoreflect.Sfixed32Kind,
+		protoreflect.Int64Kind, protoreflect.Sint64Kind, protoreflect.Sfixed64Kind:
+		return isUniqueInts
+	case protoreflect.Uint32Kind, protoreflect.Fixed32Kind,
+		protoreflect.Uint64Kind, protoreflect.Fixed64Kind:
+		return isUniqueUints
+	case protoreflect.FloatKind, protoreflect.DoubleKind:
+		return isUniqueFloats
 	case protoreflect.StringKind:
-		return isUniqueList[string]
+		return isUniqueStrings
 	case protoreflect.BoolKind:
-		return isUniqueList[bool]
+		return isUniqueBools
 	case protoreflect.EnumKind:
-		return isUniqueList[protoreflect.EnumNumber]
+		return isUniqueEnums
 	case protoreflect.BytesKind:
 		return isUniqueBytes
 	case protoreflect.MessageKind, protoreflect.GroupKind:
@@ -134,7 +131,34 @@ func uniqueCheckerForKind(desc protoreflect.FieldDescriptor) uniqueChecker {
 	}
 }
 
-var _ evaluator = nativeRepeatedEval{}
+// The checkers below read elements with typed getters, which avoids boxing
+// every element into an interface.
+
+func isUniqueInts(list protoreflect.List) bool {
+	return isUniqueList(list, protoreflect.Value.Int)
+}
+
+func isUniqueUints(list protoreflect.List) bool {
+	return isUniqueList(list, protoreflect.Value.Uint)
+}
+
+func isUniqueFloats(list protoreflect.List) bool {
+	return isUniqueList(list, protoreflect.Value.Float)
+}
+
+func isUniqueStrings(list protoreflect.List) bool {
+	return isUniqueList(list, protoreflect.Value.String)
+}
+
+func isUniqueBools(list protoreflect.List) bool {
+	return isUniqueList(list, protoreflect.Value.Bool)
+}
+
+func isUniqueEnums(list protoreflect.List) bool {
+	return isUniqueList(list, protoreflect.Value.Enum)
+}
+
+var _ evaluator = (*nativeRepeatedEval)(nil)
 
 // nativeRepeatedEval is a native Go evaluator for repeated list-level rules
 // (min_items, max_items, unique). Item-level rules are handled separately
@@ -148,7 +172,7 @@ type nativeRepeatedEval struct {
 	uniqueFn uniqueChecker
 }
 
-func (n nativeRepeatedEval) Evaluate(_ protoreflect.Message, val protoreflect.Value, cfg *validationConfig) error {
+func (n *nativeRepeatedEval) Evaluate(_ protoreflect.Message, val protoreflect.Value, cfg *validationConfig) error {
 	list := val.List()
 	size := uint64(list.Len()) //nolint:gosec // len can't be < 0 and is always within uint64 range
 	var violations []*Violation
@@ -198,20 +222,17 @@ func (n nativeRepeatedEval) Evaluate(_ protoreflect.Message, val protoreflect.Va
 const uniqueLinearThreshold = 16
 
 // isUniqueList is the generic uniqueness check used for all comparable scalar
-// element kinds (the concrete T is bound at compile time via
+// element kinds (the concrete T and get are bound at compile time via
 // uniqueCheckerForKind).
-func isUniqueList[T comparable](list protoreflect.List) bool {
+func isUniqueList[T comparable](list protoreflect.List, get func(protoreflect.Value) T) bool {
 	length := list.Len()
 	if length <= 1 {
 		return true
 	}
 	if length <= uniqueLinearThreshold {
-		var seen = make([]T, length)
+		var seen [uniqueLinearThreshold]T
 		for i := range length {
-			key, ok := list.Get(i).Interface().(T)
-			if !ok {
-				return false
-			}
+			key := get(list.Get(i))
 			for j := range i {
 				if seen[j] == key {
 					return false
@@ -224,11 +245,7 @@ func isUniqueList[T comparable](list protoreflect.List) bool {
 
 	seen := make(map[T]struct{}, length)
 	for i := range length {
-		key, ok := list.Get(i).Interface().(T)
-		if !ok {
-			// should never happen, but just in case
-			return false
-		}
+		key := get(list.Get(i))
 		if _, exists := seen[key]; exists {
 			return false
 		}
@@ -245,7 +262,7 @@ func isUniqueBytes(list protoreflect.List) bool {
 	if length <= uniqueLinearThreshold {
 		// storing []byte directly avoids the []byte→string allocation the
 		// map path needs for a hashable key.
-		var seen = make([][]byte, uniqueLinearThreshold)
+		var seen [uniqueLinearThreshold][]byte
 		for i := range length {
 			byteVal := list.Get(i).Bytes()
 			for j := range i {
@@ -272,6 +289,6 @@ func isUniqueBytes(list protoreflect.List) bool {
 	return true
 }
 
-func (n nativeRepeatedEval) Tautology() bool {
+func (n *nativeRepeatedEval) Tautology() bool {
 	return false
 }

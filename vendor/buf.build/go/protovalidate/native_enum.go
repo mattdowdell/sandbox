@@ -15,6 +15,7 @@
 package protovalidate
 
 import (
+	"errors"
 	"fmt"
 	"slices"
 
@@ -30,13 +31,10 @@ var (
 )
 
 // tryBuildNativeEnumRules attempts to build a native Go evaluator for
-// enum const/in/not_in rules. Returns nil if the rules can't be handled
-// natively. Note: defined_only is handled separately in enum.go.
-func tryBuildNativeEnumRules(base base, rules *validate.EnumRules) evaluator {
-	if rules == nil {
-		return nil
-	}
-	if len(rules.ProtoReflect().GetUnknown()) > 0 {
+// enum const/defined_only/in/not_in rules. Returns nil if the rules can't be
+// handled natively.
+func tryBuildNativeEnumRules(base base, rules *validate.EnumRules, values protoreflect.EnumValueDescriptors) evaluator {
+	if rules == nil || !canBuildNativeEnumRules(rules) {
 		return nil
 	}
 
@@ -46,6 +44,13 @@ func tryBuildNativeEnumRules(base base, rules *validate.EnumRules) evaluator {
 	if rules.HasConst() {
 		constVal = new(rules.GetConst())
 		rules.ProtoReflect().Clear(enumConstSite.desc)
+		hasRule = true
+	}
+
+	var definedOnly *definedEnum
+	if rules.GetDefinedOnly() {
+		definedOnly = &definedEnum{base: base, ValueDescriptors: values}
+		rules.ProtoReflect().Clear(enumDefinedOnlyRuleDescriptor)
 		hasRule = true
 	}
 
@@ -65,30 +70,39 @@ func tryBuildNativeEnumRules(base base, rules *validate.EnumRules) evaluator {
 		return nil
 	}
 
-	return nativeEnumEval{
-		base:      base,
-		constVal:  constVal,
-		inVals:    inVals,
-		notInVals: notInVals,
+	return &nativeEnumEval{
+		base:        base,
+		constVal:    constVal,
+		definedOnly: definedOnly,
+		inVals:      inVals,
+		notInVals:   notInVals,
 	}
 }
 
-var _ evaluator = nativeEnumEval{}
-
-// nativeEnumEval is a native Go evaluator for enum const/in/not_in rules.
-type nativeEnumEval struct {
-	base
-	constVal  *int32
-	inVals    []int32
-	notInVals []int32
+// canBuildNativeEnumRules reports whether tryBuildNativeEnumRules can handle
+// rules. Unknown fields are custom predefined rules, which CEL must evaluate
+// against the complete rules message.
+func canBuildNativeEnumRules(rules *validate.EnumRules) bool {
+	return len(rules.ProtoReflect().GetUnknown()) == 0
 }
 
-type enumProcessor func(n nativeEnumEval, val protoreflect.Value, enumVal int32) *Violation
+var _ evaluator = (*nativeEnumEval)(nil)
+
+// nativeEnumEval is a native Go evaluator for enum const/defined_only/in/not_in rules.
+type nativeEnumEval struct {
+	base
+	constVal    *int32
+	definedOnly *definedEnum
+	inVals      []int32
+	notInVals   []int32
+}
+
+type enumProcessor func(n *nativeEnumEval, val protoreflect.Value, enumVal int32) *Violation
 
 //nolint:gochecknoglobals // slice of all the processors that are used, value never modified, effectively immutable
 var enumProcessors = []enumProcessor{
 	// const
-	func(n nativeEnumEval, val protoreflect.Value, enumVal int32) *Violation {
+	func(n *nativeEnumEval, val protoreflect.Value, enumVal int32) *Violation {
 		if n.constVal != nil && enumVal != *n.constVal {
 			return n.newViolation(enumConstSite,
 				"enum.const", fmt.Sprintf("must equal %d", *n.constVal),
@@ -96,8 +110,18 @@ var enumProcessors = []enumProcessor{
 		}
 		return nil
 	},
+	// defined_only
+	func(n *nativeEnumEval, val protoreflect.Value, _ int32) *Violation {
+		if n.definedOnly == nil {
+			return nil
+		}
+		if valErr, ok := errors.AsType[*ValidationError](n.definedOnly.Evaluate(nil, val, nil)); ok {
+			return valErr.Violations[0]
+		}
+		return nil
+	},
 	// in
-	func(n nativeEnumEval, val protoreflect.Value, enumVal int32) *Violation {
+	func(n *nativeEnumEval, val protoreflect.Value, enumVal int32) *Violation {
 		if len(n.inVals) > 0 && !slices.Contains(n.inVals, enumVal) {
 			return n.newViolation(enumInSite,
 				"enum.in", "must be in list "+formatList(n.inVals),
@@ -106,7 +130,7 @@ var enumProcessors = []enumProcessor{
 		return nil
 	},
 	// not_in
-	func(n nativeEnumEval, val protoreflect.Value, enumVal int32) *Violation {
+	func(n *nativeEnumEval, val protoreflect.Value, enumVal int32) *Violation {
 		if len(n.notInVals) > 0 && slices.Contains(n.notInVals, enumVal) {
 			return n.newViolation(enumNotInSite,
 				"enum.not_in", "must not be in list "+formatList(n.notInVals),
@@ -116,7 +140,7 @@ var enumProcessors = []enumProcessor{
 	},
 }
 
-func (n nativeEnumEval) Evaluate(_ protoreflect.Message, val protoreflect.Value, cfg *validationConfig) error {
+func (n *nativeEnumEval) Evaluate(_ protoreflect.Message, val protoreflect.Value, cfg *validationConfig) error {
 	enumVal := int32(val.Enum())
 
 	var violations []*Violation
@@ -139,6 +163,6 @@ func (n nativeEnumEval) Evaluate(_ protoreflect.Message, val protoreflect.Value,
 	return nil
 }
 
-func (n nativeEnumEval) Tautology() bool {
+func (n *nativeEnumEval) Tautology() bool {
 	return false
 }

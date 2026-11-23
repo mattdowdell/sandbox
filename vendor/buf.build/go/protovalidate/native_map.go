@@ -67,14 +67,14 @@ func tryNativeMapRules(base base, rules *validate.MapRules) evaluator {
 		return nil
 	}
 
-	return nativeMapEval{
+	return &nativeMapEval{
 		base:     base,
 		minPairs: minPairs,
 		maxPairs: maxPairs,
 	}
 }
 
-var _ evaluator = nativeMapEval{}
+var _ evaluator = (*nativeMapEval)(nil)
 
 // nativeMapEval is a native Go evaluator for map-level rules
 // (min_pairs, max_pairs). Key/value rules are handled separately
@@ -85,30 +85,38 @@ type nativeMapEval struct {
 	maxPairs uint64
 }
 
-func (n nativeMapEval) Evaluate(_ protoreflect.Message, val protoreflect.Value, _ *validationConfig) error {
+func (n *nativeMapEval) Evaluate(_ protoreflect.Message, val protoreflect.Value, cfg *validationConfig) error {
 	size := uint64(val.Map().Len()) //nolint:gosec // int will never be negative or out of uint64 range
+	var violations []*Violation
 
 	// min_pairs
 	if size < n.minPairs {
-		return &ValidationError{Violations: []*Violation{n.newViolation(mapMinPairsSite,
+		violations = append(violations, n.newViolation(mapMinPairsSite,
 			"map.min_pairs",
 			fmt.Sprintf("map must be at least %d entries", n.minPairs),
-			val, protoreflect.ValueOfUint64(n.minPairs)),
-		}}
+			val, protoreflect.ValueOfUint64(n.minPairs)))
+		if cfg.failFast {
+			return &ValidationError{Violations: violations}
+		}
 	}
 
 	// max_pairs
 	if size > n.maxPairs {
-		return &ValidationError{Violations: []*Violation{n.newViolation(mapMaxPairsSite,
+		violations = append(violations, n.newViolation(mapMaxPairsSite,
 			"map.max_pairs",
 			fmt.Sprintf("map must be at most %d entries", n.maxPairs),
-			val, protoreflect.ValueOfUint64(n.maxPairs)),
-		}}
+			val, protoreflect.ValueOfUint64(n.maxPairs)))
+		if cfg.failFast {
+			return &ValidationError{Violations: violations}
+		}
 	}
 
+	if len(violations) > 0 {
+		return &ValidationError{Violations: violations}
+	}
 	return nil
 }
 
-func (n nativeMapEval) Tautology() bool {
+func (n *nativeMapEval) Tautology() bool {
 	return n.minPairs == 0 && n.maxPairs == math.MaxUint64
 }
