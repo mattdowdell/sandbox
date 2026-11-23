@@ -15,7 +15,9 @@
 package protovalidate
 
 import (
+	"cmp"
 	"fmt"
+	"slices"
 
 	"buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	pvcel "buf.build/go/protovalidate/cel"
@@ -39,11 +41,13 @@ func newCache() cache {
 
 // Build creates the standard rules for the given field. If forItems is
 // true, the rules for repeated list items are built instead of the
-// rules on the list itself.
+// rules on the list itself. Only fieldRules are compiled, but expressions see
+// allRules as `rules`, so they can read siblings that native rules handled.
 func (c *cache) Build(
 	env *cel.Env,
 	fieldDesc protoreflect.FieldDescriptor,
 	fieldRules *validate.FieldRules,
+	allRules *validate.FieldRules,
 	extensionTypeResolver protoregistry.ExtensionTypeResolver,
 	allowUnknownFields bool,
 	forItems bool,
@@ -58,7 +62,7 @@ func (c *cache) Build(
 		return set, err
 	}
 
-	if err = reparseUnrecognized(extensionTypeResolver, rules); err != nil {
+	if rules, err = reparsedRules(rules, extensionTypeResolver); err != nil {
 		return set, &CompilationError{cause: fmt.Errorf("error reparsing message: %w", err)}
 	}
 	if !allowUnknownFields && len(rules.GetUnknown()) > 0 {
@@ -69,9 +73,16 @@ func (c *cache) Build(
 	if err != nil {
 		return set, err
 	}
+	boundRules := rules
+	if allRules != fieldRules {
+		if boundRules, err = boundRulesMessage(allRules, setOneof, extensionTypeResolver); err != nil {
+			return set, &CompilationError{cause: fmt.Errorf("error reparsing message: %w", err)}
+		}
+	}
 
 	var asts astSet
-	rules.Range(func(desc protoreflect.FieldDescriptor, rule protoreflect.Value) bool {
+	for _, ruleField := range sortedRuleFields(rules) {
+		desc, rule := ruleField.desc, ruleField.value
 		// Try compiling without the rule variable first. Extending a cel
 		// environment is expensive.
 		precomputedASTs, compileErr := c.loadOrCompileStandardRule(set.env, setOneof, desc)
@@ -80,28 +91,82 @@ func (c *cache) Build(
 				cel.Variable("rule", pvcel.ProtoFieldToType(desc, true, false)),
 			)
 			if compileErr != nil {
-				err = compileErr
-				return false
+				return set, compileErr
 			}
 			precomputedASTs, compileErr = c.loadOrCompileStandardRule(fieldEnv, setOneof, desc)
 			if compileErr != nil {
-				err = compileErr
-				return false
+				return set, compileErr
 			}
 		}
-		precomputedASTs, compileErr = precomputedASTs.WithRuleValues(rules, rule, desc)
+		precomputedASTs, compileErr = precomputedASTs.WithRuleValues(boundRules, rule, desc)
 		if compileErr != nil {
-			err = compileErr
-			return false
+			return set, compileErr
 		}
 		asts = asts.Merge(precomputedASTs)
-		return true
-	})
-	if err != nil {
-		return set, err
 	}
 
-	return asts.ReduceResiduals(rules)
+	return asts.ReduceResiduals(boundRules)
+}
+
+func boundRulesMessage(
+	allRules *validate.FieldRules,
+	setOneof protoreflect.FieldDescriptor,
+	extensionTypeResolver protoregistry.ExtensionTypeResolver,
+) (protoreflect.Message, error) {
+	return reparsedRules(allRules.ProtoReflect().Get(setOneof).Message(), extensionTypeResolver)
+}
+
+// Rules may be the field's shared options, so unknown extensions are reparsed
+// into a copy. Without unknown fields, rules is returned unchanged.
+func reparsedRules(
+	rules protoreflect.Message,
+	extensionTypeResolver protoregistry.ExtensionTypeResolver,
+) (protoreflect.Message, error) {
+	if len(rules.GetUnknown()) == 0 {
+		return rules, nil
+	}
+	rules = proto.Clone(rules.Interface()).ProtoReflect()
+	return rules, reparseUnrecognized(extensionTypeResolver, rules)
+}
+
+type ruleField struct {
+	desc  protoreflect.FieldDescriptor
+	value protoreflect.Value
+}
+
+// Range order is undefined (random for dynamicpb), so violations follow
+// validate.proto declaration order, then extensions by field number.
+func sortedRuleFields(rules protoreflect.Message) []ruleField {
+	var fields []ruleField
+	rules.Range(func(desc protoreflect.FieldDescriptor, value protoreflect.Value) bool {
+		fields = append(fields, ruleField{desc: desc, value: value})
+		return true
+	})
+	slices.SortFunc(fields, func(left, right ruleField) int {
+		return cmp.Or(
+			compareBool(left.desc.IsExtension(), right.desc.IsExtension()),
+			cmp.Compare(ruleFieldOrder(left.desc), ruleFieldOrder(right.desc)),
+		)
+	})
+	return fields
+}
+
+func ruleFieldOrder(desc protoreflect.FieldDescriptor) int {
+	if desc.IsExtension() {
+		return int(desc.Number())
+	}
+	return desc.Index()
+}
+
+func compareBool(left, right bool) int {
+	switch {
+	case left == right:
+		return 0
+	case left:
+		return 1
+	default:
+		return -1
+	}
 }
 
 // resolveRules extracts the standard rules for the specified field. An
